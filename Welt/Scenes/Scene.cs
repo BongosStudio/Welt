@@ -1,0 +1,87 @@
+﻿#region Copyright
+// COPYRIGHT 2015 JUSTIN COX (CONJI)
+#endregion
+using System;
+using Microsoft.Xna.Framework;
+using Welt.Controllers;
+using Welt.Managers;
+
+namespace Welt.Scenes
+{
+    public abstract class Scene : DrawableGameComponent
+    {
+        public float Opacity { get; set; }
+        public bool IsEnabled;
+        public static TaskManager TaskManager { get; } = new TaskManager();
+        public static SceneController Controller;
+
+        protected static bool IsDrawing;
+        protected static bool IsPaused;
+        protected virtual Color BackColor { get; } = Color.CornflowerBlue;
+
+        protected Scene(Game game) : base(game)
+        {
+            IsEnabled = true;
+            Opacity = 1;
+        }
+
+        public virtual void OnExiting(object sender, EventArgs args)
+        {
+            
+        }
+
+        public override void Update(GameTime time)
+        {
+            
+            SceneUpdate?.Invoke(this, EventArgs.Empty);
+            TaskManager.Update();
+        }
+
+        public new virtual void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(BackColor);
+            base.Draw(gameTime);
+        }
+
+        public void Schedule(Action action)
+        {
+            TaskManager.Queue(o => action.Invoke());
+        }
+
+        public void Schedule(Action<object> action)
+        {
+            TaskManager.Queue(action);
+        }
+
+        public void Schedule(Action action, TimeSpan when)
+        {
+            TaskManager.Queue(o => action.Invoke(), when);
+        }
+
+        public void Schedule(Action<object> action, TimeSpan when)
+        {
+            TaskManager.Queue(action, when);
+        }
+
+        public void Schedule(Action action, double ticks)
+        {
+            TaskManager.Queue(o => action.Invoke(), ticks);
+        }
+
+        public void Schedule(Action<object> action, double ticks)
+        {
+            TaskManager.Queue(action, ticks);
+        }
+
+        #region Events
+        
+        public event EventHandler SceneUpdate;
+
+        #endregion
+
+        ~Scene()
+        {
+            Dispose();
+        }
+    }
+}
