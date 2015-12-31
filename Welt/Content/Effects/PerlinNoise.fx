@@ -1,4 +1,3 @@
-//------- Constants --------
 float4x4 xView;
 float4x4 xReflectionView;
 float4x4 xProjection;
@@ -15,12 +14,18 @@ float3 xWindDirection;
 
 float xOvercast;
 
-//------- Texture Samplers --------
 Texture xTexture;
 
-sampler TextureSampler = sampler_state { texture = <xTexture> ; magfilter = LINEAR; minfilter = LINEAR; mipfilter=LINEAR; AddressU = mirror; AddressV = mirror;};Texture xTexture0;
+sampler TextureSampler = sampler_state { 
+	texture = <xTexture> ; 
+	magfilter = LINEAR; 
+	minfilter = LINEAR; 
+	mipfilter=LINEAR; 
+	AddressU = mirror; 
+	AddressV = mirror;
+};
+Texture xTexture0;
 
-//------- Technique: PerlinNoise --------
  struct PNVertexToPixel
  {    
      float4 Position         : POSITION;

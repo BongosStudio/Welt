@@ -23,61 +23,61 @@ namespace Welt.Forge.Renderers
     {
         public ThreadedWorldRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, World world)
         {
-            _graphicsDevice = graphicsDevice;
-            _camera = camera;
-            _world = world;
+            m_graphicsDevice = graphicsDevice;
+            m_camera = camera;
+            m_world = world;
         }
 
         public void Stop()
         {
-            _running = false;
+            m_running = false;
         }
 
         #region Initialize
 
         public void Initialize()
         {
-            _vertexBuildChunkProcessor = new VertexBuildChunkProcessor(_graphicsDevice);
-            _lightingChunkProcessor = new LightingChunkProcessor();
+            m_vertexBuildChunkProcessor = new VertexBuildChunkProcessor(m_graphicsDevice);
+            m_lightingChunkProcessor = new LightingChunkProcessor();
 
             Debug.WriteLine("Generate initial chunks");
-            _world.VisitChunks(DoInitialGenerate, GENERATE_RANGE);
+            m_world.VisitChunks(DoInitialGenerate, GENERATE_RANGE);
             Debug.WriteLine("Light initial chunks");
-            _world.VisitChunks(DoLighting, LIGHT_RANGE);
+            m_world.VisitChunks(DoLighting, LIGHT_RANGE);
             Debug.WriteLine("Build initial chunks");
-            _world.VisitChunks(DoBuild, BUILD_RANGE);
+            m_world.VisitChunks(DoBuild, BUILD_RANGE);
 
             #region debugFont Rectangle
 
-            debugRectTexture = new Texture2D(_graphicsDevice, 1, 1);
+            m_debugRectTexture = new Texture2D(m_graphicsDevice, 1, 1);
             var texcol = new Color[1];
-            debugRectTexture.GetData(texcol);
+            m_debugRectTexture.GetData(texcol);
             texcol[0] = Color.Black;
-            debugRectTexture.SetData(texcol);
+            m_debugRectTexture.SetData(texcol);
 
-            genQVector2 = new Vector2(580, 0);
-            lightQVector2 = new Vector2(580, 16);
-            buildQVector2 = new Vector2(580, 32);
-            memVector2 = new Vector2(580, 48);
-            backgroundRectangle = new Rectangle(580, 0, 100, 144);
+            m_genQVector2 = new Vector2(580, 0);
+            m_lightQVector2 = new Vector2(580, 16);
+            m_buildQVector2 = new Vector2(580, 32);
+            m_memVector2 = new Vector2(580, 48);
+            m_backgroundRectangle = new Rectangle(580, 0, 100, 144);
 
             #endregion
 
             #region Thread creation
 
-            _workerQueueThread = new Thread(WorkerThread)
+            m_workerQueueThread = new Thread(WorkerThread)
             {
                 Priority = ThreadPriority.Highest,
                 IsBackground = true
             };
-            _workerQueueThread.Start();
+            m_workerQueueThread.Start();
 
-            _workerRemoveThread = new Thread(WorkerRemoveThread)
+            m_workerRemoveThread = new Thread(WorkerRemoveThread)
             {
                 Priority = ThreadPriority.Highest,
                 IsBackground = true
             };
-            _workerRemoveThread.Start();
+            m_workerRemoveThread.Start();
 
             //_workerGenerateQueueThread = new Thread(new ThreadStart(WorkerGenerateQueueThread));
             //_workerGenerateQueueThread.Priority = ThreadPriority.AboveNormal;
@@ -97,13 +97,13 @@ namespace Welt.Forge.Renderers
             //_workerBuildQueueThread.Name = "WorkerBuildQueueThread";
             //_workerBuildQueueThread.Start();
 
-            _workerCheckThread = new Thread(WorkerCheckThread)
+            m_workerCheckThread = new Thread(WorkerCheckThread)
             {
                 Priority = ThreadPriority.Highest,
                 IsBackground = true,
                 Name = "WorkerCheckThread"
             };
-            _workerCheckThread.Start();
+            m_workerCheckThread.Start();
 
             #endregion
         }
@@ -112,12 +112,12 @@ namespace Welt.Forge.Renderers
 
         public void LoadContent(ContentManager content)
         {
-            _textureAtlas = content.Load<Texture2D>("Textures\\blocks_APR28_3");
-            _solidBlockEffect = content.Load<Effect>("Effects\\SolidBlockEffect");
-            _waterBlockEffect = content.Load<Effect>("Effects\\WaterBlockEffect");
+            TextureAtlas = content.Load<Texture2D>("Textures\\blocks_APR28_3");
+            SolidBlockEffect = content.Load<Effect>("Effects\\SolidBlockEffect");
+            WaterBlockEffect = content.Load<Effect>("Effects\\WaterBlockEffect");
 
-            debugSpriteBatch = new SpriteBatch(_graphicsDevice);
-            debugFont = content.Load<SpriteFont>("Fonts\\OSDdisplay");
+            m_debugSpriteBatch = new SpriteBatch(m_graphicsDevice);
+            m_debugFont = content.Load<SpriteFont>("Fonts\\OSDdisplay");
         }
 
         #region Update
@@ -285,18 +285,18 @@ namespace Welt.Forge.Renderers
 
             #region OSD debug texts
 
-            debugSpriteBatch.Begin();
+            m_debugSpriteBatch.Begin();
 
-            if (debugRectangle)
+            if (m_debugRectangle)
             {
-                debugSpriteBatch.Draw(debugRectTexture, backgroundRectangle, Color.Black);
+                m_debugSpriteBatch.Draw(m_debugRectTexture, m_backgroundRectangle, Color.Black);
             }
             //long workingSet = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
-            debugSpriteBatch.DrawString(debugFont, "GenQ: " + _generateQueue.Count, genQVector2, Color.White);
-            debugSpriteBatch.DrawString(debugFont, "LightQ: " + _lightingQueue.Count, lightQVector2, Color.White);
-            debugSpriteBatch.DrawString(debugFont, "BuildQ: " + _buildQueue.Count, buildQVector2, Color.White);
+            m_debugSpriteBatch.DrawString(m_debugFont, "GenQ: " + m_generateQueue.Count, m_genQVector2, Color.White);
+            m_debugSpriteBatch.DrawString(m_debugFont, "LightQ: " + m_lightingQueue.Count, m_lightQVector2, Color.White);
+            m_debugSpriteBatch.DrawString(m_debugFont, "BuildQ: " + m_buildQueue.Count, m_buildQVector2, Color.White);
             //debugSpriteBatch.DrawString(debugFont, (GC.GetTotalMemory(false) / (1024 * 1024)).ToString() + "MB/" + workingSet / (1024 * 1024) + "MB", memVector2, Color.White);
-            debugSpriteBatch.End();
+            m_debugSpriteBatch.End();
 
             #endregion
         }
@@ -308,12 +308,12 @@ namespace Welt.Forge.Renderers
         private Chunk DoInitialGenerate(Vector3I chunkIndex)
         {
             //Debug.WriteLine("DoGenerate " + chunkIndex);
-            var chunk = new Chunk(_world, chunkIndex);
-            _world.Chunks[chunkIndex.X, chunkIndex.Z] = chunk;
+            var chunk = new Chunk(m_world, chunkIndex);
+            m_world.Chunks[chunkIndex.X, chunkIndex.Z] = chunk;
             if (chunk.State == ChunkState.AwaitingGenerate)
             {
                 chunk.State = ChunkState.Generating;
-                _world.Generator.Generate(chunk);
+                m_world.Generator.Generate(chunk);
                 chunk.State = ChunkState.AwaitingLighting;
             }
             return chunk;
@@ -323,29 +323,29 @@ namespace Welt.Forge.Renderers
 
         public void QueueGenerate(Vector3I chunkIndex)
         {
-            lock (_generateQueue)
+            lock (m_generateQueue)
             {
-                _generateQueue.Enqueue(chunkIndex);
+                m_generateQueue.Enqueue(chunkIndex);
             }
         }
 
         public void QueueLighting(Vector3I chunkIndex)
         {
-            if (_world.Chunks[chunkIndex.X, chunkIndex.Z] == null)
+            if (m_world.Chunks[chunkIndex.X, chunkIndex.Z] == null)
             {
                 throw new ArgumentNullException("queuing lighting for a null chunk");
             }
-            lock (_lightingQueue)
+            lock (m_lightingQueue)
             {
-                _lightingQueue.Enqueue(chunkIndex);
+                m_lightingQueue.Enqueue(chunkIndex);
             }
         }
 
         public void QueueBuild(Vector3I chunkIndex)
         {
-            lock (_buildQueue)
+            lock (m_buildQueue)
             {
-                _buildQueue.Enqueue(chunkIndex);
+                m_buildQueue.Enqueue(chunkIndex);
             }
         }
 
@@ -353,10 +353,10 @@ namespace Welt.Forge.Renderers
 
         public void WorkerCheckThread()
         {
-            while (_running)
+            while (m_running)
             {
-                var cameraX = (uint) (_camera.Position.X/Chunk.SIZE.X);
-                var cameraZ = (uint) (_camera.Position.Z/Chunk.SIZE.Z);
+                var cameraX = (uint) (m_camera.Position.X/Chunk.Size.X);
+                var cameraZ = (uint) (m_camera.Position.Z/Chunk.Size.Z);
 
                 //Vector3i currentChunkIndex = new Vector3i(cameraX, 0, cameraZ); // GC.GetGeneration(0)
 
@@ -390,10 +390,10 @@ namespace Welt.Forge.Renderers
 
                         if (distX > GENERATE_RANGE || distZ > GENERATE_RANGE)
                         {
-                            if (_world.Chunks[ix, iz] != null)
+                            if (m_world.Chunks[ix, iz] != null)
                             {
                                 //Debug.WriteLine("Remove({0},{1}) ChunkCount = {2}", ix, iz, _world.viewableChunks.Count);
-                                _world.Chunks.Remove(ix, iz);
+                                m_world.Chunks.Remove(ix, iz);
                             }
                             continue;
                         }
@@ -405,14 +405,14 @@ namespace Welt.Forge.Renderers
                         if ((distX > LIGHT_RANGE || distZ > LIGHT_RANGE) &&
                             (distX < REMOVE_RANGE || distZ < REMOVE_RANGE))
                         {
-                            if (_world.Chunks[ix, iz] == null)
+                            if (m_world.Chunks[ix, iz] == null)
                             {
                                 uint removeX = ix, removeZ = iz;
 
                                 if (distX > LIGHT_RANGE) removeX = (uint) (ix - distX*xdir*2);
                                 if (distZ > LIGHT_RANGE) removeZ = (uint) (iz - distZ*zdir*2);
 
-                                var toReAssign = _world.Chunks[removeX, removeZ];
+                                var toReAssign = m_world.Chunks[removeX, removeZ];
                                 if (toReAssign != null)
                                 {
                                     switch (toReAssign.State)
@@ -420,10 +420,10 @@ namespace Welt.Forge.Renderers
                                         case ChunkState.Ready:
                                             lock (this)
                                             {
-                                                var chunkGenerate = new Chunk(_world, chunkIndex);
+                                                var chunkGenerate = new Chunk(m_world, chunkIndex);
                                                 chunkGenerate.State = ChunkState.AwaitingGenerate;
-                                                _world.Chunks[ix, iz] = chunkGenerate;
-                                                _world.Chunks.Remove(removeX, removeZ);
+                                                m_world.Chunks[ix, iz] = chunkGenerate;
+                                                m_world.Chunks.Remove(removeX, removeZ);
                                                 //reassign is not ready, make the rest work first
                                                 //toReAssign.Assign(chunkIndex);
                                                 //toReAssign.State = ChunkState.AwaitingGenerate;
@@ -477,7 +477,7 @@ namespace Welt.Forge.Renderers
 
                         if (distX >= LIGHT_RANGE || distZ >= LIGHT_RANGE)
                         {
-                            var chunk = _world.Chunks[ix, iz];
+                            var chunk = m_world.Chunks[ix, iz];
                             if (chunk != null && chunk.State == ChunkState.AwaitingLighting)
                             {
                                 QueueLighting(chunkIndex);
@@ -489,7 +489,7 @@ namespace Welt.Forge.Renderers
 
                         #region Rebuild
 
-                        var rebuildChunk = _world.Chunks[ix, iz];
+                        var rebuildChunk = m_world.Chunks[ix, iz];
                         if (rebuildChunk != null)
                         {
                             if (rebuildChunk.State == ChunkState.AwaitingRelighting)
@@ -520,7 +520,7 @@ namespace Welt.Forge.Renderers
         {
             bool foundGenerate, foundLighting, foundBuild;
             var target = new Vector3I(0, 0, 0);
-            while (_running)
+            while (m_running)
             {
                 foundGenerate = false;
                 foundLighting = false;
@@ -529,11 +529,11 @@ namespace Welt.Forge.Renderers
                 #region Generate
 
                 // LOOK FOR CHUNKS REQUIRING GENERATION
-                lock (_generateQueue)
+                lock (m_generateQueue)
                 {
-                    if (_generateQueue.Count > 0)
+                    if (m_generateQueue.Count > 0)
                     {
-                        target = _generateQueue.Dequeue();
+                        target = m_generateQueue.Dequeue();
                         foundGenerate = true;
                     }
                 }
@@ -541,7 +541,7 @@ namespace Welt.Forge.Renderers
                 {
                     try
                     {
-                        var chunkGenerate = _world.Chunks[target.X, target.Z];
+                        var chunkGenerate = m_world.Chunks[target.X, target.Z];
                         if (chunkGenerate != null && chunkGenerate.State == ChunkState.AwaitingGenerate)
                         {
                             //Debug.WriteLine("DoGenerate target = {0}, state = {1}", target, chunkGenerate.State);
@@ -562,11 +562,11 @@ namespace Welt.Forge.Renderers
                 #region Light
 
                 // LOOK FOR CHUNKS REQUIRING LIGHTING
-                lock (_lightingQueue)
+                lock (m_lightingQueue)
                 {
-                    if (_lightingQueue.Count > 0)
+                    if (m_lightingQueue.Count > 0)
                     {
-                        target = _lightingQueue.Dequeue();
+                        target = m_lightingQueue.Dequeue();
                         foundLighting = true;
                     }
                 }
@@ -574,7 +574,7 @@ namespace Welt.Forge.Renderers
                 {
                     try
                     {
-                        var chunkLighting = _world.Chunks[target.X, target.Z];
+                        var chunkLighting = m_world.Chunks[target.X, target.Z];
                         if (chunkLighting.State == ChunkState.AwaitingLighting ||
                             chunkLighting.State == ChunkState.AwaitingRelighting)
                         {
@@ -597,11 +597,11 @@ namespace Welt.Forge.Renderers
                 #region Build
 
                 // LOOK FOR CHUNKS REQUIRING BUILD
-                lock (_buildQueue)
+                lock (m_buildQueue)
                 {
-                    if (_buildQueue.Count > 0)
+                    if (m_buildQueue.Count > 0)
                     {
-                        target = _buildQueue.Dequeue();
+                        target = m_buildQueue.Dequeue();
                         foundBuild = true;
                     }
                 }
@@ -609,7 +609,7 @@ namespace Welt.Forge.Renderers
                 {
                     try
                     {
-                        var chunkBuild = _world.Chunks[target.X, target.Z];
+                        var chunkBuild = m_world.Chunks[target.X, target.Z];
                         if (chunkBuild.State == ChunkState.AwaitingBuild ||
                             chunkBuild.State == ChunkState.AwaitingRebuild)
                         {
@@ -641,7 +641,7 @@ namespace Welt.Forge.Renderers
             var target = new Vector3I(0, 0, 0);
             bool foundGenerate;
 
-            while (_running)
+            while (m_running)
             {
                 foundGenerate = false;
 
@@ -649,11 +649,11 @@ namespace Welt.Forge.Renderers
                 //    Debug.WriteLine("_gQ = {0}, _lQ = {1}, _bQ = {2}", _generateQueue.Count, _lightingQueue.Count, _buildQueue.Count);
 
                 // LOOK FOR CHUNKS REQUIRING GENERATION
-                lock (_generateQueue)
+                lock (m_generateQueue)
                 {
-                    if (_generateQueue.Count > 0)
+                    if (m_generateQueue.Count > 0)
                     {
-                        target = _generateQueue.Dequeue();
+                        target = m_generateQueue.Dequeue();
                         foundGenerate = true;
                     }
                 }
@@ -661,7 +661,7 @@ namespace Welt.Forge.Renderers
                 {
                     try
                     {
-                        var chunkGenerate = _world.Chunks[target.X, target.Z];
+                        var chunkGenerate = m_world.Chunks[target.X, target.Z];
                         if (chunkGenerate != null && chunkGenerate.State == ChunkState.AwaitingGenerate)
                         {
                             //Debug.WriteLine("DoGenerate target = {0}, state = {1}", target, chunkGenerate.State);
@@ -689,7 +689,7 @@ namespace Welt.Forge.Renderers
             var target = new Vector3I(0, 0, 0);
             bool foundLighting;
 
-            while (_running)
+            while (m_running)
             {
                 foundLighting = false;
 
@@ -697,11 +697,11 @@ namespace Welt.Forge.Renderers
                 //    Debug.WriteLine("_gQ = {0}, _lQ = {1}, _bQ = {2}", _generateQueue.Count, _lightingQueue.Count, _buildQueue.Count);
 
                 // LOOK FOR CHUNKS REQUIRING LIGHTING
-                lock (_lightingQueue)
+                lock (m_lightingQueue)
                 {
-                    if (_lightingQueue.Count > 0)
+                    if (m_lightingQueue.Count > 0)
                     {
-                        target = _lightingQueue.Dequeue();
+                        target = m_lightingQueue.Dequeue();
                         foundLighting = true;
                     }
                 }
@@ -709,7 +709,7 @@ namespace Welt.Forge.Renderers
                 {
                     try
                     {
-                        var chunkLighting = _world.Chunks[target.X, target.Z];
+                        var chunkLighting = m_world.Chunks[target.X, target.Z];
                         if (chunkLighting.State == ChunkState.AwaitingLighting ||
                             chunkLighting.State == ChunkState.AwaitingRelighting)
                         {
@@ -738,7 +738,7 @@ namespace Welt.Forge.Renderers
             var target = new Vector3I(0, 0, 0);
             bool foundBuild;
 
-            while (_running)
+            while (m_running)
             {
                 foundBuild = false;
 
@@ -746,11 +746,11 @@ namespace Welt.Forge.Renderers
                 //    Debug.WriteLine("_gQ = {0}, _lQ = {1}, _bQ = {2}", _generateQueue.Count, _lightingQueue.Count, _buildQueue.Count);
 
                 // LOOK FOR CHUNKS REQUIRING BUILD
-                lock (_buildQueue)
+                lock (m_buildQueue)
                 {
-                    if (_buildQueue.Count > 0)
+                    if (m_buildQueue.Count > 0)
                     {
-                        target = _buildQueue.Dequeue();
+                        target = m_buildQueue.Dequeue();
                         foundBuild = true;
                     }
                 }
@@ -759,7 +759,7 @@ namespace Welt.Forge.Renderers
                 {
                     try
                     {
-                        var chunkBuild = _world.Chunks[target.X, target.Z];
+                        var chunkBuild = m_world.Chunks[target.X, target.Z];
                         if (chunkBuild.State == ChunkState.AwaitingBuild ||
                             chunkBuild.State == ChunkState.AwaitingRebuild)
                         {
@@ -785,10 +785,10 @@ namespace Welt.Forge.Renderers
 
         private void WorkerRemoveThread()
         {
-            while (_running)
+            while (m_running)
             {
-                var cameraX = (uint) (_camera.Position.X/Chunk.SIZE.X);
-                var cameraZ = (uint) (_camera.Position.Z/Chunk.SIZE.Z);
+                var cameraX = (uint) (m_camera.Position.X/Chunk.Size.X);
+                var cameraZ = (uint) (m_camera.Position.Z/Chunk.Size.Z);
 
                 for (var ix = cameraX - REMOVE_RANGE*4; ix < cameraX + REMOVE_RANGE*4; ix++)
                 {
@@ -812,10 +812,10 @@ namespace Welt.Forge.Renderers
 
                         if (distX > GENERATE_RANGE || distZ > GENERATE_RANGE)
                         {
-                            if (_world.Chunks[ix, iz] != null)
+                            if (m_world.Chunks[ix, iz] != null)
                             {
                                 //Debug.WriteLine("Remove({0},{1}) ChunkCount = {2}", ix, iz, _world.Chunks.Count);
-                                _world.Chunks.Remove(ix, iz);
+                                m_world.Chunks.Remove(ix, iz);
                             }
                         }
 
@@ -833,35 +833,35 @@ namespace Welt.Forge.Renderers
 
         private void DrawSolid(GameTime gameTime)
         {
-            _tod = _world.Tod;
+            m_tod = m_world.Tod;
 
-            _solidBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
-            _solidBlockEffect.Parameters["View"].SetValue(_camera.View);
-            _solidBlockEffect.Parameters["Projection"].SetValue(_camera.Projection);
-            _solidBlockEffect.Parameters["CameraPosition"].SetValue(_camera.Position);
-            _solidBlockEffect.Parameters["FogNear"].SetValue(FOGNEAR);
-            _solidBlockEffect.Parameters["FogFar"].SetValue(FOGFAR);
-            _solidBlockEffect.Parameters["Texture1"].SetValue(_textureAtlas);
+            SolidBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
+            SolidBlockEffect.Parameters["View"].SetValue(m_camera.View);
+            SolidBlockEffect.Parameters["Projection"].SetValue(m_camera.Projection);
+            SolidBlockEffect.Parameters["CameraPosition"].SetValue(m_camera.Position);
+            SolidBlockEffect.Parameters["FogNear"].SetValue(Fognear);
+            SolidBlockEffect.Parameters["FogFar"].SetValue(Fogfar);
+            SolidBlockEffect.Parameters["Texture1"].SetValue(TextureAtlas);
 
-            _solidBlockEffect.Parameters["HorizonColor"].SetValue(HORIZONCOLOR);
-            _solidBlockEffect.Parameters["NightColor"].SetValue(NIGHTCOLOR);
+            SolidBlockEffect.Parameters["HorizonColor"].SetValue(Horizoncolor);
+            SolidBlockEffect.Parameters["NightColor"].SetValue(Nightcolor);
 
-            _solidBlockEffect.Parameters["MorningTint"].SetValue(MORNINGTINT);
-            _solidBlockEffect.Parameters["EveningTint"].SetValue(EVENINGTINT);
+            SolidBlockEffect.Parameters["MorningTint"].SetValue(Morningtint);
+            SolidBlockEffect.Parameters["EveningTint"].SetValue(Eveningtint);
 
-            _solidBlockEffect.Parameters["SunColor"].SetValue(SUNCOLOR);
-            _solidBlockEffect.Parameters["timeOfDay"].SetValue(_tod);
+            SolidBlockEffect.Parameters["SunColor"].SetValue(Suncolor);
+            SolidBlockEffect.Parameters["timeOfDay"].SetValue(m_tod);
 
-            var viewFrustum = new BoundingFrustum(_camera.View*_camera.Projection);
+            var viewFrustum = new BoundingFrustum(m_camera.View*m_camera.Projection);
 
-            _graphicsDevice.BlendState = BlendState.Opaque;
-            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
+            m_graphicsDevice.BlendState = BlendState.Opaque;
+            m_graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var pass in _solidBlockEffect.CurrentTechnique.Passes)
+            foreach (var pass in SolidBlockEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                foreach (var chunk in _world.Chunks.Values)
+                foreach (var chunk in m_world.Chunks.Values)
                 {
                     if (chunk == null) continue;
 
@@ -871,9 +871,9 @@ namespace Welt.Forge.Renderers
                         {
                             if (chunk.IndexBuffer.IndexCount > 0)
                             {
-                                _graphicsDevice.SetVertexBuffer(chunk.VertexBuffer);
-                                _graphicsDevice.Indices = chunk.IndexBuffer;
-                                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                                m_graphicsDevice.SetVertexBuffer(chunk.VertexBuffer);
+                                m_graphicsDevice.Indices = chunk.IndexBuffer;
+                                m_graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
                                     chunk.VertexBuffer.VertexCount, 0, chunk.IndexBuffer.IndexCount/3);
                             }
                         }
@@ -886,52 +886,52 @@ namespace Welt.Forge.Renderers
 
         #region Fields
 
-        protected Effect _solidBlockEffect;
-        protected Effect _waterBlockEffect;
+        protected Effect SolidBlockEffect;
+        protected Effect WaterBlockEffect;
 
-        protected Texture2D _textureAtlas;
-        private VertexBuildChunkProcessor _vertexBuildChunkProcessor;
-        private LightingChunkProcessor _lightingChunkProcessor;
+        protected Texture2D TextureAtlas;
+        private VertexBuildChunkProcessor m_vertexBuildChunkProcessor;
+        private LightingChunkProcessor m_lightingChunkProcessor;
 
         #region Thread fields
 
-        private readonly Queue<Vector3I> _generateQueue = new Queue<Vector3I>();
-        private readonly Queue<Vector3I> _buildQueue = new Queue<Vector3I>();
-        private readonly Queue<Vector3I> _lightingQueue = new Queue<Vector3I>();
+        private readonly Queue<Vector3I> m_generateQueue = new Queue<Vector3I>();
+        private readonly Queue<Vector3I> m_buildQueue = new Queue<Vector3I>();
+        private readonly Queue<Vector3I> m_lightingQueue = new Queue<Vector3I>();
 
-        private Thread _workerQueueThread;
-        private Thread _workerCheckThread;
+        private Thread m_workerQueueThread;
+        private Thread m_workerCheckThread;
 
-        private Thread _workerRemoveThread;
+        private Thread m_workerRemoveThread;
 
         //private Thread _workerGenerateQueueThread;
         //private Thread _workerLightingQueueThread;
         //private Thread _workerBuildQueueThread;
 
-        private bool _running = true;
+        private bool m_running = true;
 
         #endregion
 
-        private readonly GraphicsDevice _graphicsDevice;
-        private readonly FirstPersonCamera _camera;
-        private readonly World _world;
+        private readonly GraphicsDevice m_graphicsDevice;
+        private readonly FirstPersonCamera m_camera;
+        private readonly World m_world;
 
-        private Vector3I _previousChunkIndex;
+        private Vector3I m_previousChunkIndex;
 
         #region Atmospheric settings
 
-        protected Vector4 NIGHTCOLOR = Color.Black.ToVector4();
-        public Vector4 SUNCOLOR = Color.White.ToVector4();
-        protected Vector4 HORIZONCOLOR = Color.White.ToVector4();
+        protected Vector4 Nightcolor = Color.Black.ToVector4();
+        public Vector4 Suncolor = Color.White.ToVector4();
+        protected Vector4 Horizoncolor = Color.White.ToVector4();
 
-        protected Vector4 EVENINGTINT = Color.Red.ToVector4();
-        protected Vector4 MORNINGTINT = Color.Gold.ToVector4();
+        protected Vector4 Eveningtint = Color.Red.ToVector4();
+        protected Vector4 Morningtint = Color.Gold.ToVector4();
 
-        private float _tod;
-        public bool dayMode = false;
-        public bool nightMode = false;
-        public const int FOGNEAR = 14*16; //(BUILD_RANGE - 1) * 16;
-        public const float FOGFAR = 16*16; //(BUILD_RANGE + 1) * 16;
+        private float m_tod;
+        public bool DayMode = false;
+        public bool NightMode = false;
+        public const int Fognear = 14*16; //(BUILD_RANGE - 1) * 16;
+        public const float Fogfar = 16*16; //(BUILD_RANGE + 1) * 16;
 
         #endregion
 
@@ -946,15 +946,15 @@ namespace Welt.Forge.Renderers
 
         #region debugFont
 
-        private SpriteBatch debugSpriteBatch;
-        private SpriteFont debugFont;
-        private Texture2D debugRectTexture;
-        private readonly bool debugRectangle = true;
-        private Vector2 genQVector2;
-        private Vector2 lightQVector2;
-        private Vector2 buildQVector2;
-        private Vector2 memVector2;
-        private Rectangle backgroundRectangle;
+        private SpriteBatch m_debugSpriteBatch;
+        private SpriteFont m_debugFont;
+        private Texture2D m_debugRectTexture;
+        private readonly bool m_debugRectangle = true;
+        private Vector2 m_genQVector2;
+        private Vector2 m_lightQVector2;
+        private Vector2 m_buildQVector2;
+        private Vector2 m_memVector2;
+        private Rectangle m_backgroundRectangle;
 
         #endregion
 
@@ -965,7 +965,7 @@ namespace Welt.Forge.Renderers
         //TODO try to avoid using this method in favor of the method taking a chunk in param
         private Chunk DoGenerate(Vector3I target)
         {
-            return DoGenerate(_world.Chunks.Get(target));
+            return DoGenerate(m_world.Chunks.Get(target));
         }
 
         private Chunk DoGenerate(Chunk chunk)
@@ -983,7 +983,7 @@ namespace Welt.Forge.Renderers
                 if (chunk.State == ChunkState.AwaitingGenerate)
                 {
                     chunk.State = ChunkState.Generating;
-                    _world.Generator.Generate(chunk);
+                    m_world.Generator.Generate(chunk);
                     chunk.State = ChunkState.AwaitingLighting;
                 }
                 return chunk;
@@ -997,7 +997,7 @@ namespace Welt.Forge.Renderers
         //TODO try to avoid using this method in favor of the method taking a chunk in param
         private Chunk DoLighting(Vector3I target)
         {
-            return DoLighting(_world.Chunks.Get(target));
+            return DoLighting(m_world.Chunks.Get(target));
         }
 
         private Chunk DoLighting(Chunk chunk)
@@ -1013,13 +1013,13 @@ namespace Welt.Forge.Renderers
                 if (chunk.State == ChunkState.AwaitingLighting)
                 {
                     chunk.State = ChunkState.Lighting;
-                    _lightingChunkProcessor.ProcessChunk(chunk);
+                    m_lightingChunkProcessor.ProcessChunk(chunk);
                     chunk.State = ChunkState.AwaitingBuild;
                 }
                 else if (chunk.State == ChunkState.AwaitingRelighting)
                 {
                     chunk.State = ChunkState.Lighting;
-                    _lightingChunkProcessor.ProcessChunk(chunk);
+                    m_lightingChunkProcessor.ProcessChunk(chunk);
                     chunk.State = ChunkState.AwaitingBuild;
                     QueueBuild(chunk.Index);
                 }
@@ -1034,7 +1034,7 @@ namespace Welt.Forge.Renderers
         //TODO try to avoid using this method in favor of the method taking a chunk in param
         private Chunk DoBuild(Vector3I target)
         {
-            return DoBuild(_world.Chunks.Get(target));
+            return DoBuild(m_world.Chunks.Get(target));
         }
 
         private Chunk DoBuild(Chunk chunk)
@@ -1046,7 +1046,7 @@ namespace Welt.Forge.Renderers
                 if (chunk.State == ChunkState.AwaitingBuild || chunk.State == ChunkState.AwaitingRebuild)
                 {
                     chunk.State = ChunkState.Building;
-                    _vertexBuildChunkProcessor.ProcessChunk(chunk);
+                    m_vertexBuildChunkProcessor.ProcessChunk(chunk);
                     chunk.State = ChunkState.Ready;
                 }
                 return chunk;
@@ -1057,55 +1057,55 @@ namespace Welt.Forge.Renderers
 
         #region DrawWater
 
-        private float rippleTime;
+        private float m_rippleTime;
 
         private void DrawWater(GameTime gameTime)
         {
-            rippleTime += 0.1f;
+            m_rippleTime += 0.1f;
 
-            _tod = _world.Tod;
+            m_tod = m_world.Tod;
 
-            _waterBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
-            _waterBlockEffect.Parameters["View"].SetValue(_camera.View);
-            _waterBlockEffect.Parameters["Projection"].SetValue(_camera.Projection);
-            _waterBlockEffect.Parameters["CameraPosition"].SetValue(_camera.Position);
-            _waterBlockEffect.Parameters["FogNear"].SetValue(FOGNEAR);
-            _waterBlockEffect.Parameters["FogFar"].SetValue(FOGFAR);
-            _waterBlockEffect.Parameters["Texture1"].SetValue(_textureAtlas);
-            _waterBlockEffect.Parameters["SunColor"].SetValue(SUNCOLOR);
+            WaterBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
+            WaterBlockEffect.Parameters["View"].SetValue(m_camera.View);
+            WaterBlockEffect.Parameters["Projection"].SetValue(m_camera.Projection);
+            WaterBlockEffect.Parameters["CameraPosition"].SetValue(m_camera.Position);
+            WaterBlockEffect.Parameters["FogNear"].SetValue(Fognear);
+            WaterBlockEffect.Parameters["FogFar"].SetValue(Fogfar);
+            WaterBlockEffect.Parameters["Texture1"].SetValue(TextureAtlas);
+            WaterBlockEffect.Parameters["SunColor"].SetValue(Suncolor);
 
-            _waterBlockEffect.Parameters["HorizonColor"].SetValue(HORIZONCOLOR);
-            _waterBlockEffect.Parameters["NightColor"].SetValue(NIGHTCOLOR);
+            WaterBlockEffect.Parameters["HorizonColor"].SetValue(Horizoncolor);
+            WaterBlockEffect.Parameters["NightColor"].SetValue(Nightcolor);
 
-            _waterBlockEffect.Parameters["MorningTint"].SetValue(MORNINGTINT);
-            _waterBlockEffect.Parameters["EveningTint"].SetValue(EVENINGTINT);
+            WaterBlockEffect.Parameters["MorningTint"].SetValue(Morningtint);
+            WaterBlockEffect.Parameters["EveningTint"].SetValue(Eveningtint);
 
-            _waterBlockEffect.Parameters["timeOfDay"].SetValue(_tod);
-            _waterBlockEffect.Parameters["RippleTime"].SetValue(rippleTime);
+            WaterBlockEffect.Parameters["timeOfDay"].SetValue(m_tod);
+            WaterBlockEffect.Parameters["RippleTime"].SetValue(m_rippleTime);
 
-            var viewFrustum = new BoundingFrustum(_camera.View*_camera.Projection);
+            var viewFrustum = new BoundingFrustum(m_camera.View*m_camera.Projection);
 
-            _graphicsDevice.BlendState = BlendState.NonPremultiplied;
-            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
+            m_graphicsDevice.BlendState = BlendState.NonPremultiplied;
+            m_graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            foreach (var pass in _waterBlockEffect.CurrentTechnique.Passes)
+            foreach (var pass in WaterBlockEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                foreach (var chunk in _world.Chunks.Values)
+                foreach (var chunk in m_world.Chunks.Values)
                 {
                     if (chunk == null) continue;
 
-                    if (chunk.BoundingBox.Intersects(viewFrustum) && chunk.waterVertexBuffer != null)
+                    if (chunk.BoundingBox.Intersects(viewFrustum) && chunk.WaterVertexBuffer != null)
                     {
                         lock (chunk)
                         {
-                            if (chunk.waterIndexBuffer.IndexCount > 0)
+                            if (chunk.WaterIndexBuffer.IndexCount > 0)
                             {
-                                _graphicsDevice.SetVertexBuffer(chunk.waterVertexBuffer);
-                                _graphicsDevice.Indices = chunk.waterIndexBuffer;
-                                _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
-                                    chunk.waterVertexBuffer.VertexCount, 0, chunk.waterIndexBuffer.IndexCount/3);
+                                m_graphicsDevice.SetVertexBuffer(chunk.WaterVertexBuffer);
+                                m_graphicsDevice.Indices = chunk.WaterIndexBuffer;
+                                m_graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
+                                    chunk.WaterVertexBuffer.VertexCount, 0, chunk.WaterIndexBuffer.IndexCount/3);
                             }
                         }
                     }

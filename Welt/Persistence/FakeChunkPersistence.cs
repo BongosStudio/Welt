@@ -13,11 +13,11 @@ namespace Welt.Persistence
     public class MockChunkPersistence : IChunkPersistence
     {
 
-        private readonly World _world;
+        private readonly World m_world;
 
         public MockChunkPersistence(World world)
         {
-            this._world = world;
+            this.m_world = world;
         }
 
         public void Save(Chunk chunk)
@@ -27,7 +27,7 @@ namespace Welt.Persistence
 
         public Chunk Load(Vector3I index)
         {
-            var position = new Vector3I(index.X * Chunk.SIZE.X, index.Y * Chunk.SIZE.Y, index.Z * Chunk.SIZE.Z);
+            var position = new Vector3I(index.X * Chunk.Size.X, index.Y * Chunk.Size.Y, index.Z * Chunk.Size.Z);
 
             var filename = GetFilename(position);
             //Debug.WriteLine("Would be loading " + filename);

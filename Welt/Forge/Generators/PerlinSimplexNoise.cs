@@ -9,7 +9,7 @@ namespace Welt.Forge.Generators
     {
         #region Initizalize grad3
 
-        private static readonly int[][] grad3 =
+        private static readonly int[][] _grad3 =
         {
             new[] {1, 1, 0},
             new[] {-1, 1, 0},
@@ -29,7 +29,7 @@ namespace Welt.Forge.Generators
 
         #region Initizalize grad4
 
-        private static int[][] grad4 =
+        private static int[][] m_grad4 =
         {
             new[] {0, 1, 1, 1},
             new[] {0, 1, 1, -1},
@@ -68,8 +68,8 @@ namespace Welt.Forge.Generators
         #endregion
 
         // A lookup table to traverse the simplex around a given point in 4D. 
-        // Details can be found where this table is used, in the 4D noise method. 
-        private static int[][] simplex =
+        // Details can be found where this table is used, in the 4D Noise method. 
+        private static int[][] m_simplex =
         {
             new[] {0, 1, 2, 3}, new[] {0, 1, 3, 2}, new[] {0, 0, 0, 0}, new[] {0, 2, 3, 1}, new[] {0, 0, 0, 0},
             new[] {0, 0, 0, 0}, new[] {0, 0, 0, 0}, new[] {1, 2, 3, 0},
@@ -91,7 +91,7 @@ namespace Welt.Forge.Generators
 
         #region Init p
 
-        private static readonly int[] p =
+        private static readonly int[] _p =
         {
             151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37,
             240, 21, 10, 23,
@@ -111,7 +111,7 @@ namespace Welt.Forge.Generators
         #endregion
 
         // To remove the need for index wrapping, float the permutation table length 
-        private static readonly int[] perm = new int[512];
+        private static readonly int[] _perm = new int[512];
 
         /// <summary> 
         /// Initializes the <see cref="PerlinSimplexNoise"/> class. 
@@ -119,49 +119,49 @@ namespace Welt.Forge.Generators
         /// <author>Sjef van Leeuwen 3-3-2007 18:27</author> 
         static PerlinSimplexNoise()
         {
-            for (var i = 0; i < 512; i++) perm[i] = p[i & 255];
+            for (var i = 0; i < 512; i++) _perm[i] = _p[i & 255];
         }
 
         // This method is a *lot* faster than using (int)Math.floor(x) 
-        private static int fastfloor(float x)
+        private static int Fastfloor(float x)
         {
             return x > 0 ? (int) x : (int) x - 1;
         }
 
-        private static float dot(int[] g, float x, float y)
+        private static float Dot(int[] g, float x, float y)
         {
             return g[0]*x + g[1]*y;
         }
 
-        private static float dot(int[] g, float x, float y, float z)
+        private static float Dot(int[] g, float x, float y, float z)
         {
             return g[0]*x + g[1]*y + g[2]*z;
         }
 
-        private static float dot(int[] g, float x, float y, float z, float w)
+        private static float Dot(int[] g, float x, float y, float z, float w)
         {
             return g[0]*x + g[1]*y + g[2]*z + g[3]*w;
         }
 
         /// <summary> 
-        /// 3D Simplex noise. 
+        /// 3D Simplex Noise. 
         /// </summary> 
         /// <param name="xin">The xin.</param> 
         /// <param name="yin">The yin.</param> 
         /// <param name="zin">The zin.</param> 
         /// <returns></returns> 
         /// <author>Sjef van Leeuwen 3-3-2007 18:44</author> 
-        public static float noise(float xin, float yin, float zin)
+        public static float Noise(float xin, float yin, float zin)
         {
             float n0, n1, n2, n3; // Noise contributions from the four corners 
             // Skew the input space to determine which simplex cell we're in 
-            var F3 = 1.0f/3.0f;
-            var s = (xin + yin + zin)*F3; // Very nice and simple skew factor for 3D 
-            var i = fastfloor(xin + s);
-            var j = fastfloor(yin + s);
-            var k = fastfloor(zin + s);
-            var G3 = 1.0f/6.0f; // Very nice and simple unskew factor, too 
-            var t = (i + j + k)*G3;
+            var f3 = 1.0f/3.0f;
+            var s = (xin + yin + zin)*f3; // Very nice and simple skew factor for 3D 
+            var i = Fastfloor(xin + s);
+            var j = Fastfloor(yin + s);
+            var k = Fastfloor(zin + s);
+            var g3 = 1.0f/6.0f; // Very nice and simple unskew factor, too 
+            var t = (i + j + k)*g3;
             var X0 = i - t; // Unskew the cell origin back to (x,y,z) space 
             var Y0 = j - t;
             var Z0 = k - t;
@@ -237,66 +237,66 @@ namespace Welt.Forge.Generators
             // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and 
             // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where 
             // c = 1/6. 
-            var x1 = x0 - i1 + G3; // Offsets for second corner in (x,y,z) coords 
-            var y1 = y0 - j1 + G3;
-            var z1 = z0 - k1 + G3;
-            var x2 = x0 - i2 + 2.0f*G3; // Offsets for third corner in (x,y,z) coords 
-            var y2 = y0 - j2 + 2.0f*G3;
-            var z2 = z0 - k2 + 2.0f*G3;
-            var x3 = x0 - 1.0f + 3.0f*G3; // Offsets for last corner in (x,y,z) coords 
-            var y3 = y0 - 1.0f + 3.0f*G3;
-            var z3 = z0 - 1.0f + 3.0f*G3;
+            var x1 = x0 - i1 + g3; // Offsets for second corner in (x,y,z) coords 
+            var y1 = y0 - j1 + g3;
+            var z1 = z0 - k1 + g3;
+            var x2 = x0 - i2 + 2.0f*g3; // Offsets for third corner in (x,y,z) coords 
+            var y2 = y0 - j2 + 2.0f*g3;
+            var z2 = z0 - k2 + 2.0f*g3;
+            var x3 = x0 - 1.0f + 3.0f*g3; // Offsets for last corner in (x,y,z) coords 
+            var y3 = y0 - 1.0f + 3.0f*g3;
+            var z3 = z0 - 1.0f + 3.0f*g3;
             // Work out the hashed gradient indices of the four simplex corners 
             var ii = i & 255;
             var jj = j & 255;
             var kk = k & 255;
-            var gi0 = perm[ii + perm[jj + perm[kk]]]%12;
-            var gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]]%12;
-            var gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]]%12;
-            var gi3 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]]%12;
+            var gi0 = _perm[ii + _perm[jj + _perm[kk]]]%12;
+            var gi1 = _perm[ii + i1 + _perm[jj + j1 + _perm[kk + k1]]]%12;
+            var gi2 = _perm[ii + i2 + _perm[jj + j2 + _perm[kk + k2]]]%12;
+            var gi3 = _perm[ii + 1 + _perm[jj + 1 + _perm[kk + 1]]]%12;
             // Calculate the contribution from the four corners 
             var t0 = 0.6f - x0*x0 - y0*y0 - z0*z0;
             if (t0 < 0) n0 = 0.0f;
             else
             {
                 t0 *= t0;
-                n0 = t0*t0*dot(grad3[gi0], x0, y0, z0);
+                n0 = t0*t0*Dot(_grad3[gi0], x0, y0, z0);
             }
             var t1 = 0.6f - x1*x1 - y1*y1 - z1*z1;
             if (t1 < 0) n1 = 0.0f;
             else
             {
                 t1 *= t1;
-                n1 = t1*t1*dot(grad3[gi1], x1, y1, z1);
+                n1 = t1*t1*Dot(_grad3[gi1], x1, y1, z1);
             }
             var t2 = 0.6f - x2*x2 - y2*y2 - z2*z2;
             if (t2 < 0) n2 = 0.0f;
             else
             {
                 t2 *= t2;
-                n2 = t2*t2*dot(grad3[gi2], x2, y2, z2);
+                n2 = t2*t2*Dot(_grad3[gi2], x2, y2, z2);
             }
             var t3 = 0.6f - x3*x3 - y3*y3 - z3*z3;
             if (t3 < 0) n3 = 0.0f;
             else
             {
                 t3 *= t3;
-                n3 = t3*t3*dot(grad3[gi3], x3, y3, z3);
+                n3 = t3*t3*Dot(_grad3[gi3], x3, y3, z3);
             }
-            // Add contributions from each corner to get the final noise value. 
+            // Add contributions from each corner to get the final Noise value. 
             // The result is scaled to stay just inside [-1,1] 
             return 32.0f*(n0 + n1 + n2 + n3);
         }
 
-        // 2D simplex noise 
-        public static float noise(float xin, float yin)
+        // 2D simplex Noise 
+        public static float Noise(float xin, float yin)
         {
             float n0, n1, n2; // Noise contributions from the three corners 
             // Skew the input space to determine which simplex cell we're in 
-            var F2 = (float) (0.5*(Math.Sqrt(3.0) - 1.0));
-            var s = (xin + yin)*F2; // Hairy factor for 2D 
-            var i = fastfloor(xin + s);
-            var j = fastfloor(yin + s);
+            var f2 = (float) (0.5*(Math.Sqrt(3.0) - 1.0));
+            var s = (xin + yin)*f2; // Hairy factor for 2D 
+            var i = Fastfloor(xin + s);
+            var j = Fastfloor(yin + s);
             var g2 = (float) ((3.0 - Math.Sqrt(3.0))/6.0);
             var t = (i + j)*g2;
             var X0 = i - t; // Unskew the cell origin back to (x,y) space 
@@ -326,9 +326,9 @@ namespace Welt.Forge.Generators
             // Work out the hashed gradient indices of the three simplex corners 
             var ii = i & 255;
             var jj = j & 255;
-            var gi0 = perm[ii + perm[jj]]%12;
-            var gi1 = perm[ii + i1 + perm[jj + j1]]%12;
-            var gi2 = perm[ii + 1 + perm[jj + 1]]%12;
+            var gi0 = _perm[ii + _perm[jj]]%12;
+            var gi1 = _perm[ii + i1 + _perm[jj + j1]]%12;
+            var gi2 = _perm[ii + 1 + _perm[jj + 1]]%12;
             // Calculate the contribution from the three corners 
             var t0 = 0.5f - x0*x0 - y0*y0;
             if (t0 < 0)
@@ -336,7 +336,7 @@ namespace Welt.Forge.Generators
             else
             {
                 t0 *= t0;
-                n0 = t0*t0*dot(grad3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient 
+                n0 = t0*t0*Dot(_grad3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient 
             }
             var t1 = 0.5f - x1*x1 - y1*y1;
             if (t1 < 0)
@@ -344,7 +344,7 @@ namespace Welt.Forge.Generators
             else
             {
                 t1 *= t1;
-                n1 = t1*t1*dot(grad3[gi1], x1, y1);
+                n1 = t1*t1*Dot(_grad3[gi1], x1, y1);
             }
             var t2 = 0.5f - x2*x2 - y2*y2;
             if (t2 < 0)
@@ -352,9 +352,9 @@ namespace Welt.Forge.Generators
             else
             {
                 t2 *= t2;
-                n2 = t2*t2*dot(grad3[gi2], x2, y2);
+                n2 = t2*t2*Dot(_grad3[gi2], x2, y2);
             }
-            // Add contributions from each corner to get the final noise value. 
+            // Add contributions from each corner to get the final Noise value. 
             // The result is scaled to return values in the interval [-1,1]. 
             var returnNoise = 70.0f*(n0 + n1 + n2);
             // make it range from 0 to 1;

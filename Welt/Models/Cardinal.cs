@@ -13,33 +13,33 @@ namespace Welt.Models
 
     public enum Cardinal
     {
-        N, S, E, W, NE, NW, SE, SW
+        N, S, E, W, Ne, Nw, Se, Sw
     }
 
     public static class Cardinals
     {
         //TODO N is +1
         public static SignedVector3I N = new SignedVector3I(0, 0, -1);
-        public static SignedVector3I NE = new SignedVector3I(+1, 0, -1);
+        public static SignedVector3I Ne = new SignedVector3I(+1, 0, -1);
         public static SignedVector3I E = new SignedVector3I(+1, 0, 0);
-        public static SignedVector3I SE = new SignedVector3I(+1, 0, +1);
+        public static SignedVector3I Se = new SignedVector3I(+1, 0, +1);
         public static SignedVector3I S = new SignedVector3I(0, 0, +1);
-        public static SignedVector3I SW = new SignedVector3I(-1, 0, +1);
+        public static SignedVector3I Sw = new SignedVector3I(-1, 0, +1);
         public static SignedVector3I W = new SignedVector3I(-1, 0, 0);
-        public static SignedVector3I NW = new SignedVector3I(-1, 0, -1);
+        public static SignedVector3I Nw = new SignedVector3I(-1, 0, -1);
 
         public static SignedVector3I VectorFrom(Cardinal c)
         {
             switch (c)
             {
                 case Cardinal.N: return N;
-                case Cardinal.NE: return NE;
+                case Cardinal.Ne: return Ne;
                 case Cardinal.E: return E;
-                case Cardinal.SE: return SE;
+                case Cardinal.Se: return Se;
                 case Cardinal.S: return S;
-                case Cardinal.SW: return SW;
+                case Cardinal.Sw: return Sw;
                 case Cardinal.W: return W;
-                case Cardinal.NW: return NW;
+                case Cardinal.Nw: return Nw;
             }
             throw new NotImplementedException("unknown cardinal direction" + c);
         }
@@ -49,13 +49,13 @@ namespace Welt.Models
             switch (c)
             {
                 case Cardinal.N: return S;
-                case Cardinal.NE: return SW;
+                case Cardinal.Ne: return Sw;
                 case Cardinal.E: return W;
-                case Cardinal.SE: return NW;
+                case Cardinal.Se: return Nw;
                 case Cardinal.S: return N;
-                case Cardinal.SW: return NE;
+                case Cardinal.Sw: return Ne;
                 case Cardinal.W: return E;
-                case Cardinal.NW: return SE;
+                case Cardinal.Nw: return Se;
                 default:
                     break;
             }
@@ -72,13 +72,13 @@ namespace Welt.Models
         {
 
             if (v == N) return Cardinal.N;
-            if (v == NE) return Cardinal.NE;
+            if (v == Ne) return Cardinal.Ne;
             if (v == E) return Cardinal.E;
-            if (v == SE) return Cardinal.SE;
+            if (v == Se) return Cardinal.Se;
             if (v == S) return Cardinal.S;
-            if (v == SW) return Cardinal.SW;
+            if (v == Sw) return Cardinal.Sw;
             if (v == W) return Cardinal.W;
-            if (v == NW) return Cardinal.NW;
+            if (v == Nw) return Cardinal.Nw;
 
             throw new NotImplementedException("vector " + v + " does not map to a cardinal direction");
         }
@@ -87,13 +87,13 @@ namespace Welt.Models
             switch (from)
             {
                 case Cardinal.N: return new Cardinal[] {Cardinal.E,Cardinal.W};
-                case Cardinal.NE: return new Cardinal[] { Cardinal.S, Cardinal.W, Cardinal.E, Cardinal.N };
+                case Cardinal.Ne: return new Cardinal[] { Cardinal.S, Cardinal.W, Cardinal.E, Cardinal.N };
                 case Cardinal.E: return new Cardinal[] { Cardinal.N, Cardinal.S };
-                case Cardinal.SE: return new Cardinal[] { Cardinal.N, Cardinal.W, Cardinal.E, Cardinal.S };
+                case Cardinal.Se: return new Cardinal[] { Cardinal.N, Cardinal.W, Cardinal.E, Cardinal.S };
                 case Cardinal.S: return new Cardinal[] { Cardinal.E, Cardinal.W };
-                case Cardinal.SW: return new Cardinal[] { Cardinal.N, Cardinal.E, Cardinal.W, Cardinal.S };
+                case Cardinal.Sw: return new Cardinal[] { Cardinal.N, Cardinal.E, Cardinal.W, Cardinal.S };
                 case Cardinal.W: return new Cardinal[] { Cardinal.N, Cardinal.S };
-                case Cardinal.NW: return new Cardinal[] { Cardinal.S, Cardinal.E, Cardinal.N, Cardinal.W };
+                case Cardinal.Nw: return new Cardinal[] { Cardinal.S, Cardinal.E, Cardinal.N, Cardinal.W };
                 default:
                     break;
             }

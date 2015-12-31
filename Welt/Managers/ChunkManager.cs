@@ -15,11 +15,11 @@ namespace Welt.Managers
     public class ChunkManager : Dictionary2<Chunk>
     {
 
-        private readonly IChunkPersistence _persistence;
+        private readonly IChunkPersistence m_persistence;
 
         public ChunkManager(IChunkPersistence persistence)
         {
-            this._persistence = persistence;
+            this.m_persistence = persistence;
         }
 
 
@@ -37,7 +37,7 @@ namespace Welt.Managers
 
         private void BeforeRemove(Chunk chunk)
         {
-            _persistence.Save(chunk);
+            m_persistence.Save(chunk);
         }
 
         public Chunk Get(Vector3I index)
@@ -82,7 +82,7 @@ namespace Welt.Managers
 
         public Chunk Load(Vector3I index)
         {
-            return _persistence.Load(index);
+            return m_persistence.Load(index);
         }
 
 

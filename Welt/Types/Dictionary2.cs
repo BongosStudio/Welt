@@ -12,11 +12,11 @@ namespace Welt.Types
 {
     public class Dictionary2<T> : ConcurrentDictionary<ulong, T>
     {
-        const ulong SIZE = UInt32.MaxValue;
+        private const ulong SIZE = uint.MaxValue;
 
         public ulong KeyFromCoords(uint x, uint z)
         {
-            return (ulong)(x + (z * SIZE));
+            return (x + (z*SIZE));
         }
 
         //prefer to let the key calculation inlined here
@@ -25,18 +25,19 @@ namespace Welt.Types
             get
             {
                 var outVal = default(T);
-                TryGetValue((ulong)(x + (z * SIZE)), out outVal);
+                TryGetValue((x + (z*SIZE)), out outVal);
                 return outVal;
             }
             set
             {
-                var key = (ulong)(x + (z * SIZE));
-           
+                var key = (x + (z*SIZE));
+
                 this[key] = value;
             }
         }
 
-        public virtual void Remove(uint x, uint z) {
+        public virtual void Remove(uint x, uint z)
+        {
             T removed;
             TryRemove(KeyFromCoords(x, z), out removed);
         }

@@ -1,12 +1,15 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Cameras;
+using Welt.IO;
 using Welt.Models;
 using Welt.Processors;
 using Welt.Types;
@@ -15,38 +18,41 @@ namespace Welt.Forge.Renderers
 {
     internal class SimpleRenderer : IRenderer
     {
-        private const byte BUILD_RANGE = 2;
+        private const byte BUILD_RANGE = 4;
         private const byte LIGHT_RANGE = BUILD_RANGE + 1;
         private const byte GENERATE_RANGE_LOW = LIGHT_RANGE + 1;
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;
-        private readonly FirstPersonCamera _camera;
-        private readonly GraphicsDevice _graphicsDevice;
-        private readonly World _world;
-        private LightingChunkProcessor _lightingChunkProcessor;
+        private readonly FirstPersonCamera m_camera;
+        private readonly GraphicsDevice m_graphicsDevice;
+        private readonly World m_world;
+        private LightingChunkProcessor m_lightingChunkProcessor;
         protected Effect SolidBlockEffect;
         protected Texture2D TextureAtlas;
-        private float _tod;
-        private VertexBuildChunkProcessor _vertexBuildChunkProcessor;
+        private float m_tod;
+        private bool m_isRunning;
+        private VertexBuildChunkProcessor m_vertexBuildChunkProcessor;
         protected Effect WaterBlockEffect;
+        protected Effect GrassBlockEffect;
 
         public SimpleRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, World world)
         {
-            _graphicsDevice = graphicsDevice;
-            _camera = camera;
-            _world = world;
+            m_graphicsDevice = graphicsDevice;
+            m_camera = camera;
+            m_world = world;
+            m_isRunning = true;
         }
 
         public void Initialize()
         {
-            _vertexBuildChunkProcessor = new VertexBuildChunkProcessor(_graphicsDevice);
-            _lightingChunkProcessor = new LightingChunkProcessor();
+            m_vertexBuildChunkProcessor = new VertexBuildChunkProcessor(m_graphicsDevice);
+            m_lightingChunkProcessor = new LightingChunkProcessor();
 
             Debug.WriteLine("Generate initial chunks");
-            _world.VisitChunks(DoGenerate, GENERATE_RANGE_HIGH);
+            m_world.VisitChunks(DoGenerate, GENERATE_RANGE_HIGH);
             Debug.WriteLine("Light initial chunks");
-            _world.VisitChunks(DoLighting, LIGHT_RANGE);
+            m_world.VisitChunks(DoLighting, LIGHT_RANGE);
             Debug.WriteLine("Build initial chunks");
-            _world.VisitChunks(DoBuild, BUILD_RANGE);
+            m_world.VisitChunks(DoBuild, BUILD_RANGE);
         }
 
         public void LoadContent(ContentManager content)
@@ -54,20 +60,25 @@ namespace Welt.Forge.Renderers
             TextureAtlas = content.Load<Texture2D>("Textures\\terrain");
             SolidBlockEffect = content.Load<Effect>("Effects\\SolidBlockEffect");
             WaterBlockEffect = content.Load<Effect>("Effects\\WaterBlockEffect");
+            GrassBlockEffect = content.Load<Effect>("Effects\\GrassBlockEffect");
         }
 
         public void Update(GameTime gameTime)
         {
+            if (!m_isRunning) return;
         }
 
         public void Draw(GameTime gameTime)
         {
+            if (!m_isRunning) return;
             DrawSolid(gameTime);
+            DrawGrass(gameTime);
             DrawWater(gameTime);
         }
 
         public void Stop()
         {
+            m_isRunning = false;
         }
 
         public void RebuildChunk(Chunk rebuildChunk)
@@ -90,45 +101,45 @@ namespace Welt.Forge.Renderers
 
         private void DrawSolid(GameTime gameTime)
         {
-            _tod = _world.Tod;
+            m_tod = m_world.Tod;
 
             SolidBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
-            SolidBlockEffect.Parameters["View"].SetValue(_camera.View);
-            SolidBlockEffect.Parameters["Projection"].SetValue(_camera.Projection);
-            SolidBlockEffect.Parameters["CameraPosition"].SetValue(_camera.Position);
-            SolidBlockEffect.Parameters["FogNear"].SetValue(_world.Fognear);
-            SolidBlockEffect.Parameters["FogFar"].SetValue(_world.Fogfar);
+            SolidBlockEffect.Parameters["View"].SetValue(m_camera.View);
+            SolidBlockEffect.Parameters["Projection"].SetValue(m_camera.Projection);
+            SolidBlockEffect.Parameters["CameraPosition"].SetValue(m_camera.Position);
+            SolidBlockEffect.Parameters["FogNear"].SetValue(m_world.Fognear);
+            SolidBlockEffect.Parameters["FogFar"].SetValue(m_world.Fogfar);
             SolidBlockEffect.Parameters["Texture1"].SetValue(TextureAtlas);
 
-            SolidBlockEffect.Parameters["HorizonColor"].SetValue(_world.Horizoncolor);
-            SolidBlockEffect.Parameters["NightColor"].SetValue(_world.Nightcolor);
+            SolidBlockEffect.Parameters["HorizonColor"].SetValue(m_world.Horizoncolor);
+            SolidBlockEffect.Parameters["NightColor"].SetValue(m_world.Nightcolor);
 
-            SolidBlockEffect.Parameters["MorningTint"].SetValue(_world.Morningtint);
-            SolidBlockEffect.Parameters["EveningTint"].SetValue(_world.Eveningtint);
+            SolidBlockEffect.Parameters["MorningTint"].SetValue(m_world.Morningtint);
+            SolidBlockEffect.Parameters["EveningTint"].SetValue(m_world.Eveningtint);
 
-            SolidBlockEffect.Parameters["SunColor"].SetValue(_world.Suncolor);
-            SolidBlockEffect.Parameters["timeOfDay"].SetValue(_tod);
+            SolidBlockEffect.Parameters["SunColor"].SetValue(m_world.Suncolor);
+            SolidBlockEffect.Parameters["timeOfDay"].SetValue(m_tod);
 
-            var viewFrustum = new BoundingFrustum(_camera.View*_camera.Projection);
+            var viewFrustum = new BoundingFrustum(m_camera.View*m_camera.Projection);
 
-            _graphicsDevice.BlendState = BlendState.Opaque;
-            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
+            m_graphicsDevice.BlendState = BlendState.Opaque;
+            m_graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var pass in SolidBlockEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                foreach (var chunk in _world.Chunks.Values.Where(chunk => chunk != null))
+                foreach (var chunk in m_world.Chunks.Values.Where(chunk => chunk != null))
                 {
                     if (chunk.State != ChunkState.Ready) RebuildChunk(chunk);
 
                     if (!chunk.BoundingBox.Intersects(viewFrustum) || chunk.IndexBuffer == null) continue;
                     if (chunk.IndexBuffer.IndexCount <= 0) continue;
-                    _graphicsDevice.SetVertexBuffer(chunk.VertexBuffer);
-                    _graphicsDevice.Indices = chunk.IndexBuffer;
+                    m_graphicsDevice.SetVertexBuffer(chunk.VertexBuffer);
+                    m_graphicsDevice.Indices = chunk.IndexBuffer;
                     //_graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0,
                     //    chunk.VertexBuffer.VertexCount, 0, chunk.IndexBuffer.IndexCount/3);
-                    _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.VertexCount);
+                    m_graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.VertexCount);
                 }
             }
         }
@@ -137,90 +148,126 @@ namespace Welt.Forge.Renderers
 
         private Chunk DoLighting(Vector3I chunkIndex)
         {
-            var chunk = _world.Chunks[chunkIndex.X, chunkIndex.Z];
+            var chunk = m_world.Chunks[chunkIndex.X, chunkIndex.Z];
             return DoLighting(chunk);
         }
 
         private Chunk DoLighting(Chunk chunk)
         {
-            _lightingChunkProcessor.ProcessChunk(chunk);
+            m_lightingChunkProcessor.ProcessChunk(chunk);
             return chunk;
         }
 
         private Chunk DoBuild(Vector3I chunkIndex)
         {
-            var chunk = _world.Chunks[chunkIndex.X, chunkIndex.Z];
+            var chunk = m_world.Chunks[chunkIndex.X, chunkIndex.Z];
             return DoBuild(chunk);
         }
 
         private Chunk DoBuild(Chunk chunk)
         {
-            _vertexBuildChunkProcessor.ProcessChunk(chunk);
+            m_vertexBuildChunkProcessor.ProcessChunk(chunk);
             return chunk;
         }
 
         private Chunk DoGenerate(Vector3I chunkIndex)
         {
-            var chunk = new Chunk(_world, chunkIndex);
+            var chunk = new Chunk(m_world, chunkIndex);
             return DoGenerate(chunk);
         }
 
         private Chunk DoGenerate(Chunk chunk)
         {
-            _world.Chunks[chunk.Index.X, chunk.Index.Z] = chunk;
-            _world.Generator.Generate(chunk);
+            m_world.Chunks[chunk.Index.X, chunk.Index.Z] = chunk;
+            m_world.Generator.Generate(chunk);
             return chunk;
         }
 
+        #region DrawGrass
+
+        private float m_waveTime;
+
+        private void DrawGrass(GameTime time)
+        {
+            m_waveTime += 0.05f;
+            GrassBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
+            GrassBlockEffect.Parameters["View"].SetValue(m_camera.View);
+            GrassBlockEffect.Parameters["Projection"].SetValue(m_camera.Projection);
+            GrassBlockEffect.Parameters["CameraPosition"].SetValue(m_camera.Position);
+            GrassBlockEffect.Parameters["Texture0"].SetValue(TextureAtlas);
+            GrassBlockEffect.Parameters["WaveTime"].SetValue(m_waveTime);
+            var viewFrustum = new BoundingFrustum(m_camera.View*m_camera.Projection);
+
+            m_graphicsDevice.BlendState = BlendState.Opaque;
+            m_graphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            foreach (var pass in GrassBlockEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                foreach (var chunk in from chunk in m_world.Chunks.Values
+                                      where chunk != null
+                                      where chunk.BoundingBox.Intersects(viewFrustum)
+                                      //where chunk.GrassVertexBuffer != null
+                                      //where chunk.GrassIndexBuffer.IndexCount > 0
+                                      select chunk)
+                {
+                    //_graphicsDevice.SetVertexBuffer(chunk.GrassVertexBuffer);
+                    //_graphicsDevice.Indices = chunk.GrassIndexBuffer;
+                    //_graphicsDevice.DrawIndexPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.GrassVertexCount);
+                }
+            }
+        }
+
+        #endregion
+
         #region DrawWater
 
-        private float _rippleTime;
+        private float m_rippleTime;
 
         private void DrawWater(GameTime gameTime)
         {
-            _rippleTime += 0.05f;
+            m_rippleTime += 0.05f;
 
-            _tod = _world.Tod;
+            m_tod = m_world.Tod;
             
-
             WaterBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
-            WaterBlockEffect.Parameters["View"].SetValue(_camera.View);
-            WaterBlockEffect.Parameters["Projection"].SetValue(_camera.Projection);
-            WaterBlockEffect.Parameters["CameraPosition"].SetValue(_camera.Position);
-            WaterBlockEffect.Parameters["FogNear"].SetValue(_world.Fognear);
-            WaterBlockEffect.Parameters["FogFar"].SetValue(_world.Fogfar);
+            WaterBlockEffect.Parameters["View"].SetValue(m_camera.View);
+            WaterBlockEffect.Parameters["Projection"].SetValue(m_camera.Projection);
+            WaterBlockEffect.Parameters["CameraPosition"].SetValue(m_camera.Position);
+            WaterBlockEffect.Parameters["FogNear"].SetValue(m_world.Fognear);
+            WaterBlockEffect.Parameters["FogFar"].SetValue(m_world.Fogfar);
             WaterBlockEffect.Parameters["Texture1"].SetValue(TextureAtlas);
-            WaterBlockEffect.Parameters["SunColor"].SetValue(_world.Suncolor);
+            WaterBlockEffect.Parameters["SunColor"].SetValue(m_world.Suncolor);
 
-            WaterBlockEffect.Parameters["HorizonColor"].SetValue(_world.Horizoncolor);
-            WaterBlockEffect.Parameters["NightColor"].SetValue(_world.Nightcolor);
+            WaterBlockEffect.Parameters["HorizonColor"].SetValue(m_world.Horizoncolor);
+            WaterBlockEffect.Parameters["NightColor"].SetValue(m_world.Nightcolor);
 
-            WaterBlockEffect.Parameters["MorningTint"].SetValue(_world.Morningtint);
-            WaterBlockEffect.Parameters["EveningTint"].SetValue(_world.Eveningtint);
+            WaterBlockEffect.Parameters["MorningTint"].SetValue(m_world.Morningtint);
+            WaterBlockEffect.Parameters["EveningTint"].SetValue(m_world.Eveningtint);
 
-            WaterBlockEffect.Parameters["timeOfDay"].SetValue(_tod);
-            WaterBlockEffect.Parameters["RippleTime"].SetValue(_rippleTime);
+            WaterBlockEffect.Parameters["timeOfDay"].SetValue(m_tod);
+            WaterBlockEffect.Parameters["RippleTime"].SetValue(m_rippleTime);
 
-            var viewFrustum = new BoundingFrustum(_camera.View*_camera.Projection);
+            var viewFrustum = new BoundingFrustum(m_camera.View*m_camera.Projection);
 
-            _graphicsDevice.BlendState = BlendState.NonPremultiplied;
-            _graphicsDevice.DepthStencilState = DepthStencilState.Default;
+            m_graphicsDevice.BlendState = BlendState.NonPremultiplied;
+            m_graphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var pass in WaterBlockEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
 
-                foreach (var chunk in from chunk in _world.Chunks.Values
+                foreach (var chunk in from chunk in m_world.Chunks.Values
                     where chunk != null
-                    where chunk.BoundingBox.Intersects(viewFrustum) && chunk.waterVertexBuffer != null
-                    where chunk.waterIndexBuffer.IndexCount > 0
+                    where chunk.BoundingBox.Intersects(viewFrustum) && chunk.WaterVertexBuffer != null
+                    where chunk.WaterIndexBuffer.IndexCount > 0
                     select chunk)
                 {
-                    _graphicsDevice.SetVertexBuffer(chunk.waterVertexBuffer);
-                    _graphicsDevice.Indices = chunk.waterIndexBuffer;
-                    _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                        0, chunk.waterVertexCount);
-                    //_graphicsDevice.BlendState = BlendState.Additive;
+                    m_graphicsDevice.SetVertexBuffer(chunk.WaterVertexBuffer);
+                    m_graphicsDevice.Indices = chunk.WaterIndexBuffer;
+                    m_graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                        0, chunk.WaterVertexCount);
                 }
             }
         }

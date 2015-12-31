@@ -7,16 +7,16 @@ namespace Welt.Tools
 {
     public abstract class Tool
     {
-        protected Player player;
+        protected Player Player;
         
         public Tool(Player player)
         {
-            this.player = player;
+            this.Player = player;
         }
 
         public abstract void Use();
 
-        public abstract void switchType(int delta );
+        public abstract void SwitchType(int delta );
 
     }
 }

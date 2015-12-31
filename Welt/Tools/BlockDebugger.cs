@@ -14,12 +14,12 @@ namespace Welt.Tools
 
         public override void Use()
         {
-            System.Diagnostics.Debug.WriteLine(player.CurrentSelection);
-            if (!player.CurrentSelection.HasValue) return;
-            System.Diagnostics.Debug.WriteLine(player.TargetPoint);
-            var b = player.CurrentSelection.Value;
+            System.Diagnostics.Debug.WriteLine(Player.CurrentSelection);
+            if (!Player.CurrentSelection.HasValue) return;
+            System.Diagnostics.Debug.WriteLine(Player.TargetPoint);
+            var b = Player.CurrentSelection.Value;
             var pos = b.Position;
-            var c = this.player.World.ChunkAt(pos);
+            var c = this.Player.World.ChunkAt(pos);
             Debug(c, "current");
             /*foreach (Cardinal card in Enum.GetValues(typeof(Cardinal)))
                 {
@@ -33,7 +33,7 @@ namespace Welt.Tools
                 $"BlockDebugger - {id} {c?.ToString() ?? "null"} , state: {(c == null ? "" : "" + c.State)} ");
         }
 
-        public override void switchType(int delta) { }
+        public override void SwitchType(int delta) { }
 
     }
 }

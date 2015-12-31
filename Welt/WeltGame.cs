@@ -24,26 +24,26 @@ namespace Welt
     {
         #region Fields
 
-        private readonly GraphicsDeviceManager _graphics;
-        private World _world;
-        private IRenderer _renderer;
+        private readonly GraphicsDeviceManager m_graphics;
+        private World m_world;
+        private IRenderer m_renderer;
 
-        private KeyboardState _oldKeyboardState;
+        private KeyboardState m_oldKeyboardState;
 
-        private bool _releaseMouse;
+        private bool m_releaseMouse;
 
-        private readonly int _preferredBackBufferHeight;
-        private readonly int _preferredBackBufferWidth;
+        private readonly int m_preferredBackBufferHeight;
+        private readonly int m_preferredBackBufferWidth;
 
-        private HudRenderer _hud;
+        private HudRenderer m_hud;
 
-        private Player _player1; //wont add a player2 for some time, but naming like this helps designing  
-        private PlayerRenderer _player1Renderer;
+        private Player m_player1; //wont add a player2 for some time, but naming like this helps designing  
+        private PlayerRenderer m_player1Renderer;
 
-        private DiagnosticWorldRenderer _diagnosticWorldRenderer;
-        private bool _diagnosticMode;
+        private DiagnosticWorldRenderer m_diagnosticWorldRenderer;
+        private bool m_diagnosticMode;
 
-        private SkyDomeRenderer _skyDomeRenderer;
+        private SkyDomeRenderer m_skyDomeRenderer;
 
         public static bool ThrowExceptions = true;
         public static WeltGame Instance;
@@ -53,33 +53,31 @@ namespace Welt
         public WeltGame()
         {
             // TODO: GET SCENES FUCKING WORKING AGAIN. Apparently XNA doesn't like the idea of them.
-            
+
             Instance = this;
             //DeProfiler.Run();
 
-            _graphics = new GraphicsDeviceManager(this)
+            m_graphics = new GraphicsDeviceManager(this)
             {
                 PreferredBackBufferWidth = 1000,
                 PreferredBackBufferHeight = 750
             };
 
-            _preferredBackBufferHeight = _graphics.PreferredBackBufferHeight;
-            _preferredBackBufferWidth = _graphics.PreferredBackBufferWidth;
+            m_preferredBackBufferHeight = m_graphics.PreferredBackBufferHeight;
+            m_preferredBackBufferWidth = m_graphics.PreferredBackBufferWidth;
 
             //enter stealth mode at start
             //graphics.PreferredBackBufferHeight = 100;
             //graphics.PreferredBackBufferWidth = 160;
 
-            var frameRate = new FrameRateCounter(this) { DrawOrder = 1 };
-            Components.Add(frameRate);
-
             Content.RootDirectory = "Content";
-            _graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime 
+            m_graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime 
 
             ShowDebugKeysHelp();
         }
 
         #region Initialize
+
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -88,56 +86,62 @@ namespace Welt
         /// </summary>
         protected override void Initialize()
         {
-            _world = new World();
+            m_world = new World();
 
-            _player1 = new Player(_world);
+            m_player1 = new Player(m_world);
 
-            _player1Renderer = new PlayerRenderer(GraphicsDevice, _player1);
-            _player1Renderer.Initialize();
+            m_player1Renderer = new PlayerRenderer(GraphicsDevice, m_player1);
+            m_player1Renderer.Initialize();
 
-            _hud = new HudRenderer(GraphicsDevice, _world, _player1Renderer.Camera);
-            _hud.Initialize();
+            m_hud = new HudRenderer(GraphicsDevice, m_world, m_player1Renderer);
+            m_hud.ShowMinimap = true;
+            m_hud.Initialize();
 
             #region choose renderer
 
             //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);
-            _renderer = new SimpleRenderer(GraphicsDevice, _player1Renderer.Camera, _world);
-            
-            _diagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _player1Renderer.Camera, _world);
-            _skyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, _player1Renderer.Camera, _world);
-            _renderer.Initialize();
-            _diagnosticWorldRenderer.Initialize();
-            _skyDomeRenderer.Initialize();
+            m_renderer = new SimpleRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
+
+            m_diagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
+            m_skyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
+            m_renderer.Initialize();
+            m_diagnosticWorldRenderer.Initialize();
+            m_skyDomeRenderer.Initialize();
+
             #endregion
 
             //TODO refactor WorldRenderer needs player position + view frustum 
 
             base.Initialize();
         }
+
         #endregion
 
         protected override void OnExiting(object sender, EventArgs args)
         {
-            _renderer.Stop();
+            m_renderer.Stop();
             base.OnExiting(sender, args);
         }
 
         #region LoadContent
+
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
         protected override void LoadContent()
         {
-            _renderer.LoadContent(Content);
-            _diagnosticWorldRenderer.LoadContent(Content);
-            _skyDomeRenderer.LoadContent(Content);
-            _player1Renderer.LoadContent(Content);
-            _hud.LoadContent(Content);
+            m_renderer.LoadContent(Content);
+            m_diagnosticWorldRenderer.LoadContent(Content);
+            m_skyDomeRenderer.LoadContent(Content);
+            m_player1Renderer.LoadContent(Content);
+            m_hud.LoadContent(Content);
         }
+
         #endregion
 
         #region UnloadContent
+
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// all content.
@@ -146,11 +150,12 @@ namespace Welt
         {
             // TODO: Unload any non ContentManager content here
         }
+
         #endregion
 
         #region DebugKeys
 
-        private void ShowDebugKeysHelp()
+        private static void ShowDebugKeysHelp()
         {
             Console.WriteLine("Debug keys");
             Console.WriteLine("F1  = toggle freelook(fly) / player physics");
@@ -170,46 +175,46 @@ namespace Welt
             var keyState = Keyboard.GetState();
 
             //toggle fullscreen
-            if (_oldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
             {
-                _graphics.ToggleFullScreen();
+                m_graphics.ToggleFullScreen();
             }
 
             //freelook mode
-            if (_oldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
             {
-                _player1Renderer.FreeCam = !_player1Renderer.FreeCam;
+                m_player1Renderer.FreeCam = !m_player1Renderer.FreeCam;
             }
 
             //minimap mode
-            if (_oldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
+            if (m_oldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
             {
-                _hud.ShowMinimap = !_hud.ShowMinimap;
+                m_hud.ShowMinimap = !m_hud.ShowMinimap;
             }
 
             //wireframe mode
-            if (_oldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
             {
-                _world.ToggleRasterMode();
+                m_world.ToggleRasterMode();
             }
 
             //diagnose mode
-            if (_oldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
             {
-                _diagnosticMode = !_diagnosticMode;
+                m_diagnosticMode = !m_diagnosticMode;
             }
 
             //day cycle/dayMode
-            if (_oldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
             {
-                _world.DayMode = !_world.DayMode;
+                m_world.DayMode = !m_world.DayMode;
                 //Debug.WriteLine("Day Mode is " + world.dayMode);
             }
 
             //day cycle/nightMode
-            if (_oldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
             {
-                _world.NightMode = !_world.NightMode;
+                m_world.NightMode = !m_world.NightMode;
                 //Debug.WriteLine("Day/Night Mode is " + world.nightMode);
             }
 
@@ -220,90 +225,94 @@ namespace Welt
             }
 
             // Release the mouse pointer
-            if (_oldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
             {
-                _releaseMouse = !_releaseMouse;
+                m_releaseMouse = !m_releaseMouse;
                 IsMouseVisible = !IsMouseVisible;
             }
 
             // fixed time step
-            if (_oldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
             {
-                _graphics.SynchronizeWithVerticalRetrace = !_graphics.SynchronizeWithVerticalRetrace;
+                m_graphics.SynchronizeWithVerticalRetrace = !m_graphics.SynchronizeWithVerticalRetrace;
                 IsFixedTimeStep = !IsFixedTimeStep;
                 Debug.WriteLine("FixedTimeStep and vsync are " + IsFixedTimeStep);
-                _graphics.ApplyChanges();
+                m_graphics.ApplyChanges();
             }
 
             // stealth mode / keep screen space for profilers
-            if (_oldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
             {
-                if (_graphics.PreferredBackBufferHeight == _preferredBackBufferHeight)
+                if (m_graphics.PreferredBackBufferHeight == m_preferredBackBufferHeight)
                 {
-                    _graphics.PreferredBackBufferHeight = 100;
-                    _graphics.PreferredBackBufferWidth = 160;
+                    m_graphics.PreferredBackBufferHeight = 100;
+                    m_graphics.PreferredBackBufferWidth = 160;
                 }
                 else
                 {
-                    _graphics.PreferredBackBufferHeight = _preferredBackBufferHeight;
-                    _graphics.PreferredBackBufferWidth = _preferredBackBufferWidth;
+                    m_graphics.PreferredBackBufferHeight = m_preferredBackBufferHeight;
+                    m_graphics.PreferredBackBufferWidth = m_preferredBackBufferWidth;
                 }
-                _graphics.ApplyChanges();
+                m_graphics.ApplyChanges();
             }
 
-            _oldKeyboardState = keyState;
+            m_oldKeyboardState = keyState;
         }
+
         #endregion
 
         #region UpdateTOD
+
         public virtual Vector3 UpdateTod(GameTime gameTime)
         {
-            long div = 20000;
+            const long div = 20000;
 
-            if (!_world.RealTime)
-                _world.Tod += ((float)gameTime.ElapsedGameTime.Milliseconds / div);
+            if (!m_world.RealTime)
+                m_world.Tod += ((float) gameTime.ElapsedGameTime.Milliseconds/div);
             else
-                _world.Tod = ((float)DateTime.Now.Hour) + ((float)DateTime.Now.Minute) / 60 + (((float)DateTime.Now.Second) / 60) / 60;
+                m_world.Tod = (DateTime.Now.Hour) + ((float) DateTime.Now.Minute)/60 +
+                              (((float) DateTime.Now.Second)/60)/60;
 
-            if (_world.Tod >= 24)
-                _world.Tod = 0;
+            if (m_world.Tod >= 24)
+                m_world.Tod = 0;
 
-            if (_world.DayMode)
+            if (m_world.DayMode)
             {
-                _world.Tod = 12;
-                _world.NightMode = false;
+                m_world.Tod = 12;
+                m_world.NightMode = false;
             }
-            else if (_world.NightMode)
+            else if (m_world.NightMode)
             {
-                _world.Tod = 0;
-                _world.DayMode = false;
+                m_world.Tod = 0;
+                m_world.DayMode = false;
             }
 
             // Calculate the position of the sun based on the time of day.
-            float x = 0;
-            float y = 0;
-            float z = 0;
+            float x;
+            float y;
 
-            if (_world.Tod <= 12)
+            if (m_world.Tod <= 12)
             {
-                y = _world.Tod / 12;
-                x = 12 - _world.Tod;
+                y = m_world.Tod/12;
+                x = 12 - m_world.Tod;
             }
             else
             {
-                y = (24 - _world.Tod) / 12;
-                x = 12 - _world.Tod;
+                y = (24 - m_world.Tod)/12;
+                x = 12 - m_world.Tod;
             }
 
             x /= 10;
 
-            _world.SunPos = new Vector3(-x, y, z);
+            m_world.SunPos = new Vector3(-x, y, 0);
 
-            return _world.SunPos;
+            return m_world.SunPos;
         }
+
         #endregion
 
         #region Update
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -315,24 +324,26 @@ namespace Welt
 
             if (IsActive)
             {
-                if (!_releaseMouse)
+                if (!m_releaseMouse)
                 {
-                    _player1Renderer.Update(gameTime);
+                    m_player1Renderer.Update(gameTime);
                 }
 
-                _skyDomeRenderer.Update(gameTime);
-                _renderer.Update(gameTime);
-                if (_diagnosticMode)
+                m_skyDomeRenderer.Update(gameTime);
+                m_renderer.Update(gameTime);
+                if (m_diagnosticMode)
                 {
-                    _diagnosticWorldRenderer.Update(gameTime);
+                    m_diagnosticWorldRenderer.Update(gameTime);
                 }
                 base.Update(gameTime);
             }
             UpdateTod(gameTime);
         }
+
         #endregion
 
         #region Draw
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -340,16 +351,17 @@ namespace Welt
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            _skyDomeRenderer.Draw(gameTime);
-            _renderer.Draw(gameTime);
-            if (_diagnosticMode)
+            m_skyDomeRenderer.Draw(gameTime);
+            m_renderer.Draw(gameTime);
+            if (m_diagnosticMode)
             {
-                _diagnosticWorldRenderer.Draw(gameTime);
+                m_diagnosticWorldRenderer.Draw(gameTime);
             }
-            _player1Renderer.Draw(gameTime);
-            _hud.Draw(gameTime);
+            m_player1Renderer.Draw(gameTime);
+            m_hud.Draw(gameTime);
             base.Draw(gameTime);
         }
+
         #endregion
 
     }

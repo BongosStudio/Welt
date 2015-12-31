@@ -10,52 +10,52 @@ namespace Welt.Forge.Generators
     /// </summary>
     public class PerlinNoise2D
     {
-        private readonly double[,] noiseValues;
+        private readonly double[,] m_noiseValues;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public PerlinNoise2D(int freq, float _amp)
+        public PerlinNoise2D(int freq, float amp)
         {
             var rand = new Random(Environment.TickCount);
-            noiseValues = new double[freq, freq];
-            Amplitude = _amp;
+            m_noiseValues = new double[freq, freq];
+            Amplitude = amp;
             Frequency = freq;
 
-            // Generate our noise values
+            // Generate our Noise values
             for (var i = 0; i < freq; i++)
             {
                 for (var k = 0; k < freq; k++)
                 {
-                    noiseValues[i, k] = rand.NextDouble();
+                    m_noiseValues[i, k] = rand.NextDouble();
                 }
             }
         }
 
         /// <summary>
-        /// Get the interpolated point from the noise graph using cosine interpolation
+        /// Get the interpolated point from the Noise graph using cosine interpolation
         /// </summary>
         /// <returns></returns>
-        public double getInterpolatedPoint(int _xa, int _xb, int _ya, int _yb, double x, double y)
+        public double GetInterpolatedPoint(int xa, int xb, int ya, int yb, double x, double y)
         {
-            var i1 = interpolate(
-                noiseValues[_xa%Frequency, _ya%Frequency],
-                noiseValues[_xb%Frequency, _ya%Frequency]
+            var i1 = Interpolate(
+                m_noiseValues[xa%Frequency, ya%Frequency],
+                m_noiseValues[xb%Frequency, ya%Frequency]
                 , x);
 
-            var i2 = interpolate(
-                noiseValues[_xa%Frequency, _yb%Frequency],
-                noiseValues[_xb%Frequency, _yb%Frequency]
+            var i2 = Interpolate(
+                m_noiseValues[xa%Frequency, yb%Frequency],
+                m_noiseValues[xb%Frequency, yb%Frequency]
                 , x);
 
-            return interpolate(i1, i2, y);
+            return Interpolate(i1, i2, y);
         }
 
         /// <summary>
-        /// Get the interpolated point from the noise graph using cosine interpolation
+        /// Get the interpolated point from the Noise graph using cosine interpolation
         /// </summary>
         /// <returns></returns>
-        private double interpolate(double a, double b, double x)
+        private double Interpolate(double a, double b, double x)
         {
             var ft = x*Math.PI;
             var f = (1 - Math.Cos(ft))*.5;

@@ -18,12 +18,12 @@ namespace Welt.Processors
 {
     public class VertexBuildChunkProcessor : IChunkProcessor
     {
-        private readonly GraphicsDevice _graphicsDevice;
+        private readonly GraphicsDevice m_graphicsDevice;
         private const int MAX_SUN_VALUE = 16;
 
         public VertexBuildChunkProcessor(GraphicsDevice graphicsDevice)
         {
-            _graphicsDevice = graphicsDevice;
+            m_graphicsDevice = graphicsDevice;
         }
 
         #region BuildVertexList
@@ -34,15 +34,15 @@ namespace Welt.Processors
             //and digging is handled correctly too 
             //TODO generalize highest/lowest None to non-solid
 
-            var yLow = (byte) (chunk.lowestNoneBlock.Y == 0 ? 0 : chunk.lowestNoneBlock.Y - 1);
+            var yLow = (byte) (chunk.LowestNoneBlock.Y == 0 ? 0 : chunk.LowestNoneBlock.Y - 1);
             var yHigh =
-                (byte) (chunk.highestSolidBlock.Y == Chunk.SIZE.Y ? Chunk.SIZE.Y : chunk.highestSolidBlock.Y + 1);
+                (byte) (chunk.HighestSolidBlock.Y == Chunk.Size.Y ? Chunk.Size.Y : chunk.HighestSolidBlock.Y + 1);
 
-            for (byte x = 0; x < Chunk.SIZE.X; x++)
+            for (byte x = 0; x < Chunk.Size.X; x++)
             {
-                for (byte z = 0; z < Chunk.SIZE.Z; z++)
+                for (byte z = 0; z < Chunk.Size.Z; z++)
                 {
-                    var offset = x*Chunk.FlattenOffset + z*Chunk.SIZE.Y;
+                    var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
                         // we don't want this x-z value to be calculated each in in y-loop!
 
                     #region ylow and yhigh on chunk borders
@@ -51,26 +51,26 @@ namespace Welt.Processors
                     {
                         if (chunk.E == null)
                         {
-                            yHigh = Chunk.SIZE.Y;
+                            yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.E.highestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.E.lowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.E.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.E.LowestNoneBlock.Y);
                         }
                     }
-                    else if (x == Chunk.MAX.X)
+                    else if (x == Chunk.Max.X)
                     {
                         if (chunk.W == null)
                         {
-                            yHigh = Chunk.SIZE.Y;
+                            yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.W.highestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.W.lowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.W.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.W.LowestNoneBlock.Y);
                         }
                     }
 
@@ -78,26 +78,26 @@ namespace Welt.Processors
                     {
                         if (chunk.S == null)
                         {
-                            yHigh = Chunk.SIZE.Y;
+                            yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.S.highestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.S.lowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.S.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.S.LowestNoneBlock.Y);
                         }
                     }
-                    else if (z == Chunk.MAX.Z)
+                    else if (z == Chunk.Max.Z)
                     {
                         if (chunk.N == null)
                         {
-                            yHigh = Chunk.SIZE.Y;
+                            yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.N.highestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.N.lowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.N.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.N.LowestNoneBlock.Y);
                         }
                     }
 
@@ -105,12 +105,12 @@ namespace Welt.Processors
 
                     for (var y = yLow; y < yHigh; y++)
                     {
-                        if (chunk.Blocks[offset + y].Type == BlockType.None) continue;
-                        if (BlockInformation.IsPlantBlock(chunk.Blocks[offset + y].Type))
+                        if (chunk.Blocks[offset + y].Id == BlockType.None) continue;
+                        if (BlockInformation.IsPlantBlock(chunk.Blocks[offset + y].Id))
                         {
                             BuildPlantVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
                         }
-                        else if (BlockInformation.IsGrassBlock(chunk.Blocks[offset + y].Type))
+                        else if (BlockInformation.IsGrassBlock(chunk.Blocks[offset + y].Id))
                         {
                             BuildGrassVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
                         }
@@ -122,36 +122,36 @@ namespace Welt.Processors
                 }
             }
 
-            var v = chunk.vertexList.ToArray();
-            var i = chunk.indexList.ToArray();
+            var v = chunk.VertexList.ToArray();
+            var i = chunk.IndexList.ToArray();
 
-            var water = chunk.watervertexList.ToArray();
-            var iWater = chunk.waterindexList.ToArray();
+            var water = chunk.WaterVertexList.ToArray();
+            var iWater = chunk.WaterIndexList.ToArray();
 
             lock (chunk)
             {
                 if (v.Length > 0)
                 {
-                    chunk.VertexBuffer = new VertexBuffer(_graphicsDevice, typeof (VertexPositionTextureLight), v.Length,
+                    chunk.VertexBuffer = new VertexBuffer(m_graphicsDevice, typeof (VertexPositionTextureLight), v.Length,
                         BufferUsage.WriteOnly);
                     chunk.VertexBuffer.SetData(v);
-                    chunk.IndexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, i.Length,
+                    chunk.IndexBuffer = new IndexBuffer(m_graphicsDevice, IndexElementSize.SixteenBits, i.Length,
                         BufferUsage.WriteOnly);
                     chunk.IndexBuffer.SetData(i);
                 }
 
                 if (water.Length > 0)
                 {
-                    chunk.waterVertexBuffer = new VertexBuffer(_graphicsDevice, typeof (VertexPositionTextureLight),
+                    chunk.WaterVertexBuffer = new VertexBuffer(m_graphicsDevice, typeof (VertexPositionTextureLight),
                         water.Length, BufferUsage.WriteOnly);
-                    chunk.waterVertexBuffer.SetData(water);
-                    chunk.waterIndexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits,
+                    chunk.WaterVertexBuffer.SetData(water);
+                    chunk.WaterIndexBuffer = new IndexBuffer(m_graphicsDevice, IndexElementSize.SixteenBits,
                         iWater.Length, BufferUsage.WriteOnly);
-                    chunk.waterIndexBuffer.SetData(iWater);
+                    chunk.WaterIndexBuffer.SetData(iWater);
                 }
             }
 
-            chunk.dirty = false;
+            chunk.Dirty = false;
         }
 
         #endregion
@@ -171,35 +171,35 @@ namespace Welt.Processors
 
             var solidBlock = new Block(BlockType.Rock);
 
-            var blockTopNw = chunk.BlockAt(x - 1, y + 1, z + 1);
-            var blockTopN = chunk.BlockAt(x, y + 1, z + 1);
-            var blockTopNe = chunk.BlockAt(x + 1, y + 1, z + 1);
-            var blockTopW = chunk.BlockAt(x - 1, y + 1, z);
-            var blockTopM = chunk.BlockAt(x, y + 1, z);
-            var blockTopE = chunk.BlockAt(x + 1, y + 1, z);
-            var blockTopSw = chunk.BlockAt(x - 1, y + 1, z - 1);
-            var blockTopS = chunk.BlockAt(x, y + 1, z - 1);
-            var blockTopSe = chunk.BlockAt(x + 1, y + 1, z - 1);
+            var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
+            var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
+            var blockTopNe = chunk.GetBlock(x + 1, y + 1, z + 1);
+            var blockTopW = chunk.GetBlock(x - 1, y + 1, z);
+            var blockTopM = chunk.GetBlock(x, y + 1, z);
+            var blockTopE = chunk.GetBlock(x + 1, y + 1, z);
+            var blockTopSw = chunk.GetBlock(x - 1, y + 1, z - 1);
+            var blockTopS = chunk.GetBlock(x, y + 1, z - 1);
+            var blockTopSe = chunk.GetBlock(x + 1, y + 1, z - 1);
 
-            var blockMidNw = chunk.BlockAt(x - 1, y, z + 1);
-            var blockMidN = chunk.BlockAt(x, y, z + 1);
-            var blockMidNe = chunk.BlockAt(x + 1, y, z + 1);
-            var blockMidW = chunk.BlockAt(x - 1, y, z);
-            var blockMidM = chunk.BlockAt(x, y, z);
-            var blockMidE = chunk.BlockAt(x + 1, y, z);
-            var blockMidSw = chunk.BlockAt(x - 1, y, z - 1);
-            var blockMidS = chunk.BlockAt(x, y, z - 1);
-            var blockMidSe = chunk.BlockAt(x + 1, y, z - 1);
+            var blockMidNw = chunk.GetBlock(x - 1, y, z + 1);
+            var blockMidN = chunk.GetBlock(x, y, z + 1);
+            var blockMidNe = chunk.GetBlock(x + 1, y, z + 1);
+            var blockMidW = chunk.GetBlock(x - 1, y, z);
+            var blockMidM = chunk.GetBlock(x, y, z);
+            var blockMidE = chunk.GetBlock(x + 1, y, z);
+            var blockMidSw = chunk.GetBlock(x - 1, y, z - 1);
+            var blockMidS = chunk.GetBlock(x, y, z - 1);
+            var blockMidSe = chunk.GetBlock(x + 1, y, z - 1);
 
-            var blockBotNw = chunk.BlockAt(x - 1, y - 1, z + 1);
-            var blockBotN = chunk.BlockAt(x, y - 1, z + 1);
-            var blockBotNe = chunk.BlockAt(x + 1, y - 1, z + 1);
-            var blockBotW = chunk.BlockAt(x - 1, y - 1, z);
-            var blockBotM = chunk.BlockAt(x, y - 1, z);
-            var blockBotE = chunk.BlockAt(x + 1, y - 1, z);
-            var blockBotSw = chunk.BlockAt(x - 1, y - 1, z - 1);
-            var blockBotS = chunk.BlockAt(x, y - 1, z - 1);
-            var blockBotSe = chunk.BlockAt(x + 1, y - 1, z - 1);
+            var blockBotNw = chunk.GetBlock(x - 1, y - 1, z + 1);
+            var blockBotN = chunk.GetBlock(x, y - 1, z + 1);
+            var blockBotNe = chunk.GetBlock(x + 1, y - 1, z + 1);
+            var blockBotW = chunk.GetBlock(x - 1, y - 1, z);
+            var blockBotM = chunk.GetBlock(x, y - 1, z);
+            var blockBotE = chunk.GetBlock(x + 1, y - 1, z);
+            var blockBotSw = chunk.GetBlock(x - 1, y - 1, z - 1);
+            var blockBotS = chunk.GetBlock(x, y - 1, z - 1);
+            var blockBotSe = chunk.GetBlock(x + 1, y - 1, z - 1);
 
             float sunTr, sunTl, sunBr, sunBl;
             float redTr, redTl, redBr, redBl;
@@ -209,7 +209,7 @@ namespace Welt.Processors
 
 
             // XDecreasing
-            if (BlockInformation.IsTransparentBlock(blockMidW.Type) && block.Type != blockMidW.Type)
+            if (BlockInformation.IsTransparentBlock(blockMidW.Id) && block.Id != blockMidW.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
@@ -237,9 +237,9 @@ namespace Welt.Processors
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
-                    block.Type, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockMidE.Type) && block.Type != blockMidE.Type)
+            if (BlockInformation.IsTransparentBlock(blockMidE.Id) && block.Id != blockMidE.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
@@ -267,9 +267,9 @@ namespace Welt.Processors
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
-                    block.Type, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockBotM.Type) && block.Type != blockBotM.Type)
+            if (BlockInformation.IsTransparentBlock(blockBotM.Id) && block.Id != blockBotM.Id)
             {
                 sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun)/4);
                 sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun)/4);
@@ -297,9 +297,9 @@ namespace Welt.Processors
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
-                    block.Type, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockTopM.Type) && block.Type != blockTopM.Type)
+            if (BlockInformation.IsTransparentBlock(blockTopM.Id) && block.Id != blockTopM.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun)/4);
@@ -327,9 +327,9 @@ namespace Welt.Processors
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
-                    block.Type, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockMidS.Type) && block.Type != blockMidS.Type)
+            if (BlockInformation.IsTransparentBlock(blockMidS.Id) && block.Id != blockMidS.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
@@ -357,9 +357,9 @@ namespace Welt.Processors
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
-                    block.Type, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockMidN.Type) && block.Type != blockMidN.Type)
+            if (BlockInformation.IsTransparentBlock(blockMidN.Id) && block.Id != blockMidN.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
@@ -387,7 +387,7 @@ namespace Welt.Processors
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
-                    block.Type, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
         }
 
@@ -475,9 +475,9 @@ namespace Welt.Processors
             //localBL = new Color(redBL, grnBL, bluBL);
             //localBR = new Color(redBR, grnBR, bluBR);
 
-            //_blockRenderer.BuildFaceVertices(blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block.Type, sunTL, sunTR, sunBL, sunBR, localTL, localTR, localBL, localBR);
+            //_blockRenderer.BuildFaceVertices(blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block.Id, sunTL, sunTR, sunBL, sunBR, localTL, localTR, localBL, localBR);
 
-            BuildPlantVertices(chunk, blockPosition, chunkRelativePosition, block.Type, 0.6f, Color.LightGray);
+            BuildPlantVertices(chunk, blockPosition, chunkRelativePosition, block.Id, 0.6f, Color.LightGray);
         }
 
         #endregion
@@ -564,15 +564,15 @@ namespace Welt.Processors
             //localBL = new Color(redBL, grnBL, bluBL);
             //localBR = new Color(redBR, grnBR, bluBR);
 
-            //_blockRenderer.BuildFaceVertices(blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block.Type, sunTL, sunTR, sunBL, sunBR, localTL, localTR, localBL, localBR);
+            //_blockRenderer.BuildFaceVertices(blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block.Id, sunTL, sunTR, sunBL, sunBR, localTL, localTR, localBL, localBR);
 
-            BuildGrassVertices(chunk, blockPosition, chunkRelativePosition, block.Type, 0.6f, Color.LightGray);
+            BuildGrassVertices(chunk, blockPosition, chunkRelativePosition, block.Id, 0.6f, Color.LightGray);
         }
 
         #endregion
 
         public void BuildGrassVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
-            BlockType blockType, float sunLight, Color localLight)
+            ushort blockType, float sunLight, Color localLight)
         {
             var texture = BlockInformation.GetTexture(blockType);
 
@@ -668,7 +668,7 @@ namespace Welt.Processors
         #region BuildPlantVertices
 
         public void BuildPlantVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
-            BlockType blockType, float sunLight, Color localLight)
+            ushort blockType, float sunLight, Color localLight)
         {
             var texture = BlockInformation.GetTexture(blockType);
 
@@ -722,7 +722,7 @@ namespace Welt.Processors
         #region BuildFaceVertices
 
         public void BuildFaceVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
-            BlockFaceDirection faceDir, BlockType blockType, float sunLightTl, float sunLightTr, float sunLightBl,
+            BlockFaceDirection faceDir, ushort blockType, float sunLightTl, float sunLightTr, float sunLightBl,
             float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr)
         {
             var texture = BlockInformation.GetTexture(blockType, faceDir);
@@ -830,45 +830,45 @@ namespace Welt.Processors
 
         #endregion
 
-        private void AddVertex(Chunk chunk, BlockType blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        private void AddVertex(Chunk chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
             Vector3 vertexAdd, Vector3 normal, Vector2 uv1, float sunLight, Color localLight)
         {
             if (blockType != BlockType.Water)
             {
-                chunk.vertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1, sunLight,
+                chunk.VertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1, sunLight,
                     localLight.ToVector3()));
             }
             else
             {
-                chunk.watervertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1,
+                chunk.WaterVertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1,
                     sunLight, localLight.ToVector3()));
             }
         }
 
         #region AddIndex
 
-        private void AddIndex(Chunk chunk, BlockType blockType, short i1, short i2, short i3, short i4, short i5,
+        private void AddIndex(Chunk chunk, ushort blockType, short i1, short i2, short i3, short i4, short i5,
             short i6)
         {
             if (blockType != BlockType.Water)
             {
-                chunk.indexList.Add((short) (chunk.VertexCount + i1));
-                chunk.indexList.Add((short) (chunk.VertexCount + i2));
-                chunk.indexList.Add((short) (chunk.VertexCount + i3));
-                chunk.indexList.Add((short) (chunk.VertexCount + i4));
-                chunk.indexList.Add((short) (chunk.VertexCount + i5));
-                chunk.indexList.Add((short) (chunk.VertexCount + i6));
+                chunk.IndexList.Add((short) (chunk.VertexCount + i1));
+                chunk.IndexList.Add((short) (chunk.VertexCount + i2));
+                chunk.IndexList.Add((short) (chunk.VertexCount + i3));
+                chunk.IndexList.Add((short) (chunk.VertexCount + i4));
+                chunk.IndexList.Add((short) (chunk.VertexCount + i5));
+                chunk.IndexList.Add((short) (chunk.VertexCount + i6));
                 chunk.VertexCount += 4;
             }
             else
             {
-                chunk.waterindexList.Add((short) (chunk.waterVertexCount + i1));
-                chunk.waterindexList.Add((short) (chunk.waterVertexCount + i2));
-                chunk.waterindexList.Add((short) (chunk.waterVertexCount + i3));
-                chunk.waterindexList.Add((short) (chunk.waterVertexCount + i4));
-                chunk.waterindexList.Add((short) (chunk.waterVertexCount + i5));
-                chunk.waterindexList.Add((short) (chunk.waterVertexCount + i6));
-                chunk.waterVertexCount += 4;
+                chunk.WaterIndexList.Add((short) (chunk.WaterVertexCount + i1));
+                chunk.WaterIndexList.Add((short) (chunk.WaterVertexCount + i2));
+                chunk.WaterIndexList.Add((short) (chunk.WaterVertexCount + i3));
+                chunk.WaterIndexList.Add((short) (chunk.WaterVertexCount + i4));
+                chunk.WaterIndexList.Add((short) (chunk.WaterVertexCount + i5));
+                chunk.WaterIndexList.Add((short) (chunk.WaterVertexCount + i6));
+                chunk.WaterVertexCount += 4;
             }
         }
 

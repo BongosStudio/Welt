@@ -75,7 +75,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	}
 
 	output.Color.rgb = (sColor * input.SunLight) + (input.LocalLight.rgb);
-	output.Color.a = 1;
+	output.Color.a = 0.7;
 
     return output;
 }
@@ -88,7 +88,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
     float4 color;
 	color.rgb = texColor1.rgb * input.Color.rgb;
-	color.a = 0.5;
+	color.a = 0.3;
 
 	
 	float4 topColor = SunColor;	 
@@ -124,7 +124,7 @@ technique BlockTechnique
 {
     pass Pass1
     {
-        VertexShader = compile vs_4_0 VertexShaderFunction();
-        PixelShader = compile ps_4_0 PixelShaderFunction();
+        VertexShader = compile vs_4_0_level_9_1 VertexShaderFunction();
+        PixelShader = compile ps_4_0_level_9_1 PixelShaderFunction();
     }
 }

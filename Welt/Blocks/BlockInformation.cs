@@ -7,60 +7,60 @@ namespace Welt.Blocks
 {
     public class BlockInformation
     {
-        public static BlockTexture GetTexture(BlockType blockType)
+        public static BlockTexture GetTexture(ushort blockType)
         {
             return GetTexture(blockType, BlockFaceDirection.Maximum, BlockType.None);
         }
 
-        public static BlockTexture GetTexture(BlockType blockType, BlockFaceDirection faceDir)
+        public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir)
         {
             return GetTexture(blockType, faceDir, BlockType.None);
         }
 
-        public static uint GetCost(BlockType type)
+        public static uint GetCost(ushort type)
         {
             return 1;
         }
 
-        public static bool IsCapBlock(BlockType type)
+        public static bool IsCapBlock(ushort type)
         {
             if (type == BlockType.Snow) return true;
             return false;
         }
 
-        public static bool IsHalfBlock(BlockType type)
+        public static bool IsHalfBlock(ushort type)
         {
             if (type == BlockType.Rock) return true;
             return false;
         }
 
-        public static bool IsSolidBlock(BlockType type)
+        public static bool IsSolidBlock(ushort type)
         {
             if (type == BlockType.Water || type == BlockType.None || type == BlockType.Snow ||
                 type == BlockType.RedFlower || type == BlockType.LongGrass) return false;
             return true;
         }
 
-        public static bool IsPlantBlock(BlockType type)
+        public static bool IsPlantBlock(ushort type)
         {
             if (type == BlockType.RedFlower) return true;
             return false;
         }
 
-        public static bool IsGrassBlock(BlockType type)
+        public static bool IsGrassBlock(ushort type)
         {
             if (type == BlockType.LongGrass) return true;
             return false;
         }
 
-        public static bool IsTransparentBlock(BlockType type)
+        public static bool IsTransparentBlock(ushort type)
         {
             if (type == BlockType.None || type == BlockType.Water || type == BlockType.Leaves || type == BlockType.Snow ||
                 type == BlockType.RedFlower || type == BlockType.Rock || type == BlockType.LongGrass) return true;
             return false;
         }
 
-        public static bool IsDiggable(BlockType type)
+        public static bool IsDiggable(ushort type)
         {
             if (type == BlockType.Water) return false;
             return true;
@@ -75,7 +75,7 @@ namespace Welt.Blocks
         /// <param name="faceDir"></param>
         /// <param name="blockAbove">Reserved for blocks which behave differently if certain blocks are above them</param>
         /// <returns></returns>
-        public static BlockTexture GetTexture(BlockType blockType, BlockFaceDirection faceDir, BlockType blockAbove)
+        public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir, ushort blockAbove)
         {
             switch (blockType)
             {

@@ -56,6 +56,13 @@ namespace Welt
             return Math.Sqrt((a*a) + (b*b));
         }
 
+        public static double DistanceTo(float ax, float az, float bx, float bz)
+        {
+            var a = Math.Abs(ax - bx);
+            var b = Math.Abs(az - bz);
+            return Math.Sqrt((a*a) + (b*b));
+        }
+
         public static int Average(params int[] values)
         {
             return values.Sum()/values.Length;

@@ -32,6 +32,7 @@ namespace Welt.Models
         public Vector3 TargetPoint;
 
         public bool IsInWater;
+        public bool IsMoving;
 
         //keep it stupid simple for now, left hand/mousebutton & right hand/mousebutton
         #endregion

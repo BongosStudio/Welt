@@ -22,20 +22,20 @@ namespace Welt.Cameras
 
         public float LeftRightRotation
         {
-            get { return _leftRightRotation; }
+            get { return m_leftRightRotation; }
             set
             {
-                _leftRightRotation = value;
+                m_leftRightRotation = value;
                 CalculateView();
             }
         }
 
         public float UpDownRotation
         {
-            get { return _upDownRotation; }
+            get { return m_upDownRotation; }
             set
             {
-                _upDownRotation = value;
+                m_upDownRotation = value;
                 CalculateView();
             }
         }
@@ -46,8 +46,8 @@ namespace Welt.Cameras
 
         public override void Initialize()
         {
-            _upDownRotation = 0;
-            _leftRightRotation = 0;
+            m_upDownRotation = 0;
+            m_leftRightRotation = 0;
 
             base.Initialize();
         }
@@ -58,7 +58,7 @@ namespace Welt.Cameras
 
         protected override void CalculateView()
         {
-            var rotationMatrix = Matrix.CreateRotationX(_upDownRotation)*Matrix.CreateRotationY(_leftRightRotation);
+            var rotationMatrix = Matrix.CreateRotationX(m_upDownRotation)*Matrix.CreateRotationY(m_leftRightRotation);
             LookVector = Vector3.Transform(Vector3.Forward, rotationMatrix);
 
             Target = Position + LookVector;
@@ -95,19 +95,19 @@ namespace Welt.Cameras
             //TODO optimize with modulo (see url)
             //http://gamedev.stackexchange.com/questions/7325/snapping-an-angle-to-the-closest-cardinal-direction
 
-            var a = MathHelper.WrapAngle(_leftRightRotation);
+            var a = MathHelper.WrapAngle(m_leftRightRotation);
             a = MathHelper.PiOver4*(float) Math.Round(a/MathHelper.PiOver4);
 
             if (a == 0)
                 return (Cardinal.N);
             if (a.CompareTo(MathHelper.PiOver4) == 0)
-                return (Cardinal.NW);
+                return (Cardinal.Nw);
             if (a.CompareTo(-MathHelper.PiOver4) == 0)
-                return (Cardinal.NE);
+                return (Cardinal.Ne);
             if (a.CompareTo(MathHelper.Pi - MathHelper.PiOver4) == 0)
-                return (Cardinal.SW);
+                return (Cardinal.Sw);
             if (a.CompareTo(-(MathHelper.Pi - MathHelper.PiOver4)) == 0)
-                return (Cardinal.SE);
+                return (Cardinal.Se);
             if (a.CompareTo(MathHelper.PiOver2) == 0)
                 return (Cardinal.W);
             if (a.CompareTo(-MathHelper.PiOver2) == 0)
@@ -122,8 +122,8 @@ namespace Welt.Cameras
         #region Fields
 
         private const float ROTATION_SPEED = 0.05f;
-        private float _leftRightRotation;
-        private float _upDownRotation;
+        private float m_leftRightRotation;
+        private float m_upDownRotation;
 
         #endregion
     }

@@ -8,37 +8,37 @@ namespace Welt.Managers
 {
     public class TaskManager : IDisposable
     {
-        private readonly Queue<GameTask> _tasks;
+        private readonly Queue<GameTask> m_tasks;
 
         public TaskManager()
         {
-            _tasks = new Queue<GameTask>();
+            m_tasks = new Queue<GameTask>();
         }
          
         public void Queue(Action<object> action)
         {
-            _tasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now});
+            m_tasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now});
         }
 
         public void Queue(Action<object> action, TimeSpan wait)
         {
-            _tasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now.Add(wait)});
+            m_tasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now.Add(wait)});
         }
 
         public void Queue(Action<object> action, double ticks)
         {
-            _tasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now.AddMilliseconds(ticks)});
+            m_tasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now.AddMilliseconds(ticks)});
         }
 
         public void Update()
         {
-            for (var i = 0; i < _tasks.Count; i++)
+            for (var i = 0; i < m_tasks.Count; i++)
             {
-                var task = _tasks.Dequeue();
+                var task = m_tasks.Dequeue();
                 if (task.ToBeExecutedAt > DateTime.Now)
                 {
                     // queue it back to the line
-                    _tasks.Enqueue(task);
+                    m_tasks.Enqueue(task);
                 }
                 else
                 {
@@ -46,7 +46,7 @@ namespace Welt.Managers
                     task.Action.Invoke(null);
                 }
             }
-            _tasks.TrimExcess();
+            m_tasks.TrimExcess();
         }
 
 
@@ -58,7 +58,7 @@ namespace Welt.Managers
 
         public void Dispose()
         {
-            _tasks.Clear();
+            m_tasks.Clear();
         }
     }
 }

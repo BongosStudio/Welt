@@ -18,21 +18,21 @@ namespace Welt.Controllers
         private const float MOVEMENTSPEED = 0.25f;
         private const float ROTATIONSPEED = 0.1f;
 
-        private MouseState _mouseMoveState;
-        private MouseState _mouseState;
+        private MouseState m_mouseMoveState;
+        private MouseState m_mouseState;
 
-        private readonly FirstPersonCamera _camera;
+        public readonly FirstPersonCamera Camera;
 
         #endregion
 
         public FirstPersonCameraController(FirstPersonCamera camera)
         {
-            this._camera = camera;
+            this.Camera = camera;
         }
 
         public void Initialize()
         {
-            _mouseState = Mouse.GetState();
+            m_mouseState = Mouse.GetState();
         }
 
         #region ProcessInput
@@ -62,9 +62,9 @@ namespace Welt.Controllers
 
             if (moveVector != Vector3.Zero)
             {
-                var rotationMatrix = Matrix.CreateRotationX(_camera.UpDownRotation) * Matrix.CreateRotationY(_camera.LeftRightRotation);
+                var rotationMatrix = Matrix.CreateRotationX(Camera.UpDownRotation) * Matrix.CreateRotationY(Camera.LeftRightRotation);
                 var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
-                _camera.Position += rotatedVector * MOVEMENTSPEED;
+                Camera.Position += rotatedVector * MOVEMENTSPEED;
             }
         }
         #endregion
@@ -74,36 +74,36 @@ namespace Welt.Controllers
         {
             var currentMouseState = Mouse.GetState();
 
-            float mouseDx = currentMouseState.X - _mouseMoveState.X;
-            float mouseDy = currentMouseState.Y - _mouseMoveState.Y;
+            float mouseDx = currentMouseState.X - m_mouseMoveState.X;
+            float mouseDy = currentMouseState.Y - m_mouseMoveState.Y;
 
             if (mouseDx != 0)
             {
-                _camera.LeftRightRotation -= ROTATIONSPEED * (mouseDx / 50);
+                Camera.LeftRightRotation -= ROTATIONSPEED * (mouseDx / 50);
             }
             if (mouseDy != 0)
             {
-                _camera.UpDownRotation -= ROTATIONSPEED * (mouseDy / 50);
+                Camera.UpDownRotation -= ROTATIONSPEED * (mouseDy / 50);
 
                 // Locking camera rotation vertically between +/- 180 degrees
-                var newPosition = _camera.UpDownRotation - ROTATIONSPEED * (mouseDy / 50);  
+                var newPosition = Camera.UpDownRotation - ROTATIONSPEED * (mouseDy / 50);  
                 if (newPosition < -1.55f)  
                     newPosition = -1.55f;  
                 else if (newPosition > 1.55f)  
                     newPosition = 1.55f;  
-                _camera.UpDownRotation = newPosition;  
+                Camera.UpDownRotation = newPosition;  
                 // End of locking
             }
 
             //camera.LeftRightRotation -= GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.X / 20;
             //camera.UpDownRotation += GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.Y / 20;
 
-            _mouseMoveState = new MouseState(_camera.Viewport.Width / 2,
-                    _camera.Viewport.Height / 2,
+            m_mouseMoveState = new MouseState(Camera.Viewport.Width / 2,
+                    Camera.Viewport.Height / 2,
                     0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
 
-            Mouse.SetPosition((int)_mouseMoveState.X, (int)_mouseMoveState.Y);
-            _mouseState = Mouse.GetState();
+            Mouse.SetPosition((int)m_mouseMoveState.X, (int)m_mouseMoveState.Y);
+            m_mouseState = Mouse.GetState();
         }
         #endregion
 

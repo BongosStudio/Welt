@@ -3,6 +3,8 @@
 #endregion
 #region Using Statements
 
+using System;
+using Welt.IO;
 using Welt.Models;
 
 #endregion
@@ -11,8 +13,8 @@ namespace Welt.Forge.Generators
 {
     internal class DualLayerTerrainWithMediumValleysForRivers : SimpleTerrain
     {
-        private float lowerGroundHeight;
-        private int upperGroundHeight;
+        private float m_lowerGroundHeight;
+        private int m_upperGroundHeight;
 
         public override void Generate(Chunk chunk)
         {
@@ -24,29 +26,29 @@ namespace Welt.Forge.Generators
 
         #region generateTerrain
 
-        protected override sealed void generateTerrain(Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
+        protected override sealed void GenerateTerrain(Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
             uint worldZ)
         {
-            lowerGroundHeight = GetLowerGroundHeight(chunk, worldX, worldZ);
-            upperGroundHeight = GetUpperGroundHeight(chunk, worldX, worldZ, lowerGroundHeight);
+            m_lowerGroundHeight = GetLowerGroundHeight(chunk, worldX, worldZ);
+            m_upperGroundHeight = GetUpperGroundHeight(chunk, worldX, worldZ, m_lowerGroundHeight);
 
             var sunlit = true;
 
-            for (int y = Chunk.MAX.Y; y >= 0; y--)
+            for (int y = Chunk.Max.Y; y >= 0; y--)
             {
                 // Everything above ground height...is air.
-                BlockType blockType;
-                if (y > upperGroundHeight)
+                ushort blockType;
+                if (y > m_upperGroundHeight)
                 {
                     blockType = BlockType.None;
                 }
                 // Are we above the lower ground height?
-                else if (y > lowerGroundHeight)
+                else if (y > m_lowerGroundHeight)
                 {
                     // Let's see about some caves er valleys!
-                    var caveNoise = PerlinSimplexNoise.noise(worldX*0.01f, worldZ*0.01f, y*0.01f)*(0.015f*y) + 0.1f;
-                    caveNoise += PerlinSimplexNoise.noise(worldX*0.01f, worldZ*0.01f, y*0.1f)*0.06f + 0.1f;
-                    caveNoise += PerlinSimplexNoise.noise(worldX*0.2f, worldZ*0.2f, y*0.2f)*0.03f + 0.01f;
+                    var caveNoise = PerlinSimplexNoise.Noise(worldX*0.01f, worldZ*0.01f, y*0.01f)*(0.015f*y) + 0.1f;
+                    caveNoise += PerlinSimplexNoise.Noise(worldX*0.01f, worldZ*0.01f, y*0.1f)*0.06f + 0.1f;
+                    caveNoise += PerlinSimplexNoise.Noise(worldX*0.2f, worldZ*0.2f, y*0.2f)*0.03f + 0.01f;
                     // We have a cave, draw air here.
                     if (caveNoise > 0.2f)
                     {
@@ -57,14 +59,7 @@ namespace Welt.Forge.Generators
                         blockType = BlockType.None;
                         if (sunlit)
                         {
-                            if (y > SNOWLEVEL + r.Next(3))
-                            {
-                                blockType = BlockType.Snow;
-                            }
-                            else
-                            {
-                                blockType = BlockType.Grass;
-                            }
+                            blockType = y > Snowlevel + R.Next(3) ? BlockType.Snow : BlockType.Grass;
                             sunlit = false;
                         }
                         else
@@ -87,7 +82,7 @@ namespace Welt.Forge.Generators
                     }
                 }
 
-                if (blockType == BlockType.None && y <= WATERLEVEL)
+                if (blockType == BlockType.None && y <= Waterlevel)
                 {
                     //if (y <= WATERLEVEL)
                     //{
@@ -95,7 +90,7 @@ namespace Welt.Forge.Generators
                     sunlit = false;
                     //}
                 }
-                chunk.setBlock(blockXInChunk, (byte) y, blockZInChunk, new Block(blockType));
+                chunk.SetBlock(blockXInChunk, (byte) y, blockZInChunk, new Block(blockType));
             }
         }
 
@@ -108,23 +103,23 @@ namespace Welt.Forge.Generators
             //BlockType blockType;
             //bool sunlit = true;
 
-            for (byte x = 0; x < Chunk.SIZE.X; x++)
+            for (byte x = 0; x < Chunk.Size.X; x++)
             {
-                for (byte z = 0; z < Chunk.SIZE.Z; z++)
+                for (byte z = 0; z < Chunk.Size.Z; z++)
                 {
-                    var offset = x*Chunk.FlattenOffset + z*Chunk.SIZE.Y;
+                    var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
                     //for (byte y = WATERLEVEL + 9; y >= MINIMUMGROUNDHEIGHT; y--)
-                    for (byte y = WATERLEVEL + 9; y >= (byte) lowerGroundHeight; y--)
+                    for (byte y = Waterlevel + 9; y >= (byte) m_lowerGroundHeight; y--)
                     {
-                        //blockType = chunk.Blocks[offset + y].Type;
-                        if (chunk.Blocks[offset + y].Type == BlockType.None)
+                        //blockType = chunk.Blocks[offset + y].Id;
+                        if (chunk.Blocks[offset + y].Id == BlockType.None)
                         {
-                            chunk.setBlock(x, y, z, new Block(BlockType.Water));
+                            chunk.SetBlock(x, y, z, new Block(BlockType.Water));
                             //blockType = BlockType.Water;
                         }
                         //else
                         //{
-                        //    if (chunk.Blocks[offset + y].Type == BlockType.Grass)
+                        //    if (chunk.Blocks[offset + y].Id == BlockType.Grass)
                         //    {
                         //        blockType = BlockType.Sand;
                         //        //if (y <= WATERLEVEL)
@@ -136,13 +131,13 @@ namespace Welt.Forge.Generators
                         //}
                         //chunk.SetBlock(x, y, z, new Block(blockType));
                     }
-                    for (byte y = WATERLEVEL + 11; y >= WATERLEVEL; y--)
+                    for (byte y = Waterlevel + 11; y >= Waterlevel; y--)
                     {
-                        if ((chunk.Blocks[offset + y].Type == BlockType.Dirt) ||
-                            (chunk.Blocks[offset + y].Type == BlockType.Grass) ||
-                            (chunk.Blocks[offset + y].Type == BlockType.Lava))
+                        if ((chunk.Blocks[offset + y].Id == BlockType.Dirt) ||
+                            (chunk.Blocks[offset + y].Id == BlockType.Grass) ||
+                            (chunk.Blocks[offset + y].Id == BlockType.Lava))
                         {
-                            chunk.setBlock(x, y, z, new Block(BlockType.Sand));
+                            chunk.SetBlock(x, y, z, new Block(BlockType.Sand));
                         }
                     }
                 }
@@ -155,23 +150,23 @@ namespace Welt.Forge.Generators
 
         private void GenerateTreesFlowers(Chunk chunk)
         {
-            for (byte x = 0; x < Chunk.SIZE.X; x++)
+            for (byte x = 0; x < Chunk.Size.X; x++)
             {
-                for (byte z = 0; z < Chunk.SIZE.Z; z++)
+                for (byte z = 0; z < Chunk.Size.Z; z++)
                 {
-                    var offset = x*Chunk.FlattenOffset + z*Chunk.SIZE.Y;
-                    for (var y = upperGroundHeight + 1; y >= WATERLEVEL + 9; y--)
+                    var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
+                    for (var y = m_upperGroundHeight + 1; y >= Waterlevel + 9; y--)
                     {
-                        if (chunk.Blocks[offset + y].Type == BlockType.Grass)
+                        if (chunk.Blocks[offset + y].Id == BlockType.Grass)
                         {
-                            if (r.Next(700) == 1)
+                            if (R.Next(700) == 1)
                             {
                                 BuildTree(chunk, x, (byte) y, z);
                             }
-                            else if (r.Next(50) == 1)
+                            else if (R.Next(50) == 1)
                             {
                                 y++;
-                                chunk.setBlock(x, (byte) y, z, new Block(BlockType.RedFlower));
+                                chunk.SetBlock(x, (byte) y, z, new Block(BlockType.RedFlower));
                             }
                             //else if (r.Next(2) == 1)
                             //{
@@ -190,12 +185,12 @@ namespace Welt.Forge.Generators
 
         private static int GetUpperGroundHeight(Chunk chunk, uint blockX, uint blockY, float lowerGroundHeight)
         {
-            var octave1 = PerlinSimplexNoise.noise((blockX + 100)*0.001f, blockY*0.001f)*0.5f;
-            var octave2 = PerlinSimplexNoise.noise((blockX + 100)*0.002f, blockY*0.002f)*0.25f;
-            var octave3 = PerlinSimplexNoise.noise((blockX + 100)*0.01f, blockY*0.01f)*0.25f;
+            var octave1 = PerlinSimplexNoise.Noise((blockX + 100)*0.001f, blockY*0.001f)*0.5f;
+            var octave2 = PerlinSimplexNoise.Noise((blockX + 100)*0.002f, blockY*0.002f)*0.25f;
+            var octave3 = PerlinSimplexNoise.Noise((blockX + 100)*0.01f, blockY*0.01f)*0.25f;
             var octaveSum = octave1 + octave2 + octave3;
 
-            return (int) (octaveSum*(Chunk.SIZE.Y/2f)) + (int) (lowerGroundHeight);
+            return (int) (octaveSum*(Chunk.Size.Y/2f)) + (int) (lowerGroundHeight);
         }
 
         #endregion
@@ -204,12 +199,12 @@ namespace Welt.Forge.Generators
 
         private static float GetLowerGroundHeight(Chunk chunk, uint blockX, uint blockY)
         {
-            var minimumGroundheight = Chunk.SIZE.Y/4;
-            var minimumGroundDepth = (int) (Chunk.SIZE.Y*0.5f);
+            var minimumGroundheight = Chunk.Size.Y/4;
+            var minimumGroundDepth = (int) (Chunk.Size.Y*0.5f);
 
-            var octave1 = PerlinSimplexNoise.noise(blockX*0.0001f, blockY*0.0001f)*0.5f;
-            var octave2 = PerlinSimplexNoise.noise(blockX*0.0005f, blockY*0.0005f)*0.35f;
-            var octave3 = PerlinSimplexNoise.noise(blockX*0.02f, blockY*0.02f)*0.15f;
+            var octave1 = PerlinSimplexNoise.Noise(blockX*0.0001f, blockY*0.0001f)*0.5f;
+            var octave2 = PerlinSimplexNoise.Noise(blockX*0.0005f, blockY*0.0005f)*0.35f;
+            var octave3 = PerlinSimplexNoise.Noise(blockX*0.02f, blockY*0.02f)*0.15f;
             var lowerGroundHeight = octave1 + octave2 + octave3;
 
             lowerGroundHeight = lowerGroundHeight*minimumGroundDepth + minimumGroundheight;

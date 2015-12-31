@@ -17,101 +17,102 @@ namespace Welt.Scenes
     {
         protected override Color BackColor => Color.Black;
 
-        private World _world;
-        private IRenderer _renderer;
-        private HudRenderer _hud;
+        private World m_world;
+        private IRenderer m_renderer;
+        private HudRenderer m_hud;
 
-        private Player _player1; //wont add a player2 for some time, but naming like this helps designing  
-        private PlayerRenderer _player1Renderer;
+        private Player m_player1; //wont add a player2 for some time, but naming like this helps designing  
+        private PlayerRenderer m_player1Renderer;
 
-        private DiagnosticWorldRenderer _diagnosticWorldRenderer;
-        private bool _diagnosticMode;
-        private bool _releaseMouse;
-        private KeyboardState _oldKeyboardState;
+        private DiagnosticWorldRenderer m_diagnosticWorldRenderer;
+        private bool m_diagnosticMode;
+        private bool m_releaseMouse;
+        private KeyboardState m_oldKeyboardState;
 
-        private SkyDomeRenderer _skyDomeRenderer;
+        private SkyDomeRenderer m_skyDomeRenderer;
 
         public PlayScene(Game game) : base(game)
         {
-            //var frameRate = new FrameRateCounter(game) { DrawOrder = 1 };
-            //Game.Components.Add(frameRate);
+            
         }
 
+        #region Initialize
+
+        /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
         public override void Initialize()
         {
-            ShowDebugKeysHelp();
-            Game.Content.Unload();
-            _world = new World();
+            m_world = new World();
+            m_player1 = new Player(m_world);
+            m_player1Renderer = new PlayerRenderer(GraphicsDevice, m_player1);
+            m_hud = new HudRenderer(GraphicsDevice, m_world, m_player1Renderer);
+            m_renderer = new SimpleRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
+            m_diagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
+            m_skyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
 
-            _player1 = new Player(_world);
-
-            _player1Renderer = new PlayerRenderer(Controller.Game.GraphicsDevice, _player1);
-            _player1Renderer.Initialize();
-
-            _hud = new HudRenderer(Controller.Game.GraphicsDevice, _world, _player1Renderer.Camera);
-            _hud.Initialize();
+            base.Initialize();
+            
+            m_player1Renderer.Initialize();
+            
+            m_hud.Initialize();
 
             #region choose renderer
 
-            //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);
-            _renderer = new SimpleRenderer(Controller.Game.GraphicsDevice, _player1Renderer.Camera, _world);
+            //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);          
+            m_renderer.Initialize();
+            m_diagnosticWorldRenderer.Initialize();
+            m_skyDomeRenderer.Initialize();
 
-            _diagnosticWorldRenderer = new DiagnosticWorldRenderer(Controller.Game.GraphicsDevice, _player1Renderer.Camera, _world);
-            _skyDomeRenderer = new SkyDomeRenderer(Controller.Game.GraphicsDevice, _player1Renderer.Camera, _world);
-            _renderer.Initialize();
-            _diagnosticWorldRenderer.Initialize();
-            _skyDomeRenderer.Initialize();
             #endregion
 
-            _renderer.LoadContent(Game.Content);
-            _diagnosticWorldRenderer.LoadContent(Game.Content);
-            _skyDomeRenderer.LoadContent(Game.Content);
-            _player1Renderer.LoadContent(Game.Content);
-            _hud.LoadContent(Game.Content);
-
-            _oldKeyboardState = Keyboard.GetState();
             //TODO refactor WorldRenderer needs player position + view frustum 
-            base.Initialize();
         }
 
-        public override void Update(GameTime gameTime)
+        #endregion
+
+        public override void OnExiting(object sender, EventArgs args)
         {
-            ProcessDebugKeys();
-            if (Game.IsActive)
-            {
-                if (!_releaseMouse)
-                {
-                    _player1Renderer.Update(gameTime);
-                }
-
-                _skyDomeRenderer.Update(gameTime);
-                _renderer.Update(gameTime);
-                if (_diagnosticMode)
-                {
-                    _diagnosticWorldRenderer.Update(gameTime);
-                }
-                base.Update(gameTime);
-            }
-            UpdateTod(gameTime);
+            m_renderer.Stop();
+            base.OnExiting(sender, args);
         }
 
-        public override void Draw(GameTime gameTime)
+        #region LoadContent
+
+        /// <summary>
+        /// LoadContent will be called once per game and is the place to load
+        /// all of your content.
+        /// </summary>
+        protected override void LoadContent()
         {
-            GraphicsDevice.Clear(BackColor);
-            _skyDomeRenderer.Draw(gameTime);
-            _renderer.Draw(gameTime);
-            if (_diagnosticMode)
-            {
-                _diagnosticWorldRenderer.Draw(gameTime);
-            }
-            _player1Renderer.Draw(gameTime);
-            _hud.Draw(gameTime);
-            base.Draw(gameTime);
+            m_renderer.LoadContent(Game.Content);
+            m_diagnosticWorldRenderer.LoadContent(Game.Content);
+            m_skyDomeRenderer.LoadContent(Game.Content);
+            m_player1Renderer.LoadContent(Game.Content);
+            m_hud.LoadContent(Game.Content);
         }
+
+        #endregion
+
+        #region UnloadContent
+
+        /// <summary>
+        /// UnloadContent will be called once per game and is the place to unload
+        /// all content.
+        /// </summary>
+        protected override void UnloadContent()
+        {
+            // TODO: Unload any non ContentManager content here
+        }
+
+        #endregion
 
         #region DebugKeys
 
-        private void ShowDebugKeysHelp()
+        private static void ShowDebugKeysHelp()
         {
             Console.WriteLine("Debug keys");
             Console.WriteLine("F1  = toggle freelook(fly) / player physics");
@@ -131,46 +132,46 @@ namespace Welt.Scenes
             var keyState = Keyboard.GetState();
 
             //toggle fullscreen
-            if (_oldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
             {
                 Controller.GraphicsManager.ToggleFullScreen();
             }
 
             //freelook mode
-            if (_oldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
             {
-                _player1Renderer.FreeCam = !_player1Renderer.FreeCam;
+                m_player1Renderer.FreeCam = !m_player1Renderer.FreeCam;
             }
 
             //minimap mode
-            if (_oldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
+            if (m_oldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
             {
-                _hud.ShowMinimap = !_hud.ShowMinimap;
+                m_hud.ShowMinimap = !m_hud.ShowMinimap;
             }
 
             //wireframe mode
-            if (_oldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
             {
-                _world.ToggleRasterMode();
+                m_world.ToggleRasterMode();
             }
 
             //diagnose mode
-            if (_oldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
             {
-                _diagnosticMode = !_diagnosticMode;
+                m_diagnosticMode = !m_diagnosticMode;
             }
 
             //day cycle/dayMode
-            if (_oldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
             {
-                _world.DayMode = !_world.DayMode;
+                m_world.DayMode = !m_world.DayMode;
                 //Debug.WriteLine("Day Mode is " + world.dayMode);
             }
 
             //day cycle/nightMode
-            if (_oldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
             {
-                _world.NightMode = !_world.NightMode;
+                m_world.NightMode = !m_world.NightMode;
                 //Debug.WriteLine("Day/Night Mode is " + world.nightMode);
             }
 
@@ -181,14 +182,14 @@ namespace Welt.Scenes
             }
 
             // Release the mouse pointer
-            if (_oldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
             {
-                _releaseMouse = !_releaseMouse;
+                m_releaseMouse = !m_releaseMouse;
                 Game.IsMouseVisible = !Game.IsMouseVisible;
             }
 
             // fixed time step
-            if (_oldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
             {
                 Controller.GraphicsManager.SynchronizeWithVerticalRetrace = !Controller.GraphicsManager.SynchronizeWithVerticalRetrace;
                 Game.IsFixedTimeStep = !Game.IsFixedTimeStep;
@@ -197,7 +198,7 @@ namespace Welt.Scenes
             }
 
             // stealth mode / keep screen space for profilers
-            if (_oldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
+            if (m_oldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
             {
                 if (Controller.GraphicsManager.PreferredBackBufferHeight == 750)
                 {
@@ -212,55 +213,112 @@ namespace Welt.Scenes
                 Controller.GraphicsManager.ApplyChanges();
             }
 
-            _oldKeyboardState = keyState;
+            m_oldKeyboardState = keyState;
         }
+
         #endregion
+
+        #region UpdateTOD
 
         public virtual Vector3 UpdateTod(GameTime gameTime)
         {
-            long div = 20000;
+            const long div = 20000;
 
-            if (!_world.RealTime)
-                _world.Tod += ((float) gameTime.ElapsedGameTime.Milliseconds/div);
+            if (!m_world.RealTime)
+                m_world.Tod += ((float)gameTime.ElapsedGameTime.Milliseconds / div);
             else
-                _world.Tod = ((float) DateTime.Now.Hour) + ((float) DateTime.Now.Minute)/60 +
-                             (((float) DateTime.Now.Second)/60)/60;
+                m_world.Tod = (DateTime.Now.Hour) + ((float)DateTime.Now.Minute) / 60 +
+                              (((float)DateTime.Now.Second) / 60) / 60;
 
-            if (_world.Tod >= 24)
-                _world.Tod = 0;
+            if (m_world.Tod >= 24)
+                m_world.Tod = 0;
 
-            if (_world.DayMode)
+            if (m_world.DayMode)
             {
-                _world.Tod = 12;
-                _world.NightMode = false;
+                m_world.Tod = 12;
+                m_world.NightMode = false;
             }
-            else if (_world.NightMode)
+            else if (m_world.NightMode)
             {
-                _world.Tod = 0;
-                _world.DayMode = false;
+                m_world.Tod = 0;
+                m_world.DayMode = false;
             }
 
             // Calculate the position of the sun based on the time of day.
-            float x = 0;
-            float y = 0;
-            float z = 0;
+            float x;
+            float y;
 
-            if (_world.Tod <= 12)
+            if (m_world.Tod <= 12)
             {
-                y = _world.Tod/12;
-                x = 12 - _world.Tod;
+                y = m_world.Tod / 12;
+                x = 12 - m_world.Tod;
             }
             else
             {
-                y = (24 - _world.Tod)/12;
-                x = 12 - _world.Tod;
+                y = (24 - m_world.Tod) / 12;
+                x = 12 - m_world.Tod;
             }
 
             x /= 10;
 
-            _world.SunPos = new Vector3(-x, y, z);
+            m_world.SunPos = new Vector3(-x, y, 0);
 
-            return _world.SunPos;
+            return m_world.SunPos;
         }
+
+        #endregion
+
+        #region Update
+
+        /// <summary>
+        /// Allows the game to run logic such as updating the world,
+        /// checking for collisions, gathering input, and playing audio.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        public override void Update(GameTime gameTime)
+        {
+            ProcessDebugKeys();
+
+            if (Game.IsActive)
+            {
+                if (!m_releaseMouse)
+                {
+                    m_player1Renderer.Update(gameTime);
+                }
+
+                m_skyDomeRenderer.Update(gameTime);
+                m_renderer.Update(gameTime);
+                if (m_diagnosticMode)
+                {
+                    m_diagnosticWorldRenderer.Update(gameTime);
+                }
+                base.Update(gameTime);
+            }
+            UpdateTod(gameTime);
+        }
+
+        #endregion
+
+        #region Draw
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        public override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(BackColor);
+            m_skyDomeRenderer.Draw(gameTime);
+            m_renderer.Draw(gameTime);
+            if (m_diagnosticMode)
+            {
+                m_diagnosticWorldRenderer.Draw(gameTime);
+            }
+            m_player1Renderer.Draw(gameTime);
+            m_hud.Draw(gameTime);
+            base.Draw(gameTime);
+        }
+
+        #endregion
     }
 }

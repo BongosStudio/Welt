@@ -56,6 +56,10 @@
     <Compile Include="Cameras\PlayerRenderer.cs" />
     <Compile Include="Controllers\FirstPersonCameraController.cs" />
     <Compile Include="Controllers\SceneController.cs" />
+    <Compile Include="Entities\DataMap.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityClass.cs" />
+    <Compile Include="Entities\EntityData\EntityDataType.cs" />
     <Compile Include="FastMath.cs" />
     <Compile Include="Forge\Biome\Biome.cs" />
     <Compile Include="Forge\Biome\Desert_Subtropical.cs" />
@@ -72,11 +76,90 @@
     <Compile Include="Forge\Generators\TerrainWithCaves.cs" />
     <Compile Include="Forge\MapTools.cs" />
     <Compile Include="Forge\Renderers\DiagnosticWorldRenderer.cs" />
+    <Compile Include="Forge\Renderers\FogRenderer.cs" />
     <Compile Include="Forge\Renderers\IRenderer.cs" />
+    <Compile Include="Forge\Renderers\ParticleSystems\ParticleSettings.cs" />
+    <Compile Include="Forge\Renderers\ParticleSystems\ParticleSystem.cs" />
+    <Compile Include="Forge\Renderers\ParticleSystems\SnowParticleSystem.cs" />
     <Compile Include="Forge\Renderers\SimpleRenderer.cs" />
     <Compile Include="Forge\Renderers\SkyDomeRenderer.cs" />
     <Compile Include="Forge\Renderers\ThreadedWorldRenderer.cs" />
+    <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\World.cs" />
+    <Compile Include="IO\WireChunk.cs" />
+    <Compile Include="Net\Encryption\NetAESEncryption.cs" />
+    <Compile Include="Net\Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="Net\Encryption\NetCryptoProviderBase.cs" />
+    <Compile Include="Net\Encryption\NetCryptoProviderEncryption.cs" />
+    <Compile Include="Net\Encryption\NetDESEncryption.cs" />
+    <Compile Include="Net\Encryption\NetEncryption.cs" />
+    <Compile Include="Net\Encryption\NetRC2Encryption.cs" />
+    <Compile Include="Net\Encryption\NetTripleDESEncryption.cs" />
+    <Compile Include="Net\Encryption\NetXorEncryption.cs" />
+    <Compile Include="Net\Encryption\NetXteaEncryption.cs" />
+    <Compile Include="Net\NamespaceDoc.cs" />
+    <Compile Include="Net\NetBigInteger.cs" />
+    <Compile Include="Net\NetBitVector.cs" />
+    <Compile Include="Net\NetBitWriter.cs" />
+    <Compile Include="Net\NetBuffer.cs" />
+    <Compile Include="Net\NetBuffer.Peek.cs" />
+    <Compile Include="Net\NetBuffer.Read.cs" />
+    <Compile Include="Net\NetBuffer.Read.Reflection.cs" />
+    <Compile Include="Net\NetBuffer.Write.cs" />
+    <Compile Include="Net\NetBuffer.Write.Reflection.cs" />
+    <Compile Include="Net\NetClient.cs" />
+    <Compile Include="Net\NetConnection.cs" />
+    <Compile Include="Net\NetConnection.Handshake.cs" />
+    <Compile Include="Net\NetConnection.Latency.cs" />
+    <Compile Include="Net\NetConnection.MTU.cs" />
+    <Compile Include="Net\NetConnectionStatistics.cs" />
+    <Compile Include="Net\NetConnectionStatus.cs" />
+    <Compile Include="Net\NetConstants.cs" />
+    <Compile Include="Net\NetDeliveryMethod.cs" />
+    <Compile Include="Net\NetException.cs" />
+    <Compile Include="Net\NetFragmentationHelper.cs" />
+    <Compile Include="Net\NetFragmentationInfo.cs" />
+    <Compile Include="Net\NetIncomingMessage.cs" />
+    <Compile Include="Net\NetIncomingMessageType.cs" />
+    <Compile Include="Net\NetMessageType.cs" />
+    <Compile Include="Net\NetNatIntroduction.cs" />
+    <Compile Include="Net\NetOutgoingMessage.cs" />
+    <Compile Include="Net\NetPeer.cs" />
+    <Compile Include="Net\NetPeer.Discovery.cs" />
+    <Compile Include="Net\NetPeer.Fragmentation.cs" />
+    <Compile Include="Net\NetPeer.Internal.cs" />
+    <Compile Include="Net\NetPeer.LatencySimulation.cs" />
+    <Compile Include="Net\NetPeer.Logging.cs" />
+    <Compile Include="Net\NetPeer.MessagePools.cs" />
+    <Compile Include="Net\NetPeer.Send.cs" />
+    <Compile Include="Net\NetPeerConfiguration.cs" />
+    <Compile Include="Net\NetPeerStatistics.cs" />
+    <Compile Include="Net\NetPeerStatus.cs" />
+    <Compile Include="Net\NetQueue.cs" />
+    <Compile Include="Net\NetRandom.cs" />
+    <Compile Include="Net\NetRandom.Implementations.cs" />
+    <Compile Include="Net\NetRandomSeed.cs" />
+    <Compile Include="Net\NetReceiverChannelBase.cs" />
+    <Compile Include="Net\NetReliableOrderedReceiver.cs" />
+    <Compile Include="Net\NetReliableSenderChannel.cs" />
+    <Compile Include="Net\NetReliableSequencedReceiver.cs" />
+    <Compile Include="Net\NetReliableUnorderedReceiver.cs" />
+    <Compile Include="Net\NetSenderChannelBase.cs" />
+    <Compile Include="Net\NetSendResult.cs" />
+    <Compile Include="Net\NetServer.cs" />
+    <Compile Include="Net\NetSRP.cs" />
+    <Compile Include="Net\NetStoredReliableMessage.cs" />
+    <Compile Include="Net\NetTime.cs" />
+    <Compile Include="Net\NetTuple.cs" />
+    <Compile Include="Net\NetUnreliableSenderChannel.cs" />
+    <Compile Include="Net\NetUnreliableSequencedReceiver.cs" />
+    <Compile Include="Net\NetUnreliableUnorderedReceiver.cs" />
+    <Compile Include="Net\NetUPnP.cs" />
+    <Compile Include="Net\NetUtility.cs" />
+    <Compile Include="Net\Platform\PlatformAndroid.cs" />
+    <Compile Include="Net\Platform\PlatformConstrained.cs" />
+    <Compile Include="Net\Platform\PlatformWin32.cs" />
+    <Compile Include="Net\Platform\PlatformWinRT.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
     <Compile Include="Managers\TaskManager.cs" />
     <Compile Include="Models\Cardinal.cs" />
@@ -86,6 +169,7 @@
     <Compile Include="Persistence\FakeChunkPersistence.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
     <Compile Include="Physics\PlayerPhysics.cs" />
+    <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="Processors\IChunkProcessor.cs" />
     <Compile Include="Processors\LightingChunkProcessor.cs" />
     <Compile Include="Processors\VertexBuildChunkProcessor.cs" />
@@ -114,17 +198,38 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
       <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Effects\GrassBlockEffect.fx" />
+    <Content Include="Content\Effects\HeightEffect.fx" />
+    <Content Include="Content\Effects\ParticleEffect.fx" />
+    <Content Include="Content\Effects\PerlinNoise.fx" />
+    <Content Include="Content\Effects\SkyDome.fx" />
+    <Content Include="Content\Effects\SolidBlockEffect.fx" />
+    <Content Include="Content\Effects\WaterBlockEffect.fx" />
+    <Content Include="Content\Textures\blocks.png" />
+    <Content Include="Content\Textures\blocks_16.png" />
+    <Content Include="Content\Textures\blocks_64_2.png" />
+    <Content Include="Content\Textures\blocks_APR28_3.png" />
+    <Content Include="Content\Textures\cloudMap.jpg" />
+    <Content Include="Content\Textures\crosshair.png" />
+    <Content Include="Content\Textures\crosshair_moving.png" />
+    <Content Include="Content\Textures\newStars.png" />
+    <Content Include="Content\Textures\SelectionBlock.png" />
+    <Content Include="Content\Textures\snow.png" />
+    <Content Include="Content\Textures\terrain.png" />
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Fonts\console.spritefont" />
+    <None Include="Content\Fonts\OSDdisplay.spritefont" />
     <None Include="Content\Models\dome.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -134,7 +239,10 @@
     <None Include="Content\Models\skydometex_0.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Net\LICENSE.md" />
+    <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -22,12 +22,15 @@ namespace Welt.Forge
 
         public Chunk(World world, Vector3I index)
         {
-            this.world = world;
-            Blocks = new Block[SIZE.X*SIZE.Z*SIZE.Y];
-            vertexList = new List<VertexPositionTextureLight>();
-            watervertexList = new List<VertexPositionTextureLight>();
-            indexList = new List<short>();
-            waterindexList = new List<short>();
+            this.World = world;
+            Blocks = new Block[Size.X*Size.Z*Size.Y];
+            HeightMap = new byte[16, 16];
+            VertexList = new List<VertexPositionTextureLight>();
+            WaterVertexList = new List<VertexPositionTextureLight>();
+            GrassVertexList = new List<VertexPositionTextureLight>();
+            IndexList = new List<short>();
+            WaterIndexList = new List<short>();
+            GrassIndexList = new List<short>();
 
             Assign(index);
             /* world.viewableChunks[index.X, index.Z] = this;
@@ -45,15 +48,15 @@ namespace Welt.Forge
         {
             //ensure world is set directly in here to have access to N S E W as soon as possible
 
-            world.Chunks.Remove(Index.X, Index.Z);
-            world.Chunks[index.X, index.Z] = this;
+            World.Chunks.Remove(Index.X, Index.Z);
+            World.Chunks[index.X, index.Z] = this;
 
-            dirty = true;
+            Dirty = true;
             //Array.Clear(Blocks, 0, Blocks.Length);
             Index = index;
-            Position = new Vector3I(index.X*SIZE.X, index.Y*SIZE.Y, index.Z*SIZE.Z);
+            Position = new Vector3I(index.X*Size.X, index.Y*Size.Y, index.Z*Size.Z);
             BoundingBox = new BoundingBox(new Vector3(Position.X, Position.Y, Position.Z),
-                new Vector3(Position.X + SIZE.X, Position.Y + SIZE.Y, Position.Z + SIZE.Z));
+                new Vector3(Position.X + Size.X, Position.Y + Size.Y, Position.Z + Size.Z));
 
             //TODO next optimization step would be reusing the vertexbuffer
             //vertexList.Clear(); 
@@ -62,66 +65,67 @@ namespace Welt.Forge
 
         public void Clear()
         {
-            vertexList.Clear();
-            indexList.Clear();
+            VertexList.Clear();
+            IndexList.Clear();
 
-            watervertexList.Clear();
-            waterindexList.Clear();
+            WaterVertexList.Clear();
+            WaterIndexList.Clear();
 
             VertexCount = 0;
-            waterVertexCount = 0;
+            WaterVertexCount = 0;
         }
 
         #region SetBlock
 
-        public void setBlock(byte x, byte y, byte z, Block b)
+        public void SetBlock(byte x, byte y, byte z, Block b)
         {
-            if (b.Type == BlockType.Water)
+            if (b.Id == BlockType.Water)
             {
-                if (lowestNoneBlock.Y > y)
+                if (LowestNoneBlock.Y > y)
                 {
-                    lowestNoneBlock = new Vector3B(x, y, z);
+                    LowestNoneBlock = new Vector3B(x, y, z);
                 }
             }
 
-            if (b.Type == BlockType.None)
+            if (b.Id == BlockType.None)
             {
-                if (lowestNoneBlock.Y > y)
+                if (LowestNoneBlock.Y > y)
                 {
-                    lowestNoneBlock = new Vector3B(x, y, z);
+                    LowestNoneBlock = new Vector3B(x, y, z);
                 }
             }
-            else if (highestSolidBlock.Y < y)
+            else if (HighestSolidBlock.Y < y)
             {
-                highestSolidBlock = new Vector3B(x, y, z);
+                HighestSolidBlock = new Vector3B(x, y, z);
+                HeightMap[x, z] = y;
             }
 
             //comment this line : you should have nothing on screen, else you ve been setting blocks directly in array !
-            Blocks[x*FlattenOffset + z*SIZE.Y + y] = b;
-            dirty = true;
+            Blocks[x*FlattenOffset + z*Size.Y + y] = b;
+            Dirty = true;
         }
 
         #endregion
 
-        public bool outOfBounds(byte x, byte y, byte z)
+        public bool OutOfBounds(byte x, byte y, byte z)
         {
-            return (x < 0 || x >= SIZE.X || y < 0 || y >= SIZE.Y || z < 0 || z >= SIZE.Z);
+            return (x >= Size.X || y >= Size.Y || z >= Size.Z);
         }
 
         #region GetBlock
 
-        public Block BlockAt(int relx, int rely, int relz)
+        public Block GetBlock(int relx, int rely, int relz)
         {
-            if (rely < 0 || rely > MAX.Y)
+            if (rely < 0 || rely > Max.Y)
             {
                 //infinite Y : y bounds currently set as rock for never rendering those y bounds
                 return new Block(BlockType.Rock);
             }
 
             //handle the normal simple case
-            if (relx >= 0 && relz >= 0 && relx < SIZE.X && relz < SIZE.Z)
+            if (relx >= 0 && relz >= 0 && relx < Size.X && relz < Size.Z)
             {
-                var b = Blocks[relx*FlattenOffset + relz*SIZE.Y + rely];
+                var b = Blocks[relx*FlattenOffset + relz*Size.Y + rely];
                 return b;
             }
 
@@ -132,24 +136,24 @@ namespace Welt.Forge
 
             //TODO chunk relative GetBlock could even handle more tha just -1 but -2 -3 ... -15 
 
-            if (relx < 0) x = MAX.X;
-            if (relz < 0) z = MAX.Z;
+            if (relx < 0) x = Max.X;
+            if (relz < 0) z = Max.Z;
             if (relx > 15) x = 0;
             if (relz > 15) z = 0;
 
 
             if (x != relx && x == 0)
                 if (z != relz && z == 0)
-                    nChunk = NW;
+                    nChunk = Nw;
                 else if (z != relz && z == 15)
-                    nChunk = SW;
+                    nChunk = Sw;
                 else
                     nChunk = W;
             else if (x != relx && x == 15)
                 if (z != relz && z == 0)
-                    nChunk = NE;
+                    nChunk = Ne;
                 else if (z != relz && z == 15)
-                    nChunk = SE;
+                    nChunk = Se;
                 else
                     nChunk = E;
             else if (z != relz && z == 0)
@@ -162,7 +166,7 @@ namespace Welt.Forge
                 //happens at current world bounds
                 return new Block(BlockType.Rock);
             }
-            var block = nChunk.Blocks[x*FlattenOffset + z*SIZE.Y + rely];
+            var block = nChunk.Blocks[x*FlattenOffset + z*Size.Y + rely];
             return block;
         }
 
@@ -193,54 +197,63 @@ namespace Welt.Forge
             var csw = new Chunk(world, new Vector3I(w, 5, s));
 
 
-            c.setBlock(0, 0, 0, new Block(BlockType.Dirt));
-            cw.setBlock(15, 0, 0, new Block(BlockType.Grass));
+            c.SetBlock(0, 0, 0, new Block(BlockType.Dirt));
+            cw.SetBlock(15, 0, 0, new Block(BlockType.Grass));
 
-            var w15 = c.BlockAt(-1, 0, 0);
-            Debug.Assert(w15.Type == BlockType.Grass);
+            var w15 = c.GetBlock(-1, 0, 0);
+            Debug.Assert(w15.Id == BlockType.Grass);
 
-            ce.setBlock(0, 0, 0, new Block(BlockType.Tree));
-            var e0 = c.BlockAt(16, 0, 0);
-            Debug.Assert(e0.Type == BlockType.Tree);
+            ce.SetBlock(0, 0, 0, new Block(BlockType.Tree));
+            var e0 = c.GetBlock(16, 0, 0);
+            Debug.Assert(e0.Id == BlockType.Tree);
 
-            csw.setBlock(15, 0, 0, new Block(BlockType.Lava));
-            var swcorner = c.BlockAt(-1, 0, 16);
-            Debug.Assert(swcorner.Type == BlockType.Lava);
+            csw.SetBlock(15, 0, 0, new Block(BlockType.Lava));
+            var swcorner = c.GetBlock(-1, 0, 16);
+            Debug.Assert(swcorner.Id == BlockType.Lava);
 
-            cne.setBlock(0, 0, 15, new Block(BlockType.Leaves));
-            var necorner = c.BlockAt(16, 0, -1);
-            Debug.Assert(necorner.Type == BlockType.Leaves);
+            cne.SetBlock(0, 0, 15, new Block(BlockType.Leaves));
+            var necorner = c.GetBlock(16, 0, -1);
+            Debug.Assert(necorner.Id == BlockType.Leaves);
         }
 
         #endregion
 
         #region Fields
 
-        private Chunk _N, _S, _E, _W, _NE, _NW, _SE, _SW;
+        private Chunk m_n, m_s, m_e, m_w, m_ne, m_nw, m_se, m_sw;
             //TODO infinite y would require Top , Bottom, maybe vertical diagonals
 
-        public static Vector3B SIZE = new Vector3B(16, 128, 16);
-        public static Vector3B MAX = new Vector3B(15, 127, 15);
+        public static Vector3B Size = new Vector3B(16, 128, 16);
+        public static Vector3B Max = new Vector3B(15, 127, 15);
 
         public VertexBuffer VertexBuffer;
-        public VertexBuffer waterVertexBuffer;
+        public VertexBuffer WaterVertexBuffer;
+        public VertexBuffer GrassVertexBuffer;
 
         public IndexBuffer IndexBuffer;
-        public IndexBuffer waterIndexBuffer;
+        public IndexBuffer WaterIndexBuffer;
+        public IndexBuffer GrassIndexBuffer;
 
-        public List<short> indexList;
-        public List<short> waterindexList;
+        public List<short> IndexList;
+        public List<short> WaterIndexList;
+        public List<short> GrassIndexList; 
 
-        public List<VertexPositionTextureLight> vertexList;
-        public List<VertexPositionTextureLight> watervertexList;
+        public List<VertexPositionTextureLight> VertexList;
+        public List<VertexPositionTextureLight> WaterVertexList;
+        public List<VertexPositionTextureLight> GrassVertexList; 
 
         public short VertexCount;
-        public short waterVertexCount;
+        public short WaterVertexCount;
+        public short GrassVertexCount;
 
         /// <summary>
         /// Contains blocks as a flattened array.
         /// </summary>
         public Block[] Blocks;
+        /// <summary>
+        /// Contains heights as a multidimensional array.
+        /// </summary>
+        public byte[,] HeightMap;
 
         /* 
         For accessing array for x,z,y coordianate use the pattern: Blocks[x * Chunk.FlattenOffset + z * Chunk.SIZE.Y + y]
@@ -253,30 +266,30 @@ namespace Welt.Forge
                 int offset = x * Chunk.FlattenOffset + z * Chunk.HeightInBlocks; // we don't want this x-z value to be calculated each in in y-loop!
                 for (int y = 0; y < Chunk.HeightInBlocks; y++)
                 {
-                    var block=Blocks[offset + y].Type 
+                    var block=Blocks[offset + y].Id 
         */
 
         /// <summary>
         /// Used when accessing flatten blocks array.
         /// </summary>
-        public static int FlattenOffset = SIZE.Z*SIZE.Y;
+        public static int FlattenOffset = Size.Z*Size.Y;
 
         public Vector3I Position;
         public Vector3I Index;
 
-        public bool dirty;
+        public bool Dirty;
         //public bool visible;
         //public bool generated;
         //public bool built;
 
-        public bool broken;
+        public bool Broken;
 
-        public readonly World world;
+        public readonly World World;
 
-        public Vector3B highestSolidBlock = new Vector3B(0, 0, 0);
+        public Vector3B HighestSolidBlock = new Vector3B(0, 0, 0);
         //highestNoneBlock starts at 0 so it will be adjusted. if you start at highest it will never be adjusted ! 
 
-        public Vector3B lowestNoneBlock = new Vector3B(0, SIZE.Y, 0);
+        public Vector3B LowestNoneBlock = new Vector3B(0, Size.Y, 0);
 
         #endregion
 
@@ -288,9 +301,9 @@ namespace Welt.Forge
         {
             get
             {
-                if (_N == null) _N = world.Chunks[Index.X, Index.Z + 1];
-                if (_N != null) _N._S = this;
-                return _N;
+                if (m_n == null) m_n = World.Chunks[Index.X, Index.Z + 1];
+                if (m_n != null) m_n.m_s = this;
+                return m_n;
             }
         }
 
@@ -298,9 +311,9 @@ namespace Welt.Forge
         {
             get
             {
-                if (_S == null) _S = world.Chunks[Index.X, Index.Z - 1];
-                if (_S != null) _S._N = this;
-                return _S;
+                if (m_s == null) m_s = World.Chunks[Index.X, Index.Z - 1];
+                if (m_s != null) m_s.m_n = this;
+                return m_s;
             }
         }
 
@@ -308,9 +321,9 @@ namespace Welt.Forge
         {
             get
             {
-                if (_E == null) _E = world.Chunks[Index.X - 1, Index.Z];
-                if (_E != null) _E._W = this;
-                return _E;
+                if (m_e == null) m_e = World.Chunks[Index.X - 1, Index.Z];
+                if (m_e != null) m_e.m_w = this;
+                return m_e;
             }
         }
 
@@ -318,31 +331,19 @@ namespace Welt.Forge
         {
             get
             {
-                if (_W == null) _W = world.Chunks[Index.X + 1, Index.Z];
-                if (_W != null) _W._E = this;
-                return _W;
+                if (m_w == null) m_w = World.Chunks[Index.X + 1, Index.Z];
+                if (m_w != null) m_w.m_e = this;
+                return m_w;
             }
         }
 
-        public Chunk NW
-        {
-            get { return _NW != null ? _NW : _NW = world.Chunks[Index.X + 1, Index.Z + 1]; }
-        }
+        public Chunk Nw => m_nw ?? (m_nw = World.Chunks[Index.X + 1, Index.Z + 1]);
 
-        public Chunk NE
-        {
-            get { return _NE != null ? _NE : _NE = world.Chunks[Index.X - 1, Index.Z + 1]; }
-        }
+        public Chunk Ne => m_ne ?? (m_ne = World.Chunks[Index.X - 1, Index.Z + 1]);
 
-        public Chunk SW
-        {
-            get { return _SW != null ? _SW : _SW = world.Chunks[Index.X + 1, Index.Z - 1]; }
-        }
+        public Chunk Sw => m_sw ?? (m_sw = World.Chunks[Index.X + 1, Index.Z - 1]);
 
-        public Chunk SE
-        {
-            get { return _SE != null ? _SE : _SE = world.Chunks[Index.X - 1, Index.Z - 1]; }
-        }
+        public Chunk Se => m_se ?? (m_se = World.Chunks[Index.X - 1, Index.Z - 1]);
 
         public Chunk GetNeighbour(Cardinal c)
         {
@@ -356,14 +357,14 @@ namespace Welt.Forge
                     return E;
                 case Cardinal.W:
                     return W;
-                case Cardinal.SE:
-                    return SE;
-                case Cardinal.SW:
-                    return SW;
-                case Cardinal.NE:
-                    return NE;
-                case Cardinal.NW:
-                    return NW;
+                case Cardinal.Se:
+                    return Se;
+                case Cardinal.Sw:
+                    return Sw;
+                case Cardinal.Ne:
+                    return Ne;
+                case Cardinal.Nw:
+                    return Nw;
             }
             throw new NotImplementedException();
         }

@@ -11,48 +11,48 @@ namespace Welt.Forge.Biome
         None = 0,
 
         //  Tundra 
-        Tundra_Alpine = 1,
-        Tundra_Artic = 2,
+        TundraAlpine = 1,
+        TundraArtic = 2,
 
         //  Grassland
-        Grassland_Savanna = 3,
-        Grassland_Temperate = 4,
+        GrasslandSavanna = 3,
+        GrasslandTemperate = 4,
 
         //  Forest
-        Forest_Tropical = 5,
-        Forest_Temperate = 6,
-        Forest_Taiga = 7,
+        ForestTropical = 5,
+        ForestTemperate = 6,
+        ForestTaiga = 7,
 
         //  Desert
-        Desert_Subtropical = 8,
-        Desert_Semiarid = 9,
-        Desert_Coastal = 10,
-        Desert_Cold = 11,
+        DesertSubtropical = 8,
+        DesertSemiarid = 9,
+        DesertCoastal = 10,
+        DesertCold = 11,
 
         //  Marine
-        Marine_Ocean = 12,
-        Marine_CoralReef = 13,
-        Marine_Estuary = 14,
+        MarineOcean = 12,
+        MarineCoralReef = 13,
+        MarineEstuary = 14,
 
         //  Freshwater
-        Freshwater_Lake = 15,
-        Freshwater_River = 16,
-        Freshwater_Wetland = 17,
+        FreshwaterLake = 15,
+        FreshwaterRiver = 16,
+        FreshwaterWetland = 17,
 
         Custom = 18,
-        MAXIMUM = 19
+        Maximum = 19
     }
 
     #endregion
 
     public class Biome
     {
-        public byte temperature_lowest { get; set; }
-        public byte temperature_highest { get; set; }
-        public byte rainfall_lowest { get; set; }
-        public byte rainfall_highest { get; set; }
-        public BlockType treetype { get; set; }
-        public BlockType topgroundblocktype { get; set; }
-        public BlockType watertype { get; set; }
+        public byte TemperatureLowest { get; set; }
+        public byte TemperatureHighest { get; set; }
+        public byte RainfallLowest { get; set; }
+        public byte RainfallHighest { get; set; }
+        public BlockType Treetype { get; set; }
+        public BlockType Topgroundblocktype { get; set; }
+        public BlockType Watertype { get; set; }
     }
 }

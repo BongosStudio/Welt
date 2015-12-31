@@ -35,7 +35,7 @@ namespace Welt.Forge
         public World()
         {
             //Chunks = new Dictionary2<Chunk>();//
-            Chunks = new ChunkManager(new MockChunkPersistence(this));
+            Chunks = new ChunkManager(new ChunkPersistence());
         }
 
         public void ToggleRasterMode()
@@ -53,6 +53,7 @@ namespace Welt.Forge
                 for (var z = Origin - radius; z < Origin + radius + 1; z++)
                 {
                     visitor(new Vector3I(x, 0, z));
+                    
                 }
             }
         }
@@ -63,22 +64,14 @@ namespace Welt.Forge
 
         public bool InView(uint x, uint y, uint z)
         {
-            if (Chunks[x/Chunk.SIZE.X, z/Chunk.SIZE.Z] == null)
+            if (Chunks[x/Chunk.Size.X, z/Chunk.Size.Z] == null)
                 return false;
 
-            var lx = x%Chunk.SIZE.X;
-            var ly = y%Chunk.SIZE.Y;
-            var lz = z%Chunk.SIZE.Z;
+            var lx = x%Chunk.Size.X;
+            var ly = y%Chunk.Size.Y;
+            var lz = z%Chunk.Size.Z;
 
-            if (lx < 0 || ly < 0 || lz < 0
-                || lx >= Chunk.SIZE.X
-                || ly >= Chunk.SIZE.Y
-                || lz >= Chunk.SIZE.Z)
-            {
-                //  Debug.WriteLine("no block at  ({0},{1},{2}) ", x, y, z);
-                return false;
-            }
-            return true;
+            return lx < Chunk.Size.X && ly < Chunk.Size.Y && lz < Chunk.Size.Z;
         }
 
         #endregion
@@ -154,8 +147,8 @@ namespace Welt.Forge
             var x = (uint) position.X;
             var z = (uint) position.Z;
 
-            var cx = x/Chunk.SIZE.X;
-            var cz = z/Chunk.SIZE.Z;
+            var cx = x/Chunk.Size.X;
+            var cz = z/Chunk.Size.Z;
 
             var at = Chunks[cx, cz];
 
@@ -164,15 +157,13 @@ namespace Welt.Forge
 
         public Block GetBlock(uint x, uint y, uint z)
         {
-            if (InView(x, y, z))
-            {
-                var chunk = Chunks[x/Chunk.SIZE.X, z/Chunk.SIZE.Z];
-                return
-                    chunk.Blocks[(x%Chunk.SIZE.X)*Chunk.FlattenOffset + (z%Chunk.SIZE.Z)*Chunk.SIZE.Y + (y%Chunk.SIZE.Y)
-                        ];
-            }
+            if (!InView(x, y, z))
+                return new Block(BlockType.None);
+            //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
+            var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
+            return
+                chunk.Blocks[(x%Chunk.Size.X)*Chunk.FlattenOffset + (z%Chunk.Size.Z)*Chunk.Size.Y + (y%Chunk.Size.Y)];
             //Debug.WriteLine("no block at  ({0},{1},{2}) ", x, y, z);
-            return new Block(BlockType.None); //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
         }
 
         #endregion
@@ -187,16 +178,16 @@ namespace Welt.Forge
         public Block SetBlock(uint x, uint y, uint z, Block newType)
         {
             if (!InView(x, y, z)) throw new NotImplementedException();
-            var chunk = Chunks[x/Chunk.SIZE.X, z/Chunk.SIZE.Z];
+            var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
 
-            var localX = (byte) (x%Chunk.SIZE.X);
-            var localY = (byte) (y%Chunk.SIZE.Y);
-            var localZ = (byte) (z%Chunk.SIZE.Z);
+            var localX = (byte) (x%Chunk.Size.X);
+            var localY = (byte) (y%Chunk.Size.Y);
+            var localZ = (byte) (z%Chunk.Size.Z);
 
-            var old = chunk.Blocks[localX*Chunk.FlattenOffset + localZ*Chunk.SIZE.Y + localY];
+            var old = chunk.Blocks[localX*Chunk.FlattenOffset + localZ*Chunk.Size.Y + localY];
 
             //chunk.SetBlock is also called by terrain generators for Y loops min max optimisation
-            chunk.setBlock(localX, localY, localZ, new Block(newType.Type));
+            chunk.SetBlock(localX, localY, localZ, new Block(newType.Id));
 
             //Chunk should be responsible for maintaining this
             chunk.State = ChunkState.AwaitingRelighting;
@@ -206,7 +197,7 @@ namespace Welt.Forge
             {
                 if (chunk.E != null) chunk.E.State = ChunkState.AwaitingRelighting;
             }
-            if (localX == Chunk.MAX.X)
+            if (localX == Chunk.Max.X)
             {
                 //viewableChunks[(x / Chunk.SIZE.X) + 1, z / Chunk.SIZE.Z].dirty = true;
                 if (chunk.W != null) chunk.W.State = ChunkState.AwaitingRelighting;
@@ -216,7 +207,7 @@ namespace Welt.Forge
                 //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) - 1].dirty = true;
                 if (chunk.S != null) chunk.S.State = ChunkState.AwaitingRelighting;
             }
-            if (localZ == Chunk.MAX.Z)
+            if (localZ == Chunk.Max.Z)
             {
                 //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) + 1].dirty = true;
                 if (chunk.N != null) chunk.N.State = ChunkState.AwaitingRelighting;

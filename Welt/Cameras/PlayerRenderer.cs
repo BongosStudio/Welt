@@ -3,12 +3,15 @@
 #endregion
 #region Using Statements
 
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Welt.Controllers;
 using Welt.Forge;
+using Welt.Forge.Renderers;
 using Welt.Models;
 using Welt.Physics;
 using Welt.Types;
@@ -23,32 +26,34 @@ namespace Welt.Cameras
     {
         public PlayerRenderer(GraphicsDevice graphicsDevice, Player player)
         {
-            _graphicsDevice = graphicsDevice;
+            m_graphicsDevice = graphicsDevice;
             this.Player = player;
-            _viewport = graphicsDevice.Viewport;
-            Camera = new FirstPersonCamera(_viewport);
-            _cameraController = new FirstPersonCameraController(Camera);
-            _physics = new PlayerPhysics(this);
+            m_viewport = graphicsDevice.Viewport;
+            Camera = new FirstPersonCamera(m_viewport);
+            m_cameraController = new FirstPersonCameraController(Camera);
+            m_physics = new PlayerPhysics(this);
+            m_fog = new FogRenderer(graphicsDevice);
         }
 
         public void Initialize()
         {
             Camera.Initialize();
-            Camera.Position = new Vector3(World.Origin*Chunk.SIZE.X, Chunk.SIZE.Y, World.Origin*Chunk.SIZE.Z);
+            Camera.Position = new Vector3(World.Origin*Chunk.Size.X, Chunk.Size.Y, World.Origin*Chunk.Size.Z);
             Player.Position = Camera.Position;
             Camera.LookAt(Vector3.Down);
 
-            _cameraController.Initialize();
+            m_cameraController.Initialize();
 
             // SelectionBlock
-            _selectionBlockEffect = new BasicEffect(_graphicsDevice);
+            m_selectionBlockEffect = new BasicEffect(m_graphicsDevice);
         }
 
         public void LoadContent(ContentManager content)
         {
             // SelectionBlock
-            SelectionBlock = content.Load<Microsoft.Xna.Framework.Graphics.Model>("Models\\SelectionBlock");
-            _selectionBlockTexture = content.Load<Texture2D>("Textures\\SelectionBlock");
+            SelectionBlock = content.Load<Model>("Models\\SelectionBlock");
+            m_selectionBlockTexture = content.Load<Texture2D>("Textures\\SelectionBlock");
+            m_fog.LoadContent();
         }
 
         #region Update
@@ -59,23 +64,23 @@ namespace Welt.Cameras
 
             if (FreeCam)
             {
-                _cameraController.ProcessInput(gameTime);
+                m_cameraController.ProcessInput(gameTime);
                 Player.Position = Camera.Position;
             }
 
-            _cameraController.Update(gameTime);
+            m_cameraController.Update(gameTime);
 
             Camera.Update(gameTime);
 
             //Do not change methods order, its not very clean but works fine
             if (!FreeCam)
-                _physics.Move(gameTime);
+                m_physics.Move(gameTime);
 
             //do not do this each tick
             if (!previousView.Equals(Camera.View))
             {
-                _lookVector = Camera.LookVector;
-                _lookVector.Normalize();
+                m_lookVector = Camera.LookVector;
+                m_lookVector.Normalize();
 
                 var waterSelectable = false;
                 var x = SetPlayerSelectedBlock(waterSelectable);
@@ -87,24 +92,24 @@ namespace Welt.Cameras
 
             var mouseState = Mouse.GetState();
 
-            var scrollWheelDelta = _previousMouseState.ScrollWheelValue - mouseState.ScrollWheelValue;
+            var scrollWheelDelta = m_previousMouseState.ScrollWheelValue - mouseState.ScrollWheelValue;
 
             if (mouseState.RightButton == ButtonState.Pressed
-                && _previousMouseState.RightButton != ButtonState.Pressed)
+                && m_previousMouseState.RightButton != ButtonState.Pressed)
             {
                 Player.RightTool.Use();
             }
 
             if (mouseState.LeftButton == ButtonState.Pressed
-                && _previousMouseState.LeftButton != ButtonState.Pressed)
+                && m_previousMouseState.LeftButton != ButtonState.Pressed)
             {
                 Player.LeftTool.Use();
             }
 
-            Player.RightTool.switchType(scrollWheelDelta);
-            Player.LeftTool.switchType(scrollWheelDelta);
+            Player.RightTool.SwitchType(scrollWheelDelta);
+            Player.LeftTool.SwitchType(scrollWheelDelta);
 
-            _previousMouseState = Mouse.GetState();
+            m_previousMouseState = Mouse.GetState();
         }
 
         #endregion
@@ -119,29 +124,28 @@ namespace Welt.Cameras
             {
                 RenderSelectionBlock(gameTime);
             }
+            m_fog.Draw();
         }
 
         #endregion
 
         #region Fields
 
-        public readonly Player Player;
-        private readonly Viewport _viewport;
+        public readonly Player Player;       
         public readonly FirstPersonCamera Camera;
-        private readonly FirstPersonCameraController _cameraController;
+        private readonly FirstPersonCameraController m_cameraController;
+        private readonly FogRenderer m_fog;
 
-        private Vector3 _lookVector;
-
-        private MouseState _previousMouseState;
-
-        private readonly GraphicsDevice _graphicsDevice;
-
-        private readonly PlayerPhysics _physics;
+        private Vector3 m_lookVector;
+        private MouseState m_previousMouseState;
+        private readonly GraphicsDevice m_graphicsDevice;
+        private readonly Viewport m_viewport;
+        private readonly PlayerPhysics m_physics;
 
         // SelectionBlock
-        public Microsoft.Xna.Framework.Graphics.Model SelectionBlock;
-        private BasicEffect _selectionBlockEffect;
-        private Texture2D _selectionBlockTexture;
+        public Model SelectionBlock;
+        private BasicEffect m_selectionBlockEffect;
+        private Texture2D m_selectionBlockTexture;
         public bool FreeCam;
 
         #endregion
@@ -150,13 +154,10 @@ namespace Welt.Cameras
 
         public void RenderSelectionBlock(GameTime gameTime)
         {
-            _graphicsDevice.BlendState = BlendState.NonPremultiplied;
+            m_graphicsDevice.BlendState = BlendState.NonPremultiplied;
                 // allows any transparent pixels in original PNG to draw transparent
 
-            if (!Player.CurrentSelection.HasValue)
-            {
-                return;
-            }
+            if (!Player.CurrentSelection.HasValue) return;
 
             //TODO why the +0.5f for rendering slection block ?
             var position = (Vector3) Player.CurrentSelection.Value.Position + new Vector3(0.5f, 0.5f, 0.5f);
@@ -171,17 +172,17 @@ namespace Welt.Cameras
             identity = Matrix.Multiply(matrixB, matrixA); // the final position of the block
 
             // set up the World, View and Projection
-            _selectionBlockEffect.World = identity;
-            _selectionBlockEffect.View = Camera.View;
-            _selectionBlockEffect.Projection = Camera.Projection;
-            _selectionBlockEffect.Texture = _selectionBlockTexture;
-            _selectionBlockEffect.TextureEnabled = true;
+            m_selectionBlockEffect.World = identity;
+            m_selectionBlockEffect.View = Camera.View;
+            m_selectionBlockEffect.Projection = Camera.Projection;
+            m_selectionBlockEffect.Texture = m_selectionBlockTexture;
+            m_selectionBlockEffect.TextureEnabled = true;
 
             // apply the effect
-            foreach (var pass in _selectionBlockEffect.CurrentTechnique.Passes)
+            foreach (var pass in m_selectionBlockEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                DrawSelectionBlockMesh(_graphicsDevice, SelectionBlock.Meshes[0], _selectionBlockEffect);
+                DrawSelectionBlockMesh(m_graphicsDevice, SelectionBlock.Meshes[0], m_selectionBlockEffect);
             }
         }
 
@@ -192,9 +193,9 @@ namespace Welt.Cameras
             {
                 var parts = mesh.MeshParts[i];
                 if (parts.NumVertices <= 0) continue;
-                _graphicsDevice.Indices = parts.IndexBuffer;
+                m_graphicsDevice.Indices = parts.IndexBuffer;
                 //TODO better use DrawUserIndexedPrimitives for fully dynamic content
-                _graphicsDevice.SetVertexBuffer(parts.VertexBuffer);
+                m_graphicsDevice.SetVertexBuffer(parts.VertexBuffer);
                 //graphicsdevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, parts.NumVertices,
                 //    parts.StartIndex, parts.PrimitiveCount);
                 graphicsdevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, parts.NumVertices, parts.PrimitiveCount);
@@ -205,11 +206,9 @@ namespace Welt.Cameras
         {
             for (var x = 0.5f; x < 8f; x += 0.1f)
             {
-                var targetPoint = Camera.Position + (_lookVector*x);
-
+                var targetPoint = Camera.Position + (m_lookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
-
-                if (block.Type != BlockType.None && (waterSelectable || block.Type != BlockType.Water))
+                if (block.Id != BlockType.None && (waterSelectable || block.Id != BlockType.Water))
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);
                     return x;
@@ -217,6 +216,7 @@ namespace Welt.Cameras
                 Player.CurrentSelection = null;
                 Player.CurrentSelectedAdjacent = null;
             }
+
             return 0;
         }
 
@@ -224,10 +224,10 @@ namespace Welt.Cameras
         {
             for (var x = xStart; x > 0.7f; x -= 0.1f)
             {
-                var targetPoint = Camera.Position + (_lookVector*x);
+                var targetPoint = Camera.Position + (m_lookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
                 
-                if (Player.World.GetBlock(targetPoint).Type != BlockType.None) continue;
+                if (Player.World.GetBlock(targetPoint).Id != BlockType.None) continue;
                 Player.CurrentSelectedAdjacent = new PositionedBlock(targetPoint, block);
                 break;
             }

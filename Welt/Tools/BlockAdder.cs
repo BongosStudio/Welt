@@ -8,31 +8,31 @@ namespace Welt.Tools
 {
     public class BlockAdder : Tool
     {
-        private BlockType blockType = BlockType.LongGrass;
+        private ushort m_blockType = BlockType.Water;
 
         public BlockAdder(Player player) : base(player) { }
 
         public override void Use()
         {
-            if (player.CurrentSelectedAdjacent.HasValue)
+            if (Player.CurrentSelectedAdjacent.HasValue)
             {
-                player.World.SetBlock(player.CurrentSelectedAdjacent.Value.Position, new Block(blockType));
+                Player.World.SetBlock(Player.CurrentSelectedAdjacent.Value.Position, new Block(m_blockType));
             }
         }
 
-        public override void switchType(int delta)
+        public override void SwitchType(int delta)
         {
 
             if (delta >= 120)
             {
-                blockType++;
-                if (blockType == BlockType.MAXIMUM) blockType = BlockType.MAXIMUM - 1;
+                m_blockType++;
+                if (m_blockType == BlockType.Maximum) m_blockType = BlockType.Maximum - 1;
 
             }
             else if (delta <= -120)
             {
-                blockType--;
-                if (blockType == BlockType.None) blockType = (BlockType)1;                
+                m_blockType--;
+                if (m_blockType == BlockType.None) m_blockType = 1;                
             }
 
 

@@ -26,7 +26,7 @@ namespace Welt.Blocks
 
     public class VertexBlockRenderer
     {
-        private readonly World _world;
+        private readonly World m_world;
 
         private static readonly Vector3 _vector101 = new Vector3(1, 0, 1);
         private static readonly Vector3 _vector110 = new Vector3(1, 1, 0);
@@ -34,7 +34,7 @@ namespace Welt.Blocks
 
         public VertexBlockRenderer(World world)
         {
-            this._world = world;
+            this.m_world = world;
         }
 
         #region BuildBlockVertices
@@ -55,51 +55,51 @@ namespace Welt.Blocks
             if (chunkRelativePosition.X == 0 ||
                 chunkRelativePosition.Y == 0 ||
                 chunkRelativePosition.Z == 0 ||
-                chunkRelativePosition.X == Chunk.MAX.X ||
-                chunkRelativePosition.Y == Chunk.MAX.Y ||
-                chunkRelativePosition.Z == Chunk.MAX.Z)
+                chunkRelativePosition.X == Chunk.Max.X ||
+                chunkRelativePosition.Y == Chunk.Max.Y ||
+                chunkRelativePosition.Z == Chunk.Max.Z)
             {
-                blockXDecreasing = _world.GetBlock(blockPosition.X - 1, blockPosition.Y, blockPosition.Z);
-                blockYDecreasing = _world.GetBlock(blockPosition.X, blockPosition.Y - 1, blockPosition.Z);
-                blockZDecreasing = _world.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z - 1);
-                blockXIncreasing = _world.GetBlock(blockPosition.X + 1, blockPosition.Y, blockPosition.Z);
-                blockYIncreasing = _world.GetBlock(blockPosition.X, blockPosition.Y + 1, blockPosition.Z);
-                blockZIncreasing = _world.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z + 1);
+                blockXDecreasing = m_world.GetBlock(blockPosition.X - 1, blockPosition.Y, blockPosition.Z);
+                blockYDecreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y - 1, blockPosition.Z);
+                blockZDecreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z - 1);
+                blockXIncreasing = m_world.GetBlock(blockPosition.X + 1, blockPosition.Y, blockPosition.Z);
+                blockYIncreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y + 1, blockPosition.Z);
+                blockZIncreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z + 1);
             }
             else
             {
                 //blockXDecreasing = chunk.Blocks[chunkRelativePosition.X - 1, chunkRelativePosition.Y, chunkRelativePosition.Z];
-                blockXDecreasing = chunk.Blocks[(chunkRelativePosition.X - 1) * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.SIZE.Y + chunkRelativePosition.Y];
+                blockXDecreasing = chunk.Blocks[(chunkRelativePosition.X - 1) * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.Size.Y + chunkRelativePosition.Y];
 
                 //blockXIncreasing = chunk.Blocks[chunkRelativePosition.X + 1, chunkRelativePosition.Y, chunkRelativePosition.Z];
-                blockXIncreasing = chunk.Blocks[(chunkRelativePosition.X + 1) * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.SIZE.Y + chunkRelativePosition.Y];
+                blockXIncreasing = chunk.Blocks[(chunkRelativePosition.X + 1) * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.Size.Y + chunkRelativePosition.Y];
 
                 //blockYDecreasing = chunk.Blocks[chunkRelativePosition.X, chunkRelativePosition.Y - 1, chunkRelativePosition.Z];
-                blockYDecreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.SIZE.Y + (chunkRelativePosition.Y - 1)];
+                blockYDecreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.Size.Y + (chunkRelativePosition.Y - 1)];
 
                 //blockYIncreasing = chunk.Blocks[chunkRelativePosition.X, chunkRelativePosition.Y + 1, chunkRelativePosition.Z];
-                blockYIncreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.SIZE.Y + (chunkRelativePosition.Y + 1)];
+                blockYIncreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + chunkRelativePosition.Z * Chunk.Size.Y + (chunkRelativePosition.Y + 1)];
 
                 //blockZDecreasing = chunk.Blocks[chunkRelativePosition.X, chunkRelativePosition.Y, chunkRelativePosition.Z - 1];
-                blockZDecreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + (chunkRelativePosition.Z - 1) * Chunk.SIZE.Y + chunkRelativePosition.Y];
+                blockZDecreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + (chunkRelativePosition.Z - 1) * Chunk.Size.Y + chunkRelativePosition.Y];
 
                 //blockZIncreasing = chunk.Blocks[chunkRelativePosition.X, chunkRelativePosition.Y, chunkRelativePosition.Z + 1];
-                blockZIncreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + (chunkRelativePosition.Z + 1) * Chunk.SIZE.Y + chunkRelativePosition.Y];
+                blockZIncreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + (chunkRelativePosition.Z + 1) * Chunk.Size.Y + chunkRelativePosition.Y];
             }
 
-            if (!BlockInformation.IsSolidBlock(blockXDecreasing.Type)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XDecreasing, block.Type);
-            if (!BlockInformation.IsSolidBlock(blockXIncreasing.Type)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XIncreasing, block.Type);
+            if (!BlockInformation.IsSolidBlock(blockXDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XDecreasing, block.Id);
+            if (!BlockInformation.IsSolidBlock(blockXIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XIncreasing, block.Id);
 
-            if (!BlockInformation.IsSolidBlock(blockYDecreasing.Type)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YDecreasing, block.Type);
-            if (!BlockInformation.IsSolidBlock(blockYIncreasing.Type)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YIncreasing, block.Type);
+            if (!BlockInformation.IsSolidBlock(blockYDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YDecreasing, block.Id);
+            if (!BlockInformation.IsSolidBlock(blockYIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YIncreasing, block.Id);
 
-            if (!BlockInformation.IsSolidBlock(blockZDecreasing.Type)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZDecreasing, block.Type);
-            if (!BlockInformation.IsSolidBlock(blockZIncreasing.Type)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZIncreasing, block.Type);
+            if (!BlockInformation.IsSolidBlock(blockZDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZDecreasing, block.Id);
+            if (!BlockInformation.IsSolidBlock(blockZIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZIncreasing, block.Id);
         }
         #endregion
 
         #region BuildFaceVertices
-        public void BuildFaceVertices(ref List<VertexPositionTextureShade> vertexList, Vector3I blockPosition, BlockFaceDirection faceDir, BlockType blockType)
+        public void BuildFaceVertices(ref List<VertexPositionTextureShade> vertexList, Vector3I blockPosition, BlockFaceDirection faceDir, ushort blockType)
         {
             var texture = BlockInformation.GetTexture(blockType, faceDir);
 

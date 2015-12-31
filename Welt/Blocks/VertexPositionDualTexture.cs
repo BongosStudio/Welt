@@ -19,42 +19,42 @@ namespace Welt.Blocks
         };
 
         public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(VertexElements);
-        private float _aoWeight;
-        private Vector3 _position;
-        private Vector2 _textureCoordinate1;
-        private Vector2 _textureCoordinate2;
+        private float m_aoWeight;
+        private Vector3 m_position;
+        private Vector2 m_textureCoordinate1;
+        private Vector2 m_textureCoordinate2;
 
         public VertexPositionDualTexture(Vector3 position, Vector2 textureCoordinate1, Vector2 textureCoordinate2,
             float aoWeight)
         {
-            _position = position;
-            _textureCoordinate1 = textureCoordinate1;
-            _textureCoordinate2 = textureCoordinate2;
-            _aoWeight = aoWeight;
+            m_position = position;
+            m_textureCoordinate1 = textureCoordinate1;
+            m_textureCoordinate2 = textureCoordinate2;
+            m_aoWeight = aoWeight;
         }
 
         public Vector3 Position
         {
-            get { return _position; }
-            set { _position = value; }
+            get { return m_position; }
+            set { m_position = value; }
         }
 
         public Vector2 TextureCoordinate1
         {
-            get { return _textureCoordinate1; }
-            set { _textureCoordinate1 = value; }
+            get { return m_textureCoordinate1; }
+            set { m_textureCoordinate1 = value; }
         }
 
         public Vector2 TextureCoordinate2
         {
-            get { return _textureCoordinate2; }
-            set { _textureCoordinate2 = value; }
+            get { return m_textureCoordinate2; }
+            set { m_textureCoordinate2 = value; }
         }
 
-        public float AOWeight
+        public float AoWeight
         {
-            get { return _aoWeight; }
-            set { _aoWeight = value; }
+            get { return m_aoWeight; }
+            set { m_aoWeight = value; }
         }
 
         public static int SizeInBytes
@@ -69,7 +69,7 @@ namespace Welt.Blocks
 
         public override string ToString()
         {
-            return "(" + _position + "),(" + _textureCoordinate1 + "),(" + _textureCoordinate1 + ")";
+            return "(" + m_position + "),(" + m_textureCoordinate1 + "),(" + m_textureCoordinate1 + ")";
         }
     }
 }

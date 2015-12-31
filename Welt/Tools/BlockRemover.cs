@@ -13,14 +13,14 @@ namespace Welt.Tools
 
         public override void Use() {
 
-            if (player.CurrentSelection.HasValue)
+            if (Player.CurrentSelection.HasValue)
             {
-                player.World.SetBlock(player.CurrentSelection.Value.Position, new Block(BlockType.None));
+                Player.World.SetBlock(Player.CurrentSelection.Value.Position, new Block(BlockType.None));
             }
         
         }
 
-        public override void switchType(int delta) { }
+        public override void SwitchType(int delta) { }
 
     }
 }

@@ -15,18 +15,18 @@ namespace Welt.Tools
 
         public override void Use()
         {
-            if (player.CurrentSelection.HasValue)
+            if (Player.CurrentSelection.HasValue)
             {
-                var position =  player.CurrentSelection.Value.Position;
+                var position =  Player.CurrentSelection.Value.Position;
 
                 for (var y = position.Y; y > 0; y--)
                 {
-                    player.World.SetBlock(position.X,y,position.Z, new Block(BlockType.None));
+                    Player.World.SetBlock(position.X,y,position.Z, new Block(BlockType.None));
                 }
                     
             }
         }
 
-        public override void switchType(int delta) { }
+        public override void SwitchType(int delta) { }
     }
 }
