@@ -42,8 +42,8 @@ namespace Welt.Models
             this.World = world;
             LeftTool = new BlockRemover(this);
             //LeftTool = new PowerDrill(this);
-            RightTool = new BlockAdder(this);
-            //RightTool = new BlockDebugger(this);
+            //RightTool = new BlockAdder(this);
+            RightTool = new BlockDebugger(this);
         }
 
     }

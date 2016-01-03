@@ -11,5 +11,10 @@ namespace Welt.Forge.Renderers.ParticleSystems
         protected ParticleSystem(Game game) : base(game)
         {
         }
+
+        public virtual void AddParticle(Vector3 position, Vector3 velocity)
+        {
+            
+        }
     }
 }

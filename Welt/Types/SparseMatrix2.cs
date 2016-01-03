@@ -2,6 +2,7 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Welt.Types
 {
@@ -163,14 +164,8 @@ namespace Welt.Types
         /// <param name="col">Matrix column</param>
         public uint GetColumnDataCount(uint col)
         {
-            uint result = 0;
-
-            foreach (var cols in Rows)
-            {
-                if (cols.Value.ContainsKey(col))
-                    result++;
-            }
-            return result;
+            
+            return (uint) Rows.Count(cols => cols.Value.ContainsKey(col));
         }
     }
 }

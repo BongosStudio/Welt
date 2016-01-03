@@ -87,21 +87,21 @@ namespace Welt.Blocks
                 blockZIncreasing = chunk.Blocks[chunkRelativePosition.X * Chunk.FlattenOffset + (chunkRelativePosition.Z + 1) * Chunk.Size.Y + chunkRelativePosition.Y];
             }
 
-            if (!BlockInformation.IsSolidBlock(blockXDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XDecreasing, block.Id);
-            if (!BlockInformation.IsSolidBlock(blockXIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XIncreasing, block.Id);
+            if (!Block.IsSolidBlock(blockXDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XDecreasing, block.Id);
+            if (!Block.IsSolidBlock(blockXIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.XIncreasing, block.Id);
 
-            if (!BlockInformation.IsSolidBlock(blockYDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YDecreasing, block.Id);
-            if (!BlockInformation.IsSolidBlock(blockYIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YIncreasing, block.Id);
+            if (!Block.IsSolidBlock(blockYDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YDecreasing, block.Id);
+            if (!Block.IsSolidBlock(blockYIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.YIncreasing, block.Id);
 
-            if (!BlockInformation.IsSolidBlock(blockZDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZDecreasing, block.Id);
-            if (!BlockInformation.IsSolidBlock(blockZIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZIncreasing, block.Id);
+            if (!Block.IsSolidBlock(blockZDecreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZDecreasing, block.Id);
+            if (!Block.IsSolidBlock(blockZIncreasing.Id)) BuildFaceVertices(ref vertexList, blockPosition, BlockFaceDirection.ZIncreasing, block.Id);
         }
         #endregion
 
         #region BuildFaceVertices
         public void BuildFaceVertices(ref List<VertexPositionTextureShade> vertexList, Vector3I blockPosition, BlockFaceDirection faceDir, ushort blockType)
         {
-            var texture = BlockInformation.GetTexture(blockType, faceDir);
+            var texture = Block.GetTexture(blockType, faceDir);
 
             //Debug.WriteLine(string.Format("BuildBlockVertices ({0},{1},{2}) : {3} ->{4} :", x, y, z, faceDir, texture));
 

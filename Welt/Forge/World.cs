@@ -6,6 +6,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Welt.API.Forge;
 using Welt.Forge.Generators;
 using Welt.Managers;
 using Welt.Models;
@@ -16,7 +17,7 @@ using Welt.Types;
 
 namespace Welt.Forge
 {
-    public class World
+    public class World : IWorld
     {
         #region choose terrain generation
 

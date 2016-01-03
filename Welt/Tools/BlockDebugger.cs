@@ -12,14 +12,15 @@ namespace Welt.Tools
 
         public BlockDebugger(Player player) : base(player) { }
 
-        public override void Use()
+        public override void Use(DateTime time)
         {
-            System.Diagnostics.Debug.WriteLine(Player.CurrentSelection);
+            base.Use(time);
+            System.Diagnostics.Debug.WriteLine(Player.CurrentSelection.GetValueOrDefault().Block.Id);
             if (!Player.CurrentSelection.HasValue) return;
             System.Diagnostics.Debug.WriteLine(Player.TargetPoint);
             var b = Player.CurrentSelection.Value;
             var pos = b.Position;
-            var c = this.Player.World.ChunkAt(pos);
+            var c = Player.World.ChunkAt(pos);
             Debug(c, "current");
             /*foreach (Cardinal card in Enum.GetValues(typeof(Cardinal)))
                 {

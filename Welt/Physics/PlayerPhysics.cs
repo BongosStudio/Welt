@@ -73,8 +73,8 @@ namespace Welt.Physics
 
             //TODO _isAboveSnowline = headPosition.Y > WorldSettings.SNOWLINE;
 
-            if (BlockInformation.IsSolidBlock(m_player.World.GetBlock(footPosition).Id) ||
-                BlockInformation.IsSolidBlock(m_player.World.GetBlock(headPosition).Id))
+            if (Block.IsSolidBlock(m_player.World.GetBlock(footPosition).Id) ||
+                Block.IsSolidBlock(m_player.World.GetBlock(headPosition).Id))
             {
                 var standingOnBlock = m_player.World.GetBlock(footPosition).Id;
                 var hittingHeadOnBlock = m_player.World.GetBlock(headPosition).Id;
@@ -103,7 +103,7 @@ namespace Welt.Physics
                 //}
 
                 // If the player has their head stuck in a block, push them down.
-                if (BlockInformation.IsSolidBlock(m_player.World.GetBlock(headPosition).Id))
+                if (Block.IsSolidBlock(m_player.World.GetBlock(headPosition).Id))
                 {
                     var blockIn = (int) (headPosition.Y);
                     m_player.Position.Y = blockIn - 0.15f;
@@ -111,7 +111,7 @@ namespace Welt.Physics
 
                 // If the player is stuck in the ground, bring them out.
                 // This happens because we're standing on a block at -1.5, but stuck in it at -1.4, so -1.45 is the sweet spot.
-                if (BlockInformation.IsSolidBlock(m_player.World.GetBlock(footPosition).Id))
+                if (Block.IsSolidBlock(m_player.World.GetBlock(footPosition).Id))
                 {
                     var blockOn = (int) (footPosition.Y);
                     m_player.Position.Y = (float) (blockOn + 1 + 1.45);
@@ -169,7 +169,7 @@ namespace Welt.Physics
             if (kstate.IsKeyDown(Keys.Space))
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if ((BlockInformation.IsSolidBlock(m_player.World.GetBlock(footPosition).Id) && m_player.Velocity.Y == 0))
+                if ((Block.IsSolidBlock(m_player.World.GetBlock(footPosition).Id) && m_player.Velocity.Y == 0))
                 {
                     m_player.Velocity.Y = PLAYERJUMPVELOCITY;
                     var amountBelowSurface = ((ushort) footPosition.Y) + 1 - footPosition.Y;
@@ -235,9 +235,9 @@ namespace Welt.Physics
             var midBodyPoint = movePosition + new Vector3(0, -0.7f, 0);
             var lowerBodyPoint = movePosition + new Vector3(0, -1.4f, 0);
 
-            if (!BlockInformation.IsSolidBlock(m_player.World.GetBlock(movePosition).Id) &&
-                !BlockInformation.IsSolidBlock(m_player.World.GetBlock(lowerBodyPoint).Id) &&
-                !BlockInformation.IsSolidBlock(m_player.World.GetBlock(midBodyPoint).Id))
+            if (!Block.IsSolidBlock(m_player.World.GetBlock(movePosition).Id) &&
+                !Block.IsSolidBlock(m_player.World.GetBlock(lowerBodyPoint).Id) &&
+                !Block.IsSolidBlock(m_player.World.GetBlock(midBodyPoint).Id))
             {
                 m_player.Position = m_player.Position + moveVector;
                 if (moveVector != Vector3.Zero)

@@ -27,12 +27,13 @@ namespace Welt.Cameras
         public PlayerRenderer(GraphicsDevice graphicsDevice, Player player)
         {
             m_graphicsDevice = graphicsDevice;
-            this.Player = player;
+            Player = player;
             m_viewport = graphicsDevice.Viewport;
             Camera = new FirstPersonCamera(m_viewport);
             m_cameraController = new FirstPersonCameraController(Camera);
             m_physics = new PlayerPhysics(this);
             m_fog = new FogRenderer(graphicsDevice);
+            m_input = InputController.CreateDefault();
         }
 
         public void Initialize()
@@ -73,43 +74,50 @@ namespace Welt.Cameras
             Camera.Update(gameTime);
 
             //Do not change methods order, its not very clean but works fine
-            if (!FreeCam)
-                m_physics.Move(gameTime);
+            if (!FreeCam) m_physics.Move(gameTime);
 
+            var mouseState = m_input.GetMouseState();
+            var scrollWheelDelta = m_input.GetMouseState().ScrollWheelValue - mouseState.ScrollWheelValue;
+            
+            if (m_leftClickCooldown > 0) m_leftClickCooldown--;
+            if (m_rightClickCooldown > 0) m_rightClickCooldown--;
+
+            if (mouseState.RightButton == ButtonState.Pressed)
+            {
+                if (m_rightClickCooldown == 0)
+                {
+                    m_rightClickCooldown = COOLDOWN_TIME;
+                    Player.RightTool.Use(DateTime.Now);
+                    m_forceUpdate = true;
+                }
+            }
+
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (m_leftClickCooldown == 0)
+                {
+                    m_leftClickCooldown = COOLDOWN_TIME;
+                    Player.LeftTool.Use(DateTime.Now);
+                    m_forceUpdate = true;
+                }
+            }
+
+            Player.RightTool.SwitchType(scrollWheelDelta);
+            Player.LeftTool.SwitchType(scrollWheelDelta);
+            
             //do not do this each tick
-            if (!previousView.Equals(Camera.View))
+            if (!previousView.Equals(Camera.View) || m_forceUpdate)
             {
                 m_lookVector = Camera.LookVector;
                 m_lookVector.Normalize();
 
-                var waterSelectable = false;
-                var x = SetPlayerSelectedBlock(waterSelectable);
+                var x = SetPlayerSelectedBlock(false);
                 if (x != 0) // x==0 is equivalent to payer.currentSelection == null
                 {
                     SetPlayerAdjacentSelectedBlock(x + 0.5f);
                 }
             }
-
-            var mouseState = Mouse.GetState();
-
-            var scrollWheelDelta = m_previousMouseState.ScrollWheelValue - mouseState.ScrollWheelValue;
-
-            if (mouseState.RightButton == ButtonState.Pressed
-                && m_previousMouseState.RightButton != ButtonState.Pressed)
-            {
-                Player.RightTool.Use();
-            }
-
-            if (mouseState.LeftButton == ButtonState.Pressed
-                && m_previousMouseState.LeftButton != ButtonState.Pressed)
-            {
-                Player.LeftTool.Use();
-            }
-
-            Player.RightTool.SwitchType(scrollWheelDelta);
-            Player.LeftTool.SwitchType(scrollWheelDelta);
-
-            m_previousMouseState = Mouse.GetState();
+            m_forceUpdate = false;
         }
 
         #endregion
@@ -131,13 +139,15 @@ namespace Welt.Cameras
 
         #region Fields
 
+        private const int COOLDOWN_TIME = 30;
+
         public readonly Player Player;       
         public readonly FirstPersonCamera Camera;
         private readonly FirstPersonCameraController m_cameraController;
         private readonly FogRenderer m_fog;
 
         private Vector3 m_lookVector;
-        private MouseState m_previousMouseState;
+        private readonly InputController m_input;
         private readonly GraphicsDevice m_graphicsDevice;
         private readonly Viewport m_viewport;
         private readonly PlayerPhysics m_physics;
@@ -146,6 +156,9 @@ namespace Welt.Cameras
         public Model SelectionBlock;
         private BasicEffect m_selectionBlockEffect;
         private Texture2D m_selectionBlockTexture;
+        private int m_leftClickCooldown;
+        private int m_rightClickCooldown;
+        private bool m_forceUpdate;
         public bool FreeCam;
 
         #endregion
@@ -158,7 +171,6 @@ namespace Welt.Cameras
                 // allows any transparent pixels in original PNG to draw transparent
 
             if (!Player.CurrentSelection.HasValue) return;
-
             //TODO why the +0.5f for rendering slection block ?
             var position = (Vector3) Player.CurrentSelection.Value.Position + new Vector3(0.5f, 0.5f, 0.5f);
 
@@ -208,6 +220,7 @@ namespace Welt.Cameras
             {
                 var targetPoint = Camera.Position + (m_lookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
+                Console.WriteLine(Block.GetBoundingBox(block.Id, targetPoint).Max.Y > targetPoint.Y);
                 if (block.Id != BlockType.None && (waterSelectable || block.Id != BlockType.Water))
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);

@@ -106,11 +106,11 @@ namespace Welt.Processors
                     for (var y = yLow; y < yHigh; y++)
                     {
                         if (chunk.Blocks[offset + y].Id == BlockType.None) continue;
-                        if (BlockInformation.IsPlantBlock(chunk.Blocks[offset + y].Id))
+                        if (Block.IsPlantBlock(chunk.Blocks[offset + y].Id))
                         {
                             BuildPlantVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
                         }
-                        else if (BlockInformation.IsGrassBlock(chunk.Blocks[offset + y].Id))
+                        else if (Block.IsGrassBlock(chunk.Blocks[offset + y].Id))
                         {
                             BuildGrassVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
                         }
@@ -209,7 +209,7 @@ namespace Welt.Processors
 
 
             // XDecreasing
-            if (BlockInformation.IsTransparentBlock(blockMidW.Id) && block.Id != blockMidW.Id)
+            if (Block.IsTransparentBlock(blockMidW.Id) && block.Id != blockMidW.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
@@ -239,7 +239,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockMidE.Id) && block.Id != blockMidE.Id)
+            if (Block.IsTransparentBlock(blockMidE.Id) && block.Id != blockMidE.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
@@ -269,7 +269,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockBotM.Id) && block.Id != blockBotM.Id)
+            if (Block.IsTransparentBlock(blockBotM.Id) && block.Id != blockBotM.Id)
             {
                 sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun)/4);
                 sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun)/4);
@@ -299,7 +299,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockTopM.Id) && block.Id != blockTopM.Id)
+            if (Block.IsTransparentBlock(blockTopM.Id) && block.Id != blockTopM.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun)/4);
@@ -329,7 +329,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockMidS.Id) && block.Id != blockMidS.Id)
+            if (Block.IsTransparentBlock(blockMidS.Id) && block.Id != blockMidS.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
@@ -359,7 +359,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (BlockInformation.IsTransparentBlock(blockMidN.Id) && block.Id != blockMidN.Id)
+            if (Block.IsTransparentBlock(blockMidN.Id) && block.Id != blockMidN.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
@@ -574,7 +574,7 @@ namespace Welt.Processors
         public void BuildGrassVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             ushort blockType, float sunLight, Color localLight)
         {
-            var texture = BlockInformation.GetTexture(blockType);
+            var texture = Block.GetTexture(blockType);
 
             var uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.3f, 1, 1),
@@ -670,7 +670,7 @@ namespace Welt.Processors
         public void BuildPlantVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             ushort blockType, float sunLight, Color localLight)
         {
-            var texture = BlockInformation.GetTexture(blockType);
+            var texture = Block.GetTexture(blockType);
 
             var uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.5f, 1, 1),
@@ -725,15 +725,15 @@ namespace Welt.Processors
             BlockFaceDirection faceDir, ushort blockType, float sunLightTl, float sunLightTr, float sunLightBl,
             float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr)
         {
-            var texture = BlockInformation.GetTexture(blockType, faceDir);
+            var texture = Block.GetTexture(blockType, faceDir);
 
             var faceIndex = (int) faceDir;
 
             var uvList = TextureHelper.UvMappings[(int) texture*6 + faceIndex];
 
             float height = 1;
-            if (BlockInformation.IsCapBlock(blockType)) height = 0.1f;
-            if (BlockInformation.IsHalfBlock(blockType)) height = 0.5f;
+            if (Block.IsCapBlock(blockType)) height = 0.1f;
+            if (Block.IsHalfBlock(blockType)) height = 0.5f;
             switch (faceDir)
             {
                 case BlockFaceDirection.XIncreasing:

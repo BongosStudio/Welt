@@ -1,19 +1,18 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
+using System;
 using Welt.Forge;
 using Welt.Models;
 
 namespace Welt.Tools
 {
-
-    //removes an entire column of blocks, just an example of what can be done with tools and how easy this is !
-    // just assign it on one of the player 's tools in player class (   LeftTool = new PowerDrill(this); in player.cs) 
     public class PowerDrill : Tool
     {
         public PowerDrill(Player player) : base(player) { }
 
-        public override void Use()
+        public override void Use(DateTime time)
         {
             if (Player.CurrentSelection.HasValue)
             {

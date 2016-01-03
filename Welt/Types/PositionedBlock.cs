@@ -16,7 +16,7 @@ namespace Welt.Types
 
         public PositionedBlock(Vector3I position, Block block)
         {
-            this.Position=position;
+            this.Position = position;
             this.Block = block;
         }
 

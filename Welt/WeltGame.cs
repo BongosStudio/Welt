@@ -52,8 +52,6 @@ namespace Welt
 
         public WeltGame()
         {
-            // TODO: GET SCENES FUCKING WORKING AGAIN. Apparently XNA doesn't like the idea of them.
-
             Instance = this;
             //DeProfiler.Run();
 

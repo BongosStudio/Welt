@@ -1,6 +1,8 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
+using System;
 using Welt.Forge;
 using Welt.Models;
 
@@ -12,7 +14,7 @@ namespace Welt.Tools
 
         public BlockAdder(Player player) : base(player) { }
 
-        public override void Use()
+        public override void Use(DateTime time)
         {
             if (Player.CurrentSelectedAdjacent.HasValue)
             {
