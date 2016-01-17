@@ -29,7 +29,7 @@ namespace Welt.Forge.Generators
 
         #region Initizalize grad4
 
-        private static int[][] m_grad4 =
+        private static int[][] _mGrad4 =
         {
             new[] {0, 1, 1, 1},
             new[] {0, 1, 1, -1},
@@ -69,7 +69,7 @@ namespace Welt.Forge.Generators
 
         // A lookup table to traverse the simplex around a given point in 4D. 
         // Details can be found where this table is used, in the 4D Noise method. 
-        private static int[][] m_simplex =
+        private static int[][] _mSimplex =
         {
             new[] {0, 1, 2, 3}, new[] {0, 1, 3, 2}, new[] {0, 0, 0, 0}, new[] {0, 2, 3, 1}, new[] {0, 0, 0, 0},
             new[] {0, 0, 0, 0}, new[] {0, 0, 0, 0}, new[] {1, 2, 3, 0},

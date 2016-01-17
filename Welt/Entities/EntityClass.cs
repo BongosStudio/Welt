@@ -3,8 +3,9 @@
 #endregion
 namespace Welt.Entities
 {
-    public enum EntityClass
+    public enum EntityClass : byte
     {
-        
+        Block,
+        Player
     }
 }

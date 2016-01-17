@@ -19,7 +19,7 @@ namespace Welt.Cameras
     {
         public HudRenderer(GraphicsDevice device, World world, PlayerRenderer playerRenderer)
         {
-            m_graphicsDevice = device;
+            _mGraphicsDevice = device;
             PlayerRenderer = playerRenderer;
             this.World = world;
         }
@@ -29,16 +29,16 @@ namespace Welt.Cameras
         public void Initialize()
         {
             // Used for crosshair sprite/texture at the moment
-            m_spriteBatch = new SpriteBatch(m_graphicsDevice);
+            _mSpriteBatch = new SpriteBatch(_mGraphicsDevice);
 
             #region Minimap
 
-            m_spriteBatchmap = new SpriteBatch(m_graphicsDevice);
-            m_minimapTex = new Texture2D(m_graphicsDevice, 1, 1);
+            _mSpriteBatchmap = new SpriteBatch(_mGraphicsDevice);
+            _mMinimapTex = new Texture2D(_mGraphicsDevice, 1, 1);
             var texcol = new Color[1];
-            m_minimapTex.GetData(texcol);
+            _mMinimapTex.GetData(texcol);
             texcol[0] = Color.White;
-            m_minimapTex.SetData(texcol);
+            _mMinimapTex.SetData(texcol);
             GenerateMinimapTexture();
             #endregion
         }
@@ -48,8 +48,8 @@ namespace Welt.Cameras
         public void LoadContent(ContentManager content)
         {
             // Crosshair
-            m_crosshairTexture = content.Load<Texture2D>("Textures\\crosshair");
-            m_crosshairMovingTexture = content.Load<Texture2D>("Textures\\crosshair_moving");
+            _mCrosshairTexture = content.Load<Texture2D>("Textures\\crosshair");
+            _mCrosshairMovingTexture = content.Load<Texture2D>("Textures\\crosshair_moving");
         }
 
         #region generateMinimapTexture
@@ -70,29 +70,29 @@ namespace Welt.Cameras
                 {
                     var y = chunk.HeightMap[xx, zz];
                     var blockcheck = chunk.Blocks[xx*Chunk.FlattenOffset + zz*Chunk.Size.Y + y].Id;
-                    var index = xx * (Chunk.Size.X) + zz;
+                    var index = xx * Chunk.Size.X + zz;
                     switch (blockcheck)
                     {
                         case BlockType.Grass:
-                            m_maptexture[index] = new Color(0, y, 0);
+                            _mMaptexture[index] = new Color(0, y, 0);
                             break;
                         case BlockType.Dirt:
-                            m_maptexture[index] = Color.Khaki;
+                            _mMaptexture[index] = Color.Khaki;
                             break;
                         case BlockType.Snow:
-                            m_maptexture[index] = new Color(y, y, y);
+                            _mMaptexture[index] = new Color(y, y, y);
                             break;
                         case BlockType.Sand:
-                            m_maptexture[index] = new Color(193 + (y / 2), 154 + (y / 2), 107 + (y / 2));
+                            _mMaptexture[index] = new Color(193 + y / 2, 154 + y / 2, 107 + y / 2);
                             break;
                         case BlockType.Water:
-                            m_maptexture[index] = new Color(0, 0, y + 64);
+                            _mMaptexture[index] = new Color(0, 0, y + 64);
                             break;
                         case BlockType.Leaves:
-                            m_maptexture[index] = new Color(0, 128, 0);
+                            _mMaptexture[index] = new Color(0, 128, 0);
                             break;
                         default:
-                            m_maptexture[index] = new Color(0, 0, 0);
+                            _mMaptexture[index] = new Color(0, 0, 0);
                             break;
                     }
                 }
@@ -145,28 +145,28 @@ namespace Welt.Cameras
         public void Draw(GameTime gameTime)
         {
             // Draw the crosshair
-            m_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            m_spriteBatch.Draw(PlayerRenderer.Player.IsMoving ? m_crosshairMovingTexture : m_crosshairTexture,
+            _mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            _mSpriteBatch.Draw(PlayerRenderer.Player.Entity.IsMoving ? _mCrosshairMovingTexture : _mCrosshairTexture,
                 new Vector2(
-                    (m_graphicsDevice.Viewport.Width/2) - m_crosshairTexture.Width/2,
-                    (m_graphicsDevice.Viewport.Height/2) - m_crosshairTexture.Height/2), Color.White);
-            m_spriteBatch.End();
+                    _mGraphicsDevice.Viewport.Width/2 - _mCrosshairTexture.Width/2,
+                    _mGraphicsDevice.Viewport.Height/2 - _mCrosshairTexture.Height/2), Color.White);
+            _mSpriteBatch.End();
 
             #region minimap
 
             if (!ShowMinimap) return;
             //GenerateMinimapTexture();
-            m_spriteBatchmap.Begin();
+            _mSpriteBatchmap.Begin();
             for (var i = 0; i < 16; i++)
             {
                 for (var j = 0; j < 16; j++)
                 {
-                    m_blockPos.X = i*8 + 650;
-                    m_blockPos.Y = j*8 + 20;
-                    m_spriteBatchmap.Draw(m_minimapTex, m_blockPos, m_maptexture[i*Chunk.Size.X + j]);
+                    _mBlockPos.X = i*8 + 650;
+                    _mBlockPos.Y = j*8 + 20;
+                    _mSpriteBatchmap.Draw(_mMinimapTex, _mBlockPos, _mMaptexture[i*Chunk.Size.X + j]);
                 }
             }
-            m_spriteBatchmap.End();
+            _mSpriteBatchmap.End();
 
             #endregion
         }
@@ -178,25 +178,25 @@ namespace Welt.Cameras
         #region minimap
 
         // Minimap
-        private SpriteBatch m_spriteBatchmap;
-        private Texture2D m_minimapTex;
-        private Color m_minimapBgCol = new Color(150, 150, 150, 150);
-        private readonly Color[] m_maptexture = new Color[Chunk.Size.X*Chunk.Size.Z];
-        private Rectangle m_minimapBgRect = new Rectangle(650, 20, 64, 64);
-        private Rectangle m_blockPos = new Rectangle(0, 0, 8, 8);
+        private SpriteBatch _mSpriteBatchmap;
+        private Texture2D _mMinimapTex;
+        private Color _mMinimapBgCol = new Color(150, 150, 150, 150);
+        private readonly Color[] _mMaptexture = new Color[Chunk.Size.X*Chunk.Size.Z];
+        private Rectangle _mMinimapBgRect = new Rectangle(650, 20, 64, 64);
+        private Rectangle _mBlockPos = new Rectangle(0, 0, 8, 8);
 
         #endregion
 
-        private readonly GraphicsDevice m_graphicsDevice;
+        private readonly GraphicsDevice _mGraphicsDevice;
         public readonly PlayerRenderer PlayerRenderer;
         public readonly World World;
 
         public bool ShowMinimap = false;
 
         // Crosshair
-        private Texture2D m_crosshairTexture;
-        private Texture2D m_crosshairMovingTexture;
-        private SpriteBatch m_spriteBatch;
+        private Texture2D _mCrosshairTexture;
+        private Texture2D _mCrosshairMovingTexture;
+        private SpriteBatch _mSpriteBatch;
 
         #endregion
     }

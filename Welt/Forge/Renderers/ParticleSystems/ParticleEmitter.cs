@@ -9,16 +9,16 @@ namespace Welt.Forge.Renderers.ParticleSystems
 {
     public class ParticleEmitter
     {
-        private readonly ParticleSystem m_particleSystem;
-        private readonly float m_timeBetweenParticles;
-        private Vector3 m_previousPosition;
-        private float m_timeLeftOver;
+        private readonly ParticleSystem _mParticleSystem;
+        private readonly float _mTimeBetweenParticles;
+        private Vector3 _mPreviousPosition;
+        private float _mTimeLeftOver;
 
         public ParticleEmitter(ParticleSystem system, float particlesPerSecond, Vector3 initialPosition)
         {
-            m_particleSystem = system;
-            m_timeBetweenParticles = 1.0f/particlesPerSecond;
-            m_previousPosition = initialPosition;
+            _mParticleSystem = system;
+            _mTimeBetweenParticles = 1.0f/particlesPerSecond;
+            _mPreviousPosition = initialPosition;
         }
 
         public void Update(GameTime time, Vector3 position)
@@ -28,24 +28,24 @@ namespace Welt.Forge.Renderers.ParticleSystems
             var elapsedTime = (float) time.ElapsedGameTime.TotalSeconds;
             if (elapsedTime > 0)
             {
-                var velocity = (position - m_previousPosition)/elapsedTime;
-                var timeToSpend = m_timeLeftOver + elapsedTime;
-                var currentTime = -m_timeLeftOver;
+                var velocity = (position - _mPreviousPosition)/elapsedTime;
+                var timeToSpend = _mTimeLeftOver + elapsedTime;
+                var currentTime = -_mTimeLeftOver;
 
-                while (timeToSpend > m_timeBetweenParticles)
+                while (timeToSpend > _mTimeBetweenParticles)
                 {
-                    currentTime += m_timeBetweenParticles;
-                    timeToSpend -= m_timeBetweenParticles;
+                    currentTime += _mTimeBetweenParticles;
+                    timeToSpend -= _mTimeBetweenParticles;
 
                     var mu = currentTime/elapsedTime;
 
-                    var p = Vector3.Lerp(m_previousPosition, position, mu);
-                    m_particleSystem.AddParticle(p, velocity);
+                    var p = Vector3.Lerp(_mPreviousPosition, position, mu);
+                    _mParticleSystem.AddParticle(p, velocity);
                 }
 
-                m_timeLeftOver = timeToSpend;
+                _mTimeLeftOver = timeToSpend;
             }
-            m_previousPosition = position;
+            _mPreviousPosition = position;
         }
     }
 }

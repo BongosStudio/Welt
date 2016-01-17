@@ -13,7 +13,7 @@ namespace Welt.Tools
         protected Player Player;
         protected virtual int CoolDown { get; }
         protected bool IsCooledDown;
-        private DateTime m_coolDownReset;
+        private DateTime _mCoolDownReset;
         
         protected Tool(Player player, int cooldown)
         {
@@ -29,9 +29,9 @@ namespace Welt.Tools
 
         public virtual void Use(DateTime time)
         {
-            IsCooledDown = m_coolDownReset <= time;
+            IsCooledDown = _mCoolDownReset <= time;
             if (!IsCooledDown) return;
-            m_coolDownReset = time.AddMilliseconds(CoolDown);
+            _mCoolDownReset = time.AddMilliseconds(CoolDown);
         }
         public abstract void SwitchType(int delta );
 

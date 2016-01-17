@@ -17,9 +17,9 @@ namespace Welt.Forge.Renderers
     {
         public SkyDomeRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, World world)
         {
-            m_graphicsDevice = graphicsDevice;
-            m_camera = camera;
-            m_world = world;
+            _mGraphicsDevice = graphicsDevice;
+            _mCamera = camera;
+            _mWorld = world;
         }
 
         public void Initialize()
@@ -37,15 +37,15 @@ namespace Welt.Forge.Renderers
             StarMap = content.Load<Texture2D>("Textures\\newStars2");
 
             ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
-                m_graphicsDevice.Viewport.AspectRatio, 0.3f, 1000.0f);
+                _mGraphicsDevice.Viewport.AspectRatio, 0.3f, 1000.0f);
 
             // GPU Generated Clouds
             if (CloudsEnabled)
             {
                 PerlinNoiseEffect = content.Load<Effect>("Effects\\PerlinNoise");
-                var pp = m_graphicsDevice.PresentationParameters;
+                var pp = _mGraphicsDevice.PresentationParameters;
                 //the mipmap does not work on some pc ( i5 laptops at least), with mipmap false it s fine 
-                CloudsRenderTarget = new RenderTarget2D(m_graphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true,
+                CloudsRenderTarget = new RenderTarget2D(_mGraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true,
                     SurfaceFormat.Color, DepthFormat.None);
                 CloudStaticMap = CreateStaticMap(32);
                 FullScreenVertices = SetUpFullscreenVertices();
@@ -79,11 +79,11 @@ namespace Welt.Forge.Renderers
 
         public void Draw(GameTime gameTime)
         {
-            m_graphicsDevice.RasterizerState = !m_world.Wireframed ? m_world.NormalRaster : m_world.WireframedRaster;
+            _mGraphicsDevice.RasterizerState = !_mWorld.Wireframed ? _mWorld.NormalRaster : _mWorld.WireframedRaster;
 
-            var currentViewMatrix = m_camera.View;
+            var currentViewMatrix = _mCamera.View;
 
-            m_tod = m_world.Tod;
+            _mTod = _mWorld.Tod;
 
             var modelTransforms = new Matrix[SkyDome.Bones.Count];
             SkyDome.CopyAbsoluteBoneTransformsTo(modelTransforms);
@@ -93,7 +93,7 @@ namespace Welt.Forge.Renderers
 
             // Stars
             var wStarMatrix = Matrix.CreateRotationY(RotationStars)*Matrix.CreateTranslation(0, -0.1f, 0)*
-                              Matrix.CreateScale(110)*Matrix.CreateTranslation(m_camera.Position);
+                              Matrix.CreateScale(110)*Matrix.CreateTranslation(_mCamera.Position);
             foreach (var mesh in SkyDome.Meshes)
             {
                 foreach (var currentEffect in mesh.Effects)
@@ -112,14 +112,14 @@ namespace Welt.Forge.Renderers
 
                     currentEffect.Parameters["MorningTint"].SetValue(MorningTint);
                     currentEffect.Parameters["EveningTint"].SetValue(EveningTint);
-                    currentEffect.Parameters["timeOfDay"].SetValue(m_tod);
+                    currentEffect.Parameters["timeOfDay"].SetValue(_mTod);
                 }
                 mesh.Draw();
             }
 
             // Clouds
             var wMatrix = Matrix.CreateRotationY(RotationClouds)*Matrix.CreateTranslation(0, -0.1f, 0)*
-                          Matrix.CreateScale(100)*Matrix.CreateTranslation(m_camera.Position);
+                          Matrix.CreateScale(100)*Matrix.CreateTranslation(_mCamera.Position);
             foreach (var mesh in SkyDome.Meshes)
             {
                 foreach (var currentEffect in mesh.Effects)
@@ -138,7 +138,7 @@ namespace Welt.Forge.Renderers
 
                     currentEffect.Parameters["MorningTint"].SetValue(MorningTint);
                     currentEffect.Parameters["EveningTint"].SetValue(EveningTint);
-                    currentEffect.Parameters["timeOfDay"].SetValue(m_tod);
+                    currentEffect.Parameters["timeOfDay"].SetValue(_mTod);
                 }
                 mesh.Draw();
             }
@@ -148,9 +148,9 @@ namespace Welt.Forge.Renderers
 
         #region Fields
 
-        private readonly GraphicsDevice m_graphicsDevice;
-        private readonly FirstPersonCamera m_camera;
-        private readonly World m_world;
+        private readonly GraphicsDevice _mGraphicsDevice;
+        private readonly FirstPersonCamera _mCamera;
+        private readonly World _mWorld;
 
         #region Atmospheric settings
 
@@ -192,7 +192,7 @@ namespace Welt.Forge.Renderers
         protected Effect PerlinNoiseEffect;
         protected VertexPositionTexture[] FullScreenVertices;
 
-        private float m_tod;
+        private float _mTod;
 
         #endregion
 
@@ -210,7 +210,7 @@ namespace Welt.Forge.Renderers
                 for (var y = 0; y < resolution; y++)
                     noisyColors[x + y*resolution] = new Color(new Vector3(rand.Next(1000)/1000.0f, 0, 0));
 
-            var noiseImage = new Texture2D(m_graphicsDevice, resolution, resolution, true, SurfaceFormat.Color);
+            var noiseImage = new Texture2D(_mGraphicsDevice, resolution, resolution, true, SurfaceFormat.Color);
             noiseImage.SetData(noisyColors);
             return noiseImage;
         }
@@ -229,7 +229,7 @@ namespace Welt.Forge.Renderers
 
         public virtual void GeneratePerlinNoise(float time)
         {
-            m_graphicsDevice.SetRenderTarget(CloudsRenderTarget);
+            _mGraphicsDevice.SetRenderTarget(CloudsRenderTarget);
             //_graphicsDevice.Clear(Color.White);
 
             PerlinNoiseEffect.CurrentTechnique = PerlinNoiseEffect.Techniques["PerlinNoise"];
@@ -240,10 +240,10 @@ namespace Welt.Forge.Renderers
             foreach (var pass in PerlinNoiseEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                m_graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, FullScreenVertices, 0, 2);
+                _mGraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, FullScreenVertices, 0, 2);
             }
 
-            m_graphicsDevice.SetRenderTarget(null);
+            _mGraphicsDevice.SetRenderTarget(null);
             CloudMap = CloudsRenderTarget;
 
         }

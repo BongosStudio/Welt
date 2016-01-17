@@ -10,7 +10,7 @@ namespace Welt.Tools
 {
     public class BlockAdder : Tool
     {
-        private ushort m_blockType = BlockType.Water;
+        private ushort _mBlockType = BlockType.Water;
 
         public BlockAdder(Player player) : base(player) { }
 
@@ -18,7 +18,7 @@ namespace Welt.Tools
         {
             if (Player.CurrentSelectedAdjacent.HasValue)
             {
-                Player.World.SetBlock(Player.CurrentSelectedAdjacent.Value.Position, new Block(m_blockType));
+                Player.World.SetBlock(Player.CurrentSelectedAdjacent.Value.Position, new Block(_mBlockType));
             }
         }
 
@@ -27,14 +27,14 @@ namespace Welt.Tools
 
             if (delta >= 120)
             {
-                m_blockType++;
-                if (m_blockType == BlockType.Maximum) m_blockType = BlockType.Maximum - 1;
+                _mBlockType++;
+                if (_mBlockType == BlockType.Maximum) _mBlockType = BlockType.Maximum - 1;
 
             }
             else if (delta <= -120)
             {
-                m_blockType--;
-                if (m_blockType == BlockType.None) m_blockType = 1;                
+                _mBlockType--;
+                if (_mBlockType == BlockType.None) _mBlockType = 1;                
             }
 
 

@@ -5,13 +5,17 @@
 
 using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
 using Welt.Forge;
 using Welt.Forge.Renderers;
 using Welt.Models;
 using Welt.Profiling;
+using Welt.UI;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 #endregion
 
@@ -24,52 +28,55 @@ namespace Welt
     {
         #region Fields
 
-        private readonly GraphicsDeviceManager m_graphics;
-        private World m_world;
-        private IRenderer m_renderer;
+        private readonly GraphicsDeviceManager _graphics;
+        private World _world;
+        private IRenderer _renderer;
 
-        private KeyboardState m_oldKeyboardState;
+        private KeyboardState _oldKeyboardState;
 
-        private bool m_releaseMouse;
+        private bool _releaseMouse;
 
-        private readonly int m_preferredBackBufferHeight;
-        private readonly int m_preferredBackBufferWidth;
+        private readonly int _preferredBackBufferHeight;
+        private readonly int _preferredBackBufferWidth;
 
-        private HudRenderer m_hud;
+        private HudRenderer _hud;
 
-        private Player m_player1; //wont add a player2 for some time, but naming like this helps designing  
-        private PlayerRenderer m_player1Renderer;
+        private Player _player1; //wont add a player2 for some time, but naming like this helps designing  
+        private PlayerRenderer _player1Renderer;
 
-        private DiagnosticWorldRenderer m_diagnosticWorldRenderer;
-        private bool m_diagnosticMode;
+        private DiagnosticWorldRenderer _diagnosticWorldRenderer;
+        private bool _diagnosticMode;
+        private TextInputComponent _text;
 
-        private SkyDomeRenderer m_skyDomeRenderer;
+        private SkyDomeRenderer _skyDomeRenderer;
 
         public static bool ThrowExceptions = true;
         public static WeltGame Instance;
+        public static GameState CurrentGameState;
 
         #endregion
 
         public WeltGame()
         {
+            CurrentGameState = GameState.Loading;
             Instance = this;
             //DeProfiler.Run();
 
-            m_graphics = new GraphicsDeviceManager(this)
+            _graphics = new GraphicsDeviceManager(this)
             {
                 PreferredBackBufferWidth = 1000,
                 PreferredBackBufferHeight = 750
             };
 
-            m_preferredBackBufferHeight = m_graphics.PreferredBackBufferHeight;
-            m_preferredBackBufferWidth = m_graphics.PreferredBackBufferWidth;
+            _preferredBackBufferHeight = _graphics.PreferredBackBufferHeight;
+            _preferredBackBufferWidth = _graphics.PreferredBackBufferWidth;
 
             //enter stealth mode at start
             //graphics.PreferredBackBufferHeight = 100;
             //graphics.PreferredBackBufferWidth = 160;
 
             Content.RootDirectory = "Content";
-            m_graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime 
+            _graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime 
 
             ShowDebugKeysHelp();
         }
@@ -84,32 +91,39 @@ namespace Welt
         /// </summary>
         protected override void Initialize()
         {
-            m_world = new World();
+            _world = new World();
 
-            m_player1 = new Player(m_world);
+            _player1 = new Player(_world);
 
-            m_player1Renderer = new PlayerRenderer(GraphicsDevice, m_player1);
-            m_player1Renderer.Initialize();
+            _player1Renderer = new PlayerRenderer(GraphicsDevice, _player1);
+            _player1Renderer.Initialize();
 
-            m_hud = new HudRenderer(GraphicsDevice, m_world, m_player1Renderer);
-            m_hud.ShowMinimap = true;
-            m_hud.Initialize();
+            _hud = new HudRenderer(GraphicsDevice, _world, _player1Renderer) {ShowMinimap = true};
+            _hud.Initialize();
 
             #region choose renderer
 
             //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);
-            m_renderer = new SimpleRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
+            _renderer = new SimpleRenderer(GraphicsDevice, _player1Renderer.Camera, _world);
 
-            m_diagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
-            m_skyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, m_player1Renderer.Camera, m_world);
-            m_renderer.Initialize();
-            m_diagnosticWorldRenderer.Initialize();
-            m_skyDomeRenderer.Initialize();
+            _diagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _player1Renderer.Camera, _world);
+            _skyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, _player1Renderer.Camera, _world);
+            _renderer.Initialize();
+            _diagnosticWorldRenderer.Initialize();
+            _skyDomeRenderer.Initialize();
 
             #endregion
 
-            //TODO refactor WorldRenderer needs player position + view frustum 
+            _text = new TextInputComponent("Username", "text", 200, 100, GraphicsDevice)
+            {
+                Foreground = Color.White,
+                Cursor = Cursors.IBeam,
+                Margin = new BoundsBox(100, 0, 100, 0)
+            };
+            _text.Initialize(this, new GameTime());
 
+            //TODO refactor WorldRenderer needs player position + view frustum 
+            this.IsMouseVisible = true;
             base.Initialize();
         }
 
@@ -117,7 +131,7 @@ namespace Welt
 
         protected override void OnExiting(object sender, EventArgs args)
         {
-            m_renderer.Stop();
+            _renderer.Stop();
             base.OnExiting(sender, args);
         }
 
@@ -129,11 +143,11 @@ namespace Welt
         /// </summary>
         protected override void LoadContent()
         {
-            m_renderer.LoadContent(Content);
-            m_diagnosticWorldRenderer.LoadContent(Content);
-            m_skyDomeRenderer.LoadContent(Content);
-            m_player1Renderer.LoadContent(Content);
-            m_hud.LoadContent(Content);
+            _renderer.LoadContent(Content);
+            _diagnosticWorldRenderer.LoadContent(Content);
+            _skyDomeRenderer.LoadContent(Content);
+            _player1Renderer.LoadContent(Content);
+            _hud.LoadContent(Content);
         }
 
         #endregion
@@ -173,46 +187,46 @@ namespace Welt
             var keyState = Keyboard.GetState();
 
             //toggle fullscreen
-            if (m_oldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
+            if (_oldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
             {
-                m_graphics.ToggleFullScreen();
+                _graphics.ToggleFullScreen();
             }
 
             //freelook mode
-            if (m_oldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
+            if (_oldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
             {
-                m_player1Renderer.FreeCam = !m_player1Renderer.FreeCam;
+                _player1Renderer.FreeCam = !_player1Renderer.FreeCam;
             }
 
             //minimap mode
-            if (m_oldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
+            if (_oldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
             {
-                m_hud.ShowMinimap = !m_hud.ShowMinimap;
+                _hud.ShowMinimap = !_hud.ShowMinimap;
             }
 
             //wireframe mode
-            if (m_oldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
+            if (_oldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
             {
-                m_world.ToggleRasterMode();
+                _world.ToggleRasterMode();
             }
 
             //diagnose mode
-            if (m_oldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
+            if (_oldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
             {
-                m_diagnosticMode = !m_diagnosticMode;
+                _diagnosticMode = !_diagnosticMode;
             }
 
             //day cycle/dayMode
-            if (m_oldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
+            if (_oldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
             {
-                m_world.DayMode = !m_world.DayMode;
+                _world.DayMode = !_world.DayMode;
                 //Debug.WriteLine("Day Mode is " + world.dayMode);
             }
 
             //day cycle/nightMode
-            if (m_oldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
+            if (_oldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
             {
-                m_world.NightMode = !m_world.NightMode;
+                _world.NightMode = !_world.NightMode;
                 //Debug.WriteLine("Day/Night Mode is " + world.nightMode);
             }
 
@@ -223,38 +237,38 @@ namespace Welt
             }
 
             // Release the mouse pointer
-            if (m_oldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
+            if (_oldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
             {
-                m_releaseMouse = !m_releaseMouse;
+                _releaseMouse = !_releaseMouse;
                 IsMouseVisible = !IsMouseVisible;
             }
 
             // fixed time step
-            if (m_oldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
+            if (_oldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
             {
-                m_graphics.SynchronizeWithVerticalRetrace = !m_graphics.SynchronizeWithVerticalRetrace;
+                _graphics.SynchronizeWithVerticalRetrace = !_graphics.SynchronizeWithVerticalRetrace;
                 IsFixedTimeStep = !IsFixedTimeStep;
                 Debug.WriteLine("FixedTimeStep and vsync are " + IsFixedTimeStep);
-                m_graphics.ApplyChanges();
+                _graphics.ApplyChanges();
             }
 
             // stealth mode / keep screen space for profilers
-            if (m_oldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
+            if (_oldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
             {
-                if (m_graphics.PreferredBackBufferHeight == m_preferredBackBufferHeight)
+                if (_graphics.PreferredBackBufferHeight == _preferredBackBufferHeight)
                 {
-                    m_graphics.PreferredBackBufferHeight = 100;
-                    m_graphics.PreferredBackBufferWidth = 160;
+                    _graphics.PreferredBackBufferHeight = 100;
+                    _graphics.PreferredBackBufferWidth = 160;
                 }
                 else
                 {
-                    m_graphics.PreferredBackBufferHeight = m_preferredBackBufferHeight;
-                    m_graphics.PreferredBackBufferWidth = m_preferredBackBufferWidth;
+                    _graphics.PreferredBackBufferHeight = _preferredBackBufferHeight;
+                    _graphics.PreferredBackBufferWidth = _preferredBackBufferWidth;
                 }
-                m_graphics.ApplyChanges();
+                _graphics.ApplyChanges();
             }
 
-            m_oldKeyboardState = keyState;
+            _oldKeyboardState = keyState;
         }
 
         #endregion
@@ -265,46 +279,46 @@ namespace Welt
         {
             const long div = 20000;
 
-            if (!m_world.RealTime)
-                m_world.Tod += ((float) gameTime.ElapsedGameTime.Milliseconds/div);
+            if (!_world.RealTime)
+                _world.Tod += ((float) gameTime.ElapsedGameTime.Milliseconds/div);
             else
-                m_world.Tod = (DateTime.Now.Hour) + ((float) DateTime.Now.Minute)/60 +
+                _world.Tod = (DateTime.Now.Hour) + ((float) DateTime.Now.Minute)/60 +
                               (((float) DateTime.Now.Second)/60)/60;
 
-            if (m_world.Tod >= 24)
-                m_world.Tod = 0;
+            if (_world.Tod >= 24)
+                _world.Tod = 0;
 
-            if (m_world.DayMode)
+            if (_world.DayMode)
             {
-                m_world.Tod = 12;
-                m_world.NightMode = false;
+                _world.Tod = 12;
+                _world.NightMode = false;
             }
-            else if (m_world.NightMode)
+            else if (_world.NightMode)
             {
-                m_world.Tod = 0;
-                m_world.DayMode = false;
+                _world.Tod = 0;
+                _world.DayMode = false;
             }
 
             // Calculate the position of the sun based on the time of day.
             float x;
             float y;
 
-            if (m_world.Tod <= 12)
+            if (_world.Tod <= 12)
             {
-                y = m_world.Tod/12;
-                x = 12 - m_world.Tod;
+                y = _world.Tod/12;
+                x = 12 - _world.Tod;
             }
             else
             {
-                y = (24 - m_world.Tod)/12;
-                x = 12 - m_world.Tod;
+                y = (24 - _world.Tod)/12;
+                x = 12 - _world.Tod;
             }
 
             x /= 10;
 
-            m_world.SunPos = new Vector3(-x, y, 0);
+            _world.SunPos = new Vector3(-x, y, 0);
 
-            return m_world.SunPos;
+            return _world.SunPos;
         }
 
         #endregion
@@ -318,20 +332,46 @@ namespace Welt
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            switch (CurrentGameState)
+            {
+                case GameState.Playing:
+                    UpdatePlaying(gameTime);
+                    break;
+                case GameState.Loading:
+                    UpdateLoading(gameTime);
+                    break;
+                case GameState.StartMenu:
+                    UpdateStartMenu(gameTime);
+                    break;
+            }
+        }
+
+        private void UpdateLoading(GameTime gameTime)
+        {
+            _text.Update(gameTime);
+        }
+
+        private void UpdateStartMenu(GameTime gameTime)
+        {
+            
+        }
+
+        private void UpdatePlaying(GameTime gameTime)
+        {
             ProcessDebugKeys();
 
             if (IsActive)
             {
-                if (!m_releaseMouse)
+                if (!_releaseMouse)
                 {
-                    m_player1Renderer.Update(gameTime);
+                    _player1Renderer.Update(gameTime);
                 }
 
-                m_skyDomeRenderer.Update(gameTime);
-                m_renderer.Update(gameTime);
-                if (m_diagnosticMode)
+                _skyDomeRenderer.Update(gameTime);
+                _renderer.Update(gameTime);
+                if (_diagnosticMode)
                 {
-                    m_diagnosticWorldRenderer.Update(gameTime);
+                    _diagnosticWorldRenderer.Update(gameTime);
                 }
                 base.Update(gameTime);
             }
@@ -348,19 +388,51 @@ namespace Welt
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
-            m_skyDomeRenderer.Draw(gameTime);
-            m_renderer.Draw(gameTime);
-            if (m_diagnosticMode)
+            switch (CurrentGameState)
             {
-                m_diagnosticWorldRenderer.Draw(gameTime);
+                case GameState.StartMenu:
+                    DrawStartMenu(gameTime);
+                    break;
+                case GameState.Loading:
+                    DrawLoading(gameTime);
+                    break;
+                case GameState.Playing:
+                    DrawPlaying(gameTime);
+                    break;
             }
-            m_player1Renderer.Draw(gameTime);
-            m_hud.Draw(gameTime);
             base.Draw(gameTime);
+        }
+
+        private void DrawLoading(GameTime gameTime)
+        {
+            _text.Draw(gameTime);
+        }
+
+        private void DrawStartMenu(GameTime gameTime)
+        {
+            
+        }
+
+        private void DrawPlaying(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.Black);
+            _skyDomeRenderer.Draw(gameTime);
+            _renderer.Draw(gameTime);
+            if (_diagnosticMode)
+            {
+                _diagnosticWorldRenderer.Draw(gameTime);
+            }
+            _player1Renderer.Draw(gameTime);
+            _hud.Draw(gameTime);
         }
 
         #endregion
 
+        public enum GameState
+        {
+            Loading,
+            StartMenu,
+            Playing,
+        }
     }
 }

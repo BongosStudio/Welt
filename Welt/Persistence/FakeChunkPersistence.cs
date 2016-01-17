@@ -13,11 +13,11 @@ namespace Welt.Persistence
     public class MockChunkPersistence : IChunkPersistence
     {
 
-        private readonly World m_world;
+        private readonly World _mWorld;
 
         public MockChunkPersistence(World world)
         {
-            this.m_world = world;
+            this._mWorld = world;
         }
 
         public void Save(Chunk chunk)

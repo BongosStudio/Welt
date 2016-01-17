@@ -18,12 +18,12 @@ namespace Welt.Processors
 {
     public class VertexBuildChunkProcessor : IChunkProcessor
     {
-        private readonly GraphicsDevice m_graphicsDevice;
+        private readonly GraphicsDevice _mGraphicsDevice;
         private const int MAX_SUN_VALUE = 16;
 
         public VertexBuildChunkProcessor(GraphicsDevice graphicsDevice)
         {
-            m_graphicsDevice = graphicsDevice;
+            _mGraphicsDevice = graphicsDevice;
         }
 
         #region BuildVertexList
@@ -132,20 +132,20 @@ namespace Welt.Processors
             {
                 if (v.Length > 0)
                 {
-                    chunk.VertexBuffer = new VertexBuffer(m_graphicsDevice, typeof (VertexPositionTextureLight), v.Length,
+                    chunk.VertexBuffer = new VertexBuffer(_mGraphicsDevice, typeof (VertexPositionTextureLight), v.Length,
                         BufferUsage.WriteOnly);
                     chunk.VertexBuffer.SetData(v);
-                    chunk.IndexBuffer = new IndexBuffer(m_graphicsDevice, IndexElementSize.SixteenBits, i.Length,
+                    chunk.IndexBuffer = new IndexBuffer(_mGraphicsDevice, IndexElementSize.SixteenBits, i.Length,
                         BufferUsage.WriteOnly);
                     chunk.IndexBuffer.SetData(i);
                 }
 
                 if (water.Length > 0)
                 {
-                    chunk.WaterVertexBuffer = new VertexBuffer(m_graphicsDevice, typeof (VertexPositionTextureLight),
+                    chunk.WaterVertexBuffer = new VertexBuffer(_mGraphicsDevice, typeof (VertexPositionTextureLight),
                         water.Length, BufferUsage.WriteOnly);
                     chunk.WaterVertexBuffer.SetData(water);
-                    chunk.WaterIndexBuffer = new IndexBuffer(m_graphicsDevice, IndexElementSize.SixteenBits,
+                    chunk.WaterIndexBuffer = new IndexBuffer(_mGraphicsDevice, IndexElementSize.SixteenBits,
                         iWater.Length, BufferUsage.WriteOnly);
                     chunk.WaterIndexBuffer.SetData(iWater);
                 }

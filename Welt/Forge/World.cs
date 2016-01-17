@@ -6,7 +6,6 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Welt.API.Forge;
 using Welt.Forge.Generators;
 using Welt.Managers;
 using Welt.Models;
@@ -17,7 +16,7 @@ using Welt.Types;
 
 namespace Welt.Forge
 {
-    public class World : IWorld
+    public class World
     {
         #region choose terrain generation
 
@@ -218,5 +217,19 @@ namespace Welt.Forge
         }
 
         #endregion
+
+        public void SetLightAt(uint x, uint y, uint z, Vector3B light)
+        {
+            var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
+            var localX = (byte)(x % Chunk.Size.X);
+            var localY = (byte)(y % Chunk.Size.Y);
+            var localZ = (byte)(z % Chunk.Size.Z);
+            var oldBlock = chunk.GetBlock(localX, localY, localZ);
+            oldBlock.R = light.X;
+            oldBlock.G = light.Y;
+            oldBlock.B = light.Z;
+            chunk.SetBlock(localX, localY, localZ, oldBlock);
+
+        }
     }
 }

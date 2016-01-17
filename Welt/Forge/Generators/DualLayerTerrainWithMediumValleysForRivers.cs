@@ -13,8 +13,8 @@ namespace Welt.Forge.Generators
 {
     internal class DualLayerTerrainWithMediumValleysForRivers : SimpleTerrain
     {
-        private float m_lowerGroundHeight;
-        private int m_upperGroundHeight;
+        private float _mLowerGroundHeight;
+        private int _mUpperGroundHeight;
 
         public override void Generate(Chunk chunk)
         {
@@ -29,8 +29,8 @@ namespace Welt.Forge.Generators
         protected override sealed void GenerateTerrain(Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
             uint worldZ)
         {
-            m_lowerGroundHeight = GetLowerGroundHeight(chunk, worldX, worldZ);
-            m_upperGroundHeight = GetUpperGroundHeight(chunk, worldX, worldZ, m_lowerGroundHeight);
+            _mLowerGroundHeight = GetLowerGroundHeight(chunk, worldX, worldZ);
+            _mUpperGroundHeight = GetUpperGroundHeight(chunk, worldX, worldZ, _mLowerGroundHeight);
 
             var sunlit = true;
 
@@ -38,12 +38,12 @@ namespace Welt.Forge.Generators
             {
                 // Everything above ground height...is air.
                 ushort blockType;
-                if (y > m_upperGroundHeight)
+                if (y > _mUpperGroundHeight)
                 {
                     blockType = BlockType.None;
                 }
                 // Are we above the lower ground height?
-                else if (y > m_lowerGroundHeight)
+                else if (y > _mLowerGroundHeight)
                 {
                     // Let's see about some caves er valleys!
                     var caveNoise = PerlinSimplexNoise.Noise(worldX*0.01f, worldZ*0.01f, y*0.01f)*(0.015f*y) + 0.1f;
@@ -56,7 +56,6 @@ namespace Welt.Forge.Generators
                     }
                     else
                     {
-                        blockType = BlockType.None;
                         if (sunlit)
                         {
                             blockType = y > Snowlevel + R.Next(3) ? BlockType.Snow : BlockType.Grass;
@@ -109,7 +108,7 @@ namespace Welt.Forge.Generators
                 {
                     var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
                     //for (byte y = WATERLEVEL + 9; y >= MINIMUMGROUNDHEIGHT; y--)
-                    for (byte y = Waterlevel + 9; y >= (byte) m_lowerGroundHeight; y--)
+                    for (byte y = Waterlevel + 9; y >= (byte) _mLowerGroundHeight; y--)
                     {
                         //blockType = chunk.Blocks[offset + y].Id;
                         if (chunk.Blocks[offset + y].Id == BlockType.None)
@@ -155,7 +154,7 @@ namespace Welt.Forge.Generators
                 for (byte z = 0; z < Chunk.Size.Z; z++)
                 {
                     var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
-                    for (var y = m_upperGroundHeight + 1; y >= Waterlevel + 9; y--)
+                    for (var y = _mUpperGroundHeight + 1; y >= Waterlevel + 9; y--)
                     {
                         if (chunk.Blocks[offset + y].Id == BlockType.Grass)
                         {

@@ -220,7 +220,7 @@ namespace Welt.Forge
 
         #region Fields
 
-        private Chunk m_n, m_s, m_e, m_w, m_ne, m_nw, m_se, m_sw;
+        private Chunk _mN, _mS, _mE, _mW, _mNe, _mNw, _mSe, _mSw;
             //TODO infinite y would require Top , Bottom, maybe vertical diagonals
 
         public static Vector3B Size = new Vector3B(16, 128, 16);
@@ -301,9 +301,9 @@ namespace Welt.Forge
         {
             get
             {
-                if (m_n == null) m_n = World.Chunks[Index.X, Index.Z + 1];
-                if (m_n != null) m_n.m_s = this;
-                return m_n;
+                if (_mN == null) _mN = World.Chunks[Index.X, Index.Z + 1];
+                if (_mN != null) _mN._mS = this;
+                return _mN;
             }
         }
 
@@ -311,9 +311,9 @@ namespace Welt.Forge
         {
             get
             {
-                if (m_s == null) m_s = World.Chunks[Index.X, Index.Z - 1];
-                if (m_s != null) m_s.m_n = this;
-                return m_s;
+                if (_mS == null) _mS = World.Chunks[Index.X, Index.Z - 1];
+                if (_mS != null) _mS._mN = this;
+                return _mS;
             }
         }
 
@@ -321,9 +321,9 @@ namespace Welt.Forge
         {
             get
             {
-                if (m_e == null) m_e = World.Chunks[Index.X - 1, Index.Z];
-                if (m_e != null) m_e.m_w = this;
-                return m_e;
+                if (_mE == null) _mE = World.Chunks[Index.X - 1, Index.Z];
+                if (_mE != null) _mE._mW = this;
+                return _mE;
             }
         }
 
@@ -331,19 +331,19 @@ namespace Welt.Forge
         {
             get
             {
-                if (m_w == null) m_w = World.Chunks[Index.X + 1, Index.Z];
-                if (m_w != null) m_w.m_e = this;
-                return m_w;
+                if (_mW == null) _mW = World.Chunks[Index.X + 1, Index.Z];
+                if (_mW != null) _mW._mE = this;
+                return _mW;
             }
         }
 
-        public Chunk Nw => m_nw ?? (m_nw = World.Chunks[Index.X + 1, Index.Z + 1]);
+        public Chunk Nw => _mNw ?? (_mNw = World.Chunks[Index.X + 1, Index.Z + 1]);
 
-        public Chunk Ne => m_ne ?? (m_ne = World.Chunks[Index.X - 1, Index.Z + 1]);
+        public Chunk Ne => _mNe ?? (_mNe = World.Chunks[Index.X - 1, Index.Z + 1]);
 
-        public Chunk Sw => m_sw ?? (m_sw = World.Chunks[Index.X + 1, Index.Z - 1]);
+        public Chunk Sw => _mSw ?? (_mSw = World.Chunks[Index.X + 1, Index.Z - 1]);
 
-        public Chunk Se => m_se ?? (m_se = World.Chunks[Index.X - 1, Index.Z - 1]);
+        public Chunk Se => _mSe ?? (_mSe = World.Chunks[Index.X - 1, Index.Z - 1]);
 
         public Chunk GetNeighbour(Cardinal c)
         {

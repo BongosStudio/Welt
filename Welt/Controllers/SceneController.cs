@@ -9,7 +9,7 @@ namespace Welt.Controllers
 {
     public class SceneController : DrawableGameComponent
     {
-        private Scene m_current;
+        private Scene _mCurrent;
         public GraphicsDeviceManager GraphicsManager;
 
         public SceneController(Game game, GraphicsDeviceManager gdm) : base(game)
@@ -20,26 +20,26 @@ namespace Welt.Controllers
 
         public void HandleExiting(object sender, EventArgs args)
         {
-            m_current.OnExiting(sender, args);
+            _mCurrent.OnExiting(sender, args);
         }
 
         public override void Update(GameTime gameTime)
         {
-            m_current.Update(gameTime);
+            _mCurrent.Update(gameTime);
             base.Update(gameTime);
         }
 
         public new void Draw(GameTime gameTime)
         {
-            m_current.Draw(gameTime);
+            _mCurrent.Draw(gameTime);
             base.Draw(gameTime);
         }
 
         public void Load(Scene scene)
         {
-            m_current?.Dispose();
-            m_current = scene;
-            m_current?.Initialize();
+            _mCurrent?.Dispose();
+            _mCurrent = scene;
+            _mCurrent?.Initialize();
         }
     }
 }

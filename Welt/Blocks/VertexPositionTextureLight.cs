@@ -10,10 +10,10 @@ namespace Welt.Blocks
     [Serializable]
     public struct VertexPositionTextureLight : IVertexType
     {
-        private Vector3 m_position;
-        private Vector2 m_textureCoordinate1;
-        private float m_sunLight;
-        private Vector3 m_localLight;
+        private Vector3 _mPosition;
+        private Vector2 _mTextureCoordinate1;
+        private float _mSunLight;
+        private Vector3 _mLocalLight;
 
         public static readonly VertexElement[] VertexElements =
         {
@@ -29,40 +29,40 @@ namespace Welt.Blocks
         public VertexPositionTextureLight(Vector3 position, Vector2 textureCoordinate1, float sunLight,
             Vector3 localLight)
         {
-            m_position = position;
-            m_textureCoordinate1 = textureCoordinate1;
-            m_sunLight = sunLight;
-            m_localLight = localLight;
+            _mPosition = position;
+            _mTextureCoordinate1 = textureCoordinate1;
+            _mSunLight = sunLight;
+            _mLocalLight = localLight;
         }
 
 
         public override string ToString()
         {
-            return $"({m_position}),({m_textureCoordinate1}),({m_textureCoordinate1})";
+            return $"({_mPosition}),({_mTextureCoordinate1}),({_mTextureCoordinate1})";
         }
 
         public Vector3 Position
         {
-            get { return m_position; }
-            set { m_position = value; }
+            get { return _mPosition; }
+            set { _mPosition = value; }
         }
 
         public Vector2 TextureCoordinate1
         {
-            get { return m_textureCoordinate1; }
-            set { m_textureCoordinate1 = value; }
+            get { return _mTextureCoordinate1; }
+            set { _mTextureCoordinate1 = value; }
         }
 
         public Vector3 LocalLight
         {
-            get { return m_localLight; }
-            set { m_localLight = value; }
+            get { return _mLocalLight; }
+            set { _mLocalLight = value; }
         }
 
         public float SunLight
         {
-            get { return m_sunLight; }
-            set { m_sunLight = value; }
+            get { return _mSunLight; }
+            set { _mSunLight = value; }
         }
 
         public static int SizeInBytes => sizeof (float)*8;

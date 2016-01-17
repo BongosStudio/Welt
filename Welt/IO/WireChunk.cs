@@ -13,9 +13,9 @@ namespace Welt.IO
 {
     public struct WireChunk
     {
-        private static MemoryStream m_dataStream = new MemoryStream();
-        private static BinaryWriter m_writer = new BinaryWriter(m_dataStream);
-        private static BinaryReader m_reader = new BinaryReader(m_dataStream);
+        private static MemoryStream _mDataStream = new MemoryStream();
+        private static BinaryWriter _mWriter = new BinaryWriter(_mDataStream);
+        private static BinaryReader _mReader = new BinaryReader(_mDataStream);
 
         public IEnumerable<ushort> Blocks;
 
@@ -26,23 +26,23 @@ namespace Welt.IO
 
         public byte[] ToArray()
         {
-            m_dataStream = new MemoryStream();
-            m_writer = new BinaryWriter(m_dataStream);
+            _mDataStream = new MemoryStream();
+            _mWriter = new BinaryWriter(_mDataStream);
             foreach (var block in Blocks)
             {
-                m_writer.Write(block);
+                _mWriter.Write(block);
             }
-            return m_dataStream.GetBuffer();
+            return _mDataStream.GetBuffer();
         }
 
         public static WireChunk FromArray(byte[] data)
         {
             var blocks = new List<ushort>(data.Length/2);
-            m_dataStream = new MemoryStream(data);
-            m_reader = new BinaryReader(m_dataStream);
-            while (m_dataStream.CanRead)
+            _mDataStream = new MemoryStream(data);
+            _mReader = new BinaryReader(_mDataStream);
+            while (_mDataStream.CanRead)
             {
-                blocks.Add(m_reader.ReadUInt16());
+                blocks.Add(_mReader.ReadUInt16());
             }
             return new WireChunk {Blocks = blocks};
         }

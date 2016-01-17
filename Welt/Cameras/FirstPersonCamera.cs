@@ -22,20 +22,20 @@ namespace Welt.Cameras
 
         public float LeftRightRotation
         {
-            get { return m_leftRightRotation; }
+            get { return _mLeftRightRotation; }
             set
             {
-                m_leftRightRotation = value;
+                _mLeftRightRotation = value;
                 CalculateView();
             }
         }
 
         public float UpDownRotation
         {
-            get { return m_upDownRotation; }
+            get { return _mUpDownRotation; }
             set
             {
-                m_upDownRotation = value;
+                _mUpDownRotation = value;
                 CalculateView();
             }
         }
@@ -46,8 +46,8 @@ namespace Welt.Cameras
 
         public override void Initialize()
         {
-            m_upDownRotation = 0;
-            m_leftRightRotation = 0;
+            _mUpDownRotation = 0;
+            _mLeftRightRotation = 0;
 
             base.Initialize();
         }
@@ -58,7 +58,7 @@ namespace Welt.Cameras
 
         protected override void CalculateView()
         {
-            var rotationMatrix = Matrix.CreateRotationX(m_upDownRotation)*Matrix.CreateRotationY(m_leftRightRotation);
+            var rotationMatrix = Matrix.CreateRotationX(_mUpDownRotation)*Matrix.CreateRotationY(_mLeftRightRotation);
             LookVector = Vector3.Transform(Vector3.Forward, rotationMatrix);
 
             Target = Position + LookVector;
@@ -95,7 +95,7 @@ namespace Welt.Cameras
             //TODO optimize with modulo (see url)
             //http://gamedev.stackexchange.com/questions/7325/snapping-an-angle-to-the-closest-cardinal-direction
 
-            var a = MathHelper.WrapAngle(m_leftRightRotation);
+            var a = MathHelper.WrapAngle(_mLeftRightRotation);
             a = MathHelper.PiOver4*(float) Math.Round(a/MathHelper.PiOver4);
 
             if (a == 0)
@@ -122,8 +122,8 @@ namespace Welt.Cameras
         #region Fields
 
         private const float ROTATION_SPEED = 0.05f;
-        private float m_leftRightRotation;
-        private float m_upDownRotation;
+        private float _mLeftRightRotation;
+        private float _mUpDownRotation;
 
         #endregion
     }

@@ -8,8 +8,8 @@ namespace Welt.Controllers
 {
     public class InputController
     {
-        private KeyboardState m_keyboard;
-        private MouseState m_mouse;
+        private KeyboardState _mKeyboard;
+        private MouseState _mMouse;
 
         #region .ctor
 
@@ -23,14 +23,14 @@ namespace Welt.Controllers
 
         public MouseState GetMouseState()
         {
-            m_mouse = Mouse.GetState();
-            return m_mouse;
+            _mMouse = Mouse.GetState();
+            return _mMouse;
         }
 
         public KeyboardState GetKeyboardState()
         {
-            m_keyboard = Keyboard.GetState();
-            return m_keyboard;
+            _mKeyboard = Keyboard.GetState();
+            return _mKeyboard;
         }
 
         public enum InputAction

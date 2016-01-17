@@ -20,8 +20,8 @@ namespace Welt.Physics
     {
         #region Fields
 
-        private readonly Player m_player;
-        private readonly FirstPersonCamera m_camera;
+        private readonly Player _mPlayer;
+        private readonly FirstPersonCamera _mCamera;
 
         private const float PLAYERJUMPVELOCITY = 6f;
         private const float PLAYERGRAVITY = -15f;
@@ -33,122 +33,95 @@ namespace Welt.Physics
 
         public PlayerPhysics(PlayerRenderer playerRenderer)
         {
-            m_player = playerRenderer.Player;
-            m_camera = playerRenderer.Camera;
+            _mPlayer = playerRenderer.Player;
+            _mCamera = playerRenderer.Camera;
         }
 
         public void Move(GameTime gameTime)
         {
             UpdatePosition(gameTime);
 
-            var headbobOffset = ((float) Math.Sin(m_player.HeadBob)*0.1f) + 0.15f;
-            if (m_player.IsInWater) headbobOffset = 0;
-            m_camera.Position = m_player.Position + new Vector3(0, headbobOffset, 0);
+            var headbobOffset = ((float) Math.Sin(_mPlayer.HeadBob)*0.1f) + 0.15f;
+            if (_mPlayer.Entity.IsInWater) headbobOffset = 0;
+            _mCamera.Position = _mPlayer.Position + new Vector3(0, headbobOffset, 0);
         }
 
         #region UpdatePosition
 
         private float GetPlayerSpeed()
         {
-            return m_player.IsInWater ? 1.7f : 3.5f;
+            return _mPlayer.Entity.IsInWater ? 1.7f : 3.5f;
         }
 
         private float GetPlayerGravity()
         {
-            return m_player.IsInWater ? PLAYERGRAVITY/2 : PLAYERGRAVITY;
+            return _mPlayer.Entity.IsInWater ? PLAYERGRAVITY/2 : PLAYERGRAVITY;
         }
 
         private void UpdatePosition(GameTime gameTime)
         {
-            var footPosition = m_player.Position + new Vector3(0f, -1.5f, 0f);
-            var headPosition = m_player.Position + new Vector3(0f, 0.1f, 0f);
+            var footPosition = _mPlayer.Position + new Vector3(0f, -1.5f, 0f);
+            var headPosition = _mPlayer.Position + new Vector3(0f, 0.1f, 0f);
             // adjust to if in water
-            m_player.IsInWater = m_player.World.GetBlock(footPosition).Id == BlockType.Water;
+            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.Water;
 
             var velocity = GetPlayerGravity()*(float) gameTime.ElapsedGameTime.TotalSeconds;
-            var min = m_player.IsInWater ? -MAX_VELOCITY_WATER : -MAX_VELOCITY;
-            var max = m_player.IsInWater ? MAX_VELOCITY_WATER : MAX_VELOCITY;
-            m_player.Velocity.Y += velocity;
-            Adjust(min, max, ref m_player.Velocity.Y);
+            var min = _mPlayer.Entity.IsInWater ? -MAX_VELOCITY_WATER : -MAX_VELOCITY;
+            var max = _mPlayer.Entity.IsInWater ? MAX_VELOCITY_WATER : MAX_VELOCITY;
+            _mPlayer.Velocity.Y += velocity;
+            Adjust(min, max, ref _mPlayer.Velocity.Y);
 
             //TODO _isAboveSnowline = headPosition.Y > WorldSettings.SNOWLINE;
 
-            if (Block.IsSolidBlock(m_player.World.GetBlock(footPosition).Id) ||
-                Block.IsSolidBlock(m_player.World.GetBlock(headPosition).Id))
+            if (Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) ||
+                Block.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
             {
-                var standingOnBlock = m_player.World.GetBlock(footPosition).Id;
-                var hittingHeadOnBlock = m_player.World.GetBlock(headPosition).Id;
+                var standingOnBlock = _mPlayer.World.GetBlock(footPosition).Id;
+                var hittingHeadOnBlock = _mPlayer.World.GetBlock(headPosition).Id;
 
-                // If we"re hitting the ground with a high velocity, die!
-                //if (standingOnBlock != BlockType.None && _P.playerVelocity.Y < 0)
-                //{
-                //    float fallDamage = Math.Abs(_P.playerVelocity.Y) / DIEVELOCITY;
-                //    if (fallDamage >= 1)
-                //    {
-                //        _P.PlaySoundForEveryone(InfiniminerSound.GroundHit, _P.playerPosition);
-                //        _P.KillPlayer(Defines.deathByFall);//"WAS KILLED BY GRAVITY!");
-                //        return;
-                //    }
-                //    else if (fallDamage > 0.5)
-                //    {
-                //        // Fall damage of 0.5 maps to a screenEffectCounter value of 2, meaning that the effect doesn't appear.
-                //        // Fall damage of 1.0 maps to a screenEffectCounter value of 0, making the effect very strong.
-                //        if (standingOnBlock != BlockType.Jump)
-                //        {
-                //            _P.screenEffect = ScreenEffect.Fall;
-                //            _P.screenEffectCounter = 2 - (fallDamage - 0.5) * 4;
-                //            _P.PlaySoundForEveryone(InfiniminerSound.GroundHit, _P.playerPosition);
-                //        }
-                //    }
-                //}
+                // TODO: fall damage
 
                 // If the player has their head stuck in a block, push them down.
-                if (Block.IsSolidBlock(m_player.World.GetBlock(headPosition).Id))
+                if (Block.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
                 {
                     var blockIn = (int) (headPosition.Y);
-                    m_player.Position.Y = blockIn - 0.15f;
+                    _mPlayer.Position.Y = blockIn - 0.15f;
                 }
 
                 // If the player is stuck in the ground, bring them out.
                 // This happens because we're standing on a block at -1.5, but stuck in it at -1.4, so -1.45 is the sweet spot.
-                if (Block.IsSolidBlock(m_player.World.GetBlock(footPosition).Id))
+                if (Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id))
                 {
                     var blockOn = (int) (footPosition.Y);
-                    m_player.Position.Y = (float) (blockOn + 1 + 1.45);
+                    _mPlayer.Position.Y = (float) (blockOn + 1 + 1.45);
                 }
 
-                m_player.Velocity.Y = 0;
+                _mPlayer.Velocity.Y = 0;
 
                 // Logic for standing on a block.
                 switch (standingOnBlock)
                 {
-                    //case BlockType.Jump:
-                    //    _player.playerVelocity.Y = 2.5f*JUMPVELOCITY;
-                    //    _P.PlaySoundForEveryone(InfiniminerSound.Jumpblock, _P.playerPosition);
-                    //    break;
-
-                    //case BlockType.Road:
-                    //    movingOnRoad = true;
-                    //    break;
-
-                    //case BlockType.Lava:
-                    //    _P.KillPlayer(Defines.deathByLava);
-                    //    return;
                     case BlockType.Water:
-
+                        // play swimming sound
+                        break;
+                    case BlockType.Dirt:
+                        // play dirt sound
+                        break;
+                    case BlockType.Grass:
+                    case BlockType.LongGrass:
+                    case BlockType.Leaves:
+                        // play rustling mix with grass movement
+                        // maybe make an easter egg where it plays the pokemon thing with "A WILD BLAHBLAHBLAH APPEARED"?
+                        // Idk, I like that idea so I may do it.
                         break;
                 }
 
                 //Logic for bumping your head on a block.
                 switch (hittingHeadOnBlock)
                 {
-                    //case BlockType.Shock:
-                    //    _P.KillPlayer(Defines.deathByElec);
-                    //    return;
-
-                    //case BlockType.Lava:
-                    //    _P.KillPlayer(Defines.deathByLava);
-                    //    return;
+                    case BlockType.Lava:
+                        // set the player on fire
+                        break;
                 }
             }
 
@@ -159,23 +132,23 @@ namespace Welt.Physics
             //    return;
             //}
 
-            m_player.Position += m_player.Velocity*(float) gameTime.ElapsedGameTime.TotalSeconds;
+            _mPlayer.Position += _mPlayer.Velocity*(float) gameTime.ElapsedGameTime.TotalSeconds;
 
             var kstate = Keyboard.GetState();
 
             var moveVector = new Vector3();
 
-            var speedNormalize = m_player.IsInWater ? 1f : 2f;
+            var speedNormalize = _mPlayer.Entity.IsInWater ? 1f : 2f;
             if (kstate.IsKeyDown(Keys.Space))
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if ((Block.IsSolidBlock(m_player.World.GetBlock(footPosition).Id) && m_player.Velocity.Y == 0))
+                if ((Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
                 {
-                    m_player.Velocity.Y = PLAYERJUMPVELOCITY;
+                    _mPlayer.Velocity.Y = PLAYERJUMPVELOCITY;
                     var amountBelowSurface = ((ushort) footPosition.Y) + 1 - footPosition.Y;
-                    m_player.Position.Y += amountBelowSurface + 0.05f;
+                    _mPlayer.Position.Y += amountBelowSurface + 0.05f;
                 }
-                else if (m_player.IsInWater)
+                else if (_mPlayer.Entity.IsInWater)
                 {
                     // handle swimming
                     // TODO: to be completely frank, idk wtf to do here. Adjusting the velocity doesn't change
@@ -200,11 +173,11 @@ namespace Welt.Physics
                 moveVector += Vector3.Right*speedNormalize;
             }
 
-            m_player.IsMoving = moveVector != new Vector3();
+            _mPlayer.Entity.IsMoving = moveVector != new Vector3();
             //moveVector.Normalize();
             moveVector *= GetPlayerSpeed()*(float) gameTime.ElapsedGameTime.TotalSeconds;
 
-            var rotatedMoveVector = Vector3.Transform(moveVector, Matrix.CreateRotationY(m_camera.LeftRightRotation));
+            var rotatedMoveVector = Vector3.Transform(moveVector, Matrix.CreateRotationY(_mCamera.LeftRightRotation));
 
             // Attempt to move, doing collision stuff.
             if (TryToMoveTo(rotatedMoveVector, gameTime))
@@ -231,26 +204,26 @@ namespace Welt.Physics
             testVector = testVector*(moveLength + 0.3f);
 
             // Apply this test vector.
-            var movePosition = m_player.Position + testVector;
+            var movePosition = _mPlayer.Position + testVector;
             var midBodyPoint = movePosition + new Vector3(0, -0.7f, 0);
             var lowerBodyPoint = movePosition + new Vector3(0, -1.4f, 0);
 
-            if (!Block.IsSolidBlock(m_player.World.GetBlock(movePosition).Id) &&
-                !Block.IsSolidBlock(m_player.World.GetBlock(lowerBodyPoint).Id) &&
-                !Block.IsSolidBlock(m_player.World.GetBlock(midBodyPoint).Id))
+            if (!Block.IsSolidBlock(_mPlayer.World.GetBlock(movePosition).Id) &&
+                !Block.IsSolidBlock(_mPlayer.World.GetBlock(lowerBodyPoint).Id) &&
+                !Block.IsSolidBlock(_mPlayer.World.GetBlock(midBodyPoint).Id))
             {
-                m_player.Position = m_player.Position + moveVector;
+                _mPlayer.Position = _mPlayer.Position + moveVector;
                 if (moveVector != Vector3.Zero)
                 {
-                    m_player.HeadBob += 0.2;
+                    _mPlayer.HeadBob += 0.2;
                 }
                 return true;
             }
 
             // It's solid there, so while we can't move we have officially collided with it.
-            var lowerBlock = m_player.World.GetBlock(lowerBodyPoint).Id;
-            var midBlock = m_player.World.GetBlock(midBodyPoint).Id;
-            var upperBlock = m_player.World.GetBlock(movePosition).Id;
+            var lowerBlock = _mPlayer.World.GetBlock(lowerBodyPoint).Id;
+            var midBlock = _mPlayer.World.GetBlock(midBodyPoint).Id;
+            var upperBlock = _mPlayer.World.GetBlock(movePosition).Id;
 
             // It's solid there, so see if it's a lava block. If so, touching it will kill us!
             //if (upperBlock == BlockType.Lava || lowerBlock == BlockType.Lava || midBlock == BlockType.Lava)

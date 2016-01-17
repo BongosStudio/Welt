@@ -20,14 +20,14 @@ namespace Welt.Profiling
 
         #region Fields
 
-        readonly ContentManager m_content;
-        SpriteBatch m_spriteBatch;
-        SpriteFont m_spriteFont;
-        readonly string[] m_numbers;
+        readonly ContentManager _mContent;
+        SpriteBatch _mSpriteBatch;
+        SpriteFont _mSpriteFont;
+        readonly string[] _mNumbers;
 
-        int m_frameRate;
-        int m_frameCounter;
-        TimeSpan m_elapsedTime = TimeSpan.Zero;
+        int _mFrameRate;
+        int _mFrameCounter;
+        TimeSpan _mElapsedTime = TimeSpan.Zero;
         #endregion
 
         /// <summary>
@@ -37,11 +37,11 @@ namespace Welt.Profiling
         public FrameRateCounter(Game game)
             : base(game)
         {
-            m_content = game.Content;
-            m_numbers = new string[10];
+            _mContent = game.Content;
+            _mNumbers = new string[10];
             for (var j = 0; j < 10; j++)
             {
-                m_numbers[j] = j.ToString();
+                _mNumbers[j] = j.ToString();
             }
         }
 
@@ -50,8 +50,8 @@ namespace Welt.Profiling
         /// </summary>
         protected override void LoadContent()
         {
-            m_spriteBatch = new SpriteBatch(GraphicsDevice);
-            m_spriteFont = m_content.Load<SpriteFont>("Fonts/OSDDisplay");
+            _mSpriteBatch = new SpriteBatch(GraphicsDevice);
+            _mSpriteFont = _mContent.Load<SpriteFont>("Fonts/OSDDisplay");
         }
 
         #region Update
@@ -63,12 +63,12 @@ namespace Welt.Profiling
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            m_elapsedTime += gameTime.ElapsedGameTime;
+            _mElapsedTime += gameTime.ElapsedGameTime;
 
-            if (m_elapsedTime <= TimeSpan.FromSeconds(1)) return;
-            m_elapsedTime -= TimeSpan.FromSeconds(1);
-            m_frameRate = m_frameCounter;
-            m_frameCounter = 0;
+            if (_mElapsedTime <= TimeSpan.FromSeconds(1)) return;
+            _mElapsedTime -= TimeSpan.FromSeconds(1);
+            _mFrameRate = _mFrameCounter;
+            _mFrameCounter = 0;
         }
         #endregion
 
@@ -80,32 +80,32 @@ namespace Welt.Profiling
         /// <param name="gameTime"></param>
         public new void Draw(GameTime gameTime)
         {
-            m_frameCounter++;
+            _mFrameCounter++;
 
             //Framerates over 1000 aren't important as we have lots of room for features.
-            if (m_frameRate >= 1000)
+            if (_mFrameRate >= 1000)
             {
-                m_frameRate = 999;
+                _mFrameRate = 999;
             }
 
             //Break the framerate down to single digit components so we can use
             //the number lookup to draw them.
-            var fps1 = m_frameRate / 100;
-            var fps2 = (m_frameRate - fps1 * 100) / 10;
-            var fps3 = m_frameRate - fps1 * 100 - fps2 * 10;
+            var fps1 = _mFrameRate / 100;
+            var fps2 = (_mFrameRate - fps1 * 100) / 10;
+            var fps3 = _mFrameRate - fps1 * 100 - fps2 * 10;
 
-            m_spriteBatch.Begin();
+            _mSpriteBatch.Begin();
 
-            m_spriteBatch.DrawString(m_spriteFont, m_numbers[fps1], new Vector2(33, 33), Color.Black);
-            m_spriteBatch.DrawString(m_spriteFont, m_numbers[fps1], new Vector2(32, 32), Color.White);
+            _mSpriteBatch.DrawString(_mSpriteFont, _mNumbers[fps1], new Vector2(33, 33), Color.Black);
+            _mSpriteBatch.DrawString(_mSpriteFont, _mNumbers[fps1], new Vector2(32, 32), Color.White);
 
-            m_spriteBatch.DrawString(m_spriteFont, m_numbers[fps2], new Vector2(33 + m_spriteFont.MeasureString(m_numbers[fps1]).X, 33), Color.Black);
-            m_spriteBatch.DrawString(m_spriteFont, m_numbers[fps2], new Vector2(32 + m_spriteFont.MeasureString(m_numbers[fps1]).X, 32), Color.White);
+            _mSpriteBatch.DrawString(_mSpriteFont, _mNumbers[fps2], new Vector2(33 + _mSpriteFont.MeasureString(_mNumbers[fps1]).X, 33), Color.Black);
+            _mSpriteBatch.DrawString(_mSpriteFont, _mNumbers[fps2], new Vector2(32 + _mSpriteFont.MeasureString(_mNumbers[fps1]).X, 32), Color.White);
 
-            m_spriteBatch.DrawString(m_spriteFont, m_numbers[fps3], new Vector2(33 + m_spriteFont.MeasureString(m_numbers[fps1]).X + m_spriteFont.MeasureString(m_numbers[fps2]).X, 33), Color.Black);
-            m_spriteBatch.DrawString(m_spriteFont, m_numbers[fps3], new Vector2(32 + m_spriteFont.MeasureString(m_numbers[fps1]).X + m_spriteFont.MeasureString(m_numbers[fps2]).X, 32), Color.White);
+            _mSpriteBatch.DrawString(_mSpriteFont, _mNumbers[fps3], new Vector2(33 + _mSpriteFont.MeasureString(_mNumbers[fps1]).X + _mSpriteFont.MeasureString(_mNumbers[fps2]).X, 33), Color.Black);
+            _mSpriteBatch.DrawString(_mSpriteFont, _mNumbers[fps3], new Vector2(32 + _mSpriteFont.MeasureString(_mNumbers[fps1]).X + _mSpriteFont.MeasureString(_mNumbers[fps2]).X, 32), Color.White);
 
-            m_spriteBatch.End();
+            _mSpriteBatch.End();
         }
         #endregion
 

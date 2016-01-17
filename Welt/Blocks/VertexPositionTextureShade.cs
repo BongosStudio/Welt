@@ -18,41 +18,41 @@ namespace Welt.Blocks
         };
 
         public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(VertexElements);
-        private Vector3 m_position;
-        private float m_shade;
-        private Vector2 m_textureCoordinate;
+        private Vector3 _mPosition;
+        private float _mShade;
+        private Vector2 _mTextureCoordinate;
 
         public VertexPositionTextureShade(Vector3 position, Vector2 textureCoordinate, float shade)
         {
-            m_position = position;
-            m_textureCoordinate = textureCoordinate;
-            m_shade = shade;
+            _mPosition = position;
+            _mTextureCoordinate = textureCoordinate;
+            _mShade = shade;
         }
 
         public VertexPositionTextureShade(Vector3 position, Vector3 normal, float shade, Vector2 textureCoordinate)
         {
             //normal is not in use currently
-            m_position = position;
-            m_textureCoordinate = textureCoordinate;
-            m_shade = shade;
+            _mPosition = position;
+            _mTextureCoordinate = textureCoordinate;
+            _mShade = shade;
         }
 
         public Vector3 Position
         {
-            get { return m_position; }
-            set { m_position = value; }
+            get { return _mPosition; }
+            set { _mPosition = value; }
         }
 
         public Vector2 TextureCoordinate
         {
-            get { return m_textureCoordinate; }
-            set { m_textureCoordinate = value; }
+            get { return _mTextureCoordinate; }
+            set { _mTextureCoordinate = value; }
         }
 
         public float Shade
         {
-            get { return m_shade; }
-            set { m_shade = value; }
+            get { return _mShade; }
+            set { _mShade = value; }
         }
 
         public static int SizeInBytes => sizeof (float)*6;
@@ -61,7 +61,7 @@ namespace Welt.Blocks
 
         public override string ToString()
         {
-            return "(" + m_position + "),(" + m_textureCoordinate + ")," + m_shade;
+            return "(" + _mPosition + "),(" + _mTextureCoordinate + ")," + _mShade;
         }
     }
 }

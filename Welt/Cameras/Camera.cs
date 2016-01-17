@@ -34,7 +34,7 @@ namespace Welt.Cameras
 
         protected virtual void CalculateProjection()
         {
-            Projection = Matrix.CreatePerspectiveFieldOfView(m_viewAngle, Viewport.AspectRatio, m_nearPlane, m_farPlane);
+            Projection = Matrix.CreatePerspectiveFieldOfView(_mViewAngle, Viewport.AspectRatio, _mNearPlane, _mFarPlane);
         }
 
         protected virtual void CalculateView()
@@ -55,9 +55,9 @@ namespace Welt.Cameras
 
         protected Vector3 _position = Vector3.Zero;
 
-        private readonly float m_viewAngle = MathHelper.PiOver4;
-        private readonly float m_nearPlane = 0.01f;
-        private readonly float m_farPlane = 220*4;
+        private readonly float _mViewAngle = MathHelper.PiOver4;
+        private readonly float _mNearPlane = 0.01f;
+        private readonly float _mFarPlane = 220*4;
 
         public readonly Viewport Viewport;
 

@@ -18,8 +18,8 @@ namespace Welt.Controllers
         private const float MOVEMENTSPEED = 0.25f;
         private const float ROTATIONSPEED = 0.1f;
 
-        private MouseState m_mouseMoveState;
-        private MouseState m_mouseState;
+        private MouseState _mMouseMoveState;
+        private MouseState _mMouseState;
 
         public readonly FirstPersonCamera Camera;
 
@@ -32,7 +32,7 @@ namespace Welt.Controllers
 
         public void Initialize()
         {
-            m_mouseState = Mouse.GetState();
+            _mMouseState = Mouse.GetState();
         }
 
         #region ProcessInput
@@ -74,8 +74,8 @@ namespace Welt.Controllers
         {
             var currentMouseState = Mouse.GetState();
 
-            float mouseDx = currentMouseState.X - m_mouseMoveState.X;
-            float mouseDy = currentMouseState.Y - m_mouseMoveState.Y;
+            float mouseDx = currentMouseState.X - _mMouseMoveState.X;
+            float mouseDy = currentMouseState.Y - _mMouseMoveState.Y;
 
             if (mouseDx != 0)
             {
@@ -98,12 +98,12 @@ namespace Welt.Controllers
             //camera.LeftRightRotation -= GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.X / 20;
             //camera.UpDownRotation += GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.Y / 20;
 
-            m_mouseMoveState = new MouseState(Camera.Viewport.Width / 2,
+            _mMouseMoveState = new MouseState(Camera.Viewport.Width / 2,
                     Camera.Viewport.Height / 2,
                     0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
 
-            Mouse.SetPosition((int)m_mouseMoveState.X, (int)m_mouseMoveState.Y);
-            m_mouseState = Mouse.GetState();
+            Mouse.SetPosition((int)_mMouseMoveState.X, (int)_mMouseMoveState.Y);
+            _mMouseState = Mouse.GetState();
         }
         #endregion
 

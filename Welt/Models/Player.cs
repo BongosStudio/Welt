@@ -4,6 +4,7 @@
 #region Using Statements
 
 using Microsoft.Xna.Framework;
+using Welt.Entities;
 using Welt.Forge;
 using Welt.Tools;
 using Welt.Types;
@@ -17,6 +18,7 @@ namespace Welt.Models
 
         #region Fields
         public readonly World World;
+        public readonly PlayerEntity Entity;
 
         public Vector3 Position;
         public Vector3 Velocity;        
@@ -31,19 +33,18 @@ namespace Welt.Models
         public Tool AutoTool;
         public Vector3 TargetPoint;
 
-        public bool IsInWater;
-        public bool IsMoving;
+        public bool IsPaused;
 
         //keep it stupid simple for now, left hand/mousebutton & right hand/mousebutton
         #endregion
 
         public Player(World world)
         {
-            this.World = world;
-            LeftTool = new BlockRemover(this);
-            //LeftTool = new PowerDrill(this);
-            //RightTool = new BlockAdder(this);
-            RightTool = new BlockDebugger(this);
+            World = world;
+            //LeftTool = new BlockRemover(this);
+            LeftTool = new PowerDrill(this);
+            RightTool = new TorchTool(this);
+            Entity = new PlayerEntity();
         }
 
     }

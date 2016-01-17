@@ -26,14 +26,16 @@ namespace Welt.Cameras
     {
         public PlayerRenderer(GraphicsDevice graphicsDevice, Player player)
         {
-            m_graphicsDevice = graphicsDevice;
+            _mGraphicsDevice = graphicsDevice;
             Player = player;
-            m_viewport = graphicsDevice.Viewport;
-            Camera = new FirstPersonCamera(m_viewport);
-            m_cameraController = new FirstPersonCameraController(Camera);
-            m_physics = new PlayerPhysics(this);
-            m_fog = new FogRenderer(graphicsDevice);
-            m_input = InputController.CreateDefault();
+            _mViewport = graphicsDevice.Viewport;
+            Camera = new FirstPersonCamera(_mViewport);
+            _mCameraController = new FirstPersonCameraController(Camera);
+            _mPhysics = new PlayerPhysics(this);
+            _mFog = new FogRenderer(graphicsDevice);
+            _mInput = InputController.CreateDefault();
+            _mLeftClickCooldown = TimeSpan.Zero;
+            _mRightClickCooldown = TimeSpan.Zero;
         }
 
         public void Initialize()
@@ -43,18 +45,18 @@ namespace Welt.Cameras
             Player.Position = Camera.Position;
             Camera.LookAt(Vector3.Down);
 
-            m_cameraController.Initialize();
+            _mCameraController.Initialize();
 
             // SelectionBlock
-            m_selectionBlockEffect = new BasicEffect(m_graphicsDevice);
+            _mSelectionBlockEffect = new BasicEffect(_mGraphicsDevice);
         }
 
         public void LoadContent(ContentManager content)
         {
             // SelectionBlock
             SelectionBlock = content.Load<Model>("Models\\SelectionBlock");
-            m_selectionBlockTexture = content.Load<Texture2D>("Textures\\SelectionBlock");
-            m_fog.LoadContent();
+            _mSelectionBlockTexture = content.Load<Texture2D>("Textures\\SelectionBlock");
+            _mFog.LoadContent();
         }
 
         #region Update
@@ -65,40 +67,41 @@ namespace Welt.Cameras
 
             if (FreeCam)
             {
-                m_cameraController.ProcessInput(gameTime);
+                _mCameraController.ProcessInput(gameTime);
                 Player.Position = Camera.Position;
             }
 
-            m_cameraController.Update(gameTime);
+            _mCameraController.Update(gameTime);
 
             Camera.Update(gameTime);
 
             //Do not change methods order, its not very clean but works fine
-            if (!FreeCam) m_physics.Move(gameTime);
+            if (!FreeCam) _mPhysics.Move(gameTime);
 
-            var mouseState = m_input.GetMouseState();
-            var scrollWheelDelta = m_input.GetMouseState().ScrollWheelValue - mouseState.ScrollWheelValue;
-            
-            if (m_leftClickCooldown > 0) m_leftClickCooldown--;
-            if (m_rightClickCooldown > 0) m_rightClickCooldown--;
+            var mouseState = _mInput.GetMouseState();
+            var scrollWheelDelta = _mInput.GetMouseState().ScrollWheelValue - mouseState.ScrollWheelValue;
+
+            // first we go ahead and subtract the amount of elapsed time since last update
+            if (_mLeftClickCooldown > TimeSpan.Zero) _mLeftClickCooldown -= gameTime.ElapsedGameTime;
+            if (_mRightClickCooldown > TimeSpan.Zero) _mRightClickCooldown -= gameTime.ElapsedGameTime;
 
             if (mouseState.RightButton == ButtonState.Pressed)
             {
-                if (m_rightClickCooldown == 0)
+                if (_mRightClickCooldown <= TimeSpan.Zero) // this means the cooldown is finished
                 {
-                    m_rightClickCooldown = COOLDOWN_TIME;
+                    _mRightClickCooldown = TimeSpan.FromMilliseconds(500);
                     Player.RightTool.Use(DateTime.Now);
-                    m_forceUpdate = true;
+                    _mForceUpdate = true;
                 }
             }
 
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
-                if (m_leftClickCooldown == 0)
+                if (_mLeftClickCooldown <= TimeSpan.Zero) // this means the cooldown is finished
                 {
-                    m_leftClickCooldown = COOLDOWN_TIME;
+                    _mLeftClickCooldown = TimeSpan.FromMilliseconds(500);
                     Player.LeftTool.Use(DateTime.Now);
-                    m_forceUpdate = true;
+                    _mForceUpdate = true;
                 }
             }
 
@@ -106,10 +109,10 @@ namespace Welt.Cameras
             Player.LeftTool.SwitchType(scrollWheelDelta);
             
             //do not do this each tick
-            if (!previousView.Equals(Camera.View) || m_forceUpdate)
+            if (!previousView.Equals(Camera.View) || _mForceUpdate)
             {
-                m_lookVector = Camera.LookVector;
-                m_lookVector.Normalize();
+                _mLookVector = Camera.LookVector;
+                _mLookVector.Normalize();
 
                 var x = SetPlayerSelectedBlock(false);
                 if (x != 0) // x==0 is equivalent to payer.currentSelection == null
@@ -117,7 +120,7 @@ namespace Welt.Cameras
                     SetPlayerAdjacentSelectedBlock(x + 0.5f);
                 }
             }
-            m_forceUpdate = false;
+            _mForceUpdate = false;
         }
 
         #endregion
@@ -132,33 +135,31 @@ namespace Welt.Cameras
             {
                 RenderSelectionBlock(gameTime);
             }
-            m_fog.Draw();
+            _mFog.Draw();
         }
 
         #endregion
 
         #region Fields
-
-        private const int COOLDOWN_TIME = 30;
-
+        
         public readonly Player Player;       
         public readonly FirstPersonCamera Camera;
-        private readonly FirstPersonCameraController m_cameraController;
-        private readonly FogRenderer m_fog;
+        private readonly FirstPersonCameraController _mCameraController;
+        private readonly FogRenderer _mFog;
 
-        private Vector3 m_lookVector;
-        private readonly InputController m_input;
-        private readonly GraphicsDevice m_graphicsDevice;
-        private readonly Viewport m_viewport;
-        private readonly PlayerPhysics m_physics;
+        private Vector3 _mLookVector;
+        private readonly InputController _mInput;
+        private readonly GraphicsDevice _mGraphicsDevice;
+        private readonly Viewport _mViewport;
+        private readonly PlayerPhysics _mPhysics;
 
         // SelectionBlock
         public Model SelectionBlock;
-        private BasicEffect m_selectionBlockEffect;
-        private Texture2D m_selectionBlockTexture;
-        private int m_leftClickCooldown;
-        private int m_rightClickCooldown;
-        private bool m_forceUpdate;
+        private BasicEffect _mSelectionBlockEffect;
+        private Texture2D _mSelectionBlockTexture;
+        private TimeSpan _mLeftClickCooldown;
+        private TimeSpan _mRightClickCooldown;
+        private bool _mForceUpdate;
         public bool FreeCam;
 
         #endregion
@@ -167,7 +168,7 @@ namespace Welt.Cameras
 
         public void RenderSelectionBlock(GameTime gameTime)
         {
-            m_graphicsDevice.BlendState = BlendState.NonPremultiplied;
+            _mGraphicsDevice.BlendState = BlendState.NonPremultiplied;
                 // allows any transparent pixels in original PNG to draw transparent
 
             if (!Player.CurrentSelection.HasValue) return;
@@ -184,17 +185,17 @@ namespace Welt.Cameras
             identity = Matrix.Multiply(matrixB, matrixA); // the final position of the block
 
             // set up the World, View and Projection
-            m_selectionBlockEffect.World = identity;
-            m_selectionBlockEffect.View = Camera.View;
-            m_selectionBlockEffect.Projection = Camera.Projection;
-            m_selectionBlockEffect.Texture = m_selectionBlockTexture;
-            m_selectionBlockEffect.TextureEnabled = true;
+            _mSelectionBlockEffect.World = identity;
+            _mSelectionBlockEffect.View = Camera.View;
+            _mSelectionBlockEffect.Projection = Camera.Projection;
+            _mSelectionBlockEffect.Texture = _mSelectionBlockTexture;
+            _mSelectionBlockEffect.TextureEnabled = true;
 
             // apply the effect
-            foreach (var pass in m_selectionBlockEffect.CurrentTechnique.Passes)
+            foreach (var pass in _mSelectionBlockEffect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                DrawSelectionBlockMesh(m_graphicsDevice, SelectionBlock.Meshes[0], m_selectionBlockEffect);
+                DrawSelectionBlockMesh(_mGraphicsDevice, SelectionBlock.Meshes[0], _mSelectionBlockEffect);
             }
         }
 
@@ -205,9 +206,9 @@ namespace Welt.Cameras
             {
                 var parts = mesh.MeshParts[i];
                 if (parts.NumVertices <= 0) continue;
-                m_graphicsDevice.Indices = parts.IndexBuffer;
+                _mGraphicsDevice.Indices = parts.IndexBuffer;
                 //TODO better use DrawUserIndexedPrimitives for fully dynamic content
-                m_graphicsDevice.SetVertexBuffer(parts.VertexBuffer);
+                _mGraphicsDevice.SetVertexBuffer(parts.VertexBuffer);
                 //graphicsdevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, parts.NumVertices,
                 //    parts.StartIndex, parts.PrimitiveCount);
                 graphicsdevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, parts.NumVertices, parts.PrimitiveCount);
@@ -218,12 +219,12 @@ namespace Welt.Cameras
         {
             for (var x = 0.5f; x < 8f; x += 0.1f)
             {
-                var targetPoint = Camera.Position + (m_lookVector*x);
+                var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
-                Console.WriteLine(Block.GetBoundingBox(block.Id, targetPoint).Max.Y > targetPoint.Y);
                 if (block.Id != BlockType.None && (waterSelectable || block.Id != BlockType.Water))
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);
+                    
                     return x;
                 }
                 Player.CurrentSelection = null;
@@ -237,7 +238,7 @@ namespace Welt.Cameras
         {
             for (var x = xStart; x > 0.7f; x -= 0.1f)
             {
-                var targetPoint = Camera.Position + (m_lookVector*x);
+                var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
                 
                 if (Player.World.GetBlock(targetPoint).Id != BlockType.None) continue;

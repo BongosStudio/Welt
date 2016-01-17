@@ -26,7 +26,7 @@ namespace Welt.Blocks
 
     public class VertexBlockRenderer
     {
-        private readonly World m_world;
+        private readonly World _mWorld;
 
         private static readonly Vector3 _vector101 = new Vector3(1, 0, 1);
         private static readonly Vector3 _vector110 = new Vector3(1, 1, 0);
@@ -34,7 +34,7 @@ namespace Welt.Blocks
 
         public VertexBlockRenderer(World world)
         {
-            this.m_world = world;
+            this._mWorld = world;
         }
 
         #region BuildBlockVertices
@@ -59,12 +59,12 @@ namespace Welt.Blocks
                 chunkRelativePosition.Y == Chunk.Max.Y ||
                 chunkRelativePosition.Z == Chunk.Max.Z)
             {
-                blockXDecreasing = m_world.GetBlock(blockPosition.X - 1, blockPosition.Y, blockPosition.Z);
-                blockYDecreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y - 1, blockPosition.Z);
-                blockZDecreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z - 1);
-                blockXIncreasing = m_world.GetBlock(blockPosition.X + 1, blockPosition.Y, blockPosition.Z);
-                blockYIncreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y + 1, blockPosition.Z);
-                blockZIncreasing = m_world.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z + 1);
+                blockXDecreasing = _mWorld.GetBlock(blockPosition.X - 1, blockPosition.Y, blockPosition.Z);
+                blockYDecreasing = _mWorld.GetBlock(blockPosition.X, blockPosition.Y - 1, blockPosition.Z);
+                blockZDecreasing = _mWorld.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z - 1);
+                blockXIncreasing = _mWorld.GetBlock(blockPosition.X + 1, blockPosition.Y, blockPosition.Z);
+                blockYIncreasing = _mWorld.GetBlock(blockPosition.X, blockPosition.Y + 1, blockPosition.Z);
+                blockZIncreasing = _mWorld.GetBlock(blockPosition.X, blockPosition.Y, blockPosition.Z + 1);
             }
             else
             {

@@ -10,11 +10,11 @@ namespace Welt.Forge.Renderers
     public class FogRenderer
     {
         protected Texture2D FogTexture;
-        private readonly SpriteBatch m_spriteBatch;
+        private readonly SpriteBatch _mSpriteBatch;
 
         public FogRenderer(GraphicsDevice device)
         {
-            m_spriteBatch = new SpriteBatch(device);
+            _mSpriteBatch = new SpriteBatch(device);
         }
 
         public void LoadContent()

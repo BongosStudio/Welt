@@ -20,42 +20,42 @@ namespace Welt.Forge.Renderers
     {
         public DiagnosticWorldRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, World world)
         {
-            m_graphicsDevice = graphicsDevice;
-            m_camera = camera;
-            m_world = world;
+            _mGraphicsDevice = graphicsDevice;
+            _mCamera = camera;
+            _mWorld = world;
         }
 
         public void Initialize()
         {
-            m_effect = new BasicEffect(m_graphicsDevice);
+            _mEffect = new BasicEffect(_mGraphicsDevice);
 
             #region debugFont Rectangle
 
-            m_debugRectTexture = new Texture2D(m_graphicsDevice, 1, 1);
+            _mDebugRectTexture = new Texture2D(_mGraphicsDevice, 1, 1);
             var texcol = new Color[1];
-            m_debugRectTexture.GetData(texcol);
+            _mDebugRectTexture.GetData(texcol);
             texcol[0] = Color.Black;
-            m_debugRectTexture.SetData(texcol);
+            _mDebugRectTexture.SetData(texcol);
 
-            m_backgroundRectangle = new Rectangle(680, 0, 120, 144);
+            _mBackgroundRectangle = new Rectangle(680, 0, 120, 144);
 
-            m_chunksVector2 = new Vector2(680, 0);
-            m_awaitingGenerateVector2 = new Vector2(680, 16);
-            m_generatingVector2 = new Vector2(680, 32);
-            m_awaitingLightingVector2 = new Vector2(680, 48);
-            m_lightingVector2 = new Vector2(680, 64);
-            m_awaitingBuildVector2 = new Vector2(680, 80);
-            m_awaitingRebuildVector2 = new Vector2(680, 96);
-            m_awaitingRelightingVector2 = new Vector2(680, 112);
-            m_readyVector2 = new Vector2(680, 128);
+            _mChunksVector2 = new Vector2(680, 0);
+            _mAwaitingGenerateVector2 = new Vector2(680, 16);
+            _mGeneratingVector2 = new Vector2(680, 32);
+            _mAwaitingLightingVector2 = new Vector2(680, 48);
+            _mLightingVector2 = new Vector2(680, 64);
+            _mAwaitingBuildVector2 = new Vector2(680, 80);
+            _mAwaitingRebuildVector2 = new Vector2(680, 96);
+            _mAwaitingRelightingVector2 = new Vector2(680, 112);
+            _mReadyVector2 = new Vector2(680, 128);
 
             #endregion
         }
 
         public void LoadContent(ContentManager content)
         {
-            m_debugSpriteBatch = new SpriteBatch(m_graphicsDevice);
-            m_debugFont = content.Load<SpriteFont>("Fonts\\OSDdisplay");
+            _mDebugSpriteBatch = new SpriteBatch(_mGraphicsDevice);
+            _mDebugFont = content.Load<SpriteFont>("Fonts\\OSDdisplay");
         }
 
         public void Update(GameTime gameTime)
@@ -66,7 +66,7 @@ namespace Welt.Forge.Renderers
 
         public void Draw(GameTime gameTime)
         {
-            var viewFrustum = new BoundingFrustum(m_camera.View*m_camera.Projection);
+            var viewFrustum = new BoundingFrustum(_mCamera.View*_mCamera.Projection);
 
             var totalChunksCounter = 0;
             var awaitingGenerateCounter = 0;
@@ -79,50 +79,50 @@ namespace Welt.Forge.Renderers
             var awaitingRelightingCounter = 0;
             var readyCounter = 0;
 
-            foreach (var chunk in m_world.Chunks.Values)
+            foreach (var chunk in _mWorld.Chunks.Values)
             {
                 //if (chunk.BoundingBox.Intersects(viewFrustum))
                 //{
                 switch (chunk.State)
                 {
                     case ChunkState.AwaitingGenerate:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Red);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Red);
                         awaitingGenerateCounter++;
                         break;
                     case ChunkState.Generating:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Pink);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Pink);
                         generatingCounter++;
                         break;
                     case ChunkState.AwaitingLighting:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Orange);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Orange);
                         awaitingLightingCounter++;
                         break;
                     case ChunkState.Lighting:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Yellow);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Yellow);
                         lightingCounter++;
                         break;
                     case ChunkState.AwaitingBuild:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Green);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Green);
                         awaitingBuildCounter++;
                         break;
                     case ChunkState.AwaitingRebuild:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Green);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Green);
                         awaitingRebuildCounter++;
                         break;
                     case ChunkState.Building:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.LightGreen);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.LightGreen);
                         buildingCounter++;
                         break;
                     case ChunkState.AwaitingRelighting:
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Black);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Black);
                         awaitingRelightingCounter++;
                         break;
                     case ChunkState.Ready:
@@ -130,8 +130,8 @@ namespace Welt.Forge.Renderers
                         break;
                     default:
                         Debug.WriteLine("Unchecked State: {0}", chunk.State);
-                        Utility.DrawBoundingBox(chunk.BoundingBox, m_graphicsDevice, m_effect, Matrix.Identity,
-                            m_camera.View, m_camera.Projection, Color.Blue);
+                        Utility.DrawBoundingBox(chunk.BoundingBox, _mGraphicsDevice, _mEffect, Matrix.Identity,
+                            _mCamera.View, _mCamera.Projection, Color.Blue);
                         break;
                 }
                 //}
@@ -140,25 +140,25 @@ namespace Welt.Forge.Renderers
 
             #region OSD debug texts
 
-            m_debugSpriteBatch.Begin();
-            if (m_debugRectangle)
+            _mDebugSpriteBatch.Begin();
+            if (_mDebugRectangle)
             {
-                m_debugSpriteBatch.Draw(m_debugRectTexture, m_backgroundRectangle, Color.Black);
+                _mDebugSpriteBatch.Draw(_mDebugRectTexture, _mBackgroundRectangle, Color.Black);
             }
-            m_debugSpriteBatch.DrawString(m_debugFont, "Chunks: " + totalChunksCounter, m_chunksVector2, Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "A.Generate: " + awaitingGenerateCounter, m_awaitingGenerateVector2,
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "Chunks: " + totalChunksCounter, _mChunksVector2, Color.White);
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "A.Generate: " + awaitingGenerateCounter, _mAwaitingGenerateVector2,
                 Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "Generating: " + generatingCounter, m_generatingVector2, Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "A.Lighting: " + awaitingLightingCounter, m_awaitingLightingVector2,
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "Generating: " + generatingCounter, _mGeneratingVector2, Color.White);
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "A.Lighting: " + awaitingLightingCounter, _mAwaitingLightingVector2,
                 Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "Lighting: " + lightingCounter, m_lightingVector2, Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "A.Build: " + awaitingBuildCounter, m_awaitingBuildVector2, Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "A.Rebuild: " + awaitingRebuildCounter, m_awaitingRebuildVector2,
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "Lighting: " + lightingCounter, _mLightingVector2, Color.White);
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "A.Build: " + awaitingBuildCounter, _mAwaitingBuildVector2, Color.White);
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "A.Rebuild: " + awaitingRebuildCounter, _mAwaitingRebuildVector2,
                 Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "A.Relighting: " + awaitingRelightingCounter,
-                m_awaitingRelightingVector2, Color.White);
-            m_debugSpriteBatch.DrawString(m_debugFont, "Ready: " + readyCounter, m_readyVector2, Color.White);
-            m_debugSpriteBatch.End();
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "A.Relighting: " + awaitingRelightingCounter,
+                _mAwaitingRelightingVector2, Color.White);
+            _mDebugSpriteBatch.DrawString(_mDebugFont, "Ready: " + readyCounter, _mReadyVector2, Color.White);
+            _mDebugSpriteBatch.End();
 
             #endregion
         }
@@ -172,28 +172,28 @@ namespace Welt.Forge.Renderers
 
         #region Fields
 
-        private BasicEffect m_effect;
-        private readonly GraphicsDevice m_graphicsDevice;
-        private readonly FirstPersonCamera m_camera;
-        private readonly World m_world;
+        private BasicEffect _mEffect;
+        private readonly GraphicsDevice _mGraphicsDevice;
+        private readonly FirstPersonCamera _mCamera;
+        private readonly World _mWorld;
 
         #region debugFont
 
-        private SpriteBatch m_debugSpriteBatch;
-        private SpriteFont m_debugFont;
-        private Texture2D m_debugRectTexture;
-        private readonly bool m_debugRectangle = true;
-        private Rectangle m_backgroundRectangle;
+        private SpriteBatch _mDebugSpriteBatch;
+        private SpriteFont _mDebugFont;
+        private Texture2D _mDebugRectTexture;
+        private readonly bool _mDebugRectangle = true;
+        private Rectangle _mBackgroundRectangle;
 
-        private Vector2 m_chunksVector2;
-        private Vector2 m_awaitingGenerateVector2;
-        private Vector2 m_generatingVector2;
-        private Vector2 m_awaitingLightingVector2;
-        private Vector2 m_lightingVector2;
-        private Vector2 m_awaitingBuildVector2;
-        private Vector2 m_awaitingRebuildVector2;
-        private Vector2 m_awaitingRelightingVector2;
-        private Vector2 m_readyVector2;
+        private Vector2 _mChunksVector2;
+        private Vector2 _mAwaitingGenerateVector2;
+        private Vector2 _mGeneratingVector2;
+        private Vector2 _mAwaitingLightingVector2;
+        private Vector2 _mLightingVector2;
+        private Vector2 _mAwaitingBuildVector2;
+        private Vector2 _mAwaitingRebuildVector2;
+        private Vector2 _mAwaitingRelightingVector2;
+        private Vector2 _mReadyVector2;
 
         #endregion
 
