@@ -21,6 +21,7 @@ namespace Welt.UI
         private bool _showCursor;
         private KeyboardState _previousKeyState;
         private SpriteFont _spriteFont;
+        private TimeSpan _inputDelay;
 
         public override Cursor Cursor => Cursors.IBeam;
         public bool IsSelected;
@@ -51,6 +52,8 @@ namespace Welt.UI
         public override void Initialize(Game game, GameTime time)
         {
             _spriteFont = game.Content.Load<SpriteFont>("Fonts/console");
+            LineIndex = Text.Count - 1;
+            CharacterIndex = Text.Last().Length - 1;
             ProcessSpace();
             base.Initialize(game, time);
         }
@@ -59,11 +62,12 @@ namespace Welt.UI
         {
             var l = 0;
             var cSpace = _showCursor ? "_" : "";
-            var text = Text.Aggregate((s, s1) => $"{s}\r\n{s1}") + cSpace;
+            var text = Text.Aggregate((s, s1) => $"{s}\r\n{s1}").Insert(CharacterIndex, cSpace);
             Graphics.Clear(Color.Black);
             if (Text.Count > 0)
             {
                 Sprite.Begin();
+                Sprite.Draw(new Texture2D(Graphics, Width, Height), new Vector2(X, Y), Color.Aqua);
                 Sprite.DrawString(_spriteFont, text, new Vector2(X, Y), Foreground);
                 Sprite.End();
             }
@@ -83,42 +87,40 @@ namespace Welt.UI
             }
 
             var keyState = Keyboard.GetState();
+            KeyAdvanceMap.Update(keyState);
 
             if (keyState.GetPressedKeys().Length == 0) return;
 
             foreach (var key in keyState.GetPressedKeys())
-            {              
+            {
+                if (keyState[Keys.Enter] == KeyState.Down && keyState[Keys.LeftShift] == KeyState.Up)
+                {
+                    EnterKeyPressed?.Invoke(this, null);
+                    return;
+                }
+
                 if (keyState[Keys.Back] == KeyState.Down)
                 {
-                    if (!_hasBeenTouched)
+                    if (!KeyAdvanceMap.Process(key)) return;
+
+                    // find the last line and remove the last char in that line.
+                    // if the line is empty, remove the line.
+                    if (Text.Count > 1 && Text[LineIndex].Length == 0)
                     {
-                        // if it hasn't been edited before, clear
-                        Text = new List<string> {""};
-                        LineIndex = 0;
-                        CharacterIndex = 0;
+                        Text.RemoveAt(LineIndex);
+                        LineIndex--;
+                        CharacterIndex = Text[LineIndex].Length - 1;
                     }
-                    else
+                    else if (Text.Count > 0 && Text.Last().Length > 0)
                     {
-                        // find the last line and remove the last char in that line.
-                        // if the line is empty, remove the line.
-                        if (Text.Count > 1 && Text.Last().Length == 0)
-                        {
-                            Text.RemoveAt(Text.Count - 1);
-                            LineIndex--;
-                            CharacterIndex = Text.Last().Length;
-                        }
-                        else if (Text.Count > 0 && Text.Last().Length > 0)
-                        {
-                            Text[Text.Count - 1] = Text.Last().Substring(0, Text.Last().Length - 1);
-                            CharacterIndex--;
-                        }
-                    }            
+                        Text[LineIndex] = Text[LineIndex].Substring(0, CharacterIndex - 1);
+                        CharacterIndex--;
+                    }
                 }
                 else
                 {
-                    if (_previousKeyState[key] == KeyState.Down) continue;
-                    var c = KeySystem.ConvertToString(key, keyState);
-                    Text[Text.Count - 1] += c;
+                    if (!KeyAdvanceMap.Process(key)) return;
+                    Text[Text.Count - 1] += KeySystem.ConvertToString(key, keyState);                 
                 }
             }
 
@@ -131,13 +133,9 @@ namespace Welt.UI
 
         private void ProcessSpace()
         {
-            if (Text.Count == 0)
-            {
-                LineIndex = 0;
-                CharacterIndex = 0;
-                return;
-            }
-            
+            if (LineIndex > Text.Count - 1) LineIndex = Text.Count - 1;
+            if (CharacterIndex > Text[LineIndex].Length - 1) CharacterIndex = Text[LineIndex].Length - 1;
+
             var v = _spriteFont.MeasureString(Text.Last());
             if (v.X > Width)
             {
@@ -153,7 +151,9 @@ namespace Welt.UI
                         var secondLine = Text.Last().Substring(ci);
                         Text[Text.Count - 1] = firstLine;
                         Text.Add(secondLine);
-                        break;
+                        LineIndex++;
+                        CharacterIndex = secondLine.Length - 1;
+                        return;
                     }
                 }
                 else
@@ -161,16 +161,20 @@ namespace Welt.UI
                     var beg = Text.Last().Split(' ')[i];
                     Text[Text.Count - 1] = Text.Last().Split(' ').Take(i).Aggregate((s, s1) => $"{s} {s1}");
                     Text.Add(beg);
+                    CharacterIndex += beg.Length - 1;
+                    LineIndex++;
                 }
-                LineIndex++;
-                CharacterIndex = 1;
             }
             else
             {
                 CharacterIndex++;
+                // TODO:
             }
+            
         }
 
         public event EventHandler TextChanged;
+        public event EventHandler EnterKeyPressed;
+
     }
 }

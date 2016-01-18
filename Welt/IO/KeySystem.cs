@@ -3,12 +3,14 @@
 #endregion
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Welt.IO
 {
     public class KeySystem
     {
+
         public static string ConvertToString(Keys key, KeyboardState state)
         {
             var c = "";
@@ -17,9 +19,6 @@ namespace Welt.IO
             {
                 case Keys.Back:
                     c = "\b";
-                    break;
-                case Keys.Enter:
-                    c = Environment.NewLine;
                     break;
                 case Keys.Space:
                     c = " ";
@@ -93,6 +92,10 @@ namespace Welt.IO
             if ((int) key > 64 && (int) key < 91) return key.ToString().ToUpper();
             switch (key)
             {
+                case Keys.Enter:
+                    return Environment.NewLine;
+                case Keys.Space:
+                    return " ";
                 case Keys.D1:
                     return "!";
                 case Keys.D2:
@@ -140,5 +143,7 @@ namespace Welt.IO
                     return string.Empty;
             }
         }
+
+        
     }
 }

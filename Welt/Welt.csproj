@@ -90,6 +90,7 @@
     <Compile Include="Forge\Renderers\ThreadedWorldRenderer.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\World.cs" />
+    <Compile Include="IO\KeyAdvanceMap.cs" />
     <Compile Include="IO\KeySystem.cs" />
     <Compile Include="IO\WireChunk.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
