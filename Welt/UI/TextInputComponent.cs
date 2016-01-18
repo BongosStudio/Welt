@@ -16,12 +16,8 @@ namespace Welt.UI
 {
     public class TextInputComponent : UIComponent
     {
-        private bool _hasBeenTouched;
-        private TimeSpan _cursor;
-        private bool _showCursor;
         private KeyboardState _previousKeyState;
         private SpriteFont _spriteFont;
-        private TimeSpan _inputDelay;
 
         public override Cursor Cursor => Cursors.IBeam;
         public bool IsSelected;
@@ -44,9 +40,7 @@ namespace Welt.UI
         public TextInputComponent(string text, string name, int width, int height, UIComponent parent, GraphicsDevice device) : base(name, width, height, parent, device)
         {
             Text = new List<string> {text};
-            _hasBeenTouched = false;
             IsSelected = true; // TODO: this is for testing only
-            _showCursor = true;
         }
 
         public override void Initialize(Game game, GameTime time)
@@ -60,14 +54,11 @@ namespace Welt.UI
 
         public override void Draw(GameTime time)
         {
-            var l = 0;
-            var cSpace = _showCursor ? "_" : "";
-            var text = Text.Aggregate((s, s1) => $"{s}\r\n{s1}").Insert(CharacterIndex, cSpace);
+            var text = Text.Aggregate((s, s1) => $"{s}\r\n{s1}");
             Graphics.Clear(Color.Black);
             if (Text.Count > 0)
             {
                 Sprite.Begin();
-                Sprite.Draw(new Texture2D(Graphics, Width, Height), new Vector2(X, Y), Color.Aqua);
                 Sprite.DrawString(_spriteFont, text, new Vector2(X, Y), Foreground);
                 Sprite.End();
             }
@@ -76,16 +67,6 @@ namespace Welt.UI
 
         public override void Update(GameTime time)
         {
-            if (_cursor.TotalMilliseconds > 0)
-            {
-                _cursor -= time.ElapsedGameTime;
-            }
-            else
-            {
-                _cursor = TimeSpan.FromSeconds(1);
-                _showCursor = !_showCursor;
-            }
-
             var keyState = Keyboard.GetState();
             KeyAdvanceMap.Update(keyState);
 
@@ -99,9 +80,48 @@ namespace Welt.UI
                     return;
                 }
 
+                switch (key)
+                {
+                    case Keys.Left:
+                        if (CharacterIndex == 0 && LineIndex > 0)
+                        {
+                            LineIndex--;
+                            CharacterIndex = Text[LineIndex].Length - 1;
+                        }
+                        else
+                        {
+                            CharacterIndex--;
+                        }
+                        break;
+                    case Keys.Right:
+                        if (CharacterIndex == Text[LineIndex].Length && LineIndex < Text.Count - 1)
+                        {
+                            LineIndex++;
+                            CharacterIndex = 0;
+                        }
+                        else
+                        {
+                            CharacterIndex++;
+                        }
+                        break;
+                    case Keys.Up:
+                        if (LineIndex > 0)
+                        {
+                            LineIndex--;
+                        }
+                        break;
+                    case Keys.Down:
+                        if (LineIndex < Text.Count - 1)
+                        {
+                            LineIndex++;
+                        }
+                        break;
+
+                }
+
                 if (keyState[Keys.Back] == KeyState.Down)
                 {
-                    if (!KeyAdvanceMap.Process(key)) return;
+                    if (!KeyAdvanceMap.Process(key) && keyState[Keys.LeftShift] != KeyState.Down) return;
 
                     // find the last line and remove the last char in that line.
                     // if the line is empty, remove the line.
@@ -111,9 +131,11 @@ namespace Welt.UI
                         LineIndex--;
                         CharacterIndex = Text[LineIndex].Length - 1;
                     }
-                    else if (Text.Count > 0 && Text.Last().Length > 0)
+                    else if (Text.Count > 0 && Text[LineIndex].Length > 0)
                     {
                         Text[LineIndex] = Text[LineIndex].Substring(0, CharacterIndex - 1);
+                        // BUG: this throws an error if multiple lines are deleted. 
+                        // cont of BUG: make sure that the line and character index are correct
                         CharacterIndex--;
                     }
                 }
@@ -125,7 +147,6 @@ namespace Welt.UI
             }
 
             _previousKeyState = keyState;
-            _hasBeenTouched = true;
             ProcessSpace(); // adjust text box width and height
             TextChanged?.Invoke(this, EventArgs.Empty);
             base.Update(time);
@@ -136,7 +157,7 @@ namespace Welt.UI
             if (LineIndex > Text.Count - 1) LineIndex = Text.Count - 1;
             if (CharacterIndex > Text[LineIndex].Length - 1) CharacterIndex = Text[LineIndex].Length - 1;
 
-            var v = _spriteFont.MeasureString(Text.Last());
+            var v = _spriteFont.MeasureString(Text[LineIndex]);
             if (v.X > Width)
             {
                 Height += _spriteFont.LineSpacing;
@@ -144,13 +165,13 @@ namespace Welt.UI
                 if (i == 0)
                 {
                     // this means the line is a single word and building
-                    for (var ci = Text.Last().Length; ci > 0; ci--)
+                    for (var ci = Text[LineIndex].Length; ci > 0; ci--)
                     {
-                        if (_spriteFont.MeasureString(Text.Last().Substring(0, ci)).X > Width) continue;
-                        var firstLine = Text.Last().Substring(0, ci);
-                        var secondLine = Text.Last().Substring(ci);
-                        Text[Text.Count - 1] = firstLine;
-                        Text.Add(secondLine);
+                        if (_spriteFont.MeasureString(Text[LineIndex].Substring(0, ci)).X > Width) continue;
+                        var firstLine = Text[LineIndex].Substring(0, ci);
+                        var secondLine = Text[LineIndex].Substring(ci);
+                        Text[LineIndex] = firstLine;
+                        Text.Insert(LineIndex + 1, secondLine);
                         LineIndex++;
                         CharacterIndex = secondLine.Length - 1;
                         return;
@@ -158,9 +179,9 @@ namespace Welt.UI
                 }
                 else
                 {
-                    var beg = Text.Last().Split(' ')[i];
-                    Text[Text.Count - 1] = Text.Last().Split(' ').Take(i).Aggregate((s, s1) => $"{s} {s1}");
-                    Text.Add(beg);
+                    var beg = Text[LineIndex].Split(' ')[i];
+                    Text[LineIndex] = Text[LineIndex].Split(' ').Take(i).Aggregate((s, s1) => $"{s} {s1}");
+                    Text.Insert(LineIndex + 1, beg);
                     CharacterIndex += beg.Length - 1;
                     LineIndex++;
                 }
