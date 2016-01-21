@@ -34,6 +34,7 @@ namespace Welt.Models
         public Vector3 TargetPoint;
 
         public bool IsPaused;
+        public string Username;
 
         //keep it stupid simple for now, left hand/mousebutton & right hand/mousebutton
         #endregion
@@ -41,8 +42,8 @@ namespace Welt.Models
         public Player(World world)
         {
             World = world;
-            //LeftTool = new BlockRemover(this);
-            LeftTool = new PowerDrill(this);
+            LeftTool = new BlockRemover(this);
+            //LeftTool = new PowerDrill(this);
             RightTool = new TorchTool(this);
             Entity = new PlayerEntity();
         }

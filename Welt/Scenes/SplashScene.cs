@@ -1,7 +1,10 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
+using System;
 using Microsoft.Xna.Framework;
+using Welt.Controllers;
 
 namespace Welt.Scenes
 {
@@ -13,6 +16,10 @@ namespace Welt.Scenes
 
         public SplashScene(Game game) : base(game)
         {
+            Schedule(() =>
+            {
+                SceneController.Load(new MainMenuScene(game));
+            }, TimeSpan.FromSeconds(5));
         }
     }
 }

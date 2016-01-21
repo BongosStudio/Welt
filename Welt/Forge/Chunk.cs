@@ -109,7 +109,7 @@ namespace Welt.Forge
 
         public bool OutOfBounds(byte x, byte y, byte z)
         {
-            return (x >= Size.X || y >= Size.Y || z >= Size.Z);
+            return x >= Size.X || y >= Size.Y || z >= Size.Z;
         }
 
         #region GetBlock
@@ -174,7 +174,7 @@ namespace Welt.Forge
 
         public override string ToString()
         {
-            return ("chunk at index " + Index);
+            return "chunk at index " + Index;
         }
 
         #region main as unit test for neighbours

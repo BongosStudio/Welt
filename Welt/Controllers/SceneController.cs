@@ -7,12 +7,12 @@ using Welt.Scenes;
 
 namespace Welt.Controllers
 {
-    public class SceneController : DrawableGameComponent
+    public class SceneController
     {
-        private Scene _mCurrent;
-        public GraphicsDeviceManager GraphicsManager;
+        private static Scene _mCurrent;
+        public static GraphicsDeviceManager GraphicsManager;
 
-        public SceneController(Game game, GraphicsDeviceManager gdm) : base(game)
+        public SceneController(Game game, GraphicsDeviceManager gdm)
         {
             GraphicsManager = gdm;
             Scene.Controller = this;
@@ -23,19 +23,24 @@ namespace Welt.Controllers
             _mCurrent.OnExiting(sender, args);
         }
 
-        public override void Update(GameTime gameTime)
+        public void Initialize(Scene scene)
+        {
+            _mCurrent = scene;
+            _mCurrent.Initialize();
+            //_mCurrent.LoadContent();
+        }
+
+        public void Update(GameTime gameTime)
         {
             _mCurrent.Update(gameTime);
-            base.Update(gameTime);
         }
 
-        public new void Draw(GameTime gameTime)
+        public void Draw(GameTime gameTime)
         {
             _mCurrent.Draw(gameTime);
-            base.Draw(gameTime);
         }
-
-        public void Load(Scene scene)
+        
+        public static void Load(Scene scene)
         {
             _mCurrent?.Dispose();
             _mCurrent = scene;

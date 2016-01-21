@@ -3,37 +3,38 @@
 #endregion
 using System;
 using System.Diagnostics;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
+using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
 using Welt.Models;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Welt.Scenes
 {
     public class PlayScene : Scene
     {
-        protected override Color BackColor => Color.Black;
-
         private World _mWorld;
         private IRenderer _mRenderer;
         private HudRenderer _mHud;
-
         private Player _mPlayer1; //wont add a player2 for some time, but naming like this helps designing  
         private PlayerRenderer _mPlayer1Renderer;
-
         private DiagnosticWorldRenderer _mDiagnosticWorldRenderer;
         private bool _mDiagnosticMode;
         private bool _mReleaseMouse;
         private KeyboardState _mOldKeyboardState;
-
         private SkyDomeRenderer _mSkyDomeRenderer;
+        
+        protected override Color BackColor => Color.Black;
 
         public PlayScene(Game game) : base(game)
         {
-            
+
         }
 
         #region Initialize
@@ -54,10 +55,8 @@ namespace Welt.Scenes
             _mDiagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
             _mSkyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
 
-            base.Initialize();
-            
-            _mPlayer1Renderer.Initialize();
-            
+            base.Initialize();           
+            _mPlayer1Renderer.Initialize();        
             _mHud.Initialize();
 
             #region choose renderer
@@ -69,7 +68,9 @@ namespace Welt.Scenes
 
             #endregion
 
-            //TODO refactor WorldRenderer needs player position + view frustum 
+            Game.IsMouseVisible = false;
+            //TODO refactor WorldRenderer needs player position + view frustum
+            
         }
 
         #endregion
@@ -88,11 +89,11 @@ namespace Welt.Scenes
         /// </summary>
         protected override void LoadContent()
         {
-            _mRenderer.LoadContent(Game.Content);
-            _mDiagnosticWorldRenderer.LoadContent(Game.Content);
-            _mSkyDomeRenderer.LoadContent(Game.Content);
-            _mPlayer1Renderer.LoadContent(Game.Content);
-            _mHud.LoadContent(Game.Content);
+            _mRenderer.LoadContent(WeltGame.Instance.Content);
+            _mDiagnosticWorldRenderer.LoadContent(WeltGame.Instance.Content);
+            _mSkyDomeRenderer.LoadContent(WeltGame.Instance.Content);
+            _mPlayer1Renderer.LoadContent(WeltGame.Instance.Content);
+            _mHud.LoadContent(WeltGame.Instance.Content);
         }
 
         #endregion
@@ -134,7 +135,7 @@ namespace Welt.Scenes
             //toggle fullscreen
             if (_mOldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
             {
-                Controller.GraphicsManager.ToggleFullScreen();
+                SceneController.GraphicsManager.ToggleFullScreen();
             }
 
             //freelook mode
@@ -191,26 +192,26 @@ namespace Welt.Scenes
             // fixed time step
             if (_mOldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
             {
-                Controller.GraphicsManager.SynchronizeWithVerticalRetrace = !Controller.GraphicsManager.SynchronizeWithVerticalRetrace;
+                SceneController.GraphicsManager.SynchronizeWithVerticalRetrace = !SceneController.GraphicsManager.SynchronizeWithVerticalRetrace;
                 Game.IsFixedTimeStep = !Game.IsFixedTimeStep;
                 Debug.WriteLine("FixedTimeStep and vsync are " + Game.IsFixedTimeStep);
-                Controller.GraphicsManager.ApplyChanges();
+                SceneController.GraphicsManager.ApplyChanges();
             }
 
             // stealth mode / keep screen space for profilers
             if (_mOldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
             {
-                if (Controller.GraphicsManager.PreferredBackBufferHeight == 750)
+                if (SceneController.GraphicsManager.PreferredBackBufferHeight == 750)
                 {
-                    Controller.GraphicsManager.PreferredBackBufferHeight = 100;
-                    Controller.GraphicsManager.PreferredBackBufferWidth = 160;
+                    SceneController.GraphicsManager.PreferredBackBufferHeight = 100;
+                    SceneController.GraphicsManager.PreferredBackBufferWidth = 160;
                 }
                 else
                 {
-                    Controller.GraphicsManager.PreferredBackBufferHeight = 750;
-                    Controller.GraphicsManager.PreferredBackBufferWidth = 1000;
+                    SceneController.GraphicsManager.PreferredBackBufferHeight = 750;
+                    SceneController.GraphicsManager.PreferredBackBufferWidth = 1000;
                 }
-                Controller.GraphicsManager.ApplyChanges();
+                SceneController.GraphicsManager.ApplyChanges();
             }
 
             _mOldKeyboardState = keyState;
@@ -307,7 +308,8 @@ namespace Welt.Scenes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(BackColor);
+            base.Draw(gameTime);
+
             _mSkyDomeRenderer.Draw(gameTime);
             _mRenderer.Draw(gameTime);
             if (_mDiagnosticMode)
@@ -316,7 +318,6 @@ namespace Welt.Scenes
             }
             _mPlayer1Renderer.Draw(gameTime);
             _mHud.Draw(gameTime);
-            base.Draw(gameTime);
         }
 
         #endregion

@@ -128,6 +128,9 @@
     <Compile Include="Types\Vector3B.cs" />
     <Compile Include="Types\Vector3I.cs" />
     <Compile Include="UI\BoundsBox.cs" />
+    <Compile Include="UI\ImageComponent.cs" />
+    <Compile Include="UI\StackPanelComponent.cs" />
+    <Compile Include="UI\TextAlignment.cs" />
     <Compile Include="UI\TextComponent.cs" />
     <Compile Include="UI\TextInputComponent.cs" />
     <Compile Include="UI\UIComponent.cs" />

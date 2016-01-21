@@ -12,6 +12,7 @@ namespace Welt.UI
         private SpriteFont _spriteFont;
 
         public string Text { get; set; }
+        public string Font { get; set; } = "Fonts/console";
         public Color Foreground { get; set; }
 
         public override int Opacity
@@ -31,10 +32,10 @@ namespace Welt.UI
             Text = text; // TODO: process text like escaping or regexes? 
         }
 
-        public override void Initialize(Game game, GameTime time)
+        public override void Initialize()
         {
-            _spriteFont = game.Content.Load<SpriteFont>("Fonts/console");
-            base.Initialize(game, time);
+            _spriteFont = WeltGame.Instance.Content.Load<SpriteFont>(Font);
+            base.Initialize();
         }
 
         public override void Draw(GameTime time)

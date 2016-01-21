@@ -31,8 +31,7 @@ namespace Welt.Scenes
         }
 
         public override void Update(GameTime time)
-        {
-            
+        {          
             SceneUpdate?.Invoke(this, EventArgs.Empty);
             TaskManager.Update();
         }

@@ -15,7 +15,7 @@ using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 namespace Welt.UI
 {
-    public abstract class UIComponent
+    public abstract class UIComponent : IDisposable
     {
         public virtual string Name { get; }
         public virtual int Width { get; set; }
@@ -36,8 +36,8 @@ namespace Welt.UI
         protected virtual int Y { get; set; }
         protected virtual SpriteBatch Sprite { get; set; }
         protected virtual Texture2D Texture { get; set; }
-        protected virtual GraphicsDevice Graphics { get; }
-        protected virtual UIComponent Parent { get; }
+        protected virtual GraphicsDevice Graphics { get; private set; }
+        protected virtual UIComponent Parent { get; private set; }
         protected virtual Dictionary<string, UIComponent> Components { get; }  
 
         protected UIComponent(string name, int width, int height, GraphicsDevice device) : this(name, width, height, null, device)
@@ -48,12 +48,22 @@ namespace Welt.UI
         protected UIComponent(string name, int width, int height, UIComponent parent, GraphicsDevice device)
         {
             Name = name;
-            Width = width;
-            Height = height;
+            if (parent != null)
+            {
+                Width = width == -1 ? parent.Width : width;
+                Height = height == -1 ? parent.Height : height;
+            }
+            else
+            {
+                Width = width == -1 ? device.Viewport.Width : width;
+                Height = height == -1 ? device.Viewport.Height : height;
+            }
+            
             Components = new Dictionary<string, UIComponent>(8); // default size is 8 children.
             Parent = parent;
             Graphics = device;
             Sprite = new SpriteBatch(device);
+            
         }
 
         protected void ProcessArea()
@@ -73,6 +83,9 @@ namespace Welt.UI
                     width = Parent?.Width ?? WeltGame.Instance.Window.ClientBounds.Width;
                     x = X + (width - Width)/2 + Margin.Left - Margin.Right;
                     break;
+                case HorizontalAlignment.Left:
+                    x = X + Margin.Left;
+                    break;
             }
 
             switch (VerticalAlignment)
@@ -84,6 +97,9 @@ namespace Welt.UI
                 case VerticalAlignment.Center:
                     height = Parent?.Height ?? WeltGame.Instance.Window.ClientBounds.Height;
                     y = Y + (height - Height)/2 + Margin.Top - Margin.Bottom;
+                    break;
+                case VerticalAlignment.Top:
+                    y = Y + Margin.Top;
                     break;
             }
 
@@ -100,12 +116,14 @@ namespace Welt.UI
 
         #region Public Methods
 
-        public virtual void Initialize(Game game, GameTime time)
+        public virtual void Initialize()
         {
+            IsActive = true;
+            ProcessArea();
             // TODO: creation logic here. Mainly spritebatch creation logic.
             foreach (var child in Components.Values)
             {
-                child.Initialize(game, time);
+                child.Initialize();
             }
         }
 
@@ -117,12 +135,17 @@ namespace Welt.UI
             }
 
             MouseState mouse;
+
             if (GetMouseOver(out mouse))
             {
+                // TODO: ARGS for the mouse
                 if (!IsMouseOver)
                 {
-                    Parent?.MouseEnter?.Invoke(this, null);
-                    MouseEnter?.Invoke(this, null);
+
+                    Parent?.MouseEnter?.Invoke(this,
+                        new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
+                    MouseEnter?.Invoke(this,
+                        new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                     IsMouseOver = true;
                     // change the cursor
                     ((Form) Control.FromHandle(WeltGame.Instance.Window.Handle)).Cursor = Cursor;
@@ -131,8 +154,10 @@ namespace Welt.UI
                 {
                     if (!IsLeftMouseDown)
                     {
-                        Parent?.MouseLeftDown?.Invoke(this, null);
-                        MouseLeftDown?.Invoke(this, null);
+                        Parent?.MouseLeftDown?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.Left, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
+                        MouseLeftDown?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.Left, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsLeftMouseDown = true;
                     }
                 }
@@ -140,17 +165,22 @@ namespace Welt.UI
                 {
                     if (IsLeftMouseDown)
                     {
-                        Parent?.MouseLeftUp?.Invoke(this, null);
-                        MouseLeftUp?.Invoke(this, null);
+                        Parent?.MouseLeftUp?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
+                        MouseLeftUp?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsLeftMouseDown = false;
                     }
                 }
+
                 if (mouse.RightButton == ButtonState.Pressed)
                 {
                     if (!IsRightMouseDown)
                     {
-                        Parent?.MouseRightDown?.Invoke(this, null);
-                        MouseRightDown?.Invoke(this, null);
+                        Parent?.MouseRightDown?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.Right, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
+                        MouseRightDown?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.Right, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsRightMouseDown = true;
                     }
                 }
@@ -158,8 +188,10 @@ namespace Welt.UI
                 {
                     if (IsRightMouseDown)
                     {
-                        Parent?.MouseRightUp?.Invoke(this, null);
-                        MouseRightUp?.Invoke(this, null);
+                        Parent?.MouseRightUp?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
+                        MouseRightUp?.Invoke(this,
+                            new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsRightMouseDown = false;
                     }
                 }
@@ -168,8 +200,10 @@ namespace Welt.UI
             {
                 if (IsMouseOver)
                 {
-                    Parent?.MouseLeave?.Invoke(this, null);
-                    MouseLeave?.Invoke(this, null);
+                    Parent?.MouseLeave?.Invoke(this,
+                        new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
+                    MouseLeave?.Invoke(this,
+                        new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                     IsMouseOver = false;
                     ((Form) Control.FromHandle(WeltGame.Instance.Window.Handle)).ResetCursor();
                 }
@@ -177,6 +211,7 @@ namespace Welt.UI
                 IsLeftMouseDown = false;
             }
         }
+
 
         public virtual void Draw(GameTime time)
         {
@@ -198,11 +233,29 @@ namespace Welt.UI
 
         #endregion
 
+        #region Private Methods
+        
+
+
+        #endregion
+
         public event EventHandler<MouseEventArgs> MouseEnter;
         public event EventHandler<MouseEventArgs> MouseLeave;
         public event EventHandler<MouseEventArgs> MouseLeftDown;
         public event EventHandler<MouseEventArgs> MouseLeftUp;
         public event EventHandler<MouseEventArgs> MouseRightDown;
         public event EventHandler<MouseEventArgs> MouseRightUp;
+        public virtual void Dispose()
+        {
+            MouseEnter = null;
+            MouseLeave = null;
+            MouseLeftDown = null;
+            MouseLeftUp = null;
+            MouseRightDown = null;
+            MouseRightUp = null;
+            Components.Clear();
+            Parent = null;
+            Graphics = null;
+        }
     }
 }

@@ -220,15 +220,11 @@ namespace Welt.Forge
 
         public void SetLightAt(uint x, uint y, uint z, Vector3B light)
         {
-            var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
-            var localX = (byte)(x % Chunk.Size.X);
-            var localY = (byte)(y % Chunk.Size.Y);
-            var localZ = (byte)(z % Chunk.Size.Z);
-            var oldBlock = chunk.GetBlock(localX, localY, localZ);
+            var oldBlock = GetBlock(x, y, z);
             oldBlock.R = light.X;
             oldBlock.G = light.Y;
             oldBlock.B = light.Z;
-            chunk.SetBlock(localX, localY, localZ, oldBlock);
+            SetBlock(x, y, z, oldBlock);
 
         }
     }
