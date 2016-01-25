@@ -17,44 +17,45 @@ namespace Welt.Scenes
 
         public MainMenuScene(Game game) : base(game)
         {
-            _text = new TextInputComponent("Username", "username", 300, 100, game.GraphicsDevice)
+            var text = new TextInputComponent("Username", "username", 300, 100, game.GraphicsDevice)
             {
                 Foreground = Color.Black
             };
 
-            _text.EnterKeyPressed += (sender, args) =>
+            text.EnterKeyPressed += (sender, args) =>
             {
                 SceneController.Load(new PlayScene(game));
             };
+            AddComponent(text);
         }
 
         public override void Initialize()
         {
             base.Initialize();
-            _text.Initialize();
+            //_text.Initialize();
         }
 
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
-            _text.Draw(gameTime);
+            //_text.Draw(gameTime);
         }
 
         public override void Update(GameTime time)
         {
             base.Update(time);
-            _text.Update(time);
+            //_text.Update(time);
         }
 
         public new void Dispose()
         {
-            _text.Dispose();
+            //_text.Dispose();
             base.Dispose();
         }
 
         protected override void Dispose(bool disposing)
         {
-            _text.Dispose();
+            //_text.Dispose();
             base.Dispose(disposing);
         }
     }

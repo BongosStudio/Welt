@@ -34,10 +34,10 @@ namespace Welt.UI
         public TextAlignment TextAlignment { get; set; }
         public string Font { get; set; } = "Fonts/console";
 
-        public override int Opacity
+        public override float Opacity
         {
             get { return Foreground.A; }
-            set { Foreground = Color.FromNonPremultiplied(Foreground.R, Foreground.G, Foreground.B, value); }
+            set { Foreground = Color.FromNonPremultiplied(Foreground.R, Foreground.G, Foreground.B, (int) (value*255)); }
         }
 
         public TextInputComponent(string text, string name, int width, int height, GraphicsDevice device) : this(text, name, width, height, null, device)

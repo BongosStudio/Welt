@@ -5,12 +5,16 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Design;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Welt.UI.Animations;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 namespace Welt.UI
@@ -20,7 +24,7 @@ namespace Welt.UI
         public virtual string Name { get; }
         public virtual int Width { get; set; }
         public virtual int Height { get; set; }
-        public virtual int Opacity { get; set; }
+        public virtual float Opacity { get; set; } = 1;
         public virtual Cursor Cursor { get; set; }
         public virtual BoundsBox Margin { get; set; }
         public virtual BoundsBox Padding { get; set; }
@@ -55,8 +59,8 @@ namespace Welt.UI
             }
             else
             {
-                Width = width == -1 ? device.Viewport.Width : width;
-                Height = height == -1 ? device.Viewport.Height : height;
+                Width = width == -1 ? WeltGame.Instance.Window.ClientBounds.Width : width;
+                Height = height == -1 ? WeltGame.Instance.Window.ClientBounds.Height : height;
             }
             
             Components = new Dictionary<string, UIComponent>(8); // default size is 8 children.
@@ -245,6 +249,23 @@ namespace Welt.UI
         public event EventHandler<MouseEventArgs> MouseLeftUp;
         public event EventHandler<MouseEventArgs> MouseRightDown;
         public event EventHandler<MouseEventArgs> MouseRightUp;
+
+        public static UIProperty OpacityProperty = new UIProperty("opacity");
+        public static UIProperty WidthProperty = new UIProperty("width");
+        public static UIProperty HeightProperty = new UIProperty("height");
+
+        public object GetPropertyValue(UIProperty property)
+        {
+            var prop = GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
+            return prop.GetValue(this, null);
+        }
+
+        public void SetPropertyValue(UIProperty property, object value)
+        {
+            var prop = GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
+            prop.SetValue(this, value, BindingFlags.IgnoreCase, null, null, null);
+        }
+
         public virtual void Dispose()
         {
             MouseEnter = null;
@@ -253,6 +274,10 @@ namespace Welt.UI
             MouseLeftUp = null;
             MouseRightDown = null;
             MouseRightUp = null;
+            foreach (var child in Components)
+            {
+                child.Value.Dispose();
+            }
             Components.Clear();
             Parent = null;
             Graphics = null;

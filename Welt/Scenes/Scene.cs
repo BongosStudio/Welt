@@ -2,9 +2,12 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Welt.Controllers;
 using Welt.Managers;
+using Welt.UI;
 
 namespace Welt.Scenes
 {
@@ -18,6 +21,8 @@ namespace Welt.Scenes
         protected static bool IsDrawing;
         protected static bool IsPaused;
         protected virtual Color BackColor { get; } = Color.CornflowerBlue;
+        protected Dictionary<string, UIComponent> UIComponents { get; } 
+            = new Dictionary<string, UIComponent>(32); 
 
         protected Scene(Game game) : base(game)
         {
@@ -30,16 +35,33 @@ namespace Welt.Scenes
             
         }
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            foreach (var child in UIComponents.Values)
+            {
+                child.Initialize();
+            }
+        }
+
         public override void Update(GameTime time)
         {          
             SceneUpdate?.Invoke(this, EventArgs.Empty);
             TaskManager.Update();
+            foreach (var child in UIComponents.Values)
+            {
+                child.Update(time);
+            }
         }
 
         public new virtual void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(BackColor);
             base.Draw(gameTime);
+            foreach (var child in UIComponents.Values.Where(child => child.IsActive))
+            {
+                child.Draw(gameTime);
+            }
         }
 
         public void Schedule(Action action)
@@ -70,6 +92,21 @@ namespace Welt.Scenes
         public void Schedule(Action<object> action, double ticks)
         {
             TaskManager.Queue(action, ticks);
+        }
+
+        protected void AddComponent(UIComponent component)
+        {
+            UIComponents.Add(component.Name, component);
+        }
+
+        protected void RemoveComponent(string name)
+        {
+            UIComponents.Remove(name);
+        }
+
+        protected UIComponent GetComponent(string name)
+        {
+            return UIComponents[name];
         }
 
         #region Events

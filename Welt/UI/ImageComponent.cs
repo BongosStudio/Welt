@@ -2,6 +2,7 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Welt.UI
@@ -10,7 +11,7 @@ namespace Welt.UI
     {
         public string File { get; }
         private readonly SpriteBatch _sprite;
-        private readonly Texture2D _image;
+        private Texture2D _image;
 
         public ImageComponent(string file, string name, int width, int height, GraphicsDevice device)
             : this(file, name, width, height, null, device)
@@ -23,7 +24,20 @@ namespace Welt.UI
         {
             File = file;
             _sprite = new SpriteBatch(device);
-            _image = WeltGame.Instance.Content.Load<Texture2D>(file);
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            _image = WeltGame.Instance.Content.Load<Texture2D>(File);
+        }
+
+        public override void Draw(GameTime time)
+        {
+            base.Draw(time);
+            _sprite.Begin();
+            _sprite.Draw(_image, new Vector2(X, Y), Color.FromNonPremultiplied(255, 255, 255, (int) (Opacity*255)));
+            _sprite.End();
         }
     }
 }

@@ -127,6 +127,8 @@
     <Compile Include="Types\SparseMatrix2.cs" />
     <Compile Include="Types\Vector3B.cs" />
     <Compile Include="Types\Vector3I.cs" />
+    <Compile Include="UI\Animations\UIAnimation.cs" />
+    <Compile Include="UI\Animations\UIProperty.cs" />
     <Compile Include="UI\BoundsBox.cs" />
     <Compile Include="UI\ImageComponent.cs" />
     <Compile Include="UI\StackPanelComponent.cs" />
