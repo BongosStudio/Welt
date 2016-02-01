@@ -2,8 +2,10 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Welt.UI
 {
@@ -12,6 +14,11 @@ namespace Welt.UI
         public string File { get; }
         private readonly SpriteBatch _sprite;
         private Texture2D _image;
+
+        public ImageComponent(string file, string name, GraphicsDevice device) : this(file, name, -2, -2, device)
+        {
+            
+        }
 
         public ImageComponent(string file, string name, int width, int height, GraphicsDevice device)
             : this(file, name, width, height, null, device)
@@ -28,8 +35,12 @@ namespace Welt.UI
 
         public override void Initialize()
         {
-            base.Initialize();
+            //base.Initialize();
+            IsActive = true;
             _image = WeltGame.Instance.Content.Load<Texture2D>(File);
+            Width = _image.Width;
+            Height = _image.Height;
+            ProcessArea();
         }
 
         public override void Draw(GameTime time)

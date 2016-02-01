@@ -27,7 +27,6 @@ namespace Welt.Controllers
         {
             _mCurrent = scene;
             _mCurrent.Initialize();
-            //_mCurrent.LoadContent();
         }
 
         public void Update(GameTime gameTime)

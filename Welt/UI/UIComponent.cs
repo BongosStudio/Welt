@@ -14,7 +14,6 @@ using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Welt.UI.Animations;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 namespace Welt.UI
@@ -42,7 +41,8 @@ namespace Welt.UI
         protected virtual Texture2D Texture { get; set; }
         protected virtual GraphicsDevice Graphics { get; private set; }
         protected virtual UIComponent Parent { get; private set; }
-        protected virtual Dictionary<string, UIComponent> Components { get; }  
+        protected virtual Dictionary<string, UIComponent> Components { get; }
+        protected virtual bool IsSizeProcessed { get; set; }
 
         protected UIComponent(string name, int width, int height, GraphicsDevice device) : this(name, width, height, null, device)
         {
@@ -72,6 +72,8 @@ namespace Welt.UI
 
         protected void ProcessArea()
         {
+            if (IsSizeProcessed) return;
+            IsSizeProcessed = true;
             float x = X;
             float y = Y;
             float width;
@@ -127,6 +129,7 @@ namespace Welt.UI
             // TODO: creation logic here. Mainly spritebatch creation logic.
             foreach (var child in Components.Values)
             {
+                child.Parent = this;
                 child.Initialize();
             }
         }
@@ -265,7 +268,7 @@ namespace Welt.UI
             var prop = GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
             prop.SetValue(this, value, BindingFlags.IgnoreCase, null, null, null);
         }
-
+        
         public virtual void Dispose()
         {
             MouseEnter = null;

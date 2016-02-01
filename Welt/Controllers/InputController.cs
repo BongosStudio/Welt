@@ -2,6 +2,7 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Welt.Controllers
@@ -31,6 +32,11 @@ namespace Welt.Controllers
         {
             _mKeyboard = Keyboard.GetState();
             return _mKeyboard;
+        }
+
+        public void Update(GameTime time)
+        {
+            
         }
 
         public enum InputAction

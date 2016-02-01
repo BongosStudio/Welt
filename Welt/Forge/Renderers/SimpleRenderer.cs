@@ -18,7 +18,7 @@ namespace Welt.Forge.Renderers
 {
     internal class SimpleRenderer : IRenderer
     {
-        private const byte BUILD_RANGE = 4;
+        private const byte BUILD_RANGE = 1;
         private const byte LIGHT_RANGE = BUILD_RANGE + 1;
         private const byte GENERATE_RANGE_LOW = LIGHT_RANGE + 1;
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;

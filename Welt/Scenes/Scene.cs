@@ -21,6 +21,7 @@ namespace Welt.Scenes
         protected static bool IsDrawing;
         protected static bool IsPaused;
         protected virtual Color BackColor { get; } = Color.CornflowerBlue;
+        protected InputController InputController { get; } = InputController.CreateDefault();
         protected Dictionary<string, UIComponent> UIComponents { get; } 
             = new Dictionary<string, UIComponent>(32); 
 
@@ -47,6 +48,8 @@ namespace Welt.Scenes
         public override void Update(GameTime time)
         {          
             SceneUpdate?.Invoke(this, EventArgs.Empty);
+            NextUpdate?.Invoke(this, EventArgs.Empty);
+            NextUpdate = null;
             TaskManager.Update();
             foreach (var child in UIComponents.Values)
             {
@@ -96,11 +99,14 @@ namespace Welt.Scenes
 
         protected void AddComponent(UIComponent component)
         {
+            component.Initialize();
             UIComponents.Add(component.Name, component);
         }
 
         protected void RemoveComponent(string name)
         {
+            var comp = UIComponents[name];
+            comp.Dispose();
             UIComponents.Remove(name);
         }
 
@@ -112,12 +118,22 @@ namespace Welt.Scenes
         #region Events
         
         public event EventHandler SceneUpdate;
+        public event EventHandler NextUpdate; 
 
         #endregion
 
         ~Scene()
         {
             Dispose();
+        }
+
+        public new void Dispose()
+        {
+            foreach (var comp in UIComponents.Values)
+            {
+                comp.Dispose();
+            }
+            base.Dispose(true);
         }
     }
 }

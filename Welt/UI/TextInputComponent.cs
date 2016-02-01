@@ -62,15 +62,19 @@ namespace Welt.UI
 
         public override void Draw(GameTime time)
         {
+            // first adjust indices
+            if (LineIndex >= _text.Count) LineIndex = _text.Count - 1;
+            if (_text[LineIndex].Length < CharacterIndex) CharacterIndex = _text[LineIndex].Length;
+
             var builder = new StringBuilder();
-            var h = _spriteFont.LineSpacing * _text.Count;
+            var h = _spriteFont.LineSpacing*_text.Count;
+            if (!IsSelected) _isCursorFlashing = false;
             for (var i = 0; i < _text.Count; i++)
             {
                 builder.AppendLine(i == LineIndex ? _text[i].Insert(CharacterIndex, _isCursorFlashing ? "_" : "") : _text[i]);
             }
 
             if (h > Height) Height = h;
-            //Graphics.Clear(Color.Black);
             if (!IsActive) return;
             var stateColor = IsActive ? Foreground : new Color(Foreground, 0.5f);
             if (_text.Count > 0)
@@ -85,6 +89,8 @@ namespace Welt.UI
 
         public override void Update(GameTime time)
         {
+            
+            // update the cursor flash
             if (_cursorFlash <= TimeSpan.Zero)
             {
                 _cursorFlash = TimeSpan.FromMilliseconds(750);
@@ -109,14 +115,22 @@ namespace Welt.UI
 
         private void ClickCharacter(object sender, MouseEventArgs args)
         {
-            var positionWithinComponent = args.Location - new Size(new Point(X, Y));
-            LineIndex = positionWithinComponent.Y/_spriteFont.LineSpacing;
-            CharacterIndex = positionWithinComponent.X/_text[LineIndex].Length;
+            if (IsSelected)
+            {
+                var positionWithinComponent = args.Location - new Size(new Point(X, Y));
+                LineIndex = positionWithinComponent.Y/_spriteFont.LineSpacing;
+                CharacterIndex = positionWithinComponent.X/_text[LineIndex].Length;
+            }
+            else
+            {
+                IsSelected = true;
+            }
         }
         
 
         private void InputCharacter(object sender, TextInputEventArgs args)
         {
+            if (!IsSelected) return;
             var keyState = Keyboard.GetState();
             if (keyState[Keys.Enter] == KeyState.Down)
             {
@@ -150,6 +164,10 @@ namespace Welt.UI
                     _text[LineIndex] = _text[LineIndex].Remove(CharacterIndex - 1, 1);
                     CharacterIndex--;
                 }
+            }
+            else if (keyState[Keys.Escape] == KeyState.Down)
+            {
+                IsSelected = false;
             }
             else
             {

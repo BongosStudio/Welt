@@ -3,8 +3,9 @@
 #endregion
 
 using System;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Welt.Controllers;
 using Welt.UI;
 
@@ -12,51 +13,31 @@ namespace Welt.Scenes
 {
     public class MainMenuScene : Scene
     {
-        private readonly TextInputComponent _text;
         protected override Color BackColor => Color.GhostWhite;
 
         public MainMenuScene(Game game) : base(game)
         {
-            var text = new TextInputComponent("Username", "username", 300, 100, game.GraphicsDevice)
+            
+            AddComponent(new ImageComponent("Images/welt", "background", game.GraphicsDevice)
             {
-                Foreground = Color.Black
+                Opacity = 0.8f
+            });
+            var button = new ButtonComponent("Singleplayer", "spbutton", 300, 100, GraphicsDevice)
+            {
+                TextHorizontalAlignment = HorizontalAlignment.Center,
+                BorderWidth = 2f,
+                BackgroundColor = Color.Black,
+                BackgroundActiveColor = Color.DarkGray,
+                ForegroundColor = Color.White,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            text.EnterKeyPressed += (sender, args) =>
+            button.ButtonPressed += (sender, args) =>
             {
                 SceneController.Load(new PlayScene(game));
             };
-            AddComponent(text);
-        }
-
-        public override void Initialize()
-        {
-            base.Initialize();
-            //_text.Initialize();
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            base.Draw(gameTime);
-            //_text.Draw(gameTime);
-        }
-
-        public override void Update(GameTime time)
-        {
-            base.Update(time);
-            //_text.Update(time);
-        }
-
-        public new void Dispose()
-        {
-            //_text.Dispose();
-            base.Dispose();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            //_text.Dispose();
-            base.Dispose(disposing);
+            AddComponent(button);
         }
     }
 }
