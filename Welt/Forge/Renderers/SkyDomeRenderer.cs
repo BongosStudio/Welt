@@ -171,7 +171,7 @@ namespace Welt.Forge.Renderers
         protected Vector4 EveningTint = Color.Red.ToVector4();
         protected Vector4 MorningTint = Color.Gold.ToVector4();
 
-        public float CloudOvercast = 0.5f;
+        public float CloudOvercast = 1f;
 
         public const bool CloudsEnabled = true;
 

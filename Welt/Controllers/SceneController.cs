@@ -42,8 +42,8 @@ namespace Welt.Controllers
         public static void Load(Scene scene)
         {
             _mCurrent?.Dispose();
+            scene.Initialize();
             _mCurrent = scene;
-            _mCurrent?.Initialize();
         }
     }
 }

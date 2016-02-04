@@ -24,6 +24,7 @@ namespace Welt.UI
         private readonly List<string> _text;
         private TimeSpan _cursorFlash;
         private bool _isCursorFlashing;
+        private KeyboardState _oKeyState;
 
         public override Cursor Cursor => Cursors.IBeam;
         public bool IsSelected;
@@ -58,6 +59,7 @@ namespace Welt.UI
             LineIndex = _text.Count - 1;
             CharacterIndex = _text.Last().Length;
             base.Initialize();
+            _oKeyState = Keyboard.GetState();
         }
 
         public override void Draw(GameTime time)
@@ -104,11 +106,10 @@ namespace Welt.UI
             base.Update(time);         
 
             var keyState = Keyboard.GetState();
-            KeyAdvanceMap.Update(keyState); 
-            if (keyState[Keys.Left] == KeyState.Down && KeyAdvanceMap.Process(Keys.Left)) ShiftLeft();
-            if (keyState[Keys.Right] == KeyState.Down && KeyAdvanceMap.Process(Keys.Right)) ShiftRight();
-            if (keyState[Keys.Down] == KeyState.Down && KeyAdvanceMap.Process(Keys.Down)) ShiftDown();
-            if (keyState[Keys.Up] == KeyState.Down && KeyAdvanceMap.Process(Keys.Up)) ShiftUp();
+            if (keyState[Keys.Left] == KeyState.Down && _oKeyState[Keys.Left] == KeyState.Up) ShiftLeft();
+            if (keyState[Keys.Right] == KeyState.Down && _oKeyState[Keys.Right] == KeyState.Up) ShiftRight();
+            if (keyState[Keys.Down] == KeyState.Down && _oKeyState[Keys.Down] == KeyState.Up) ShiftDown();
+            if (keyState[Keys.Up] == KeyState.Down && _oKeyState[Keys.Up] == KeyState.Up) ShiftUp();
 
             TextChanged?.Invoke(this, EventArgs.Empty);
         }

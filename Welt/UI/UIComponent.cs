@@ -29,14 +29,15 @@ namespace Welt.UI
         public virtual BoundsBox Padding { get; set; }
         public virtual HorizontalAlignment HorizontalAlignment { get; set; }
         public virtual VerticalAlignment VerticalAlignment { get; set; }
-        public virtual bool IsActive { get; set; }
+        public virtual bool IsActive { get; set; } = true;
 
         public bool IsMouseOver { get; private set; }
         public bool IsLeftMouseDown { get; private set; }
         public bool IsRightMouseDown { get; private set; }
 
-        protected virtual int X { get; set; }
-        protected virtual int Y { get; set; }
+        public virtual int X { get; set; }
+        public virtual int Y { get; set; }
+
         protected virtual SpriteBatch Sprite { get; set; }
         protected virtual Texture2D Texture { get; set; }
         protected virtual GraphicsDevice Graphics { get; private set; }
@@ -124,7 +125,6 @@ namespace Welt.UI
 
         public virtual void Initialize()
         {
-            IsActive = true;
             ProcessArea();
             // TODO: creation logic here. Mainly spritebatch creation logic.
             foreach (var child in Components.Values)
@@ -228,12 +228,12 @@ namespace Welt.UI
             }
         }
 
-        public void AddComponent(UIComponent component)
+        public virtual void AddComponent(UIComponent component)
         {
             Components.Add(component.Name, component);
         }
 
-        public void RemoveComponent(string name)
+        public virtual void RemoveComponent(string name)
         {
             Components.Remove(name);
         }

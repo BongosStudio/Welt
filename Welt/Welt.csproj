@@ -90,8 +90,7 @@
     <Compile Include="Forge\Renderers\ThreadedWorldRenderer.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\World.cs" />
-    <Compile Include="IO\KeyAdvanceMap.cs" />
-    <Compile Include="IO\KeySystem.cs" />
+    <Compile Include="IO\InputMap.cs" />
     <Compile Include="IO\WireChunk.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
     <Compile Include="Managers\TaskManager.cs" />
@@ -128,10 +127,10 @@
     <Compile Include="Types\Vector3B.cs" />
     <Compile Include="Types\Vector3I.cs" />
     <Compile Include="UI\ButtonComponent.cs" />
+    <Compile Include="UI\PanelComponent.cs" />
     <Compile Include="UI\UIProperty.cs" />
     <Compile Include="UI\BoundsBox.cs" />
     <Compile Include="UI\ImageComponent.cs" />
-    <Compile Include="UI\StackPanelComponent.cs" />
     <Compile Include="UI\TextAlignment.cs" />
     <Compile Include="UI\TextComponent.cs" />
     <Compile Include="UI\TextInputComponent.cs" />

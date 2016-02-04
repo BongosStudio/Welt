@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,6 +14,7 @@ using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
 using Welt.Models;
+using Welt.UI;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Welt.Scenes
@@ -34,7 +36,7 @@ namespace Welt.Scenes
 
         public PlayScene(Game game) : base(game)
         {
-
+            
         }
 
         #region Initialize
@@ -177,16 +179,19 @@ namespace Welt.Scenes
             }
 
             // Allows the game to exit
-            if (keyState.IsKeyDown(Keys.Escape))
+            if (keyState.IsKeyDown(Keys.Escape) && keyState.IsKeyDown(Keys.LeftShift))
             {
                 Game.Exit();
+                return;
             }
 
             // Release the mouse pointer
-            if (_mOldKeyboardState.IsKeyUp(Keys.F) && keyState.IsKeyDown(Keys.F))
+            if (_mOldKeyboardState.IsKeyUp(Keys.Escape) && keyState.IsKeyDown(Keys.Escape))
             {
                 _mReleaseMouse = !_mReleaseMouse;
                 Game.IsMouseVisible = !Game.IsMouseVisible;
+                _mPlayer1.IsPaused = !_mPlayer1.IsPaused;
+                GetComponent("resumebutton").IsActive = !GetComponent("resumebutton").IsActive;
             }
 
             // fixed time step
@@ -282,11 +287,7 @@ namespace Welt.Scenes
 
             if (Game.IsActive)
             {
-                if (!_mReleaseMouse)
-                {
-                    _mPlayer1Renderer.Update(gameTime);
-                }
-
+                _mPlayer1Renderer.Update(gameTime);
                 _mSkyDomeRenderer.Update(gameTime);
                 _mRenderer.Update(gameTime);
                 if (_mDiagnosticMode)

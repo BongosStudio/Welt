@@ -38,19 +38,12 @@ namespace Welt
         }
 
         #region Initialize
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+        
         protected override void Initialize()
         {
             _sceneController = new SceneController(this, _graphics);
-            _sceneController.Initialize(new SplashScene(this));
+            _sceneController.Initialize(new MainMenuScene(this));
             
-            //TODO refactor WorldRenderer needs player position + view frustum 
             IsMouseVisible = true;
             
             base.Initialize();
@@ -59,12 +52,7 @@ namespace Welt
         #endregion
         
         #region Update
-
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+      
         protected override void Update(GameTime gameTime)
         {
             _sceneController.Update(gameTime);
@@ -75,11 +63,7 @@ namespace Welt
         #endregion
 
         #region Draw
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        
         protected override void Draw(GameTime gameTime)
         {
             _sceneController.Draw(gameTime);

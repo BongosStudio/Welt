@@ -145,6 +145,7 @@ namespace Welt.Cameras
         public void Draw(GameTime gameTime)
         {
             // Draw the crosshair
+            if (PlayerRenderer.Player.IsPaused) return;
             _mSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             _mSpriteBatch.Draw(PlayerRenderer.Player.Entity.IsMoving ? _mCrosshairMovingTexture : _mCrosshairTexture,
                 new Vector2(

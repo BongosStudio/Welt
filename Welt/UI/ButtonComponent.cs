@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Remoting.Channels;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,7 +23,7 @@ namespace Welt.UI
         public Color ForegroundActiveColor { get; set; } = Color.White;
         public Color BackgroundColor { get; set; } = Color.Blue;
         public Color BackgroundActiveColor { get; set; } = Color.CornflowerBlue;
-        public Color BorderColor { get; set; } = Color.Gray;
+        public Color BorderColor { get; set; } = Color.Black;
         public Texture2D BackgroundImage { get; set; }
 
         private readonly SpriteFont _font;
@@ -46,7 +45,6 @@ namespace Welt.UI
         public override void Initialize()
         {
             base.Initialize();
-            MouseLeftDown += (sender, args) => ButtonPressed?.Invoke(sender, null);
             _textPosition = GetTextPosition();
             
             if (BackgroundImage != null) return;
@@ -56,10 +54,10 @@ namespace Welt.UI
             {
                 // TODO borders? Maybe?
                 var isBorder =
-                    i%Width < BorderWidth*100 ||
-                    i%Width >= Width - BorderWidth*100 ||
-                    i <= Width*BorderWidth*100 ||
-                    i >= colors.Length - Width*BorderWidth*100;
+                    i%Width < BorderWidth ||
+                    i%Width >= Width - BorderWidth ||
+                    i <= Width*BorderWidth ||
+                    i >= colors.Length - Width*BorderWidth;
                 if (isBorder) colors[i] = BorderColor;
                 else colors[i] = Color.White;
             }
@@ -79,8 +77,6 @@ namespace Welt.UI
             base.Draw(time);
         }
 
-        public event EventHandler ButtonPressed;
-
         [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
         private Vector2 GetTextPosition()
         {
@@ -90,7 +86,7 @@ namespace Welt.UI
                 case HorizontalAlignment.Left:
                     return new Vector2(X, y);
                 case HorizontalAlignment.Center:
-                    return new Vector2(X + _font.MeasureString(Text).X/2, y);
+                    return new Vector2(X + (Width - _font.MeasureString(Text).X)/2, y);
                 case HorizontalAlignment.Right:
                     return new Vector2(X + Width - _font.MeasureString(Text).X/2, y);
                 default:

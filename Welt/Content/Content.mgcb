@@ -223,3 +223,9 @@
 /processorParam:TextureFormat=Color
 /build:Images/welt.png
 
+#begin Music/Feather.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/Feather.wav
+

@@ -6,6 +6,7 @@ using System;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Media;
 using Welt.Controllers;
 using Welt.UI;
 
@@ -17,26 +18,28 @@ namespace Welt.Scenes
 
         public MainMenuScene(Game game) : base(game)
         {
-            
-            AddComponent(new ImageComponent("Images/welt", "background", game.GraphicsDevice)
+
+            AddComponent(new ImageComponent("Images/welt", "background", GraphicsDevice)
             {
                 Opacity = 0.8f
             });
+            
             var button = new ButtonComponent("Singleplayer", "spbutton", 300, 100, GraphicsDevice)
             {
                 TextHorizontalAlignment = HorizontalAlignment.Center,
                 BorderWidth = 2f,
-                BackgroundColor = Color.Black,
+                BackgroundColor = Color.White,
                 BackgroundActiveColor = Color.DarkGray,
-                ForegroundColor = Color.White,
+                ForegroundColor = Color.Black,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
 
-            button.ButtonPressed += (sender, args) =>
+            button.MouseLeftDown += (sender, args) =>
             {
                 SceneController.Load(new PlayScene(game));
             };
+            
             AddComponent(button);
         }
     }
