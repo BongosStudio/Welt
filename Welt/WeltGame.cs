@@ -2,15 +2,13 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Welt.Controllers;
 using Welt.Scenes;
 
 namespace Welt
 {
-    /// <summary>
-    /// This is the main type for your game
-    /// </summary>
     public class WeltGame : Game
     {
         #region Fields
@@ -71,5 +69,10 @@ namespace Welt
         }
         
         #endregion
+
+        public static void SetCursor(Cursor cursor)
+        {
+            ((Form) Control.FromHandle(Instance.Window.Handle)).Cursor = cursor;
+        }
     }
 }

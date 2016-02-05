@@ -39,7 +39,7 @@ namespace Welt.Scenes
             base.Update(time);
             if (_o < 1f)
             {
-                GetComponent("splash").SetPropertyValue(UIComponent.OpacityProperty, _o);
+                GetComponent("splash").Value.SetPropertyValue(UIComponent.OpacityProperty, _o);
                 _o += 0.02f;
             }
             

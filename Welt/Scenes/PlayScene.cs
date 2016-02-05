@@ -3,11 +3,7 @@
 #endregion
 using System;
 using System.Diagnostics;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
 using Welt.Controllers;
@@ -24,6 +20,7 @@ namespace Welt.Scenes
         private World _mWorld;
         private IRenderer _mRenderer;
         private HudRenderer _mHud;
+        private GuiRenderer _mGui;
         private Player _mPlayer1; //wont add a player2 for some time, but naming like this helps designing  
         private PlayerRenderer _mPlayer1Renderer;
         private DiagnosticWorldRenderer _mDiagnosticWorldRenderer;
@@ -53,6 +50,7 @@ namespace Welt.Scenes
             _mPlayer1 = new Player(_mWorld);
             _mPlayer1Renderer = new PlayerRenderer(GraphicsDevice, _mPlayer1);
             _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayer1Renderer);
+            _mGui = new GuiRenderer(GraphicsDevice, _mPlayer1);
             _mRenderer = new SimpleRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
             _mDiagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
             _mSkyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
@@ -69,6 +67,8 @@ namespace Welt.Scenes
             _mSkyDomeRenderer.Initialize();
 
             #endregion
+
+            _mGui.Initialize();
 
             Game.IsMouseVisible = false;
             //TODO refactor WorldRenderer needs player position + view frustum
@@ -191,7 +191,6 @@ namespace Welt.Scenes
                 _mReleaseMouse = !_mReleaseMouse;
                 Game.IsMouseVisible = !Game.IsMouseVisible;
                 _mPlayer1.IsPaused = !_mPlayer1.IsPaused;
-                GetComponent("resumebutton").IsActive = !GetComponent("resumebutton").IsActive;
             }
 
             // fixed time step
@@ -319,6 +318,7 @@ namespace Welt.Scenes
             }
             _mPlayer1Renderer.Draw(gameTime);
             _mHud.Draw(gameTime);
+            _mGui.Draw(gameTime);
         }
 
         #endregion

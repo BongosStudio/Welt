@@ -5,8 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Design;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -14,6 +12,7 @@ using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Welt.Models;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 namespace Welt.UI
@@ -38,11 +37,13 @@ namespace Welt.UI
         public virtual int X { get; set; }
         public virtual int Y { get; set; }
 
+        internal virtual UIComponent Parent { get; set; }
+
         protected virtual SpriteBatch Sprite { get; set; }
         protected virtual Texture2D Texture { get; set; }
         protected virtual GraphicsDevice Graphics { get; private set; }
-        protected virtual UIComponent Parent { get; private set; }
-        protected virtual Dictionary<string, UIComponent> Components { get; }
+        
+        protected virtual Dictionary<string, UIComponent> Components { get; set; }
         protected virtual bool IsSizeProcessed { get; set; }
 
         protected UIComponent(string name, int width, int height, GraphicsDevice device) : this(name, width, height, null, device)
@@ -155,7 +156,7 @@ namespace Welt.UI
                         new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                     IsMouseOver = true;
                     // change the cursor
-                    ((Form) Control.FromHandle(WeltGame.Instance.Window.Handle)).Cursor = Cursor;
+                    WeltGame.SetCursor(Cursor);
                 }
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
@@ -236,6 +237,18 @@ namespace Welt.UI
         public virtual void RemoveComponent(string name)
         {
             Components.Remove(name);
+        }
+
+        public virtual Maybe<UIComponent, NullReferenceException> GetComponent(string name)
+        {
+            foreach (var child in Components)
+            {
+                if (child.Key == name) return new Maybe<UIComponent, NullReferenceException>(child.Value, null);
+                var m = Maybe<UIComponent, NullReferenceException>.Check(() => child.Value.GetComponent(name).Value);
+                if (m.HasError) continue;
+                return new Maybe<UIComponent, NullReferenceException>(child.Value, null);
+            }
+            return new Maybe<UIComponent, NullReferenceException>(null, new NullReferenceException());
         }
 
         #endregion

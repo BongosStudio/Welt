@@ -27,9 +27,9 @@ namespace Welt.Scenes
             var button = new ButtonComponent("Singleplayer", "spbutton", 300, 100, GraphicsDevice)
             {
                 TextHorizontalAlignment = HorizontalAlignment.Center,
-                BorderWidth = 2f,
+                BorderWidth = new BoundsBox(2, 2, 2, 2),
                 BackgroundColor = Color.White,
-                BackgroundActiveColor = Color.DarkGray,
+                BackgroundActiveColor = Color.CadetBlue,
                 ForegroundColor = Color.Black,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
@@ -39,8 +39,9 @@ namespace Welt.Scenes
             {
                 SceneController.Load(new PlayScene(game));
             };
-            
+
             AddComponent(button);
+            
         }
     }
 }

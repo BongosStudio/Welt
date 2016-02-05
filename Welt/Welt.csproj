@@ -96,6 +96,7 @@
     <Compile Include="Managers\TaskManager.cs" />
     <Compile Include="Models\Cardinal.cs" />
     <Compile Include="Models\ChunkState.cs" />
+    <Compile Include="Models\Maybe.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Persistence\ChunkPersistence.cs" />
     <Compile Include="Persistence\FakeChunkPersistence.cs" />
@@ -127,7 +128,9 @@
     <Compile Include="Types\Vector3B.cs" />
     <Compile Include="Types\Vector3I.cs" />
     <Compile Include="UI\ButtonComponent.cs" />
-    <Compile Include="UI\PanelComponent.cs" />
+    <Compile Include="UI\ColumnPanelComponent.cs" />
+    <Compile Include="UI\GuiRenderer.cs" />
+    <Compile Include="UI\StackPanelComponent.cs" />
     <Compile Include="UI\UIProperty.cs" />
     <Compile Include="UI\BoundsBox.cs" />
     <Compile Include="UI\ImageComponent.cs" />

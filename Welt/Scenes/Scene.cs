@@ -7,6 +7,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Welt.Controllers;
 using Welt.Managers;
+using Welt.Models;
 using Welt.UI;
 
 namespace Welt.Scenes
@@ -111,9 +112,9 @@ namespace Welt.Scenes
             UIComponents.Remove(name);
         }
 
-        public UIComponent GetComponent(string name)
+        public Maybe<UIComponent, NullReferenceException> GetComponent(string name)
         {
-            return UIComponents[name];
+            return Maybe<UIComponent, NullReferenceException>.Check(() => UIComponents[name]);
         }
 
         #region Events
