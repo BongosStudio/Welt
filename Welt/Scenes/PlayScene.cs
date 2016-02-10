@@ -21,8 +21,8 @@ namespace Welt.Scenes
         private IRenderer _mRenderer;
         private HudRenderer _mHud;
         private GuiRenderer _mGui;
-        private Player _mPlayer1; //wont add a player2 for some time, but naming like this helps designing  
-        private PlayerRenderer _mPlayer1Renderer;
+        private Player _mPlayer;
+        private PlayerRenderer _mPlayerRenderer;
         private DiagnosticWorldRenderer _mDiagnosticWorldRenderer;
         private bool _mDiagnosticMode;
         private bool _mReleaseMouse;
@@ -31,9 +31,14 @@ namespace Welt.Scenes
         
         protected override Color BackColor => Color.Black;
 
-        public PlayScene(Game game) : base(game)
+        public PlayScene(Game game, World worldToHandoff, IRenderer rendererToHandoff, SkyDomeRenderer skyToHandoff,
+            PlayerRenderer playerToHandoff) : base(game)
         {
-            
+            _mWorld = worldToHandoff;
+            _mRenderer = rendererToHandoff;
+            _mSkyDomeRenderer = skyToHandoff;
+            _mPlayerRenderer = playerToHandoff;
+            _mPlayer = playerToHandoff.Player;
         }
 
         #region Initialize
@@ -46,33 +51,41 @@ namespace Welt.Scenes
         /// </summary>
         public override void Initialize()
         {
-            _mWorld = new World();
-            _mPlayer1 = new Player(_mWorld);
-            _mPlayer1Renderer = new PlayerRenderer(GraphicsDevice, _mPlayer1);
-            _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayer1Renderer);
-            _mGui = new GuiRenderer(GraphicsDevice, _mPlayer1);
-            _mRenderer = new SimpleRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
-            _mDiagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
-            _mSkyDomeRenderer = new SkyDomeRenderer(GraphicsDevice, _mPlayer1Renderer.Camera, _mWorld);
-
-            base.Initialize();           
-            _mPlayer1Renderer.Initialize();        
+            _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayerRenderer);
+            _mGui = new GuiRenderer(GraphicsDevice, _mPlayer);
+            _mDiagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
+            
+            base.Initialize();                  
             _mHud.Initialize();
 
             #region choose renderer
 
             //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);          
-            _mRenderer.Initialize();
             _mDiagnosticWorldRenderer.Initialize();
-            _mSkyDomeRenderer.Initialize();
 
             #endregion
 
             _mGui.Initialize();
 
-            Game.IsMouseVisible = false;
-            //TODO refactor WorldRenderer needs player position + view frustum
-            
+            #region Initialize Keys
+
+            AssignKeyToEvent(() =>
+            {
+                SceneController.GraphicsManager.ToggleFullScreen();
+                return true;
+            }, Keys.F11);
+            AssignKeyToEvent(() =>
+            {
+                _mPlayerRenderer.FreeCam = !_mPlayerRenderer.FreeCam;
+                return true;
+            }, Keys.F1);
+            AssignKeyToEvent(() =>
+            {
+                Game.Exit();
+                return true;
+            }, Keys.LeftShift, Keys.Escape);
+            #endregion  
+
         }
 
         #endregion
@@ -91,10 +104,8 @@ namespace Welt.Scenes
         /// </summary>
         protected override void LoadContent()
         {
-            _mRenderer.LoadContent(WeltGame.Instance.Content);
+            
             _mDiagnosticWorldRenderer.LoadContent(WeltGame.Instance.Content);
-            _mSkyDomeRenderer.LoadContent(WeltGame.Instance.Content);
-            _mPlayer1Renderer.LoadContent(WeltGame.Instance.Content);
             _mHud.LoadContent(WeltGame.Instance.Content);
         }
 
@@ -143,7 +154,7 @@ namespace Welt.Scenes
             //freelook mode
             if (_mOldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
             {
-                _mPlayer1Renderer.FreeCam = !_mPlayer1Renderer.FreeCam;
+                _mPlayerRenderer.FreeCam = !_mPlayerRenderer.FreeCam;
             }
 
             //minimap mode
@@ -190,7 +201,7 @@ namespace Welt.Scenes
             {
                 _mReleaseMouse = !_mReleaseMouse;
                 Game.IsMouseVisible = !Game.IsMouseVisible;
-                _mPlayer1.IsPaused = !_mPlayer1.IsPaused;
+                _mPlayer.IsPaused = !_mPlayer.IsPaused;
             }
 
             // fixed time step
@@ -282,11 +293,11 @@ namespace Welt.Scenes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            ProcessDebugKeys();
+            //ProcessDebugKeys();
 
             if (Game.IsActive)
             {
-                _mPlayer1Renderer.Update(gameTime);
+                _mPlayerRenderer.Update(gameTime);
                 _mSkyDomeRenderer.Update(gameTime);
                 _mRenderer.Update(gameTime);
                 if (_mDiagnosticMode)
@@ -295,6 +306,7 @@ namespace Welt.Scenes
                 }
                 base.Update(gameTime);
             }
+            WeltGame.Instance.IsMouseVisible = _mPlayer.IsPaused;
             UpdateTod(gameTime);
         }
 
@@ -316,7 +328,7 @@ namespace Welt.Scenes
             {
                 _mDiagnosticWorldRenderer.Draw(gameTime);
             }
-            _mPlayer1Renderer.Draw(gameTime);
+            _mPlayerRenderer.Draw(gameTime);
             _mHud.Draw(gameTime);
             _mGui.Draw(gameTime);
         }

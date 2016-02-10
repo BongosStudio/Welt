@@ -101,7 +101,14 @@ namespace Welt.Forge
             }
 
             //comment this line : you should have nothing on screen, else you ve been setting blocks directly in array !
-            Blocks[x*FlattenOffset + z*Size.Y + y] = b;
+            try
+            {
+                Blocks[x*FlattenOffset + z*Size.Y + y] = b;
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                
+            }
             Dirty = true;
         }
 

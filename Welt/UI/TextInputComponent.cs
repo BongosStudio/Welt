@@ -25,11 +25,13 @@ namespace Welt.UI
         private TimeSpan _cursorFlash;
         private bool _isCursorFlashing;
         private KeyboardState _oKeyState;
+        private Texture2D _backgroundTexture;
 
         public override Cursor Cursor => Cursors.IBeam;
         public bool IsSelected;
         public string Text => _text.Aggregate((s, s1) => $"{s} {s1}");
         public Color Foreground { get; set; }
+        public Color Background { get; set; }
         public int LineIndex { get; set; }
         public int CharacterIndex { get; set; }
         public TextAlignment TextAlignment { get; set; }
@@ -53,13 +55,14 @@ namespace Welt.UI
 
         public override void Initialize()
         {
-            _spriteFont = WeltGame.Instance.Content.Load<SpriteFont>(Font);
+            _spriteFont = WeltGame.Instance.Content.Load<SpriteFont>(Font);           
             WeltGame.Instance.Window.TextInput += InputCharacter;
             MouseLeftDown += ClickCharacter;
             LineIndex = _text.Count - 1;
             CharacterIndex = _text.Last().Length;
             base.Initialize();
             _oKeyState = Keyboard.GetState();
+            _backgroundTexture = Effects.CreateSolidColorTexture(Graphics, Width, Height, Background);
         }
 
         public override void Draw(GameTime time)
@@ -82,6 +85,7 @@ namespace Welt.UI
             if (_text.Count > 0)
             {
                 Sprite.Begin();
+                Sprite.Draw(_backgroundTexture, new Vector2(X, Y), Background);
                 Sprite.DrawString(_spriteFont, builder, new Vector2(X, Y), stateColor);
                 Sprite.End();
             }

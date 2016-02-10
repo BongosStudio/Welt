@@ -41,6 +41,8 @@ namespace Welt.Cameras
         }
 
         public Vector3 LookVector { get; private set; }
+        public float VerticalLookSensitivity { get; set; } = 0.8f;
+        public float HorizontalLookSensitivity { get; set; } = 0.8f;
 
         #region Initialize
 

@@ -33,6 +33,8 @@ namespace Welt.Forge.Renderers
             _mRunning = false;
         }
 
+        public event EventHandler LoadStepCompleted;
+
         #region Initialize
 
         public void Initialize()

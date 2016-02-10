@@ -15,43 +15,88 @@ namespace Welt.UI
     {
         private GraphicsDevice _graphics;
         private Player _player;
-        private UIComponent[][] _guiElements;
-        private ColumnPanelComponent _pauseMenu;
+        private UIComponent[] _guiElements;
+        private int _currentMenuIndex;
+
+        private ColumnPanelComponent _hotbar;
 
         public GuiRenderer(GraphicsDevice device, Player player)
         {
             _graphics = device;
             _player = player;
-            _pauseMenu = new ColumnPanelComponent("pauseMenu", -1, -1, device,
-                new ButtonComponent("Resume", "resumebtn", -2, 100, _pauseMenu, device),
-                new ButtonComponent("Settings", "settingsbtn", -2, 100, _pauseMenu, device),
-                new ButtonComponent("Quit", "quitbtn", -2, 100, _pauseMenu, device))
+            
+
+            var _pauseMenu = new ColumnPanelComponent("pauseMenu", -1, -1, device,
+                new ButtonComponent("Resume", "resumebtn", -2, 100, device),
+                new ButtonComponent("Settings", "settingsbtn", -2, 100, device),
+                new ButtonComponent("Quit", "quitbtn", -2, 100, device))
             {
-                ChildVerticalAlignment = VerticalAlignment.Center
+                ChildVerticalAlignment = VerticalAlignment.Center,
+                BackgroundColor = Color.Green,
+                Padding = new BoundsBox(10, 10, 10, 10)
             };
             
             _pauseMenu.ApplyToChildren(ButtonComponent.BorderWidthProperty, new BoundsBox(1, 1, 5, 5));
             _pauseMenu.ApplyToChildren(ButtonComponent.BackgroundColorProperty, Color.DarkGray);
             _pauseMenu.ApplyToChildren(ButtonComponent.ForegroundColorProperty, Color.White);
             _pauseMenu.ApplyToChildren(ButtonComponent.TextHorizontalAlignmentProperty, HorizontalAlignment.Center);
+
+            _guiElements = new UIComponent[]
+            {
+                _pauseMenu
+            };
+
+            _hotbar = new ColumnPanelComponent("hotbar", -1, 40, device,
+                new TextComponent("1", "hb1", -2, 30, device),
+                new TextComponent("2", "hb2", -2, 30, device),
+                new TextComponent("3", "hb3", -2, 30, device),
+                new TextComponent("4", "hb4", -2, 30, device),
+                new TextComponent("5", "hb5", -2, 30, device),
+                new TextComponent("6", "hb6", -2, 30, device),
+                new TextComponent("7", "hb7", -2, 30, device),
+                new TextComponent("8", "hb8", -2, 30, device),
+                new TextComponent("9", "hb9", -2, 30, device),
+                new TextComponent("0", "hb0", -2, 30, device)
+                )
+            {
+                ChildVerticalAlignment = VerticalAlignment.Bottom,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                BackgroundColor = Color.BlueViolet
+            };
+
+            _hotbar.ApplyToChildren(TextComponent.ForegroundProperty, Color.White);
         }
 
         public void Initialize()
         {
-            _pauseMenu.Initialize();
+            foreach (var elem in _guiElements)
+            {
+                elem.Initialize();
+            }
+            _hotbar.Initialize();
         }
 
         public void Update(GameTime time)
         {
-            if (_player.IsPaused) _pauseMenu.Update(time);
+            if (_player.IsPaused) _guiElements[_currentMenuIndex].Update(time);
+            else
+            {
+                _currentMenuIndex = 0;
+                _hotbar.Update(time);
+            }
         }
 
         public void Draw(GameTime time)
         {
             if (_player.IsPaused)
             {
-                _pauseMenu.Draw(time);
-                WeltGame.SetCursor(Cursors.AppStarting);
+                _guiElements[_currentMenuIndex].Draw(time);
+                //WeltGame.SetCursor(Cursors.AppStarting);
+            }
+            else
+            {
+                _hotbar.Draw(time);
             }
         }
     }

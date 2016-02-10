@@ -70,6 +70,8 @@
     <Compile Include="Forge\Biome\Tundra_Alpine.cs" />
     <Compile Include="Forge\Block.cs" />
     <Compile Include="Forge\Chunk.cs" />
+    <Compile Include="Forge\Generators\Decorations\IDecorGenerator.cs" />
+    <Compile Include="Forge\Generators\Decorations\TreeDecorator.cs" />
     <Compile Include="Forge\Generators\DualLayerTerrainWithMediumValleysForRivers.cs" />
     <Compile Include="Forge\Generators\FlatReferenceTerrain.cs" />
     <Compile Include="Forge\Generators\IChunkGenerator.cs" />
@@ -81,15 +83,12 @@
     <Compile Include="Forge\Renderers\DiagnosticWorldRenderer.cs" />
     <Compile Include="Forge\Renderers\FogRenderer.cs" />
     <Compile Include="Forge\Renderers\IRenderer.cs" />
-    <Compile Include="Forge\Renderers\ParticleSystems\ParticleEmitter.cs" />
-    <Compile Include="Forge\Renderers\ParticleSystems\ParticleSettings.cs" />
-    <Compile Include="Forge\Renderers\ParticleSystems\ParticleSystem.cs" />
-    <Compile Include="Forge\Renderers\ParticleSystems\SnowParticleSystem.cs" />
     <Compile Include="Forge\Renderers\SimpleRenderer.cs" />
     <Compile Include="Forge\Renderers\SkyDomeRenderer.cs" />
     <Compile Include="Forge\Renderers\ThreadedWorldRenderer.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\World.cs" />
+    <Compile Include="Forge\WorldHelpers.cs" />
     <Compile Include="IO\InputMap.cs" />
     <Compile Include="IO\WireChunk.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
@@ -110,6 +109,7 @@
     <Compile Include="Profiling\Utility.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\LoadScene.cs" />
     <Compile Include="Scenes\MainMenuScene.cs" />
     <Compile Include="Scenes\PlayScene.cs" />
     <Compile Include="Scenes\Scene.cs" />
@@ -129,7 +129,9 @@
     <Compile Include="Types\Vector3I.cs" />
     <Compile Include="UI\ButtonComponent.cs" />
     <Compile Include="UI\ColumnPanelComponent.cs" />
+    <Compile Include="UI\Effects.cs" />
     <Compile Include="UI\GuiRenderer.cs" />
+    <Compile Include="UI\LoadingBarComponent.cs" />
     <Compile Include="UI\StackPanelComponent.cs" />
     <Compile Include="UI\UIProperty.cs" />
     <Compile Include="UI\BoundsBox.cs" />
@@ -142,13 +144,13 @@
     <Compile Include="WeltGame.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Lidgren.Network, Version=3.5.0.921, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Lidgren.Network, Version=3.4.0.456, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Lidgren.Network.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>$(MonoGameInstallDirectory)\MonoGame\v3.0\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
+    <Reference Include="MonoGame.Framework, Version=3.5.0.967, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.5.0.967-develop\lib\net40\MonoGame.Framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Sec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -195,8 +197,11 @@
     <None Include="Content\Models\skydometex_0.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Console\" />
+    <Folder Include="Forge\Renderers\ParticleSystems\" />
     <Folder Include="Logic\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

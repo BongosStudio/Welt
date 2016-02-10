@@ -108,6 +108,33 @@ namespace Welt.Forge.Generators
                         if (chunk.Blocks[lx*Chunk.FlattenOffset + lz*Chunk.Size.Y + ly].Id == BlockType.None)
                             chunk.SetBlock((byte) lx, (byte) ly, (byte) lz, new Block(BlockType.Leaves));
                     }
+                    else
+                    {
+                        //if (lx < 0)
+                        //{
+                        //    // will be to the left chunk
+                        //    chunk.W.SetBlock((byte) (Chunk.Size.X - Chunk.Size.X%lx), (byte) ly, (byte) lz,
+                        //        new Block(BlockType.Leaves));
+                        //}
+                        //else if (lx > 15)
+                        //{
+                        //    // will be the right chunk
+                        //    chunk.E.SetBlock((byte) (Chunk.Size.X - Chunk.Size.X%lx), (byte) ly, (byte) lz,
+                        //        new Block(BlockType.Leaves));
+                        //}
+                        //else if (lz < 0)
+                        //{
+                        //    // will be the back chunk
+                        //    chunk.S.SetBlock((byte) lx, (byte) ly, (byte) (Chunk.Size.Z - Chunk.Size.Z%lz),
+                        //        new Block(BlockType.Leaves));
+                        //}
+                        //else if (lz > 15)
+                        //{
+                        //    // will be to the fore chunk
+                        //    chunk.N.SetBlock((byte)lx, (byte)ly, (byte)(Chunk.Size.Z - Chunk.Size.Z % lz),
+                        //        new Block(BlockType.Leaves));
+                        //}
+                    }
                 }
             }
         }

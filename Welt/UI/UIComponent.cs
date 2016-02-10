@@ -269,17 +269,32 @@ namespace Welt.UI
         public static UIProperty OpacityProperty = new UIProperty("opacity");
         public static UIProperty WidthProperty = new UIProperty("width");
         public static UIProperty HeightProperty = new UIProperty("height");
+        public static UIProperty MarginProperty = new UIProperty("margin");
+        public static UIProperty PaddingProperty = new UIProperty("padding");
+        public static UIProperty HorizontalAlignmentProperty = new UIProperty("horizontalalignment");
+        public static UIProperty VerticalAlignmentProperty = new UIProperty("verticalalignment");
 
         public object GetPropertyValue(UIProperty property)
         {
-            var prop = GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
-            return prop.GetValue(this, null);
+            var m = Maybe<PropertyInfo, NullReferenceException>.Check(() =>
+            {
+                return GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
+            });
+
+            if (m.HasError) return m.Error;
+            return m.Value;  
         }
 
         public void SetPropertyValue(UIProperty property, object value)
         {
-            var prop = GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
-            prop.SetValue(this, value, BindingFlags.IgnoreCase, null, null, null);
+            var m = Maybe<PropertyInfo, NullReferenceException>.Check(() =>
+            {
+                return GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
+            });
+
+            if (m.HasError) Console.WriteLine(m.Error);
+            else m.Value.SetValue(this, value, BindingFlags.IgnoreCase, null, null, null);
+            ProcessArea();
         }
         
         public virtual void Dispose()

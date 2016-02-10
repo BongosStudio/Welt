@@ -6,6 +6,7 @@
 
 #endregion
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 
@@ -18,5 +19,7 @@ namespace Welt.Forge.Renderers
         void Draw(GameTime gameTime);
         void LoadContent(ContentManager content);
         void Stop();
+
+        event EventHandler LoadStepCompleted;
     }
 }

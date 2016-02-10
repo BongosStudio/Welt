@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Welt.Controllers;
 using Welt.Managers;
 using Welt.Models;
@@ -25,12 +26,16 @@ namespace Welt.Scenes
         protected virtual Color BackColor { get; } = Color.CornflowerBlue;
         protected InputController InputController { get; } = InputController.CreateDefault();
         public Dictionary<string, UIComponent> UIComponents { get; } 
-            = new Dictionary<string, UIComponent>(32); 
+            = new Dictionary<string, UIComponent>(32);
+
+        private KeyboardState _previousKeyState;
+        private readonly Dictionary<Keys[], Func<bool>> _keyMap; 
 
         protected Scene(Game game) : base(game)
         {
             IsEnabled = true;
             Opacity = 1;
+            _keyMap = new Dictionary<Keys[], Func<bool>>();
         }
 
         public virtual void OnExiting(object sender, EventArgs args)
@@ -45,14 +50,25 @@ namespace Welt.Scenes
             {
                 child.Initialize();
             }
+            _previousKeyState = Keyboard.GetState();
         }
 
         public override void Update(GameTime time)
         {          
             SceneUpdate?.Invoke(this, EventArgs.Empty);
-            NextUpdate?.Invoke(this, EventArgs.Empty);
-            NextUpdate = null;
-            TaskManager.Update();
+
+            var currentKeyState = Keyboard.GetState();
+            if (currentKeyState != _previousKeyState)
+            {
+                Func<bool> function;
+                if (_keyMap.TryGetValue(currentKeyState.GetPressedKeys(), out function))
+                {
+                    function.Invoke();
+                }
+                _previousKeyState = currentKeyState;
+            }
+
+            TaskManager.Update(time);
             foreach (var child in UIComponents.Values)
             {
                 child.Update(time);
@@ -89,12 +105,12 @@ namespace Welt.Scenes
             TaskManager.Queue(action, when);
         }
 
-        public void Schedule(Action action, double ticks)
+        public void Schedule(Action action, long ticks)
         {
             TaskManager.Queue(o => action.Invoke(), ticks);
         }
 
-        public void Schedule(Action<object> action, double ticks)
+        public void Schedule(Action<object> action, long ticks)
         {
             TaskManager.Queue(action, ticks);
         }
@@ -115,6 +131,16 @@ namespace Welt.Scenes
         public Maybe<UIComponent, NullReferenceException> GetComponent(string name)
         {
             return Maybe<UIComponent, NullReferenceException>.Check(() => UIComponents[name]);
+        } 
+
+        public Maybe<TComponent, NullReferenceException> GetComponent<TComponent>(string name) where TComponent : UIComponent
+        {
+            return Maybe<TComponent, NullReferenceException>.Check(() => (TComponent) UIComponents[name]);
+        }
+
+        protected void AssignKeyToEvent(Func<bool> func, params Keys[] keys)
+        {
+            _keyMap.Add(keys, func);
         }
 
         #region Events

@@ -45,7 +45,7 @@ namespace Welt.Forge.Renderers
                 PerlinNoiseEffect = content.Load<Effect>("Effects\\PerlinNoise");
                 var pp = _mGraphicsDevice.PresentationParameters;
                 //the mipmap does not work on some pc ( i5 laptops at least), with mipmap false it s fine 
-                CloudsRenderTarget = new RenderTarget2D(_mGraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true,
+                CloudsRenderTarget = new RenderTarget2D(_mGraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, false,
                     SurfaceFormat.Color, DepthFormat.None);
                 CloudStaticMap = CreateStaticMap(32);
                 FullScreenVertices = SetUpFullscreenVertices();
@@ -58,6 +58,8 @@ namespace Welt.Forge.Renderers
         {
             //_running = false;
         }
+
+        public event EventHandler LoadStepCompleted;
 
         #region Update
 
@@ -217,14 +219,14 @@ namespace Welt.Forge.Renderers
 
         public virtual VertexPositionTexture[] SetUpFullscreenVertices()
         {
-            var vertices = new VertexPositionTexture[4];
+            return new[]
+            {
 
-            vertices[0] = new VertexPositionTexture(new Vector3(-1, 1, 0f), new Vector2(0, 1));
-            vertices[1] = new VertexPositionTexture(new Vector3(1, 1, 0f), new Vector2(1, 1));
-            vertices[2] = new VertexPositionTexture(new Vector3(-1, -1, 0f), new Vector2(0, 0));
-            vertices[3] = new VertexPositionTexture(new Vector3(1, -1, 0f), new Vector2(1, 0));
-
-            return vertices;
+                new VertexPositionTexture(new Vector3(-1, 1, 0f), new Vector2(0, 1)),
+                new VertexPositionTexture(new Vector3(1, 1, 0f), new Vector2(1, 1)),
+                new VertexPositionTexture(new Vector3(-1, -1, 0f), new Vector2(0, 0)),
+                new VertexPositionTexture(new Vector3(1, -1, 0f), new Vector2(1, 0))
+            };
         }
 
         public virtual void GeneratePerlinNoise(float time)

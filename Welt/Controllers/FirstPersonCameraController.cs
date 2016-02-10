@@ -20,6 +20,7 @@ namespace Welt.Controllers
 
         private MouseState _mMouseMoveState;
         private MouseState _mMouseState;
+        private readonly object _mMouseLock = new object();
 
         public readonly FirstPersonCamera Camera;
 
@@ -74,39 +75,43 @@ namespace Welt.Controllers
 
         public void Update(GameTime gameTime)
         {
-            var currentMouseState = Mouse.GetState();
-
-            float mouseDx = currentMouseState.X - _mMouseMoveState.X;
-            float mouseDy = currentMouseState.Y - _mMouseMoveState.Y;
-
-            if (mouseDx != 0)
+            lock (_mMouseLock)
             {
-                Camera.LeftRightRotation -= ROTATIONSPEED*(mouseDx/50);
-            }
-            if (mouseDy != 0)
-            {
-                Camera.UpDownRotation -= ROTATIONSPEED*(mouseDy/50);
+                // BUG: for some reason, mouse movement eventually slows down. I'd like to figure out why and if it has
+                // anything to do with MonoGame, to try another method.
+                var currentMouseState = Mouse.GetState();
 
-                // Locking camera rotation vertically between +/- 180 degrees
-                var newPosition = Camera.UpDownRotation - ROTATIONSPEED*(mouseDy/50);
-                if (newPosition < -1.55f)
-                    newPosition = -1.55f;
-                else if (newPosition > 1.55f)
-                    newPosition = 1.55f;
-                Camera.UpDownRotation = newPosition;
-                // End of locking
-            }
+                float mouseDx = currentMouseState.X - _mMouseMoveState.X;
+                float mouseDy = currentMouseState.Y - _mMouseMoveState.Y;
 
-            //camera.LeftRightRotation -= GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.X / 20;
-            //camera.UpDownRotation += GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.Y / 20;
+                if (mouseDx != 0)
+                {
+                    Camera.LeftRightRotation -= ROTATIONSPEED*(mouseDx/50)*Camera.HorizontalLookSensitivity;
+                }
+                if (mouseDy != 0)
+                {
+                    Camera.UpDownRotation -= ROTATIONSPEED*(mouseDy/50)*Camera.VerticalLookSensitivity;
 
-            _mMouseMoveState = new MouseState(Camera.Viewport.Width/2,
-                Camera.Viewport.Height/2,
-                0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released,
-                ButtonState.Released);
+                    // Locking camera rotation vertically between +/- 180 degrees
+                    var newPosition = Camera.UpDownRotation - ROTATIONSPEED * (mouseDy / 50);
+                    if (newPosition < -1.55f)
+                        newPosition = -1.55f;
+                    else if (newPosition > 1.55f)
+                        newPosition = 1.55f;
+                    Camera.UpDownRotation = newPosition;
+                    // End of locking
+                }
+                //camera.LeftRightRotation -= GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.X / 20;
+                //camera.UpDownRotation += GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.Y / 20;
 
-            Mouse.SetPosition(_mMouseMoveState.X, _mMouseMoveState.Y);
-            _mMouseState = Mouse.GetState();
+                _mMouseMoveState = new MouseState(Camera.Viewport.Width / 2,
+                    Camera.Viewport.Height / 2,
+                    0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released,
+                    ButtonState.Released);
+
+                Mouse.SetPosition(_mMouseMoveState.X, _mMouseMoveState.Y);
+                _mMouseState = Mouse.GetState();
+            }          
         }
 
         #endregion

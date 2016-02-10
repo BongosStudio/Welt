@@ -2,6 +2,7 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 
+using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Welt.Controllers;
@@ -33,6 +34,7 @@ namespace Welt
 
             Content.RootDirectory = "Content";
             _graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime 
+            Console.WriteLine(Color.Black);
         }
 
         #region Initialize
@@ -40,7 +42,7 @@ namespace Welt
         protected override void Initialize()
         {
             _sceneController = new SceneController(this, _graphics);
-            _sceneController.Initialize(new MainMenuScene(this));
+            _sceneController.Initialize(new SplashScene(this));
             
             IsMouseVisible = true;
             

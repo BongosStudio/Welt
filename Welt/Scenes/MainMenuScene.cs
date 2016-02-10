@@ -8,6 +8,7 @@ using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Media;
 using Welt.Controllers;
+using Welt.Forge;
 using Welt.UI;
 
 namespace Welt.Scenes
@@ -37,7 +38,7 @@ namespace Welt.Scenes
 
             button.MouseLeftDown += (sender, args) =>
             {
-                SceneController.Load(new PlayScene(game));
+                SceneController.Load(new LoadScene(game, new World())); // TODO: fetch world data
             };
 
             AddComponent(button);

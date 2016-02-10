@@ -15,20 +15,27 @@ namespace Welt.Models
         {
             Value = value;
             Error = exception;
+            HasError = false;
         } 
         
-        public bool HasError => Error != null && Value == null;
+        public bool HasError { get; private set; }
 
         public void TrySetValue(Func<TValue> value)
         {
             try
             {
-
                 Value = value.Invoke();
+                HasError = false;
             }
-            catch (Exception e)
+            catch (TException e)
             {
-                Error = (TException) e;
+                Error = e;
+                HasError = true;
+            }
+            catch (Exception)
+            {
+                Error = default(TException);
+                HasError = true;
             }
         }
 
@@ -39,7 +46,7 @@ namespace Welt.Models
             return maybe;
         }
 
-        public static implicit operator TValue(Maybe<TValue, TException> value)
+        public static explicit operator TValue(Maybe<TValue, TException> value)
         {
             return value.Value;
         }

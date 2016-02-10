@@ -115,6 +115,15 @@ namespace Welt
             }
         }
 
+        public static float NextRandomBetween(float lower, float upper)
+        {
+            var rand = NextRandom((int)Math.Floor(lower), (int)Math.Ceiling(upper));
+            var randD = (float)NextRandomDouble();
+            if (rand + randD > upper) return rand - randD;
+            if (rand - randD < lower) return rand + randD;
+            return NextRandomBoolean() ? rand + randD : rand - randD;
+        }
+
         public static float FRand()
         {
             var b = NextRandomBoolean();

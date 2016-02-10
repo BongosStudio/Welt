@@ -85,9 +85,7 @@ namespace Welt.UI
                 iColors[i] = _inactiveColor;
             }
             _inactiveTexture.SetData(iColors);
-            BackgroundImage.SetData(colors);
-
-            
+            BackgroundImage.SetData(colors);      
         }
 
         public override void Draw(GameTime time)

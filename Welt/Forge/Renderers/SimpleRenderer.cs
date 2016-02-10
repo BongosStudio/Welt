@@ -18,7 +18,7 @@ namespace Welt.Forge.Renderers
 {
     internal class SimpleRenderer : IRenderer
     {
-        private const byte BUILD_RANGE = 1;
+        private const byte BUILD_RANGE = 4;
         private const byte LIGHT_RANGE = BUILD_RANGE + 1;
         private const byte GENERATE_RANGE_LOW = LIGHT_RANGE + 1;
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;
@@ -49,10 +49,13 @@ namespace Welt.Forge.Renderers
 
             Debug.WriteLine("Generate initial chunks");
             _world.VisitChunks(DoGenerate, GENERATE_RANGE_HIGH);
+            LoadStepCompleted?.Invoke(this, EventArgs.Empty);
             Debug.WriteLine("Light initial chunks");
             _world.VisitChunks(DoLighting, LIGHT_RANGE);
+            LoadStepCompleted?.Invoke(this, EventArgs.Empty);
             Debug.WriteLine("Build initial chunks");
             _world.VisitChunks(DoBuild, BUILD_RANGE);
+            LoadStepCompleted?.Invoke(this, EventArgs.Empty);
         }
 
         public void LoadContent(ContentManager content)
@@ -80,6 +83,8 @@ namespace Welt.Forge.Renderers
         {
             _mIsRunning = false;
         }
+
+        public event EventHandler LoadStepCompleted;
 
         public void RebuildChunk(Chunk rebuildChunk)
         {

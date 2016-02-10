@@ -118,7 +118,7 @@ namespace Welt.Forge
 
         #region Atmospheric settings
 
-        public Vector4 Nightcolor = Color.Black.ToVector4();
+        public Vector4 Nightcolor = Color.Red.ToVector4();
         public Vector4 Suncolor = Color.White.ToVector4();
         public Vector4 Horizoncolor = Color.White.ToVector4();
 
@@ -161,8 +161,7 @@ namespace Welt.Forge
                 return new Block(BlockType.None);
             //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
             var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
-            return
-                chunk.Blocks[(x%Chunk.Size.X)*Chunk.FlattenOffset + (z%Chunk.Size.Z)*Chunk.Size.Y + (y%Chunk.Size.Y)];
+            return chunk.Blocks[x%Chunk.Size.X*Chunk.FlattenOffset + z%Chunk.Size.Z*Chunk.Size.Y + y%Chunk.Size.Y];
             //Debug.WriteLine("no block at  ({0},{1},{2}) ", x, y, z);
         }
 

@@ -20,7 +20,7 @@ sampler TextureSampler = sampler_state {
 	texture = <xTexture> ; 
 	magfilter = LINEAR; 
 	minfilter = LINEAR; 
-	mipfilter=LINEAR; 
+	mipfilter = LINEAR; 
 	AddressU = mirror; 
 	AddressV = mirror;
 };

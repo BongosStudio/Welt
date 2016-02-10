@@ -170,6 +170,8 @@ namespace Welt.Forge.Renderers
             throw new NotImplementedException();
         }
 
+        public event EventHandler LoadStepCompleted;
+
         #region Fields
 
         private BasicEffect _mEffect;

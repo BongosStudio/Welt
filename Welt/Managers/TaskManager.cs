@@ -3,6 +3,7 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace Welt.Managers
 {
@@ -17,33 +18,34 @@ namespace Welt.Managers
          
         public void Queue(Action<object> action)
         {
-            _mTasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now});
+            _mTasks.Enqueue(new GameTask {Action = action, Wait = TimeSpan.Zero});
         }
 
         public void Queue(Action<object> action, TimeSpan wait)
         {
-            _mTasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now.Add(wait)});
+            _mTasks.Enqueue(new GameTask {Action = action, Wait = wait});
         }
 
-        public void Queue(Action<object> action, double ticks)
+        public void Queue(Action<object> action, long ticks)
         {
-            _mTasks.Enqueue(new GameTask {Action = action, ToBeExecutedAt = DateTime.Now.AddMilliseconds(ticks)});
+            _mTasks.Enqueue(new GameTask {Action = action, Wait = TimeSpan.FromTicks(ticks)});
         }
 
-        public void Update()
+        public void Update(GameTime time)
         {
             for (var i = 0; i < _mTasks.Count; i++)
             {
                 var task = _mTasks.Dequeue();
-                if (task.ToBeExecutedAt > DateTime.Now)
+                if (task.Wait > TimeSpan.Zero)
                 {
                     // queue it back to the line
+                    task.Wait -= time.ElapsedGameTime;
                     _mTasks.Enqueue(task);
                 }
                 else
                 {
                     // execute the event on the main form thread
-                    task.Action.Invoke(null);
+                    task.Action.Invoke(this);
                 }
             }
             _mTasks.TrimExcess();
@@ -53,7 +55,7 @@ namespace Welt.Managers
         public struct GameTask
         {
             public Action<object> Action;
-            public DateTime ToBeExecutedAt;
+            public TimeSpan Wait;
         }
 
         public void Dispose()
