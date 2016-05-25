@@ -1,0 +1,250 @@
+﻿#region Copyright
+// COPYRIGHT 2015 JUSTIN COX (CONJI)
+#endregion
+#region Using Statements
+
+using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+using Welt.Blocks;
+using Welt.Cameras;
+using Welt.Forge;
+using Welt.Models;
+using static Welt.FastMath;
+
+#endregion
+
+namespace Welt.Physics
+{
+    public class PlayerPhysics
+    {
+        #region Fields
+
+        private readonly Player _mPlayer;
+        private readonly FirstPersonCamera _mCamera;
+
+        private const float PLAYERJUMPVELOCITY = 6f;
+        private const float PLAYERGRAVITY = -15f;
+        private const float MAX_VELOCITY = 20f;
+        private const float MAX_VELOCITY_WATER = 4f;
+        private const float VELOCITY_DAMAGE_CAP = 5f; // each 0.5f would take 0.5f HP. 20f is instant death.
+
+        #endregion
+
+        public PlayerPhysics(PlayerRenderer playerRenderer)
+        {
+            _mPlayer = playerRenderer.Player;
+            _mCamera = playerRenderer.Camera;
+        }
+
+        public void Move(GameTime gameTime)
+        {
+            UpdatePosition(gameTime);
+
+            var headbobOffset = ((float) Math.Sin(_mPlayer.HeadBob)*0.1f) + 0.15f;
+            if (_mPlayer.Entity.IsInWater) headbobOffset = 0;
+            _mCamera.Position = _mPlayer.Position + new Vector3(0, headbobOffset, 0);
+        }
+
+        #region UpdatePosition
+
+        private float GetPlayerSpeed()
+        {
+            return _mPlayer.Entity.IsInWater ? 1.7f : 3.5f;
+        }
+
+        private float GetPlayerGravity()
+        {
+            return _mPlayer.Entity.IsInWater ? PLAYERGRAVITY/2 : PLAYERGRAVITY;
+        }
+
+        private void UpdatePosition(GameTime gameTime)
+        {
+            var footPosition = _mPlayer.Position + new Vector3(0f, -1.5f, 0f);
+            var headPosition = _mPlayer.Position + new Vector3(0f, 0.1f, 0f);
+            // adjust to if in water
+            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.Water;
+
+            var velocity = GetPlayerGravity()*(float) gameTime.ElapsedGameTime.TotalSeconds;
+            var min = _mPlayer.Entity.IsInWater ? -MAX_VELOCITY_WATER : -MAX_VELOCITY;
+            var max = _mPlayer.Entity.IsInWater ? MAX_VELOCITY_WATER : MAX_VELOCITY;
+            _mPlayer.Velocity.Y += velocity;
+            Adjust(min, max, ref _mPlayer.Velocity.Y);
+
+            //TODO _isAboveSnowline = headPosition.Y > WorldSettings.SNOWLINE;
+
+            if (Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) ||
+                Block.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
+            {
+                var standingOnBlock = _mPlayer.World.GetBlock(footPosition).Id;
+                var hittingHeadOnBlock = _mPlayer.World.GetBlock(headPosition).Id;
+
+                // TODO: fall damage
+
+                // If the player has their head stuck in a block, push them down.
+                if (Block.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
+                {
+                    var blockIn = (int) (headPosition.Y);
+                    _mPlayer.Position.Y = blockIn - 0.15f;
+                }
+
+                // If the player is stuck in the ground, bring them out.
+                // This happens because we're standing on a block at -1.5, but stuck in it at -1.4, so -1.45 is the sweet spot.
+                if (Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id))
+                {
+                    var blockOn = (int) (footPosition.Y);
+                    _mPlayer.Position.Y = (float) (blockOn + 1 + 1.45);
+                }
+
+                _mPlayer.Velocity.Y = 0;
+
+                // Logic for standing on a block.
+                switch (standingOnBlock)
+                {
+                    case BlockType.Water:
+                        // play swimming sound
+                        break;
+                    case BlockType.Dirt:
+                        // play dirt sound
+                        break;
+                    case BlockType.Grass:
+                    case BlockType.LongGrass:
+                    case BlockType.Leaves:
+                        // play rustling mix with grass movement
+                        // maybe make an easter egg where it plays the pokemon thing with "A WILD BLAHBLAHBLAH APPEARED"?
+                        // Idk, I like that idea so I may do it.
+                        break;
+                }
+
+                //Logic for bumping your head on a block.
+                switch (hittingHeadOnBlock)
+                {
+                    case BlockType.Lava:
+                        // set the player on fire
+                        break;
+                }
+            }
+
+            // Death by falling off the map.
+            //if (_P.playerPosition.Y < -30)
+            //{
+            //    _P.KillPlayer(Defines.deathByMiss);
+            //    return;
+            //}
+
+            _mPlayer.Position += _mPlayer.Velocity*(float) gameTime.ElapsedGameTime.TotalSeconds;
+
+            var kstate = Keyboard.GetState();
+
+            var moveVector = new Vector3();
+
+            var speedNormalize = _mPlayer.Entity.IsInWater ? 1f : 2f;
+            if (kstate.IsKeyDown(Keys.Space))
+            {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if ((Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
+                {
+                    _mPlayer.Velocity.Y = PLAYERJUMPVELOCITY;
+                    var amountBelowSurface = ((ushort) footPosition.Y) + 1 - footPosition.Y;
+                    _mPlayer.Position.Y += amountBelowSurface + 0.05f;
+                }
+                else if (_mPlayer.Entity.IsInWater)
+                {
+                    // handle swimming
+                    // TODO: to be completely frank, idk wtf to do here. Adjusting the velocity doesn't change
+                    // and we already slowed down the moving speed by using GetPlayerSpeed()
+                }
+            }
+
+            if (kstate.IsKeyDown(Keys.W))
+            {
+                moveVector += Vector3.Forward*speedNormalize;
+            }
+            if (kstate.IsKeyDown(Keys.S))
+            {
+                moveVector += Vector3.Backward*speedNormalize;
+            }
+            if (kstate.IsKeyDown(Keys.A))
+            {
+                moveVector += Vector3.Left*speedNormalize;
+            }
+            if (kstate.IsKeyDown(Keys.D))
+            {
+                moveVector += Vector3.Right*speedNormalize;
+            }
+
+            _mPlayer.Entity.IsMoving = moveVector != new Vector3();
+            //moveVector.Normalize();
+            moveVector *= GetPlayerSpeed()*(float) gameTime.ElapsedGameTime.TotalSeconds;
+
+            var rotatedMoveVector = Vector3.Transform(moveVector, Matrix.CreateRotationY(_mCamera.LeftRightRotation));
+
+            // Attempt to move, doing collision stuff.
+            if (TryToMoveTo(rotatedMoveVector, gameTime))
+            {
+            }
+            else if (!TryToMoveTo(new Vector3(0, 0, rotatedMoveVector.Z), gameTime))
+            {
+            }
+            else if (!TryToMoveTo(new Vector3(rotatedMoveVector.X, 0, 0), gameTime))
+            {
+            }           
+        }
+
+        #endregion
+
+        #region TryToMoveTo
+
+        private bool TryToMoveTo(Vector3 moveVector, GameTime gameTime)
+        {
+            // Build a "test vector" that is a little longer than the move vector.
+            var moveLength = moveVector.Length();
+            var testVector = moveVector;
+            testVector.Normalize();
+            testVector = testVector*(moveLength + 0.3f);
+
+            // Apply this test vector.
+            var movePosition = _mPlayer.Position + testVector;
+            var midBodyPoint = movePosition + new Vector3(0, -0.7f, 0);
+            var lowerBodyPoint = movePosition + new Vector3(0, -1.4f, 0);
+
+            if (!Block.IsSolidBlock(_mPlayer.World.GetBlock(movePosition).Id) &&
+                !Block.IsSolidBlock(_mPlayer.World.GetBlock(lowerBodyPoint).Id) &&
+                !Block.IsSolidBlock(_mPlayer.World.GetBlock(midBodyPoint).Id))
+            {
+                _mPlayer.Position = _mPlayer.Position + moveVector;
+                if (moveVector != Vector3.Zero)
+                {
+                    _mPlayer.HeadBob += 0.2;
+                }
+                return true;
+            }
+
+            // It's solid there, so while we can't move we have officially collided with it.
+            var lowerBlock = _mPlayer.World.GetBlock(lowerBodyPoint).Id;
+            var midBlock = _mPlayer.World.GetBlock(midBodyPoint).Id;
+            var upperBlock = _mPlayer.World.GetBlock(movePosition).Id;
+
+            // It's solid there, so see if it's a lava block. If so, touching it will kill us!
+            //if (upperBlock == BlockType.Lava || lowerBlock == BlockType.Lava || midBlock == BlockType.Lava)
+            //{
+            //    _P.KillPlayer(Defines.deathByLava);
+            //    return true;
+            //}
+
+            // If it's a ladder, move up.
+            //if (upperBlock == BlockType.Ladder || lowerBlock == BlockType.Ladder || midBlock == BlockType.Ladder)
+            //{
+            //    _P.playerVelocity.Y = CLIMBVELOCITY;
+            //    Vector3 footPosition = _P.playerPosition + new Vector3(0f, -1.5f, 0f);
+            //    if (_P.blockEngine.SolidAtPointForPlayer(footPosition))
+            //        _P.playerPosition.Y += 0.1f;
+            //    return true;
+            //}
+
+            return false;
+        }
+
+        #endregion
+    }
+}
