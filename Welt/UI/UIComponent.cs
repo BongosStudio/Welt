@@ -13,14 +13,19 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Welt.Models;
+<<<<<<< HEAD
 using Welt.UI.Components;
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+=======
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
 namespace Welt.UI
 {
     public abstract class UIComponent : IDisposable
     {
+<<<<<<< HEAD
         public virtual string Name { get; protected set; }
         public virtual int Width { get; set; } = 100;
         public virtual int Height { get; set; } = 100;
@@ -30,6 +35,17 @@ namespace Welt.UI
         public virtual BoundsBox Padding { get; set; } = new BoundsBox();
         public virtual HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Left;
         public virtual VerticalAlignment VerticalAlignment { get; set; } = VerticalAlignment.Top;
+=======
+        public virtual string Name { get; }
+        public virtual int Width { get; set; }
+        public virtual int Height { get; set; }
+        public virtual float Opacity { get; set; } = 1;
+        public virtual Cursor Cursor { get; set; }
+        public virtual BoundsBox Margin { get; set; }
+        public virtual BoundsBox Padding { get; set; }
+        public virtual HorizontalAlignment HorizontalAlignment { get; set; }
+        public virtual VerticalAlignment VerticalAlignment { get; set; }
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         public virtual bool IsActive { get; set; } = true;
 
         public bool IsMouseOver { get; private set; }
@@ -41,18 +57,26 @@ namespace Welt.UI
 
         internal virtual UIComponent Parent { get; set; }
 
+<<<<<<< HEAD
         // TODO: consider making this static then have each component indexed so we can tell when the batch should push
         protected SpriteBatch Sprite { get; set; }
         protected Rectangle Region => new Rectangle(X, Y, Width, Height);
        
+=======
+        protected virtual SpriteBatch Sprite { get; set; }
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         protected virtual Texture2D Texture { get; set; }
         protected virtual GraphicsDevice Graphics { get; private set; }
         
         protected virtual Dictionary<string, UIComponent> Components { get; set; }
+<<<<<<< HEAD
         internal bool IsSizeProcessed;
 
         protected static string CurrentlySelectedTextComponent;
         private static Cursor _currentCursor = Cursor.Current;
+=======
+        protected virtual bool IsSizeProcessed { get; set; }
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
         protected UIComponent(string name, int width, int height, GraphicsDevice device) : this(name, width, height, null, device)
         {
@@ -69,6 +93,7 @@ namespace Welt.UI
             }
             else
             {
+<<<<<<< HEAD
                 Width = width == -1 ? WeltGame.Width : width;
                 Height = height == -1 ? WeltGame.Height : height;
             }
@@ -185,12 +210,71 @@ namespace Welt.UI
                     break;
             }
             Y = y;
+=======
+                Width = width == -1 ? WeltGame.Instance.Window.ClientBounds.Width : width;
+                Height = height == -1 ? WeltGame.Instance.Window.ClientBounds.Height : height;
+            }
+            
+            Components = new Dictionary<string, UIComponent>(8); // default size is 8 children.
+            Parent = parent;
+            Graphics = device;
+            Sprite = new SpriteBatch(device);
+            
+        }
+
+        protected void ProcessArea()
+        {
+            if (IsSizeProcessed) return;
+            IsSizeProcessed = true;
+            float x = X;
+            float y = Y;
+            float width;
+            float height;
+
+            switch (HorizontalAlignment)
+            {
+                case HorizontalAlignment.Right:
+                    width = Parent?.Width ?? WeltGame.Instance.Window.ClientBounds.Width;
+                    x = X + (width - Width) - Margin.Right;
+                    break;
+                case HorizontalAlignment.Center:
+                    width = Parent?.Width ?? WeltGame.Instance.Window.ClientBounds.Width;
+                    x = X + (width - Width)/2 + Margin.Left - Margin.Right;
+                    break;
+                case HorizontalAlignment.Left:
+                    x = X + Margin.Left;
+                    break;
+            }
+
+            switch (VerticalAlignment)
+            {
+                case VerticalAlignment.Bottom:
+                    height = Parent?.Height ?? WeltGame.Instance.Window.ClientBounds.Height;
+                    y = Y + (height - Height) - Margin.Bottom;
+                    break;
+                case VerticalAlignment.Center:
+                    height = Parent?.Height ?? WeltGame.Instance.Window.ClientBounds.Height;
+                    y = Y + (height - Height)/2 + Margin.Top - Margin.Bottom;
+                    break;
+                case VerticalAlignment.Top:
+                    y = Y + Margin.Top;
+                    break;
+            }
+
+            X = (int) x;
+            Y = (int) y;
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
 
         protected bool GetMouseOver(out MouseState mouse)
         {
             mouse = Mouse.GetState();
+<<<<<<< HEAD
             return Region.Contains(mouse.X*WeltGame.WidthViewRatio, mouse.Y*WeltGame.HeightViewRatio);
+=======
+            var bounds = new RectangleF(X, Y, Width, Height);
+            return bounds.Contains(mouse.X, mouse.Y);
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
 
         #region Public Methods
@@ -208,17 +292,36 @@ namespace Welt.UI
 
         public virtual void Update(GameTime time)
         {
+<<<<<<< HEAD
             MouseState mouse;
+=======
+            foreach (var child in Components.Values)
+            {
+                child.Update(time);
+            }
+
+            MouseState mouse;
+
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             if (GetMouseOver(out mouse))
             {
                 // TODO: ARGS for the mouse
                 if (!IsMouseOver)
                 {
+<<<<<<< HEAD
+=======
+
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                     Parent?.MouseEnter?.Invoke(this,
                         new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                     MouseEnter?.Invoke(this,
                         new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                     IsMouseOver = true;
+<<<<<<< HEAD
+=======
+                    // change the cursor
+                    WeltGame.SetCursor(Cursor);
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                 }
                 if (mouse.LeftButton == ButtonState.Pressed)
                 {
@@ -229,8 +332,11 @@ namespace Welt.UI
                         MouseLeftDown?.Invoke(this,
                             new MouseEventArgs(MouseButtons.Left, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsLeftMouseDown = true;
+<<<<<<< HEAD
                         CurrentlySelectedTextComponent = Name;
                         GainFocus?.Invoke(this, null);
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                     }
                 }
                 else
@@ -242,7 +348,10 @@ namespace Welt.UI
                         MouseLeftUp?.Invoke(this,
                             new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsLeftMouseDown = false;
+<<<<<<< HEAD
                         LostFocus?.Invoke(this, null);
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                     }
                 }
 
@@ -255,7 +364,10 @@ namespace Welt.UI
                         MouseRightDown?.Invoke(this,
                             new MouseEventArgs(MouseButtons.Right, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                         IsRightMouseDown = true;
+<<<<<<< HEAD
                         CurrentlySelectedTextComponent = Name;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                     }
                 }
                 else
@@ -269,7 +381,10 @@ namespace Welt.UI
                         IsRightMouseDown = false;
                     }
                 }
+<<<<<<< HEAD
                 if (Cursor.Current != Cursor) Cursor.Current = Cursor;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             }
             else
             {
@@ -280,11 +395,16 @@ namespace Welt.UI
                     MouseLeave?.Invoke(this,
                         new MouseEventArgs(MouseButtons.None, 0, mouse.X, mouse.Y, mouse.ScrollWheelValue));
                     IsMouseOver = false;
+<<<<<<< HEAD
                     WeltGame.SetCursor(Cursors.Default);
+=======
+                    ((Form) Control.FromHandle(WeltGame.Instance.Window.Handle)).ResetCursor();
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                 }
                 IsRightMouseDown = false;
                 IsLeftMouseDown = false;
             }
+<<<<<<< HEAD
             
             foreach (var child in Components.Values)
             {
@@ -293,6 +413,8 @@ namespace Welt.UI
 
             (this as PasswordBoxComponent)?.ToggleSelected(CurrentlySelectedTextComponent == Name);
             (this as TextInputComponent)?.ToggleSelected(CurrentlySelectedTextComponent == Name);
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
 
 
@@ -340,6 +462,7 @@ namespace Welt.UI
         public event EventHandler<MouseEventArgs> MouseLeftUp;
         public event EventHandler<MouseEventArgs> MouseRightDown;
         public event EventHandler<MouseEventArgs> MouseRightUp;
+<<<<<<< HEAD
         public event EventHandler GainFocus;
         public event EventHandler LostFocus;
 
@@ -353,16 +476,36 @@ namespace Welt.UI
         public static UIProperty<bool> IsActiveProperty = new UIProperty<bool>("isactive");
 
         public Maybe<PropertyInfo, NullReferenceException> GetPropertyValue<T>(UIProperty<T> property)
+=======
+
+        public static UIProperty OpacityProperty = new UIProperty("opacity");
+        public static UIProperty WidthProperty = new UIProperty("width");
+        public static UIProperty HeightProperty = new UIProperty("height");
+        public static UIProperty MarginProperty = new UIProperty("margin");
+        public static UIProperty PaddingProperty = new UIProperty("padding");
+        public static UIProperty HorizontalAlignmentProperty = new UIProperty("horizontalalignment");
+        public static UIProperty VerticalAlignmentProperty = new UIProperty("verticalalignment");
+
+        public object GetPropertyValue(UIProperty property)
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         {
             var m = Maybe<PropertyInfo, NullReferenceException>.Check(() =>
             {
                 return GetType().GetProperties().First(p => p.Name.ToLower() == property.Name.ToLower());
             });
 
+<<<<<<< HEAD
             return m;
         }
 
         public void SetPropertyValue<T>(UIProperty<T> property, T value)
+=======
+            if (m.HasError) return m.Error;
+            return m.Value;  
+        }
+
+        public void SetPropertyValue(UIProperty property, object value)
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         {
             var m = Maybe<PropertyInfo, NullReferenceException>.Check(() =>
             {
@@ -373,6 +516,7 @@ namespace Welt.UI
             else m.Value.SetValue(this, value, BindingFlags.IgnoreCase, null, null, null);
             ProcessArea();
         }
+<<<<<<< HEAD
 
         public static UIComponent Clone(UIComponent comp, string name)
         {
@@ -380,6 +524,8 @@ namespace Welt.UI
             n.Name = name;
             return n;
         }
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         
         public virtual void Dispose()
         {

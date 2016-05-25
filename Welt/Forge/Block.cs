@@ -97,11 +97,14 @@ namespace Welt.Forge
             return !(left == right);
         }
 
+<<<<<<< HEAD
         public static byte GetStackSize(ushort id)
         {
             return 64;
         }
 
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         public static void GetLightLevel(ushort id, out byte red, out byte green, out byte blue)
         {
             switch (id)

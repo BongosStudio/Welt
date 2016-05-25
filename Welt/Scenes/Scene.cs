@@ -4,15 +4,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+<<<<<<< HEAD
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+=======
+using Microsoft.Xna.Framework;
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 using Microsoft.Xna.Framework.Input;
 using Welt.Controllers;
 using Welt.Managers;
 using Welt.Models;
 using Welt.UI;
+<<<<<<< HEAD
 using Keys = Microsoft.Xna.Framework.Input.Keys;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
 namespace Welt.Scenes
 {
@@ -29,7 +36,11 @@ namespace Welt.Scenes
         protected virtual Color BackColor { get; } = Color.CornflowerBlue;
         protected InputController InputController { get; } = InputController.CreateDefault();
         public Dictionary<string, UIComponent> UIComponents { get; } 
+<<<<<<< HEAD
             = new Dictionary<string, UIComponent>(64);
+=======
+            = new Dictionary<string, UIComponent>(32);
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
         private KeyboardState _previousKeyState;
         private readonly Dictionary<Keys[], Func<bool>> _keyMap; 
@@ -54,6 +65,7 @@ namespace Welt.Scenes
                 child.Initialize();
             }
             _previousKeyState = Keyboard.GetState();
+<<<<<<< HEAD
             WeltGame.SetCursor(Cursors.Arrow);
         }
 
@@ -72,12 +84,30 @@ namespace Welt.Scenes
                                 kvp.Key.All(key => pressedKeys.Contains(key)) && kvp.Key.Length == pressedKeys.Length))
                 {
                     kvp.Value.Invoke();
+=======
+        }
+
+        public override void Update(GameTime time)
+        {          
+            SceneUpdate?.Invoke(this, EventArgs.Empty);
+
+            var currentKeyState = Keyboard.GetState();
+            if (currentKeyState != _previousKeyState)
+            {
+                Func<bool> function;
+                if (_keyMap.TryGetValue(currentKeyState.GetPressedKeys(), out function))
+                {
+                    function.Invoke();
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                 }
                 _previousKeyState = currentKeyState;
             }
 
             TaskManager.Update(time);
+<<<<<<< HEAD
 
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             foreach (var child in UIComponents.Values)
             {
                 child.Update(time);
@@ -126,7 +156,11 @@ namespace Welt.Scenes
 
         public void AddComponent(UIComponent component)
         {
+<<<<<<< HEAD
             //component.Initialize();
+=======
+            component.Initialize();
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             UIComponents.Add(component.Name, component);
         }
 

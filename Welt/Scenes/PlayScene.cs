@@ -3,7 +3,10 @@
 #endregion
 using System;
 using System.Diagnostics;
+<<<<<<< HEAD
 using System.Windows.Forms;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
@@ -29,7 +32,10 @@ namespace Welt.Scenes
         private bool _mReleaseMouse;
         private KeyboardState _mOldKeyboardState;
         private SkyDomeRenderer _mSkyDomeRenderer;
+<<<<<<< HEAD
         private Vector2 _mPreviousPauseMousePosition;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         
         protected override Color BackColor => Color.Black;
 
@@ -41,8 +47,11 @@ namespace Welt.Scenes
             _mSkyDomeRenderer = skyToHandoff;
             _mPlayerRenderer = playerToHandoff;
             _mPlayer = playerToHandoff.Player;
+<<<<<<< HEAD
             _mPreviousPauseMousePosition = new Vector2(FirstPersonCameraController.DefaultMouseState.X,
                 FirstPersonCameraController.DefaultMouseState.Y);
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
 
         #region Initialize
@@ -88,6 +97,7 @@ namespace Welt.Scenes
                 Game.Exit();
                 return true;
             }, Keys.LeftShift, Keys.Escape);
+<<<<<<< HEAD
             
             AssignKeyToEvent(() =>
             {
@@ -110,6 +120,9 @@ namespace Welt.Scenes
             AssignHotbarKeys();
 
             #endregion
+=======
+            #endregion  
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
         }
 
@@ -319,7 +332,10 @@ namespace Welt.Scenes
         public override void Update(GameTime gameTime)
         {
             //ProcessDebugKeys();
+<<<<<<< HEAD
             base.Update(gameTime);
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
             if (Game.IsActive)
             {
@@ -360,6 +376,7 @@ namespace Welt.Scenes
         }
 
         #endregion
+<<<<<<< HEAD
 
         #region Private methods
 
@@ -378,5 +395,7 @@ namespace Welt.Scenes
         }
 
         #endregion
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
     }
 }

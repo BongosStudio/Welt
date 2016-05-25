@@ -3,7 +3,10 @@
 #endregion
 
 using System;
+<<<<<<< HEAD
 using System.Drawing.Design;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
 namespace Welt.Models
 {

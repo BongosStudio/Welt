@@ -16,9 +16,15 @@ using Welt.Types;
 
 namespace Welt.Forge.Renderers
 {
+<<<<<<< HEAD
     public class SimpleRenderer : IRenderer
     {
         private const byte BUILD_RANGE = 12;
+=======
+    internal class SimpleRenderer : IRenderer
+    {
+        private const byte BUILD_RANGE = 4;
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         private const byte LIGHT_RANGE = BUILD_RANGE + 1;
         private const byte GENERATE_RANGE_LOW = LIGHT_RANGE + 1;
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;
@@ -39,7 +45,10 @@ namespace Welt.Forge.Renderers
             _graphicsDevice = graphicsDevice;
             _mCamera = camera;
             _world = world;
+<<<<<<< HEAD
             _world.Renderer = this;
+=======
+>>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             _mIsRunning = true;
         }
 
