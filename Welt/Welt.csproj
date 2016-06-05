@@ -30,7 +30,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Windows\Debug\</OutputPath>
+    <OutputPath>..\Build\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -41,7 +41,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Windows\Release\</OutputPath>
+    <OutputPath>..\Build\Release\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -132,8 +132,6 @@
     <Compile Include="Models\InventoryContainer.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
     <Compile Include="Managers\TaskManager.cs" />
-    <Compile Include="Models\Cardinal.cs" />
-    <Compile Include="Models\ChunkState.cs" />
     <Compile Include="Models\Maybe.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Persistence\ChunkPersistence.cs" />
