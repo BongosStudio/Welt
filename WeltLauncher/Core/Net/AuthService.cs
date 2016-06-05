@@ -19,12 +19,7 @@ namespace WeltLauncher.Core.Net
 
         public async Task<HttpResponseMessage> AttemptLogin(string username, string password)
         {
-            string url;
-#if DEBUG
-            url = ApiResources.TEST_USER_LOG_URL;
-#else
-            url = ApiResources.RELEASE_USER_LOG_URL;
-#endif
+            var url = ApiResources.GetUrl(ApiResources.AUTH_LOG);
 
             var result = await _netClient.PostAsync(url, new JsonContent(new {username, password}));
             return result;

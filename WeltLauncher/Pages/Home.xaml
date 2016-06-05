@@ -30,6 +30,6 @@
         <TextBox x:Name="UsernameTxt" HorizontalAlignment="Right" Height="23" Margin="0,0,96,54" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="162"/>
         <PasswordBox x:Name="PasswordTxt" HorizontalAlignment="Right" Height="23" Margin="0,0,96,26" VerticalAlignment="Bottom" Width="162" KeyDown="PasswordTxt_OnKeyDown"></PasswordBox>
         <Button x:Name="LoginBtn" IsEnabled="false" Content="Login" Margin="0,0,0,50" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="82" Height="27"/>
-        <TextBlock x:Name="StatusTxt" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="10,0,258,10" Height="44"/>
+        <TextBlock x:Name="StatusTxt" TextWrapping="Wrap" VerticalAlignment="Bottom" Margin="10,0,258,31" Height="44" Foreground="{StaticResource Accent}"/>
     </Grid>
 </UserControl>

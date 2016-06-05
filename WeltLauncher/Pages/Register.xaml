@@ -11,9 +11,7 @@
             <StackPanel MinWidth="200">
                 <TextBlock Text="Register" Style="{StaticResource Heading2}" />
                 <TextBlock x:Name="ResponseTxt" Foreground="{StaticResource Accent}"/>
-                <TextBlock>Email</TextBlock>
-                <TextBox x:Name="EmailTxt" HorizontalAlignment="Left" Width="200"/>
-                <TextBlock Text="Username"></TextBlock>
+                <TextBlock Text="Username"/>
                 <TextBox x:Name="UsernameTxt" HorizontalAlignment="Left" Width="200"/>
                 <TextBlock>Password (minimum 6 characters)</TextBlock>
                 <PasswordBox x:Name="PasswordTxt" HorizontalAlignment="Left" Width="200"/>

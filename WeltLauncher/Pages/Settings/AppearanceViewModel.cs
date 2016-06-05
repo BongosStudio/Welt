@@ -55,11 +55,10 @@ namespace WeltLauncher.Pages.Settings
             {
                 var colordata = MainWindow.Settings["accent_color"].Split(';');
 
-                AppearanceManager.Current.AccentColor = Color.FromArgb(
+                AppearanceManager.Current.AccentColor = Color.FromRgb(
                     byte.Parse(colordata[0]),
                     byte.Parse(colordata[1]),
-                    byte.Parse(colordata[2]),
-                    byte.Parse(colordata[3])
+                    byte.Parse(colordata[2])
                     );
                 AppearanceManager.Current.ThemeSource = new Uri(MainWindow.Settings["theme_source"], UriKind.Relative);
                 FontSize size;
@@ -83,7 +82,7 @@ namespace WeltLauncher.Pages.Settings
             SelectedAccentColor = AppearanceManager.Current.AccentColor;
             MainWindow.Settings["theme_source"] = AppearanceManager.Current.ThemeSource.ToString();
             MainWindow.Settings["accent_color"] =
-                $"{SelectedAccentColor.R};{SelectedAccentColor.G};{SelectedAccentColor.B};{SelectedAccentColor.A}";
+                $"{SelectedAccentColor.R};{SelectedAccentColor.G};{SelectedAccentColor.B}";
             MainWindow.Settings.Save();
         }
 

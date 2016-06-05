@@ -35,17 +35,15 @@ namespace WeltLauncher.Pages
                 UsernameTxt.IsEnabled = false;
                 PasswordTxt.IsEnabled = false;
                 ConfirmPasswordTxt.IsEnabled = false;
-                EmailTxt.IsEnabled = false;
                 var json = JObject.FromObject(
                     new
                     {
                         username = UsernameTxt.Text,
                         password = PasswordTxt.Password,
-                        confirm_password = ConfirmPasswordTxt.Password,
-                        email = EmailTxt.Text
+                        confirm_password = ConfirmPasswordTxt.Password
                     });
                 var web = new WebClient {Headers = {["Content-Type"] = "application/json"}};
-                var response = await web.UploadStringTaskAsync(ApiResources.TEST_USER_REG_URL, json.ToString());
+                var response = await web.UploadStringTaskAsync(ApiResources.GetUrl(ApiResources.AUTH_REG), json.ToString());
                 var jr = JObject.Parse(response);
                 var token = jr["token"].ToString(); // TODO: use this lol
                 ResponseTxt.Text = $"{jr["message"]} with the token {token}";           
@@ -60,7 +58,6 @@ namespace WeltLauncher.Pages
                 UsernameTxt.IsEnabled = true;
                 PasswordTxt.IsEnabled = true;
                 ConfirmPasswordTxt.IsEnabled = true;
-                EmailTxt.IsEnabled = true;
             }
         }
     }

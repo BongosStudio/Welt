@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,7 +28,8 @@ namespace WeltLauncher.Pages
     /// </summary>
     public partial class Home : UserControl
     {
-        private AuthService _auth;
+        private readonly AuthService _auth;
+        private static readonly HttpClient _client = new HttpClient();
 
         public Home()
         {
@@ -45,7 +47,11 @@ namespace WeltLauncher.Pages
             if (login.IsSuccessStatusCode)
             {
                 StatusTxt.Foreground = new SolidColorBrush(FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor);
-                Process.Start("welt.exe", $"{UsernameTxt.Text} {json["token"]}");
+                var game = Process.Start("welt.exe", $"{UsernameTxt.Text} {json["token"]}");
+                if (game != null)
+                {
+                    game.OutputDataReceived += (sender, args) => GameConsole.WriteLine(args.Data);
+                }
                 if (MainWindow.Settings["keep_open"] != "true")
                 {
                     Application.Current.Shutdown();
@@ -59,11 +65,53 @@ namespace WeltLauncher.Pages
             StatusTxt.Text = message;
         }
 
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        private async void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
             UpdateMd.Document = new Markdown().Transform(GetChangelogString());
+            UpdateMd.Document.FontFamily = new FontFamily("Arial");
+
+            #region Get game version
+
+            StatusTxt.Text = "Checking resources.";
+            if (await RequiresUpdate())
+            {
+                StatusTxt.Text = "Beginning update.";
+
+                #region Download the new game
+
+                var game = await _client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.RESX_DL));
+                File.WriteAllBytes("Welt.exe", game);
+
+                #endregion
+
+                #region Download resource objects
+
+                var resourceJson = JArray.Parse(await _client.GetStringAsync(ApiResources.GetUrl(ApiResources.RESX_OBJ)));
+                foreach (var r in resourceJson.Select(j => (JObject) j))
+                {
+                    var file = r["file"].ToString();
+                    var url = r["url"].ToString();
+                    StatusTxt.Text = $"Installing {file}.";
+                    // this means it belongs in a directory
+                    if (file.Contains("\\")) Directory.CreateDirectory(file.Substring(0, file.LastIndexOf('\\')));
+                    var data = await _client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.RESX_DL + url));
+                    File.WriteAllBytes(file, data);
+                }
+
+                #endregion
+            }
+            StatusTxt.Text = "";
+
+            #endregion
         }
-        
+
+        private async Task<bool> RequiresUpdate()
+        {
+            
+            var clientv = MainWindow.Settings["version"];
+            var gamev = await _client.GetStringAsync(ApiResources.GetUrl(ApiResources.RESX_VER));
+            return gamev != clientv;
+        }
 
         private static string GetChangelogString()
         {
@@ -71,8 +119,8 @@ namespace WeltLauncher.Pages
             try
             {
                 var builder = new StringBuilder();
-                var response = JArray.Parse(client.DownloadString(ApiResources.TEST_CHANGELOG_URL));
-                foreach (var ja in response)
+                var response = JArray.Parse(client.DownloadString(ApiResources.GetUrl(ApiResources.CHANGELOG)));
+                foreach (var ja in response.Reverse())
                 {
                     builder.Append($"{ja["date"]}\r\n===========\r\n\r\n{ja["text"]}\r\n\r\n");
                 }
@@ -86,8 +134,7 @@ namespace WeltLauncher.Pages
 
         private void PasswordTxt_OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (UsernameTxt.Text.Length > 0 && PasswordTxt.Password.Length > 5) LoginBtn.IsEnabled = true;
-            else LoginBtn.IsEnabled = false;
+            LoginBtn.IsEnabled = (UsernameTxt.Text.Length > 0 && PasswordTxt.Password.Length > 4);
             if (e.Key == Key.Enter && LoginBtn.IsEnabled) LoginUser();
         }
     }
