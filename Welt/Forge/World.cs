@@ -7,14 +7,11 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Forge.Generators;
-<<<<<<< HEAD
-using Welt.Forge.Renderers;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 using Welt.Managers;
 using Welt.Models;
 using Welt.Persistence;
 using Welt.Types;
+using Welt.Forge.Renderers;
 
 #endregion
 
@@ -36,18 +33,11 @@ namespace Welt.Forge
 
         #endregion
 
-<<<<<<< HEAD
         public World(string name)
         {
             //Chunks = new Dictionary2<Chunk>();//
             Chunks = new ChunkManager(new ChunkPersistence());
             Name = name;
-=======
-        public World()
-        {
-            //Chunks = new Dictionary2<Chunk>();//
-            Chunks = new ChunkManager(new ChunkPersistence());
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
 
         public void ToggleRasterMode()
@@ -95,12 +85,8 @@ namespace Welt.Forge
         //public const byte VIEW_CHUNKS_X = 8;
         //public const byte VIEW_CHUNKS_Y = 1;
         //public const byte VIEW_CHUNKS_Z = 8;
-
-<<<<<<< HEAD
+        
         public string Name { get; }
-
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         public static int Seed = 54321;
 
         public static uint Origin = 1000;
@@ -132,12 +118,8 @@ namespace Welt.Forge
         public bool RealTime = false;
         public bool DayMode = false;
         public bool NightMode = false;
-
-<<<<<<< HEAD
         internal SimpleRenderer Renderer;
-
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
+        
         #region Atmospheric settings
 
         public Vector4 Nightcolor = Color.Red.ToVector4();
@@ -193,7 +175,6 @@ namespace Welt.Forge
 
         public Block SetBlock(Vector3I pos, Block b)
         {
-<<<<<<< HEAD
             var result = SetBlock(pos.X, pos.Y, pos.Z, b);
             return result.HasError ? new Block() : result.Value;
         }
@@ -203,23 +184,13 @@ namespace Welt.Forge
             if (!InView(x, y, z))
                 return new Maybe<Block, Exception>(new Block(),
                     new AccessViolationException("Cannot access block at this distance."));
-=======
-            return SetBlock(pos.X, pos.Y, pos.Z, b);
-        }
-
-        public Block SetBlock(uint x, uint y, uint z, Block newType)
-        {
-            if (!InView(x, y, z)) throw new NotImplementedException();
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
-            var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
-
-            var localX = (byte) (x%Chunk.Size.X);
-            var localY = (byte) (y%Chunk.Size.Y);
-            var localZ = (byte) (z%Chunk.Size.Z);
-
-<<<<<<< HEAD
-            var m = Maybe<Block, Exception>.Check(() =>
+            return Maybe<Block, Exception>.Check(() =>
             {
+                var chunk = Chunks[x / Chunk.Size.X, z / Chunk.Size.Z];
+
+                var localX = (byte)(x % Chunk.Size.X);
+                var localY = (byte)(y % Chunk.Size.Y);
+                var localZ = (byte)(z % Chunk.Size.Z);
                 var old = chunk.Blocks[localX*Chunk.FlattenOffset + localZ*Chunk.Size.Y + localY];
 
                 //chunk.SetBlock is also called by terrain generators for Y loops min max optimisation
@@ -250,56 +221,8 @@ namespace Welt.Forge
                 }
                 return old;
             });
-
-            return m;
-=======
-            var old = chunk.Blocks[localX*Chunk.FlattenOffset + localZ*Chunk.Size.Y + localY];
-
-            //chunk.SetBlock is also called by terrain generators for Y loops min max optimisation
-            chunk.SetBlock(localX, localY, localZ, new Block(newType.Id));
-
-            //Chunk should be responsible for maintaining this
-            chunk.State = ChunkState.AwaitingRelighting;
-
-            // use Chunk accessors
-            if (localX == 0)
-            {
-                if (chunk.E != null) chunk.E.State = ChunkState.AwaitingRelighting;
-            }
-            if (localX == Chunk.Max.X)
-            {
-                //viewableChunks[(x / Chunk.SIZE.X) + 1, z / Chunk.SIZE.Z].dirty = true;
-                if (chunk.W != null) chunk.W.State = ChunkState.AwaitingRelighting;
-            }
-            if (localZ == 0)
-            {
-                //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) - 1].dirty = true;
-                if (chunk.S != null) chunk.S.State = ChunkState.AwaitingRelighting;
-            }
-            if (localZ == Chunk.Max.Z)
-            {
-                //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) + 1].dirty = true;
-                if (chunk.N != null) chunk.N.State = ChunkState.AwaitingRelighting;
-            }
-
-            return old;
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
-
+        
         #endregion
-
-        public void SetLightAt(uint x, uint y, uint z, Vector3B light)
-        {
-            var oldBlock = GetBlock(x, y, z);
-            oldBlock.R = light.X;
-            oldBlock.G = light.Y;
-            oldBlock.B = light.Z;
-            SetBlock(x, y, z, oldBlock);
-<<<<<<< HEAD
-            Renderer.DoLightFor(ChunkAt(new Vector3(x, y, z)));
-=======
-
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
-        }
     }
 }

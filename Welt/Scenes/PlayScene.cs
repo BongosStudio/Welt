@@ -3,10 +3,6 @@
 #endregion
 using System;
 using System.Diagnostics;
-<<<<<<< HEAD
-using System.Windows.Forms;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
@@ -21,21 +17,18 @@ namespace Welt.Scenes
 {
     public class PlayScene : Scene
     {
-        private World _mWorld;
-        private IRenderer _mRenderer;
+        private readonly World _mWorld;
+        private readonly IRenderer _mRenderer;
         private HudRenderer _mHud;
         private GuiRenderer _mGui;
-        private Player _mPlayer;
-        private PlayerRenderer _mPlayerRenderer;
+        private readonly Player _mPlayer;
+        private readonly PlayerRenderer _mPlayerRenderer;
         private DiagnosticWorldRenderer _mDiagnosticWorldRenderer;
         private bool _mDiagnosticMode;
         private bool _mReleaseMouse;
         private KeyboardState _mOldKeyboardState;
-        private SkyDomeRenderer _mSkyDomeRenderer;
-<<<<<<< HEAD
+        private readonly SkyDomeRenderer _mSkyDomeRenderer;
         private Vector2 _mPreviousPauseMousePosition;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         
         protected override Color BackColor => Color.Black;
 
@@ -47,11 +40,8 @@ namespace Welt.Scenes
             _mSkyDomeRenderer = skyToHandoff;
             _mPlayerRenderer = playerToHandoff;
             _mPlayer = playerToHandoff.Player;
-<<<<<<< HEAD
             _mPreviousPauseMousePosition = new Vector2(FirstPersonCameraController.DefaultMouseState.X,
                 FirstPersonCameraController.DefaultMouseState.Y);
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         }
 
         #region Initialize
@@ -97,7 +87,6 @@ namespace Welt.Scenes
                 Game.Exit();
                 return true;
             }, Keys.LeftShift, Keys.Escape);
-<<<<<<< HEAD
             
             AssignKeyToEvent(() =>
             {
@@ -120,9 +109,6 @@ namespace Welt.Scenes
             AssignHotbarKeys();
 
             #endregion
-=======
-            #endregion  
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
         }
 
@@ -331,12 +317,6 @@ namespace Welt.Scenes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-            //ProcessDebugKeys();
-<<<<<<< HEAD
-            base.Update(gameTime);
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
-
             if (Game.IsActive)
             {
                 _mPlayerRenderer.Update(gameTime);
@@ -376,26 +356,15 @@ namespace Welt.Scenes
         }
 
         #endregion
-<<<<<<< HEAD
 
         #region Private methods
 
         private void AssignHotbarKeys()
         {
-            AssignKeyToEvent(() =>
-            {
-                
-                return true;
-            }, Keys.D1);
-            AssignKeyToEvent(() =>
-            {
-
-                return true;
-            }, Keys.D2);
+            AssignKeyToEvent(() => true, Keys.D1);
+            AssignKeyToEvent(() => true, Keys.D2);
         }
 
         #endregion
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
     }
 }

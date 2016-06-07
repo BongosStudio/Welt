@@ -5,27 +5,19 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Models;
-<<<<<<< HEAD
 using Welt.Scenes;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
 namespace Welt.UI
 {
     public static class Effects
     {
-<<<<<<< HEAD
         public static Texture2D CreateSolidColorTexture(GraphicsDevice graphics, int width, int height, Color color,
             BoundsBox border = new BoundsBox(), Color borderColor = default(Color))
-=======
-        public static Texture2D CreateSolidColorTexture(GraphicsDevice graphics, int width, int height, Color color)
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         {
             var texture = new Texture2D(graphics, width, height);
             var colors = new Color[width*height];
             for (var i = 0; i < colors.Length; i++)
             {
-<<<<<<< HEAD
                 var isBorder =
                     i%width < border.Left ||
                     i%width >= width - border.Right ||
@@ -33,9 +25,6 @@ namespace Welt.UI
                     i >= colors.Length - width*border.Bottom;
                 if (isBorder) colors[i] = borderColor;
                 else colors[i] = color;
-=======
-                colors[i] = color;
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             }
             texture.SetData(colors);
             return texture;
@@ -43,10 +32,7 @@ namespace Welt.UI
 
         public static KeyValuePair<Color, string>[] ProcessText(string input, Color defaultColor)
         {
-<<<<<<< HEAD
             if (input == null) return new KeyValuePair<Color, string>[0];
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             var data = new List<KeyValuePair<Color, string>>();
             var builder = new StringBuilder();
             var color = defaultColor;
@@ -143,11 +129,7 @@ namespace Welt.UI
 
             for (var i = 0; i < input.Length; i++)
             {
-<<<<<<< HEAD
                 switch (char.ToUpper(input[i]))
-=======
-                switch (input[i])
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                 {
                     case 'R':
                         r = byte.Parse(input.Substring(i + 2, 2));
@@ -167,36 +149,14 @@ namespace Welt.UI
             }
             return Color.FromNonPremultiplied(r, g, b, a);
         }
-<<<<<<< HEAD
 
-        public static void FadeIn(this UIComponent component, Scene scene, TimeSpan length)
+        public static void FadeIn(this UIComponent ui, Scene scene, TimeSpan span)
         {
-            component.Opacity = 0;
-            var stepSpan = length.TotalMilliseconds/50;
-            for (var i = 0; i < 50; i++)
+            ui.Opacity = 0;
+            for (var i = 0; i < 20; i++)
             {
-                scene.Schedule(() => component.Opacity += 0.02f, TimeSpan.FromMilliseconds(stepSpan*i));
+                scene.Schedule(() => ui.Opacity += .05f, TimeSpan.FromMilliseconds(span.TotalMilliseconds/20*i));
             }
         }
-
-        public static void PopulateWith(this UIComponent c, UIComponent child, int count, Action selectfunc = null)
-        {
-            for (var i = 0; i < count; i++)
-            {
-                c.AddComponent(UIComponent.Clone(child, $"{child.Name}{i}"));
-                selectfunc?.Invoke();
-            }
-        }
-
-        public static void FadeSceneIn(this Scene scene, TimeSpan length)
-        {
-            // how to do this:
-            // 1: draw a black rectangle over the screen OR clear screen of this specific color
-            // 2: watch for .Initialize to be finished then start fading the rectangle. 
-            // simple, yeah?
-            
-        }
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
     }
 }

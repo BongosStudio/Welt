@@ -97,14 +97,11 @@ namespace Welt.Forge
             return !(left == right);
         }
 
-<<<<<<< HEAD
         public static byte GetStackSize(ushort id)
         {
             return 64;
         }
 
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         public static void GetLightLevel(ushort id, out byte red, out byte green, out byte blue)
         {
             switch (id)
@@ -176,34 +173,28 @@ namespace Welt.Forge
 
         public static bool IsSolidBlock(ushort type)
         {
-            if (type == BlockType.Water || type == BlockType.None || type == BlockType.Snow ||
-                type == BlockType.RedFlower || type == BlockType.LongGrass) return false;
-            return true;
+            return type != BlockType.Water && type != BlockType.None && type != BlockType.Snow && type != BlockType.RedFlower && type != BlockType.LongGrass;
         }
 
         public static bool IsPlantBlock(ushort type)
         {
-            if (type == BlockType.RedFlower) return true;
-            return false;
+            return type == BlockType.RedFlower;
         }
 
         public static bool IsGrassBlock(ushort type)
         {
-            if (type == BlockType.LongGrass) return true;
-            return false;
+            return type == BlockType.LongGrass;
         }
 
         public static bool IsTransparentBlock(ushort type)
         {
-            if (type == BlockType.None || type == BlockType.Water || type == BlockType.Leaves || type == BlockType.Snow ||
-                type == BlockType.RedFlower || type == BlockType.Rock || type == BlockType.LongGrass) return true;
-            return false;
+            return type == BlockType.None || type == BlockType.Water || type == BlockType.Leaves || type == BlockType.Snow ||
+                   type == BlockType.RedFlower || type == BlockType.Rock || type == BlockType.LongGrass;
         }
 
         public static bool IsDiggable(ushort type)
         {
-            if (type == BlockType.Water) return false;
-            return true;
+            return type != BlockType.Water;
         }
 
         #region GetTexture

@@ -183,51 +183,7 @@ namespace Welt.Forge
         {
             return "chunk at index " + Index;
         }
-
-<<<<<<< HEAD
-=======
-        #region main as unit test for neighbours
-
-        private static void Main(string[] args)
-        {
-            var world = new World();
-
-            uint n = 4, s = 6, w = 4, e = 6;
-
-            var cw = new Chunk(world, new Vector3I(w, 5, 5));
-            var c = new Chunk(world, new Vector3I(5, 5, 5));
-            var ce = new Chunk(world, new Vector3I(e, 5, 5));
-
-            var cn = new Chunk(world, new Vector3I(5, 5, n));
-            var cs = new Chunk(world, new Vector3I(5, 5, s));
-            var cne = new Chunk(world, new Vector3I(e, 5, n));
-            var cnw = new Chunk(world, new Vector3I(w, 5, n));
-            var cse = new Chunk(world, new Vector3I(e, 5, s));
-            var csw = new Chunk(world, new Vector3I(w, 5, s));
-
-
-            c.SetBlock(0, 0, 0, new Block(BlockType.Dirt));
-            cw.SetBlock(15, 0, 0, new Block(BlockType.Grass));
-
-            var w15 = c.GetBlock(-1, 0, 0);
-            Debug.Assert(w15.Id == BlockType.Grass);
-
-            ce.SetBlock(0, 0, 0, new Block(BlockType.Tree));
-            var e0 = c.GetBlock(16, 0, 0);
-            Debug.Assert(e0.Id == BlockType.Tree);
-
-            csw.SetBlock(15, 0, 0, new Block(BlockType.Lava));
-            var swcorner = c.GetBlock(-1, 0, 16);
-            Debug.Assert(swcorner.Id == BlockType.Lava);
-
-            cne.SetBlock(0, 0, 15, new Block(BlockType.Leaves));
-            var necorner = c.GetBlock(16, 0, -1);
-            Debug.Assert(necorner.Id == BlockType.Leaves);
-        }
-
-        #endregion
-
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
+        
         #region Fields
 
         private Chunk _mN, _mS, _mE, _mW, _mNe, _mNw, _mSe, _mSw;

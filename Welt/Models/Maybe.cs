@@ -3,10 +3,6 @@
 #endregion
 
 using System;
-<<<<<<< HEAD
-using System.Drawing.Design;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
 namespace Welt.Models
 {
@@ -43,10 +39,11 @@ namespace Welt.Models
             }
         }
 
-        public static Maybe<TValue, TException> Check(Func<TValue> value)
+        public static Maybe<TValue, TException> Check(Func<TValue> value, Exception exception = null) 
         {
             var maybe = new Maybe<TValue, TException>();
             maybe.TrySetValue(value);
+            if (maybe.HasError) maybe.Error = (TException) exception;
             return maybe;
         }
 

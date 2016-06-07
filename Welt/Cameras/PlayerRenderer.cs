@@ -16,10 +16,7 @@ using Welt.Models;
 using Welt.Physics;
 using Welt.Types;
 using Welt.UI;
-<<<<<<< HEAD
 using Welt.UI.Components;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 
 #endregion
 
@@ -96,11 +93,7 @@ namespace Welt.Cameras
                 if (_mRightClickCooldown <= TimeSpan.Zero) // this means the cooldown is finished
                 {
                     _mRightClickCooldown = TimeSpan.FromMilliseconds(500);
-<<<<<<< HEAD
                     Player.RightClick(gameTime);
-=======
-                    Player.RightTool.Use(DateTime.Now);
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
                     _mForceUpdate = true;
                 }
             }
@@ -110,20 +103,9 @@ namespace Welt.Cameras
                 if (_mLeftClickCooldown <= TimeSpan.Zero) // this means the cooldown is finished
                 {
                     _mLeftClickCooldown = TimeSpan.FromMilliseconds(500);
-<<<<<<< HEAD
-                    Player.LeftClick(gameTime);
                     _mForceUpdate = true;
                 }
             }
-=======
-                    Player.LeftTool.Use(DateTime.Now);
-                    _mForceUpdate = true;
-                }
-            }
-
-            Player.RightTool.SwitchType(scrollWheelDelta);
-            Player.LeftTool.SwitchType(scrollWheelDelta);
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             
             //do not do this each tick
             if (!previousView.Equals(Camera.View) || _mForceUpdate)

@@ -23,8 +23,7 @@ namespace Welt.Controllers
         private readonly object _mMouseLock = new object();
 
         public readonly FirstPersonCamera Camera;
-
-<<<<<<< HEAD
+        
         public static MouseState DefaultMouseState
             =>
                 new MouseState(
@@ -37,9 +36,7 @@ namespace Welt.Controllers
                     ButtonState.Released,
                     ButtonState.Released
                     );
-
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
+        
         #endregion
 
         public FirstPersonCameraController(FirstPersonCamera camera)
@@ -82,11 +79,7 @@ namespace Welt.Controllers
                 var rotationMatrix = Matrix.CreateRotationX(Camera.UpDownRotation)*
                                      Matrix.CreateRotationY(Camera.LeftRightRotation);
                 var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
-<<<<<<< HEAD
                 Camera.Position += rotatedVector*MOVEMENTSPEED;
-=======
-                Camera.Position += rotatedVector * MOVEMENTSPEED;
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
             }
         }
         #endregion
@@ -133,11 +126,6 @@ namespace Welt.Controllers
                 _mMouseState = Mouse.GetState();
             }          
         }
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
         #endregion
 
     }

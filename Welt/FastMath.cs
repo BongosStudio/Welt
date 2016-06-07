@@ -1,4 +1,4 @@
-﻿#region Copyright
+#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 using System;

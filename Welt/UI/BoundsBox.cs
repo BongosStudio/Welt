@@ -2,10 +2,6 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
-<<<<<<< HEAD
-using System;
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
 using System.Runtime.InteropServices;
 
 namespace Welt.UI
@@ -36,7 +32,6 @@ namespace Welt.UI
             Top = top;
             Bottom = bottom;
         }
-<<<<<<< HEAD
 
         public static bool operator ==(BoundsBox left, BoundsBox right)
         {
@@ -51,7 +46,5 @@ namespace Welt.UI
         {
             return !(left == right);
         }
-=======
->>>>>>> b2fc2c2fe2bde1de545e4c42ddb20053f36579b5
     }
 }
