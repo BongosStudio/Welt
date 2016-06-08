@@ -125,6 +125,7 @@
     <Compile Include="IO\InputMap.cs" />
     <Compile Include="IO\WireChunk.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Managers\AudioManager.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
     <Compile Include="Managers\TaskManager.cs" />
     <Compile Include="Models\BlockContainer.cs" />
@@ -206,6 +207,10 @@
     <Content Include="Content\Effects\SkyDome.fx" />
     <Content Include="Content\Effects\SolidBlockEffect.fx" />
     <Content Include="Content\Effects\WaterBlockEffect.fx" />
+    <Content Include="Content\Images\splashscreen.png" />
+    <Content Include="Content\Images\welt.png" />
+    <Content Include="Content\Music\Feather.wav" />
+    <Content Include="Content\Sounds\menu-button.wma" />
     <Content Include="Content\Textures\blocks.png" />
     <Content Include="Content\Textures\blocks_16.png" />
     <Content Include="Content\Textures\blocks_64_2.png" />

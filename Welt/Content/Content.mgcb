@@ -229,3 +229,9 @@
 /processorParam:Quality=Best
 /build:Music/Feather.wav
 
+#begin Sounds/menu-button.wma
+/importer:WmaImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/menu-button.wma
+

@@ -29,6 +29,7 @@ namespace Welt.UI.Components
             BackgroundTexture = Effects.CreateSolidColorTexture(Graphics, Width, Height, BackgroundColor);
             var currentY = Y;
 
+            // TODO: FIX THE SHIT OUT OF THIS
             foreach (var child in Components.Values)
             {
                 child.Parent = this;
@@ -36,6 +37,7 @@ namespace Welt.UI.Components
                 if (child.Width == -1) child.Width = Width;
                 child.Y = currentY + (int) child.Margin.Top;
                 currentY = child.Y + (int) child.Margin.Bottom;
+                
                 switch (ChildHorizontalAlignment)
                 {
                     case HorizontalAlignment.Left:

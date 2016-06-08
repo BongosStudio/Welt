@@ -29,7 +29,7 @@ namespace Welt.Models
         // NOTE: should I have a cap set on the hotbar index? It might be kinda cool to see what people
         // could do if I don't set one... Maybe a macro mod/plugin? :o
         public byte HotbarIndex;
-        public InventoryContainer Inventory;
+        public InventoryContainer Inventory => Entity.Inventory;
         
         public Vector3 TargetPoint;
 
@@ -53,7 +53,6 @@ namespace Welt.Models
         {
             World = world;
             Entity = new PlayerEntity();
-            Inventory = new InventoryContainer();
         }
 
         public bool LeftClick(GameTime time)

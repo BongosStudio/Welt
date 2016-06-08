@@ -32,6 +32,7 @@ namespace Welt.Scenes
                 TextHorizontalAlignment = HorizontalAlignment.Center,
                 BorderWidth = new BoundsBox(2, 2, 2, 2),
                 BackgroundActiveColor = Color.CadetBlue,
+                BackgroundColor = Color.LightSteelBlue,
                 ForegroundColor = Color.Black,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center

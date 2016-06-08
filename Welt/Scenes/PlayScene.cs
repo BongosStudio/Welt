@@ -87,6 +87,11 @@ namespace Welt.Scenes
                 Game.Exit();
                 return true;
             }, Keys.LeftShift, Keys.Escape);
+            AssignKeyToEvent(() =>
+            {
+                // TODO: show console
+                return true;
+            }, Keys.OemTilde);
             
             AssignKeyToEvent(() =>
             {

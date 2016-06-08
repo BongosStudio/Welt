@@ -21,11 +21,6 @@ namespace Welt.Scenes
 
         public SplashScene(Game game) : base(game)
         {
-            AddComponent(new ImageComponent(SPLASH, "splash", game.GraphicsDevice)
-            {
-                Opacity = 0f,
-                HorizontalAlignment = HorizontalAlignment.Left
-            });
             AddComponent(new ImageComponent(SPLASH, "splash", -1, -1, game.GraphicsDevice)
             {
                 Opacity = 0f,

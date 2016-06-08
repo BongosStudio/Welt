@@ -5,8 +5,10 @@
 using System;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Controllers;
+using Welt.Managers;
 using Welt.Models;
 using Welt.Scenes;
 
@@ -44,8 +46,6 @@ namespace Welt
             Content.RootDirectory = "Content";
             _graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime
             Player.CreatePlayer(username, key);
-            _graphics.SynchronizeWithVerticalRetrace = true; // press f3 to set it to false at runtime 
-            Console.WriteLine(Color.Black);
         }
 
         #region Initialize
@@ -66,6 +66,7 @@ namespace Welt
             Width = Window.ClientBounds.Width;
             SetCursor(Cursors.Default);
             SceneController.Initialize(_graphics, new SplashScene(this));
+            AudioManager.Initialize(this);
             
             IsMouseVisible = true;
             
@@ -103,7 +104,6 @@ namespace Welt
         protected void __SetCursor(Cursor cursor)
         {
             Cursor.Current = cursor;
-            ((Form) Control.FromHandle(Instance.Window.Handle)).Cursor = cursor;
         }
     }
 }

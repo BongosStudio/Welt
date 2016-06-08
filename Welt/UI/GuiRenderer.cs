@@ -30,17 +30,15 @@ namespace Welt.UI
             _hotbar = new ColumnPanelComponent("hotbar", (int) (WeltGame.Width*WeltGame.WidthViewRatio - 100), 40,
                 device);
 
-            var pauseMenu = new ColumnPanelComponent("pauseMenu", -1, -1, device,
-                new ButtonComponent("Resume", "resumebtn", -2, 100, device),
-                new ButtonComponent("Settings", "settingsbtn", -2, 100, device),
-                new ButtonComponent("Quit", "quitbtn", -2, 100, device))
+            var pauseMenu = new StackPanelComponent("pauseMenu", 100, -1, device,
+                new ButtonComponent("Resume", "resumebtn", 100, 100, device),
+                new ButtonComponent("Settings", "settingsbtn", 100, 100, device),
+                new ButtonComponent("Quit", "quitbtn", 100, 100, device))
             {
-                ChildVerticalAlignment = VerticalAlignment.Center,
-                BackgroundColor = Color.Green,
-                Padding = new BoundsBox(10, 10, 10, 10)
+                ChildHorizontalAlignment = HorizontalAlignment.Left
             };
             
-            pauseMenu.ApplyToChildren(ButtonComponent.BorderWidthProperty, new BoundsBox(1, 1, 5, 5));
+            pauseMenu.ApplyToChildren(ButtonComponent.BorderWidthProperty, new BoundsBox(0, 4, 0, 0));
             pauseMenu.ApplyToChildren(ButtonComponent.BackgroundColorProperty, Color.DarkGray);
             pauseMenu.ApplyToChildren(ButtonComponent.ForegroundColorProperty, Color.White);
             pauseMenu.ApplyToChildren(ButtonComponent.TextHorizontalAlignmentProperty, HorizontalAlignment.Center);

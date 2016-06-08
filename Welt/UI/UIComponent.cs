@@ -183,6 +183,7 @@ namespace Welt.UI
                     y -= (int) Margin.Bottom;
                     break;
             }
+            Y = y;
         }
         
         protected bool GetMouseOver(out MouseState mouse)

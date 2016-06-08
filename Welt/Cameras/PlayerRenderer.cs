@@ -103,6 +103,7 @@ namespace Welt.Cameras
                 if (_mLeftClickCooldown <= TimeSpan.Zero) // this means the cooldown is finished
                 {
                     _mLeftClickCooldown = TimeSpan.FromMilliseconds(500);
+                    Player.LeftClick(gameTime);
                     _mForceUpdate = true;
                 }
             }

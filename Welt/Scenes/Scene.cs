@@ -73,6 +73,7 @@ namespace Welt.Scenes
                 {
                     kvp.Value.Invoke();
                 }
+                _previousKeyState = currentKeyState;
             }
             TaskManager.Update(time);
             foreach (var child in UIComponents.Values)

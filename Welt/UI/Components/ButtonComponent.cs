@@ -5,6 +5,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Welt.UI.Components
@@ -46,6 +47,7 @@ namespace Welt.UI.Components
 
         private readonly SpriteFont _font;
         private Vector2 _textPosition;
+        private SoundEffectInstance _click;
 
         public ButtonComponent(string text, string name, int width, int height, GraphicsDevice device)
             : this(text, name, width, height, null, device)
@@ -84,6 +86,8 @@ namespace Welt.UI.Components
             }
             _inactiveTexture.SetData(iColors);
             BackgroundImage.SetData(colors);
+            _click = WeltGame.Instance.Content.Load<SoundEffect>("Sounds/menu-button").CreateInstance();
+            MouseLeftDown += (sender, args) => _click.Play();
         }
 
         public override void Draw(GameTime time)
