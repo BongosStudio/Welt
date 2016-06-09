@@ -19,30 +19,30 @@ namespace Welt.Forge.Generators
                 {
                     for (byte z = 0; z < sizeZ; z++)
                     {
-                        var block = new Block(BlockType.None);
+                        var block = new Block(BlockType.NONE);
 
                         if (y < sizeY/4)
-                            block.Id = BlockType.Lava;
+                            block.Id = BlockType.LAVA;
                         /*
                          * else if (y == (sizeY / 2) - 1) // test caves visibility 
                          * block.Id = Id.empty;
                          */
                         else if (y < sizeY/2)
-                            block.Id = BlockType.Rock;
+                            block.Id = BlockType.ROCK;
                         else if (y == sizeY/2)
                         {
                             var i = chunk.Index.X%2 == 0
                                 ? chunk.Index.X ^ chunk.Index.Y
                                 : chunk.Index.X/(chunk.Index.Y + 1);
 
-                            block.Id = (ushort) (i%(BlockType.Maximum - 1));
+                            block.Id = (ushort) (i%(BlockType.MAXIMUM - 1));
                         }
                         else
                         {
                             if (y == sizeY/2 + 1 && (x == 0 || x == sizeX - 1 || z == 0 || z == sizeZ - 1))
-                                block.Id = BlockType.Sand;
+                                block.Id = BlockType.SAND;
                             else
-                                block.Id = BlockType.None;
+                                block.Id = BlockType.NONE;
                         }
 
                         var h = (byte) (chunk.Index.Z%2 == 0 && y > 1 ? y - 1 : y);

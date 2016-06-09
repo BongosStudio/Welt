@@ -3,6 +3,7 @@
 #endregion
 
 using System;
+using Microsoft.Xna.Framework;
 using Welt.Models;
 
 namespace Welt.Entities
@@ -13,6 +14,7 @@ namespace Welt.Entities
         public virtual bool IsOnFire { get; set; }
         public virtual bool IsRunning { get; set; }
         public virtual bool IsMoving { get; set; }
+        public virtual bool IsCrouching { get; set; }
 
         //public virtual InventoryMap Inventory { get; set; }
 
@@ -26,5 +28,6 @@ namespace Welt.Entities
         public event EventHandler DamageDealt;
         public event EventHandler DamageRecieved;
         public event EventHandler InventoryUpdated;
+        
     }
 }

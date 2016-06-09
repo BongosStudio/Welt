@@ -162,7 +162,7 @@ namespace Welt.Forge
         public Block GetBlock(uint x, uint y, uint z)
         {
             if (!InView(x, y, z))
-                return new Block(BlockType.None);
+                return new Block(BlockType.NONE);
             //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
             var chunk = Chunks[x/Chunk.Size.X, z/Chunk.Size.Z];
             return chunk.Blocks[x%Chunk.Size.X*Chunk.FlattenOffset + z%Chunk.Size.Z*Chunk.Size.Y + y%Chunk.Size.Y];

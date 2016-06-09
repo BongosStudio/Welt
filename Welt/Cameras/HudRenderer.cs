@@ -73,22 +73,22 @@ namespace Welt.Cameras
                     var index = xx * Chunk.Size.X + zz;
                     switch (blockcheck)
                     {
-                        case BlockType.Grass:
+                        case BlockType.GRASS:
                             _mMaptexture[index] = new Color(0, y, 0);
                             break;
-                        case BlockType.Dirt:
+                        case BlockType.DIRT:
                             _mMaptexture[index] = Color.Khaki;
                             break;
-                        case BlockType.Snow:
+                        case BlockType.SNOW:
                             _mMaptexture[index] = new Color(y, y, y);
                             break;
-                        case BlockType.Sand:
+                        case BlockType.SAND:
                             _mMaptexture[index] = new Color(193 + y / 2, 154 + y / 2, 107 + y / 2);
                             break;
-                        case BlockType.Water:
+                        case BlockType.WATER:
                             _mMaptexture[index] = new Color(0, 0, y + 64);
                             break;
-                        case BlockType.Leaves:
+                        case BlockType.LEAVES:
                             _mMaptexture[index] = new Color(0, 128, 0);
                             break;
                         default:

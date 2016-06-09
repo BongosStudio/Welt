@@ -30,14 +30,14 @@ namespace Welt.Forge.Biome
 
             for (int y = Chunk.Max.Y; y >= 0; y--)
             {
-                blockType = BlockType.None;
+                blockType = BlockType.NONE;
                 if (y > upperGroundHeight)
                 {
-                    blockType = BlockType.None;
+                    blockType = BlockType.NONE;
                 }
                 else
                 {
-                    blockType = BlockType.Grass;
+                    blockType = BlockType.GRASS;
                 }
 
                 if ((y > lowerGroundHeight) && (y < upperGroundHeight))
@@ -69,18 +69,18 @@ namespace Welt.Forge.Biome
                     var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
                     for (byte y = Waterlevel + 9; y >= Minimumgroundheight; y--)
                     {
-                        blockType = BlockType.None;
+                        blockType = BlockType.NONE;
                         //if (chunk.Blocks[x, y, z].Id == BlockType.None)
-                        if (chunk.Blocks[offset + y].Id == BlockType.None)
+                        if (chunk.Blocks[offset + y].Id == BlockType.NONE)
                         {
                             //    blockType = BlockType.Water;
                         }
                         else
                         {
                             //if (chunk.Blocks[x, y, z].Id == BlockType.Grass)
-                            if (chunk.Blocks[offset + y].Id == BlockType.Grass)
+                            if (chunk.Blocks[offset + y].Id == BlockType.GRASS)
                             {
-                                blockType = BlockType.Grass;
+                                blockType = BlockType.GRASS;
                                 if (y <= Waterlevel)
                                 {
                                     sunlit = false;
@@ -95,14 +95,14 @@ namespace Welt.Forge.Biome
                     for (byte y = Waterlevel + 27; y >= Waterlevel; y--)
                     {
                         //if ((y > 11) && (chunk.Blocks[x, y, z].Id == BlockType.Grass)) chunk.SetBlock(x, y, z, new Block(BlockType.Grass, sunlit));
-                        if ((y > 11) && (chunk.Blocks[offset + y].Id == BlockType.Grass))
-                            chunk.SetBlock(x, y, z, new Block(BlockType.Grass));
+                        if ((y > 11) && (chunk.Blocks[offset + y].Id == BlockType.GRASS))
+                            chunk.SetBlock(x, y, z, new Block(BlockType.GRASS));
 
                         //if ((chunk.Blocks[x, y, z].Id == BlockType.Dirt) || (chunk.Blocks[x, y, z].Id == BlockType.Grass))
-                        if ((chunk.Blocks[offset + y].Id == BlockType.Dirt) ||
-                            (chunk.Blocks[offset + y].Id == BlockType.Grass))
+                        if ((chunk.Blocks[offset + y].Id == BlockType.DIRT) ||
+                            (chunk.Blocks[offset + y].Id == BlockType.GRASS))
                         {
-                            chunk.SetBlock(x, y, z, new Block(BlockType.Grass));
+                            chunk.SetBlock(x, y, z, new Block(BlockType.GRASS));
                         }
                     }
                 }

@@ -222,7 +222,7 @@ namespace Welt.Cameras
             {
                 var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
-                if (block.Id != BlockType.None && (waterSelectable || block.Id != BlockType.Water))
+                if (block.Id != BlockType.NONE && (waterSelectable || block.Id != BlockType.WATER))
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);
                     
@@ -242,7 +242,7 @@ namespace Welt.Cameras
                 var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
                 
-                if (Player.World.GetBlock(targetPoint).Id != BlockType.None) continue;
+                if (Player.World.GetBlock(targetPoint).Id != BlockType.NONE) continue;
                 Player.CurrentSelectedAdjacent = new PositionedBlock(targetPoint, block);
                 break;
             }

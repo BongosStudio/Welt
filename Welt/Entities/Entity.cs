@@ -3,6 +3,7 @@
 #endregion
 
 using System;
+using Microsoft.Xna.Framework;
 
 namespace Welt.Entities
 {
@@ -14,5 +15,9 @@ namespace Welt.Entities
         public event EventHandler Spawn;
         public event EventHandler Despawn;
 
+        public virtual void Update(GameTime time)
+        {
+            // insert logic here
+        }
     }
 }

@@ -7,10 +7,10 @@ namespace Welt.Forge.Generators.Decorations
         public Block[] GenerateDecoration(Chunk chunk, Vector3I anchor, params string[] args)
         {
             var trees = new Block[5*5*8];
-            trees[WorldHelpers.GetIndexFromPosition(3, 0, 3, 4, 7, 4)] = new Block(BlockType.Tree);
-            trees[WorldHelpers.GetIndexFromPosition(3, 1, 3, 4, 7, 4)] = new Block(BlockType.Tree);
-            trees[WorldHelpers.GetIndexFromPosition(3, 2, 3, 4, 7, 4)] = new Block(BlockType.Tree);
-            trees[WorldHelpers.GetIndexFromPosition(3, 3, 3, 4, 7, 4)] = new Block(BlockType.Tree);
+            trees[WorldHelpers.GetIndexFromPosition(3, 0, 3, 4, 7, 4)] = new Block(BlockType.TREE);
+            trees[WorldHelpers.GetIndexFromPosition(3, 1, 3, 4, 7, 4)] = new Block(BlockType.TREE);
+            trees[WorldHelpers.GetIndexFromPosition(3, 2, 3, 4, 7, 4)] = new Block(BlockType.TREE);
+            trees[WorldHelpers.GetIndexFromPosition(3, 3, 3, 4, 7, 4)] = new Block(BlockType.TREE);
             return trees;
         }
     }

@@ -28,6 +28,7 @@ namespace Welt.Physics
         private const float MAX_VELOCITY = 20f;
         private const float MAX_VELOCITY_WATER = 4f;
         private const float VELOCITY_DAMAGE_CAP = 5f; // each 0.5f would take 0.5f HP. 20f is instant death.
+        // TODO: player stamina catcher & updater
 
         #endregion
 
@@ -39,18 +40,47 @@ namespace Welt.Physics
 
         public void Move(GameTime gameTime)
         {
+            UpdateEntity(gameTime);
             UpdatePosition(gameTime);
 
-            var headbobOffset = ((float) Math.Sin(_mPlayer.HeadBob)*0.1f) + 0.15f;
+            var headbobOffset = (float) Math.Sin(_mPlayer.HeadBob)*GetPlayerHeadBob() + 0.15f;
             if (_mPlayer.Entity.IsInWater) headbobOffset = 0;
             _mCamera.Position = _mPlayer.Position + new Vector3(0, headbobOffset, 0);
         }
 
         #region UpdatePosition
 
+        public void UpdateEntity(GameTime time)
+        {
+            var kstate = Keyboard.GetState();
+            _mPlayer.Entity.IsRunning = kstate[Keys.LeftShift] == KeyState.Down && _mPlayer.Entity.Stamina > 0;
+            _mPlayer.Entity.IsCrouching = kstate[Keys.LeftControl] == KeyState.Down;
+
+            if (_mPlayer.Entity.IsRunning)
+            {
+                _mPlayer.Entity.Stamina -= 0.005f;
+            }
+            else                // TODO: make this shit better. 
+            {
+                _mPlayer.Entity.Stamina += 0.005f;
+            }
+            if (_mPlayer.Entity.Stamina < 0) _mPlayer.Entity.Stamina = 0;
+            if (_mPlayer.Entity.Stamina > 1) _mPlayer.Entity.Stamina = 1;
+        }
+
         private float GetPlayerSpeed()
         {
-            return _mPlayer.Entity.IsInWater ? 1.7f : 3.5f;
+            if (_mPlayer.Entity.IsInWater) return 1.7f;
+            if (_mPlayer.Entity.IsRunning) return 5.0f;
+            if (_mPlayer.Entity.IsCrouching) return 1.7f;
+            return 3.5f;
+        }
+
+        private float GetPlayerHeadBob()
+        {
+            if (_mPlayer.Entity.IsCrouching) return 0.05f;
+            if (_mPlayer.Entity.IsRunning) return 0.2f;
+            return 0.1f;
         }
 
         private float GetPlayerGravity()
@@ -63,7 +93,7 @@ namespace Welt.Physics
             var footPosition = _mPlayer.Position + new Vector3(0f, -1.5f, 0f);
             var headPosition = _mPlayer.Position + new Vector3(0f, 0.1f, 0f);
             // adjust to if in water
-            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.Water;
+            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.WATER;
 
             var velocity = GetPlayerGravity()*(float) gameTime.ElapsedGameTime.TotalSeconds;
             var min = _mPlayer.Entity.IsInWater ? -MAX_VELOCITY_WATER : -MAX_VELOCITY;
@@ -101,15 +131,15 @@ namespace Welt.Physics
                 // Logic for standing on a block.
                 switch (standingOnBlock)
                 {
-                    case BlockType.Water:
+                    case BlockType.WATER:
                         // play swimming sound
                         break;
-                    case BlockType.Dirt:
+                    case BlockType.DIRT:
                         // play dirt sound
                         break;
-                    case BlockType.Grass:
-                    case BlockType.LongGrass:
-                    case BlockType.Leaves:
+                    case BlockType.GRASS:
+                    case BlockType.LONG_GRASS:
+                    case BlockType.LEAVES:
                         // play rustling mix with grass movement
                         // maybe make an easter egg where it plays the pokemon thing with "A WILD BLAHBLAHBLAH APPEARED"?
                         // Idk, I like that idea so I may do it.
@@ -119,7 +149,7 @@ namespace Welt.Physics
                 //Logic for bumping your head on a block.
                 switch (hittingHeadOnBlock)
                 {
-                    case BlockType.Lava:
+                    case BlockType.LAVA:
                         // set the player on fire
                         break;
                 }

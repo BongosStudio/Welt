@@ -22,20 +22,20 @@ namespace Welt.Forge.Generators
             // Default to sunlit.. for caves
             var sunlit = true;
 
-            var blockType = BlockType.None;
+            var blockType = BlockType.NONE;
 
             //chunk.Blocks[x, groundHeight, z] = new Block(BlockType.Grass,true);
             //chunk.Blocks[x, 0, z] = new Block(BlockType.Dirt, true);
 
             var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
-            chunk.Blocks[offset + groundHeight] = new Block(BlockType.Grass);
-            chunk.Blocks[offset] = new Block(BlockType.Dirt);
+            chunk.Blocks[offset + groundHeight] = new Block(BlockType.GRASS);
+            chunk.Blocks[offset] = new Block(BlockType.DIRT);
 
             for (int y = Chunk.Max.Y; y >= 0; y--)
             {
                 if (y > groundHeight)
                 {
-                    blockType = BlockType.None;
+                    blockType = BlockType.NONE;
                 }
                 // Or we at or below ground height?
                 else if (y < groundHeight)
@@ -51,7 +51,7 @@ namespace Welt.Forge.Generators
 
                     if (initialNoise > 0.2f)
                     {
-                        blockType = BlockType.None;
+                        blockType = BlockType.NONE;
                     }
                     else
                     {
@@ -60,15 +60,15 @@ namespace Welt.Forge.Generators
                         if (sunlit)
                         {
                             sunlit = false;
-                            blockType = BlockType.Grass;
+                            blockType = BlockType.GRASS;
                             //chunk.addGrassBlock(x,y,z);
                         }
                         else
                         {
-                            blockType = BlockType.Dirt;
+                            blockType = BlockType.DIRT;
                             if (octave1 < 0.2f)
                             {
-                                blockType = BlockType.Rock;
+                                blockType = BlockType.ROCK;
                             }
                         }
                     }

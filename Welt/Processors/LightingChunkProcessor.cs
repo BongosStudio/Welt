@@ -42,7 +42,7 @@ namespace Welt.Processors
                         //for (byte y = Chunk.MAX.Y; y > 0; y--)
                         for (var y = Chunk.Max.Y; y > chunk.LowestNoneBlock.Y; y--)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.None) inShade = true;
+                            if (chunk.Blocks[offset + y].Id != BlockType.NONE) inShade = true;
                             chunk.Blocks[offset + y].Sun = (byte) (!inShade ? sunValue : 0);
                             
                             Block.GetLightLevel(chunk.Blocks[offset + y].Id, 
@@ -84,7 +84,7 @@ namespace Welt.Processors
         private void PropogateLightSun(Chunk chunk, byte x, byte y, byte z, byte light)
         {
             var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y + y;
-            if (chunk.Blocks[offset].Id != BlockType.None && chunk.Blocks[offset].Id != BlockType.Water) return;
+            if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
             if (chunk.Blocks[offset].Sun >= light) return;
             chunk.Blocks[offset].Sun = light;
 
@@ -115,7 +115,7 @@ namespace Welt.Processors
             try
             {
                 var offset = x * Chunk.FlattenOffset + z * Chunk.Size.Y + y;
-                if (chunk.Blocks[offset].Id != BlockType.None && chunk.Blocks[offset].Id != BlockType.Water) return;
+                if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
                 if (chunk.Blocks[offset].R >= lightR) return;
                 chunk.Blocks[offset].R = lightR;
                 if (chunk.State > ChunkState.Lighting) chunk.State = ChunkState.AwaitingBuild;
@@ -145,7 +145,7 @@ namespace Welt.Processors
             try
             {
                 var offset = x * Chunk.FlattenOffset + z * Chunk.Size.Y + y;
-                if (chunk.Blocks[offset].Id != BlockType.None && chunk.Blocks[offset].Id != BlockType.Water) return;
+                if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
                 if (chunk.Blocks[offset].G >= lightG) return;
                 chunk.Blocks[offset].G = lightG;
 
@@ -174,7 +174,7 @@ namespace Welt.Processors
             try
             {
                 var offset = x * Chunk.FlattenOffset + z * Chunk.Size.Y + y;
-                if (chunk.Blocks[offset].Id != BlockType.None && chunk.Blocks[offset].Id != BlockType.Water) return;
+                if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
                 if (chunk.Blocks[offset].B >= lightB) return;
                 chunk.Blocks[offset].B = lightB;
 
@@ -220,7 +220,7 @@ namespace Welt.Processors
                     //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                     for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                     {
-                        if (chunk.Blocks[offset + y].Id != BlockType.None) continue;
+                        if (chunk.Blocks[offset + y].Id != BlockType.NONE) continue;
                         // Sunlight
                         if (chunk.Blocks[offset + y].Sun > 1)
                         {
@@ -257,9 +257,9 @@ namespace Welt.Processors
                         //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                         for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.None &&
-                                chunk.Blocks[offset + y].Id != BlockType.Tree &&
-                                chunk.Blocks[offset + y].Id != BlockType.RedFlower) continue;
+                            if (chunk.Blocks[offset + y].Id != BlockType.NONE &&
+                                chunk.Blocks[offset + y].Id != BlockType.TREE &&
+                                chunk.Blocks[offset + y].Id != BlockType.RED_FLOWER) continue;
                             // Local light R
                             if (chunk.Blocks[offset + y].R > 1)
                             {
@@ -300,9 +300,9 @@ namespace Welt.Processors
                         //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                         for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.None &&
-                                chunk.Blocks[offset + y].Id != BlockType.Tree &&
-                                chunk.Blocks[offset + y].Id != BlockType.RedFlower) continue;
+                            if (chunk.Blocks[offset + y].Id != BlockType.NONE &&
+                                chunk.Blocks[offset + y].Id != BlockType.TREE &&
+                                chunk.Blocks[offset + y].Id != BlockType.RED_FLOWER) continue;
                             // Local light G
                             if (chunk.Blocks[offset + y].G > 1)
                             {
@@ -342,9 +342,9 @@ namespace Welt.Processors
                         //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                         for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.None &&
-                                chunk.Blocks[offset + y].Id != BlockType.Tree &&
-                                chunk.Blocks[offset + y].Id != BlockType.RedFlower) continue;
+                            if (chunk.Blocks[offset + y].Id != BlockType.NONE &&
+                                chunk.Blocks[offset + y].Id != BlockType.TREE &&
+                                chunk.Blocks[offset + y].Id != BlockType.RED_FLOWER) continue;
                             // Local light B
                             if (chunk.Blocks[offset + y].B > 1)
                             {

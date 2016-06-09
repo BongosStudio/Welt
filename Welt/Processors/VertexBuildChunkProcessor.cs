@@ -105,7 +105,7 @@ namespace Welt.Processors
 
                     for (var y = yLow; y < yHigh; y++)
                     {
-                        if (chunk.Blocks[offset + y].Id == BlockType.None) continue;
+                        if (chunk.Blocks[offset + y].Id == BlockType.NONE) continue;
                         if (Block.IsPlantBlock(chunk.Blocks[offset + y].Id))
                         {
                             BuildPlantVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
@@ -169,7 +169,7 @@ namespace Welt.Processors
             var z = (sbyte) chunkRelativePosition.Z;
 
 
-            var solidBlock = new Block(BlockType.Rock);
+            var solidBlock = new Block(BlockType.ROCK);
 
             var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
             var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
@@ -833,7 +833,7 @@ namespace Welt.Processors
         private void AddVertex(Chunk chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
             Vector3 vertexAdd, Vector3 normal, Vector2 uv1, float sunLight, Color localLight)
         {
-            if (blockType != BlockType.Water)
+            if (blockType != BlockType.WATER)
             {
                 chunk.VertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1, sunLight,
                     localLight.ToVector3()));
@@ -850,7 +850,7 @@ namespace Welt.Processors
         private void AddIndex(Chunk chunk, ushort blockType, short i1, short i2, short i3, short i4, short i5,
             short i6)
         {
-            if (blockType != BlockType.Water)
+            if (blockType != BlockType.WATER)
             {
                 chunk.IndexList.Add((short) (chunk.VertexCount + i1));
                 chunk.IndexList.Add((short) (chunk.VertexCount + i2));

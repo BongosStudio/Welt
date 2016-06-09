@@ -22,7 +22,7 @@ namespace Welt.Forge
                 {
                     for (byte z = 0; z < Chunk.Size.Z; z++)
                     {
-                        chunk.SetBlock(x, y, z, new Block(BlockType.None));
+                        chunk.SetBlock(x, y, z, new Block(BlockType.NONE));
                     }
                 }
             }

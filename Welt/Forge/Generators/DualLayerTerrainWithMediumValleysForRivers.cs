@@ -40,7 +40,7 @@ namespace Welt.Forge.Generators
                 ushort blockType;
                 if (y > _mUpperGroundHeight)
                 {
-                    blockType = BlockType.None;
+                    blockType = BlockType.NONE;
                 }
                 // Are we above the lower ground height?
                 else if (y > _mLowerGroundHeight)
@@ -52,18 +52,18 @@ namespace Welt.Forge.Generators
                     // We have a cave, draw air here.
                     if (caveNoise > 0.2f)
                     {
-                        blockType = BlockType.None;
+                        blockType = BlockType.NONE;
                     }
                     else
                     {
                         if (sunlit)
                         {
-                            blockType = y > Snowlevel + R.Next(3) ? BlockType.Snow : BlockType.Grass;
+                            blockType = y > Snowlevel + R.Next(3) ? BlockType.SNOW : BlockType.GRASS;
                             sunlit = false;
                         }
                         else
                         {
-                            blockType = BlockType.Dirt;
+                            blockType = BlockType.DIRT;
                         }
                     }
                 }
@@ -72,20 +72,20 @@ namespace Welt.Forge.Generators
                     // We are at the lower ground level
                     if (sunlit)
                     {
-                        blockType = BlockType.Grass;
+                        blockType = BlockType.GRASS;
                         sunlit = false;
                     }
                     else
                     {
-                        blockType = BlockType.Dirt;
+                        blockType = BlockType.DIRT;
                     }
                 }
 
-                if (blockType == BlockType.None && y <= Waterlevel)
+                if (blockType == BlockType.NONE && y <= Waterlevel)
                 {
                     //if (y <= WATERLEVEL)
                     //{
-                    blockType = BlockType.Lava;
+                    blockType = BlockType.LAVA;
                     sunlit = false;
                     //}
                 }
@@ -111,9 +111,9 @@ namespace Welt.Forge.Generators
                     for (byte y = Waterlevel + 9; y >= (byte) _mLowerGroundHeight; y--)
                     {
                         //blockType = chunk.Blocks[offset + y].Id;
-                        if (chunk.Blocks[offset + y].Id == BlockType.None)
+                        if (chunk.Blocks[offset + y].Id == BlockType.NONE)
                         {
-                            chunk.SetBlock(x, y, z, new Block(BlockType.Water));
+                            chunk.SetBlock(x, y, z, new Block(BlockType.WATER));
                             //blockType = BlockType.Water;
                         }
                         //else
@@ -132,11 +132,11 @@ namespace Welt.Forge.Generators
                     }
                     for (byte y = Waterlevel + 11; y >= Waterlevel; y--)
                     {
-                        if ((chunk.Blocks[offset + y].Id == BlockType.Dirt) ||
-                            (chunk.Blocks[offset + y].Id == BlockType.Grass) ||
-                            (chunk.Blocks[offset + y].Id == BlockType.Lava))
+                        if ((chunk.Blocks[offset + y].Id == BlockType.DIRT) ||
+                            (chunk.Blocks[offset + y].Id == BlockType.GRASS) ||
+                            (chunk.Blocks[offset + y].Id == BlockType.LAVA))
                         {
-                            chunk.SetBlock(x, y, z, new Block(BlockType.Sand));
+                            chunk.SetBlock(x, y, z, new Block(BlockType.SAND));
                         }
                     }
                 }
@@ -156,7 +156,7 @@ namespace Welt.Forge.Generators
                     var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
                     for (var y = _mUpperGroundHeight + 1; y >= Waterlevel + 9; y--)
                     {
-                        if (chunk.Blocks[offset + y].Id == BlockType.Grass)
+                        if (chunk.Blocks[offset + y].Id == BlockType.GRASS)
                         {
                             if (R.Next(700) == 1)
                             {
@@ -165,7 +165,7 @@ namespace Welt.Forge.Generators
                             else if (R.Next(50) == 1)
                             {
                                 y++;
-                                chunk.SetBlock(x, (byte) y, z, new Block(BlockType.RedFlower));
+                                chunk.SetBlock(x, (byte) y, z, new Block(BlockType.RED_FLOWER));
                             }
                             //else if (r.Next(2) == 1)
                             //{

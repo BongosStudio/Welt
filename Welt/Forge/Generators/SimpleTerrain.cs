@@ -53,7 +53,7 @@ namespace Welt.Forge.Generators
 
             var sunlit = true;
 
-            var blockType = BlockType.None;
+            var blockType = BlockType.NONE;
 
             for (int y = Chunk.Max.Y; y >= 0; y--)
             {
@@ -61,12 +61,12 @@ namespace Welt.Forge.Generators
                 {
                     if (sunlit)
                     {
-                        blockType = BlockType.Grass;
+                        blockType = BlockType.GRASS;
                         sunlit = false;
                     }
                     else
                     {
-                        blockType = BlockType.Rock;
+                        blockType = BlockType.ROCK;
                     }
                 }
                 chunk.SetBlock(blockXInChunk, (byte) y, blockZInChunk, new Block(blockType));
@@ -88,7 +88,7 @@ namespace Welt.Forge.Generators
             {
                 for (var y = ty; y < ty + height; y++)
                 {
-                    chunk.SetBlock(tx, y, tz, new Block(BlockType.Tree));
+                    chunk.SetBlock(tx, y, tz, new Block(BlockType.TREE));
                 }
             }
 
@@ -105,8 +105,8 @@ namespace Welt.Forge.Generators
                     if (chunk.OutOfBounds((byte) lx, (byte) ly, (byte) lz) == false)
                     {
                         //if (chunk.Blocks[lx, ly, lz].Id == BlockType.None)
-                        if (chunk.Blocks[lx*Chunk.FlattenOffset + lz*Chunk.Size.Y + ly].Id == BlockType.None)
-                            chunk.SetBlock((byte) lx, (byte) ly, (byte) lz, new Block(BlockType.Leaves));
+                        if (chunk.Blocks[lx*Chunk.FlattenOffset + lz*Chunk.Size.Y + ly].Id == BlockType.NONE)
+                            chunk.SetBlock((byte) lx, (byte) ly, (byte) lz, new Block(BlockType.LEAVES));
                     }
                     else
                     {
@@ -148,7 +148,7 @@ namespace Welt.Forge.Generators
             Debug.WriteLine("New tree    at {0},{1},{2}={3}", tx, ty, tz, height);
             for (var y = ty; y < ty + height; y++)
             {
-                chunk.SetBlock(tx, y, tz, new Block(BlockType.Tree));
+                chunk.SetBlock(tx, y, tz, new Block(BlockType.TREE));
             }
         }
 
@@ -183,7 +183,7 @@ namespace Welt.Forge.Generators
                     {
                         if (chunk.OutOfBounds((byte) (tx + xoff), (byte) y, (byte) (tz + zoff)) == false)
                         {
-                            chunk.SetBlock((byte) (tx + xoff), (byte) y, (byte) (tz + zoff), new Block(BlockType.Leaves));
+                            chunk.SetBlock((byte) (tx + xoff), (byte) y, (byte) (tz + zoff), new Block(BlockType.LEAVES));
                             //Debug.WriteLine("rad={0},xoff={1},zoff={2},y={3},start={4},end={5}", rad, xoff, zoff, y, start, end);
                         }
                     }

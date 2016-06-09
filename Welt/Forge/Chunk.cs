@@ -79,7 +79,7 @@ namespace Welt.Forge
 
         public void SetBlock(byte x, byte y, byte z, Block b)
         {
-            if (b.Id == BlockType.Water)
+            if (b.Id == BlockType.WATER)
             {
                 if (LowestNoneBlock.Y > y)
                 {
@@ -87,7 +87,7 @@ namespace Welt.Forge
                 }
             }
 
-            if (b.Id == BlockType.None)
+            if (b.Id == BlockType.NONE)
             {
                 if (LowestNoneBlock.Y > y)
                 {
@@ -126,7 +126,7 @@ namespace Welt.Forge
             if (rely < 0 || rely > Max.Y)
             {
                 //infinite Y : y bounds currently set as rock for never rendering those y bounds
-                return new Block(BlockType.Rock);
+                return new Block(BlockType.ROCK);
             }
 
             //handle the normal simple case
@@ -171,7 +171,7 @@ namespace Welt.Forge
             if (nChunk == null)
             {
                 //happens at current world bounds
-                return new Block(BlockType.Rock);
+                return new Block(BlockType.ROCK);
             }
             var block = nChunk.Blocks[x*FlattenOffset + z*Size.Y + rely];
             return block;

@@ -16,8 +16,8 @@ namespace Welt.Logic.Forge
             
             switch (block.Id)
             {
-                case BlockType.RedFlower:
-                    world.SetBlock(position, new Block(BlockType.Lava));
+                case BlockType.RED_FLOWER:
+                    world.SetBlock(position, new Block(BlockType.LAVA));
                     return true;
                 default:
                     return false;
