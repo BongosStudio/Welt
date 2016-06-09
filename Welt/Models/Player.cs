@@ -6,6 +6,7 @@
 using Microsoft.Xna.Framework;
 using Welt.Entities;
 using Welt.Forge;
+using Welt.Logic.Forge;
 using Welt.Types;
 
 #endregion
@@ -64,9 +65,15 @@ namespace Welt.Models
 
         public bool RightClick(GameTime time)
         {
-            if (Inventory[HotbarIndex].Block.Id == 0) return false; // TODO: use block
-            if (CurrentSelectedAdjacent != null)
-                World.SetBlock(CurrentSelectedAdjacent.Value.Position, Inventory[HotbarIndex].Block);
+            if (Inventory[HotbarIndex].Block.Id == 0) return false;
+            if (CurrentSelectedAdjacent != null &&
+                !BlockLogic.GetRightClick(World, CurrentSelectedAdjacent.Value.Position, this))
+            {
+
+                World.SetBlock(
+                    BlockLogic.DetermineTarget(World, CurrentSelection.Value.Position,
+                        CurrentSelectedAdjacent.Value.Position), Inventory[HotbarIndex].Block);
+            }
             return true;
         }
 

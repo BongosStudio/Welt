@@ -39,6 +39,7 @@ namespace Welt.Forge
         public const ushort Snow = 8;
         public const ushort RedFlower = 9;
         public const ushort LongGrass = 10;
+        public const ushort Torch = 90;
         public const ushort Water = 182;
         public const ushort Maximum = ushort.MaxValue;
     }
@@ -125,6 +126,11 @@ namespace Welt.Forge
                     red = 0;
                     green = 1;
                     blue = 3;
+                    return;
+                case BlockType.Torch:
+                    red = 10;
+                    green = 0;
+                    blue = 10;
                     return;
                 default:
                     red = 0;
@@ -257,6 +263,8 @@ namespace Welt.Forge
                     return BlockTexture.Rose;
                 case BlockType.LongGrass:
                     return BlockTexture.Grass;
+                case BlockType.Torch:
+                    return BlockTexture.Torch;
                 default:
                     return BlockTexture.Rock;
             }

@@ -35,6 +35,7 @@ namespace Welt.Blocks
         Grass = 39,
         Leaves = 53,
         Snow = 66,
+        Torch = 80,
 
         Lava = 289,
 

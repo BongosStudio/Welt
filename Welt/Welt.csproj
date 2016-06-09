@@ -125,6 +125,7 @@
     <Compile Include="IO\InputMap.cs" />
     <Compile Include="IO\WireChunk.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Logic\Forge\BlockLogic.cs" />
     <Compile Include="Managers\AudioManager.cs" />
     <Compile Include="Managers\ChunkManager.cs" />
     <Compile Include="Managers\TaskManager.cs" />
@@ -246,7 +247,6 @@
   <ItemGroup>
     <Folder Include="Console\" />
     <Folder Include="Forge\Renderers\ParticleSystems\" />
-    <Folder Include="Logic\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
