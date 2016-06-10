@@ -65,8 +65,11 @@ namespace Welt.Cameras
 
         public void Update(GameTime gameTime)
         {
-            if (Player.IsPaused) return;
             var previousView = Camera.View;
+
+            if (!FreeCam) _mPhysics.Move(gameTime);
+
+            if (Player.IsPaused) return; // this is here so we can still process the game while paused.
 
             if (FreeCam)
             {
@@ -77,9 +80,7 @@ namespace Welt.Cameras
             _mCameraController.Update(gameTime);
 
             Camera.Update(gameTime);
-
-            //Do not change methods order, its not very clean but works fine
-            if (!FreeCam) _mPhysics.Move(gameTime);
+            
 
             var mouseState = _mInput.GetMouseState();
             var scrollWheelDelta = _mInput.GetMouseState().ScrollWheelValue - mouseState.ScrollWheelValue;

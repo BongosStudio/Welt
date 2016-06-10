@@ -235,3 +235,9 @@
 /processorParam:Quality=Best
 /build:Sounds/menu-button.wma
 
+#begin Sounds\waves.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds\waves.wav
+

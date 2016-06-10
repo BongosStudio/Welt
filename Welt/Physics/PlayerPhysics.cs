@@ -4,6 +4,7 @@
 #region Using Statements
 
 using System;
+using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Welt.Blocks;
@@ -29,6 +30,7 @@ namespace Welt.Physics
         private const float MAX_VELOCITY_WATER = 4f;
         private const float VELOCITY_DAMAGE_CAP = 5f; // each 0.5f would take 0.5f HP. 20f is instant death.
         // TODO: player stamina catcher & updater
+        private TimeSpan _staminaReset = TimeSpan.Zero;
 
         #endregion
 
@@ -36,6 +38,7 @@ namespace Welt.Physics
         {
             _mPlayer = playerRenderer.Player;
             _mCamera = playerRenderer.Camera;
+            _mPlayer.Entity.PropertyChanged += OnEntityPropertyChanged;
         }
 
         public void Move(GameTime gameTime)
@@ -50,22 +53,53 @@ namespace Welt.Physics
 
         #region UpdatePosition
 
-        public void UpdateEntity(GameTime time)
+        private void OnEntityPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName.ToLower())
+            {
+                case "isrunning":
+                    // TODO: change FOV and change stamina
+                    if (_mPlayer.Entity.IsRunning)
+                    {
+                        _mPlayer.Entity.Stamina -= 0.005f;
+                    }
+                    break;
+                case "stamina":
+                    if (_mPlayer.Entity.Stamina == 0)
+                    {
+                        _staminaReset = TimeSpan.FromSeconds(3);
+                    }
+                    if (_mPlayer.Entity.Stamina > 1)
+                    {
+                        _mPlayer.Entity.Stamina = 1;
+                    }
+                    break;
+                case "isinwater":
+                    break;
+                case "iscrouching":
+                    // TODO: change model height and view height
+                    break;
+            }
+        }
+
+        private void UpdateEntity(GameTime time)
         {
             var kstate = Keyboard.GetState();
             _mPlayer.Entity.IsRunning = kstate[Keys.LeftShift] == KeyState.Down && _mPlayer.Entity.Stamina > 0;
             _mPlayer.Entity.IsCrouching = kstate[Keys.LeftControl] == KeyState.Down;
-
-            if (_mPlayer.Entity.IsRunning)
+            if (_staminaReset > TimeSpan.Zero) _staminaReset -= time.ElapsedGameTime;
+            if (_staminaReset <= TimeSpan.Zero)
             {
-                _mPlayer.Entity.Stamina -= 0.005f;
+                if (_mPlayer.Entity.Stamina < 0.25f)
+                {
+                    _mPlayer.Entity.Stamina = 0.25f;
+                    _staminaReset = TimeSpan.FromSeconds(5);
+                }
+                else
+                {
+                    _mPlayer.Entity.Stamina += 0.005f;
+                }
             }
-            else                // TODO: make this shit better. 
-            {
-                _mPlayer.Entity.Stamina += 0.005f;
-            }
-            if (_mPlayer.Entity.Stamina < 0) _mPlayer.Entity.Stamina = 0;
-            if (_mPlayer.Entity.Stamina > 1) _mPlayer.Entity.Stamina = 1;
         }
 
         private float GetPlayerSpeed()
@@ -78,8 +112,8 @@ namespace Welt.Physics
 
         private float GetPlayerHeadBob()
         {
-            if (_mPlayer.Entity.IsCrouching) return 0.05f;
-            if (_mPlayer.Entity.IsRunning) return 0.2f;
+            if (_mPlayer.Entity.IsCrouching) return 0.01f;
+            if (_mPlayer.Entity.IsRunning) return 0.15f;
             return 0.1f;
         }
 
@@ -171,18 +205,16 @@ namespace Welt.Physics
             var speedNormalize = _mPlayer.Entity.IsInWater ? 1f : 2f;
             if (kstate.IsKeyDown(Keys.Space))
             {
+                if (_mPlayer.Entity.IsInWater)
+                {
+                    _mPlayer.Position.Y += 0.05f;
+                }
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if ((Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
+                else if ((Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
                 {
                     _mPlayer.Velocity.Y = PLAYERJUMPVELOCITY;
                     var amountBelowSurface = ((ushort) footPosition.Y) + 1 - footPosition.Y;
                     _mPlayer.Position.Y += amountBelowSurface + 0.05f;
-                }
-                else if (_mPlayer.Entity.IsInWater)
-                {
-                    // handle swimming
-                    // TODO: to be completely frank, idk wtf to do here. Adjusting the velocity doesn't change
-                    // and we already slowed down the moving speed by using GetPlayerSpeed()
                 }
             }
 

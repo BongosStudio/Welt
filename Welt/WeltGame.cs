@@ -3,6 +3,7 @@
 #endregion
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -34,7 +35,7 @@ namespace Welt
         #endregion
         
         public WeltGame(string username, string key)
-        {          
+        {
             Instance = this;
 
             _graphics = new GraphicsDeviceManager(this)

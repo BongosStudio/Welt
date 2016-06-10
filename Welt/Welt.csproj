@@ -147,6 +147,7 @@
     <Compile Include="Profiling\FrameRateCounter.cs" />
     <Compile Include="Profiling\Utility.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\LoadScene.cs" />
     <Compile Include="Scenes\LoginScene.cs" />

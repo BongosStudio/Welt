@@ -45,7 +45,12 @@ namespace Welt.Models
             var player = new Player
             {
                 Username = username,
-                AuthToken = token
+                AuthToken = token,
+                Entity =
+                {
+                    Stamina = 1,
+                    Health = 1
+                }
             };
             Current = player;
         }

@@ -3,6 +3,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
@@ -18,6 +19,7 @@ namespace Welt.UI
         private GraphicsDevice _graphics;
         private Player _player;
         private UIComponent[] _guiElements;
+        private TextComponent _staminaElement;
         private int _currentMenuIndex;
         
         private ColumnPanelComponent _hotbar;
@@ -65,9 +67,21 @@ namespace Welt.UI
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 BackgroundColor = Color.Gray,
+                
             };
             
             _hotbar.ApplyToChildren(TextComponent.ForegroundProperty, Color.White);
+            _hotbar.ApplyToChildren(UIComponent.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            _hotbar.ApplyToChildren(UIComponent.MarginProperty, new BoundsBox(10, 0, 0, 0));
+
+            _staminaElement = new TextComponent(_player.Entity.Stamina.ToString("F"), "staminatxt", device);
+            _player.Entity.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName.ToLower() == "stamina")
+                {
+                    _staminaElement.Text = _player.Entity.Stamina.ToString("F");
+                }
+            };
         }
 
         public void Initialize()
@@ -76,6 +90,7 @@ namespace Welt.UI
             {
                 elem.Initialize();
                 _hotbar.Initialize();
+                _staminaElement.Initialize();
             }
         }
 
@@ -86,6 +101,7 @@ namespace Welt.UI
             {
                 _currentMenuIndex = 0;
                 _hotbar.Update(time);
+                _staminaElement.Update(time);
             }
         }
 
@@ -99,6 +115,7 @@ namespace Welt.UI
             else
             {
                 _hotbar.Draw(time);
+                _staminaElement.Draw(time);
             }
         }
     }
