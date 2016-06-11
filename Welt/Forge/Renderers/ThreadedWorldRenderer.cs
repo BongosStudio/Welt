@@ -315,7 +315,7 @@ namespace Welt.Forge.Renderers
             if (chunk.State == ChunkState.AwaitingGenerate)
             {
                 chunk.State = ChunkState.Generating;
-                _mWorld.Generator.Generate(chunk);
+                _mWorld.Generator.Generate(_mWorld, chunk);
                 chunk.State = ChunkState.AwaitingLighting;
             }
             return chunk;
@@ -985,7 +985,7 @@ namespace Welt.Forge.Renderers
                 if (chunk.State == ChunkState.AwaitingGenerate)
                 {
                     chunk.State = ChunkState.Generating;
-                    _mWorld.Generator.Generate(chunk);
+                    _mWorld.Generator.Generate(_mWorld, chunk);
                     chunk.State = ChunkState.AwaitingLighting;
                 }
                 return chunk;

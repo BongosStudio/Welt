@@ -23,7 +23,7 @@ namespace Welt.Scenes
         private GuiRenderer _mGui;
         private readonly Player _mPlayer;
         private readonly PlayerRenderer _mPlayerRenderer;
-        private DiagnosticWorldRenderer _mDiagnosticWorldRenderer;
+        private DiagnosticWorldRenderer _mWorldRenderer;
         private bool _mDiagnosticMode;
         private bool _mReleaseMouse;
         private KeyboardState _mOldKeyboardState;
@@ -56,7 +56,7 @@ namespace Welt.Scenes
         {
             _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayerRenderer);
             _mGui = new GuiRenderer(GraphicsDevice, _mPlayer);
-            _mDiagnosticWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
+            _mWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
             
             base.Initialize();                  
             _mHud.Initialize();
@@ -64,7 +64,7 @@ namespace Welt.Scenes
             #region choose renderer
 
             //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);          
-            _mDiagnosticWorldRenderer.Initialize();
+            _mWorldRenderer.Initialize();
 
             #endregion
 
@@ -134,7 +134,7 @@ namespace Welt.Scenes
         protected override void LoadContent()
         {
             
-            _mDiagnosticWorldRenderer.LoadContent(WeltGame.Instance.Content);
+            _mWorldRenderer.LoadContent(WeltGame.Instance.Content);
             _mHud.LoadContent(WeltGame.Instance.Content);
         }
 
@@ -329,7 +329,7 @@ namespace Welt.Scenes
                 _mRenderer.Update(gameTime);
                 if (_mDiagnosticMode)
                 {
-                    _mDiagnosticWorldRenderer.Update(gameTime);
+                    _mWorldRenderer.Update(gameTime);
                 }
                 base.Update(gameTime);
             }
@@ -353,7 +353,7 @@ namespace Welt.Scenes
             _mRenderer.Draw(gameTime);
             if (_mDiagnosticMode)
             {
-                _mDiagnosticWorldRenderer.Draw(gameTime);
+                _mWorldRenderer.Draw(gameTime);
             }
             _mPlayerRenderer.Draw(gameTime);
             _mHud.Draw(gameTime);

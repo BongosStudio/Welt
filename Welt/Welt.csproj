@@ -136,6 +136,171 @@
     <Compile Include="Models\InventoryContainer.cs" />
     <Compile Include="Models\Maybe.cs" />
     <Compile Include="Models\Player.cs" />
+    <Compile Include="MonoGame.Extended\Angle.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Animation.cs" />
+    <Compile Include="MonoGame.Extended\Animations\AnimationComponent.cs" />
+    <Compile Include="MonoGame.Extended\Animations\SpriteSheets\SpriteSheetAnimation.cs" />
+    <Compile Include="MonoGame.Extended\Animations\SpriteSheets\SpriteSheetAnimationData.cs" />
+    <Compile Include="MonoGame.Extended\Animations\SpriteSheets\SpriteSheetAnimationFactory.cs" />
+    <Compile Include="MonoGame.Extended\Animations\SpriteSheets\SpriteSheetAnimationFactoryReader.cs" />
+    <Compile Include="MonoGame.Extended\Animations\SpriteSheets\SpriteSheetAnimator.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\DelayTween.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\EasingFunctions.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\FluentTweening.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\PropertyTween.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\TweenAnimation.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\TweenChain.cs" />
+    <Compile Include="MonoGame.Extended\Animations\Tweens\TweenGroup.cs" />
+    <Compile Include="MonoGame.Extended\BitmapFonts\BitmapFont.cs" />
+    <Compile Include="MonoGame.Extended\BitmapFonts\BitmapFontExtensions.cs" />
+    <Compile Include="MonoGame.Extended\BitmapFonts\BitmapFontReader.cs" />
+    <Compile Include="MonoGame.Extended\BitmapFonts\BitmapFontRegion.cs" />
+    <Compile Include="MonoGame.Extended\Camera2D.cs" />
+    <Compile Include="MonoGame.Extended\Collections\BitVector32.cs" />
+    <Compile Include="MonoGame.Extended\Collections\Deque.cs" />
+    <Compile Include="MonoGame.Extended\Collections\ListExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Collections\Pool.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\CollisionActor.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\CollisionGrid.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\CollisionGridCell.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\CollisionGridCellFlag.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\CollisionInfo.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\CollisionWorld.cs" />
+    <Compile Include="MonoGame.Extended\Collisions\IActorTarget.cs" />
+    <Compile Include="MonoGame.Extended\Content\ContentManagerExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Content\ContentReaderExtensions.cs" />
+    <Compile Include="MonoGame.Extended\EventHandlerExtensions.cs" />
+    <Compile Include="MonoGame.Extended\FastRandom.cs" />
+    <Compile Include="MonoGame.Extended\FramesPerSecondCounter.cs" />
+    <Compile Include="MonoGame.Extended\FramesPerSecondCounterComponent.cs" />
+    <Compile Include="MonoGame.Extended\GameTimeExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\BatchDrawer.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\BatchDrawOperation.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\BatchDrawStrategy.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\BatchMode.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\BatchQueuer.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\DeferredBatchQueuer.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\DynamicVertexBufferBatchDrawer.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\ImmediateBatchQueuer.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\PrimitiveBatch.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\PrimitiveBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\Batching\UserPrimitivesBatchDrawer.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\EffectMaterial.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\IDrawContext.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\IDrawContextTexture2D.cs" />
+    <Compile Include="MonoGame.Extended\Graphics\PrimitiveTypeExtensions.cs" />
+    <Compile Include="MonoGame.Extended\IColorable.cs" />
+    <Compile Include="MonoGame.Extended\IDraw.cs" />
+    <Compile Include="MonoGame.Extended\IMovable.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\GamePadEventArgs.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\GamePadListener.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\GamePadListenerSettings.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\InputListener.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\InputListenerManager.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\InputListenerSettings.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\KeyboardEventArgs.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\KeyboardListener.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\KeyboardListenerSettings.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\KeyboardModifiers.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\MouseButton.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\MouseEventArgs.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\MouseListener.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\MouseListenerSettings.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\TouchEventArgs.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\TouchListener.cs" />
+    <Compile Include="MonoGame.Extended\InputListeners\TouchListenerSettings.cs" />
+    <Compile Include="MonoGame.Extended\IPoolable.cs" />
+    <Compile Include="MonoGame.Extended\IRotatable.cs" />
+    <Compile Include="MonoGame.Extended\IScalable.cs" />
+    <Compile Include="MonoGame.Extended\IUpdate.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\CollisionWorldExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\SpriteBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledImageLayer.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledLayer.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledMap.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledMapOrientation.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledMapReader.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledObject.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledObjectGroup.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledProperties.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledRenderOrder.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledTile.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledTileLayer.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledTileSet.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledTileSetTile.cs" />
+    <Compile Include="MonoGame.Extended\Maps\Tiled\TiledTileSetTileFrame.cs" />
+    <Compile Include="MonoGame.Extended\MatrixExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Particles\ColorExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Particles\FastRandomExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Particles\HslColor.cs" />
+    <Compile Include="MonoGame.Extended\Particles\LineSegment.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\AgeModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Containers\CircleContainerModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Containers\RectangleContainerModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Containers\RectangleLoopContainerModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\DragModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\IModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Interpolators\ColorInterpolator.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Interpolators\HueInterpolator.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Interpolators\IInterpolator.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Interpolators\OpacityInterpolator.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Interpolators\RotationInterpolator.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\Interpolators\ScaleInterpolator.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\LinearGravityModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\OpacityFastFadeModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\RotationModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\VelocityColorModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\VelocityModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Modifiers\VortexModifier.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Particle.cs" />
+    <Compile Include="MonoGame.Extended\Particles\ParticleBuffer.cs" />
+    <Compile Include="MonoGame.Extended\Particles\ParticleEffect.cs" />
+    <Compile Include="MonoGame.Extended\Particles\ParticleEmitter.cs" />
+    <Compile Include="MonoGame.Extended\Particles\ParticleModifierExecutionStrategy.cs" />
+    <Compile Include="MonoGame.Extended\Particles\ParticleReleaseParameters.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\BoxFillProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\BoxProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\BoxUniformProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\CircleProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\LineProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\PointProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\Profile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\RingProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\Profiles\SprayProfile.cs" />
+    <Compile Include="MonoGame.Extended\Particles\SpriteBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\RandomExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Range.cs" />
+    <Compile Include="MonoGame.Extended\RenderTarget2DExtensions.cs" />
+    <Compile Include="MonoGame.Extended\SceneGraphs\ISceneEntity.cs" />
+    <Compile Include="MonoGame.Extended\SceneGraphs\SceneEntityCollection.cs" />
+    <Compile Include="MonoGame.Extended\SceneGraphs\SceneGraph.cs" />
+    <Compile Include="MonoGame.Extended\SceneGraphs\SceneNode.cs" />
+    <Compile Include="MonoGame.Extended\SceneGraphs\SceneNodeCollection.cs" />
+    <Compile Include="MonoGame.Extended\SceneGraphs\SpriteBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Shapes\CircleF.cs" />
+    <Compile Include="MonoGame.Extended\Shapes\PolygonF.cs" />
+    <Compile Include="MonoGame.Extended\Shapes\RectangleExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Shapes\RectangleF.cs" />
+    <Compile Include="MonoGame.Extended\Shapes\ShapeF.cs" />
+    <Compile Include="MonoGame.Extended\Shapes\SpriteBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\Size.cs" />
+    <Compile Include="MonoGame.Extended\Sprites\Sprite.cs" />
+    <Compile Include="MonoGame.Extended\Sprites\SpriteAnimator.cs" />
+    <Compile Include="MonoGame.Extended\Sprites\SpriteBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\TextureAtlases\SpriteBatchExtensions.cs" />
+    <Compile Include="MonoGame.Extended\TextureAtlases\TextureAtlas.cs" />
+    <Compile Include="MonoGame.Extended\TextureAtlases\TextureAtlasReader.cs" />
+    <Compile Include="MonoGame.Extended\TextureAtlases\TextureRegion2D.cs" />
+    <Compile Include="MonoGame.Extended\Timers\ContinuousClock.cs" />
+    <Compile Include="MonoGame.Extended\Timers\CountdownTimer.cs" />
+    <Compile Include="MonoGame.Extended\Timers\GameTimer.cs" />
+    <Compile Include="MonoGame.Extended\Timers\TimerState.cs" />
+    <Compile Include="MonoGame.Extended\Vector2Extensions.cs" />
+    <Compile Include="MonoGame.Extended\ViewportAdapters\BoxingViewportAdapter.cs" />
+    <Compile Include="MonoGame.Extended\ViewportAdapters\DefaultViewportAdapter.cs" />
+    <Compile Include="MonoGame.Extended\ViewportAdapters\ScalingViewportAdapter.cs" />
+    <Compile Include="MonoGame.Extended\ViewportAdapters\ViewportAdapter.cs" />
+    <Compile Include="MonoGame.Extended\ViewportAdapters\WindowViewportAdapter.cs" />
     <Compile Include="Persistence\ChunkPersistence.cs" />
     <Compile Include="Persistence\FakeChunkPersistence.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
@@ -188,9 +353,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.5.1.1679, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.5.1.1679\lib\net40\MonoGame.Framework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MonoGame.Framework, Version=3.5.0.921, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Sec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -198,6 +363,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -242,7 +408,8 @@
     <None Include="Content\Models\skydometex_0.xnb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
+    <None Include="MonoGame.Extended\Animations\SpriteSheetAnimation.cs~8df2635... renamed the new key frame animations to sprite sheet animations" />
+    <None Include="MonoGame.Extended\Animations\SpriteSheetAnimation.cs~HEAD" />
     <None Include="UI\Framework\README.md" />
   </ItemGroup>
   <ItemGroup>

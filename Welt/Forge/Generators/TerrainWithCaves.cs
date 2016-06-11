@@ -7,7 +7,7 @@ namespace Welt.Forge.Generators
     {
         #region generateTerrain
 
-        protected override sealed void GenerateTerrain(Chunk chunk, byte x, byte z, uint blockX, uint blockZ)
+        protected sealed override void GenerateTerrain(World world, Chunk chunk, byte x, byte z, uint blockX, uint blockZ)
         {
             var groundHeight = (int) GetBlockNoise(blockX, blockZ);
             if (groundHeight < 1)
@@ -43,7 +43,7 @@ namespace Welt.Forge.Generators
                     // Since we are at or below ground height, let's see if we need
                     // to make
                     // a cave
-                    var noiseX = (blockX + (uint) World.Seed);
+                    var noiseX = (blockX + (uint) world.Seed);
                     var octave1 = PerlinSimplexNoise.Noise(noiseX*0.009f, blockZ*0.009f, y*0.009f)*0.25f;
 
                     var initialNoise = octave1 + PerlinSimplexNoise.Noise(noiseX*0.04f, blockZ*0.04f, y*0.04f)*0.15f;

@@ -7,7 +7,7 @@ namespace Welt.Forge.Generators
     {
         #region build
 
-        public void Generate(Chunk chunk)
+        public void Generate(World world, Chunk chunk)
         {
             int sizeY = Chunk.Size.Y;
             int sizeX = Chunk.Size.X;

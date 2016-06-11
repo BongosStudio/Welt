@@ -1,0 +1,16 @@
+using Microsoft.Xna.Framework;
+using Welt.MonoGame.Extended.Shapes;
+
+namespace Welt.MonoGame.Extended.Collisions
+{
+    public interface ICollidable
+    {
+        RectangleF BoundingBox { get; }
+    }
+
+    public interface IActorTarget : IMovable, ICollidable
+    {
+        Vector2 Velocity { get; set; }
+        void OnCollision(CollisionInfo collisionInfo);
+    }
+}

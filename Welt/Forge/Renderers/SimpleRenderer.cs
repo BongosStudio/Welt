@@ -20,7 +20,7 @@ namespace Welt.Forge.Renderers
 {
     internal class SimpleRenderer : IRenderer
     {
-        private const byte BUILD_RANGE = 4;
+        private const byte BUILD_RANGE = 12;
         private const byte LIGHT_RANGE = BUILD_RANGE + 1;
         private const byte GENERATE_RANGE_LOW = LIGHT_RANGE + 1;
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;
@@ -32,6 +32,7 @@ namespace Welt.Forge.Renderers
         protected Texture2D TextureAtlas;
         private float _mTod;
         private bool _mIsRunning;
+        private bool _mIsInitialized;
         private VertexBuildChunkProcessor _mVertexBuildChunkProcessor;
         protected Effect WaterBlockEffect;
         protected Effect GrassBlockEffect;
@@ -43,10 +44,12 @@ namespace Welt.Forge.Renderers
             _world = world;
             _world.Renderer = this;
             _mIsRunning = true;
+            _mIsInitialized = false;
         }
 
         public void Initialize()
         {
+            if (_mIsInitialized) return;
             _mVertexBuildChunkProcessor = new VertexBuildChunkProcessor(_graphicsDevice);
             _lightingChunkProcessor = new LightingChunkProcessor();
 
@@ -59,6 +62,7 @@ namespace Welt.Forge.Renderers
             Debug.WriteLine("Build initial chunks");
             _world.VisitChunks(DoBuild, BUILD_RANGE);
             LoadStepCompleted?.Invoke(this, EventArgs.Empty);
+            _mIsInitialized = true;
         }
 
         public void LoadContent(ContentManager content)
@@ -189,7 +193,7 @@ namespace Welt.Forge.Renderers
         private Chunk DoGenerate(Chunk chunk)
         {
             _world.Chunks[chunk.Index.X, chunk.Index.Z] = chunk;
-            _world.Generator.Generate(chunk);
+            _world.Generator.Generate(_world, chunk);
             return chunk;
         }
 

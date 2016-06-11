@@ -38,6 +38,12 @@ namespace Welt.Forge
             //Chunks = new Dictionary2<Chunk>();//
             Chunks = new ChunkManager(new ChunkPersistence());
             Name = name;
+            Seed = 54321;
+        }
+
+        public World(string name, int seed) : this(name)
+        {
+            Seed = seed;
         }
 
         public void ToggleRasterMode()
@@ -87,7 +93,7 @@ namespace Welt.Forge
         //public const byte VIEW_CHUNKS_Z = 8;
         
         public string Name { get; }
-        public static int Seed = 54321;
+        public int Seed { get; }
 
         public static uint Origin = 1000;
         //TODO UInt32 requires decoupling rendering coordinates to avoid float problems

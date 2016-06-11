@@ -17,6 +17,7 @@ namespace Welt.Processors
     {
         private const int MAX_SUN_VALUE = 16;
         private readonly Random _mR = new Random();
+        private byte _r, _g, _b;
 
         public void ProcessChunk(Chunk chunk)
         {
@@ -257,13 +258,12 @@ namespace Welt.Processors
                         //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                         for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.NONE &&
-                                chunk.Blocks[offset + y].Id != BlockType.TREE &&
-                                chunk.Blocks[offset + y].Id != BlockType.RED_FLOWER) continue;
+                            Block.GetLightLevel(chunk.Blocks[offset + y].Id, out _r, out _g, out _b);
+              
                             // Local light R
-                            if (chunk.Blocks[offset + y].R > 1)
+                            if (_r > 1)
                             {
-                                var light = Attenuate(chunk.Blocks[offset + y].R);
+                                var light = Attenuate(_r);
 
                                 if (x > 0) PropogateLightR(chunk, (byte)(x - 1), y, z, light);
                                 if (x < Chunk.Max.X) PropogateLightR(chunk, (byte)(x + 1), y, z, light);
@@ -300,13 +300,13 @@ namespace Welt.Processors
                         //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                         for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.NONE &&
-                                chunk.Blocks[offset + y].Id != BlockType.TREE &&
-                                chunk.Blocks[offset + y].Id != BlockType.RED_FLOWER) continue;
+
+                            Block.GetLightLevel(chunk.Blocks[offset + y].Id, out _r, out _g, out _b);
+
                             // Local light G
-                            if (chunk.Blocks[offset + y].G > 1)
+                            if (_g > 1)
                             {
-                                var light = Attenuate(chunk.Blocks[offset + y].G);
+                                var light = Attenuate(_g);
                                 if (x > 0) PropogateLightG(chunk, (byte)(x - 1), y, z, light);
                                 if (x < Chunk.Max.X) PropogateLightG(chunk, (byte)(x + 1), y, z, light);
                                 if (y > 0) PropogateLightG(chunk, x, (byte)(y - 1), z, light);
@@ -342,13 +342,13 @@ namespace Welt.Processors
                         //for (byte y = 0; y < Chunk.SIZE.Y; y++)
                         for (var y = chunk.LowestNoneBlock.Y; y < Chunk.Size.Y; y++)
                         {
-                            if (chunk.Blocks[offset + y].Id != BlockType.NONE &&
-                                chunk.Blocks[offset + y].Id != BlockType.TREE &&
-                                chunk.Blocks[offset + y].Id != BlockType.RED_FLOWER) continue;
+
+                            Block.GetLightLevel(chunk.Blocks[offset + y].Id, out _r, out _g, out _b);
+
                             // Local light B
-                            if (chunk.Blocks[offset + y].B > 1)
+                            if (_b > 1)
                             {
-                                var light = Attenuate(chunk.Blocks[offset + y].B);
+                                var light = Attenuate(_b);
                                 if (x > 0) PropogateLightB(chunk, (byte)(x - 1), y, z, light);
                                 if (x < Chunk.Max.X) PropogateLightB(chunk, (byte)(x + 1), y, z, light);
                                 if (y > 0) PropogateLightB(chunk, x, (byte)(y - 1), z, light);

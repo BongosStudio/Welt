@@ -5,6 +5,6 @@ namespace Welt.Forge.Generators
 {
     public interface IChunkGenerator
     {
-        void Generate(Chunk chunk);
+        void Generate(World world, Chunk chunk);
     }
 }

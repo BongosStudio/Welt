@@ -30,6 +30,8 @@ namespace WeltLauncher.Pages
     {
         private readonly AuthService _auth;
         private static readonly HttpClient _client = new HttpClient();
+        private static bool _hasInstalledUpdates = false;
+        private static Task _updateTask;
 
         public Home()
         {
@@ -99,17 +101,20 @@ namespace WeltLauncher.Pages
                 }
 
                 #endregion
+
+                _hasInstalledUpdates = true;
             }
             StatusTxt.Text = "";
 
             #endregion
         }
 
-        private async Task<bool> RequiresUpdate()
+        private static async Task<bool> RequiresUpdate()
         {
-            
+            if (_hasInstalledUpdates) return false;
             var clientv = MainWindow.Settings["version"];
             var gamev = await _client.GetStringAsync(ApiResources.GetUrl(ApiResources.RESX_VER));
+            MainWindow.Settings.Save();
             return gamev != clientv;
         }
 

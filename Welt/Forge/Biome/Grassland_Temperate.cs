@@ -11,15 +11,15 @@ namespace Welt.Forge.Biome
 {
     internal class GrasslandTemperate : SimpleTerrain
     {
-        public override void Generate(Chunk chunk)
+        public override void Generate(World world, Chunk chunk)
         {
-            base.Generate(chunk);
+            base.Generate(world, chunk);
             //GenerateWaterSandLayer(chunk);
         }
 
         #region generateTerrain
 
-        protected override sealed void GenerateTerrain(Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
+        protected sealed override void GenerateTerrain(World world, Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
             uint worldZ)
         {
             var lowerGroundHeight = GetLowerGroundHeight(chunk, worldX, worldZ);

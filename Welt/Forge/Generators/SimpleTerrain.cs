@@ -15,16 +15,17 @@ namespace Welt.Forge.Generators
     {
         #region build
 
-        public virtual void Generate(Chunk chunk)
+        public virtual void Generate(World world, Chunk chunk)
         {
+            if (R == null) R = new Random(world.Seed);
             for (byte x = 0; x < Chunk.Size.X; x++)
             {
-                var worldX = chunk.Position.X + x + (uint) World.Seed;
+                var worldX = chunk.Position.X + x + (uint) world.Seed;
 
                 for (byte z = 0; z < Chunk.Size.Z; z++)
                 {
                     var worldZ = chunk.Position.Z + z;
-                    GenerateTerrain(chunk, x, z, worldX, worldZ);
+                    GenerateTerrain(world, chunk, x, z, worldX, worldZ);
                 }
             }
             chunk.State = ChunkState.AwaitingBuild;
@@ -35,7 +36,7 @@ namespace Welt.Forge.Generators
 
         #region generateTerrain
 
-        protected virtual void GenerateTerrain(Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
+        protected virtual void GenerateTerrain(World world, Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
             uint worldY)
         {
             // The lower ground level is at least this high.
@@ -199,7 +200,7 @@ namespace Welt.Forge.Generators
         public const int Snowlevel = 95;
         public const int Minimumgroundheight = 32; //Chunk.SIZE.Y / 4;
 
-        public Random R = new Random(World.Seed);
+        public Random R;
 
         #endregion
     }

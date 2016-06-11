@@ -16,9 +16,9 @@ namespace Welt.Forge.Generators
         private float _mLowerGroundHeight;
         private int _mUpperGroundHeight;
 
-        public override void Generate(Chunk chunk)
+        public override void Generate(World world, Chunk chunk)
         {
-            base.Generate(chunk);
+            base.Generate(world, chunk);
             GenerateWaterSandLayer(chunk);
             GenerateTreesFlowers(chunk);
             chunk.State = ChunkState.AwaitingBuild;
@@ -26,7 +26,7 @@ namespace Welt.Forge.Generators
 
         #region generateTerrain
 
-        protected override sealed void GenerateTerrain(Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
+        protected sealed override void GenerateTerrain(World world, Chunk chunk, byte blockXInChunk, byte blockZInChunk, uint worldX,
             uint worldZ)
         {
             _mLowerGroundHeight = GetLowerGroundHeight(chunk, worldX, worldZ);

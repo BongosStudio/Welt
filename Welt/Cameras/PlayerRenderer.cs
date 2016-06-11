@@ -44,9 +44,10 @@ namespace Welt.Cameras
         {
             Camera.Initialize();
             Camera.Position = new Vector3(World.Origin*Chunk.Size.X, Chunk.Size.Y, World.Origin*Chunk.Size.Z);
+            // TODO: change the Y of the spawn position so we don't fall please?
             Player.Position = Camera.Position;
-            Camera.LookAt(Vector3.Down);
-
+            Camera.LookAt(Vector3.Forward);
+            // TODO: load the previous data of position
             _mCameraController.Initialize();
 
             // SelectionBlock
