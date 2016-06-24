@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Welt.API.Forge;
 using Welt.Blocks;
 using Welt.Models;
 using Welt.Types;
@@ -16,7 +17,7 @@ using Welt.Types;
 
 namespace Welt.Forge
 {
-    public class Chunk
+    public class Chunk : IChunk
     {
         private const byte MAX_SUN_VALUE = 16;
 

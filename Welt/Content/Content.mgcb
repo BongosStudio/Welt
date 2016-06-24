@@ -241,3 +241,21 @@
 /processorParam:Quality=Best
 /build:Sounds\waves.wav
 
+#begin Fonts/Arial_9_Regular.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Arial_9_Regular.spritefont
+
+#begin Fonts/Code_7x5_13.5_Regular.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Code_7x5_13.5_Regular.spritefont
+
+#begin Fonts/Arial_13.5_Regular.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Arial_13.5_Regular.spritefont
+

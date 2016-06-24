@@ -5,6 +5,7 @@ namespace Welt.API.Forge
 {
     public interface IWorld
     {
-         
+        string Name { get; }
+        int Seed { get; }
     }
 }

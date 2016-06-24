@@ -3,6 +3,11 @@
 #endregion
 using System;
 using System.Diagnostics;
+using EmptyKeys.UserInterface;
+using EmptyKeys.UserInterface.Controls;
+using EmptyKeys.UserInterface.Generated;
+using EmptyKeys.UserInterface.Mvvm;
+using GameUILibrary.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
@@ -10,7 +15,6 @@ using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
 using Welt.Models;
-using Welt.UI;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 
 namespace Welt.Scenes
@@ -20,7 +24,6 @@ namespace Welt.Scenes
         private readonly World _mWorld;
         private readonly IRenderer _mRenderer;
         private HudRenderer _mHud;
-        private GuiRenderer _mGui;
         private readonly Player _mPlayer;
         private readonly PlayerRenderer _mPlayerRenderer;
         private DiagnosticWorldRenderer _mWorldRenderer;
@@ -31,6 +34,8 @@ namespace Welt.Scenes
         private Vector2 _mPreviousPauseMousePosition;
         
         protected override Color BackColor => Color.Black;
+        internal override UIRoot UI => new Play();
+        internal override ViewModelBase DataContext { get; set; }
 
         public PlayScene(Game game, World worldToHandoff, IRenderer rendererToHandoff, SkyDomeRenderer skyToHandoff,
             PlayerRenderer playerToHandoff) : base(game)
@@ -42,6 +47,29 @@ namespace Welt.Scenes
             _mPlayer = playerToHandoff.Player;
             _mPreviousPauseMousePosition = new Vector2(FirstPersonCameraController.DefaultMouseState.X,
                 FirstPersonCameraController.DefaultMouseState.Y);
+
+            var viewModel = new PlayViewModel();
+            AssignKeyToEvent(() =>
+            {
+                if (_mPlayer.IsPaused)
+                {
+                    _mPreviousPauseMousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                    Mouse.SetPosition(FirstPersonCameraController.DefaultMouseState.X,
+                        FirstPersonCameraController.DefaultMouseState.Y);
+                    viewModel.PauseMenuVisibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    Mouse.SetPosition((int)_mPreviousPauseMousePosition.X, (int)_mPreviousPauseMousePosition.Y);
+                    viewModel.PauseMenuVisibility = Visibility.Visible;
+                }
+                _mPlayer.IsPaused = !_mPlayer.IsPaused;
+                WeltGame.Instance.IsMouseVisible = !WeltGame.Instance.IsMouseVisible;
+                Console.WriteLine(viewModel.PauseMenuVisibility);
+
+                return true;
+            }, Keys.Escape);
+            DataContext = viewModel;
         }
 
         #region Initialize
@@ -55,7 +83,6 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayerRenderer);
-            _mGui = new GuiRenderer(GraphicsDevice, _mPlayer);
             _mWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
             
             base.Initialize();                  
@@ -67,8 +94,8 @@ namespace Welt.Scenes
             _mWorldRenderer.Initialize();
 
             #endregion
+            
 
-            _mGui.Initialize();
 
             #region Initialize Keys
 
@@ -93,23 +120,23 @@ namespace Welt.Scenes
                 return true;
             }, Keys.OemTilde);
             
-            AssignKeyToEvent(() =>
-            {
-                if (_mPlayer.IsPaused)
-                {
-                    _mPreviousPauseMousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-                    Mouse.SetPosition(FirstPersonCameraController.DefaultMouseState.X,
-                        FirstPersonCameraController.DefaultMouseState.Y);
-                }
-                else
-                {
-                    Mouse.SetPosition((int) _mPreviousPauseMousePosition.X, (int) _mPreviousPauseMousePosition.Y);
-                }
-                _mPlayer.IsPaused = !_mPlayer.IsPaused;
-                WeltGame.Instance.IsMouseVisible = !WeltGame.Instance.IsMouseVisible;
+            //AssignKeyToEvent(() =>
+            //{
+            //    if (_mPlayer.IsPaused)
+            //    {
+            //        _mPreviousPauseMousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            //        Mouse.SetPosition(FirstPersonCameraController.DefaultMouseState.X,
+            //            FirstPersonCameraController.DefaultMouseState.Y);
+            //    }
+            //    else
+            //    {
+            //        Mouse.SetPosition((int) _mPreviousPauseMousePosition.X, (int) _mPreviousPauseMousePosition.Y);
+            //    }
+            //    _mPlayer.IsPaused = !_mPlayer.IsPaused;
+            //    WeltGame.Instance.IsMouseVisible = !WeltGame.Instance.IsMouseVisible;
                  
-                return true;
-            }, Keys.Escape);
+            //    return true;
+            //}, Keys.Escape);
             
             AssignHotbarKeys();
 
@@ -357,7 +384,6 @@ namespace Welt.Scenes
             }
             _mPlayerRenderer.Draw(gameTime);
             _mHud.Draw(gameTime);
-            _mGui.Draw(gameTime);
         }
 
         #endregion

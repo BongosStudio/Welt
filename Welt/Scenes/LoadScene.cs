@@ -5,6 +5,10 @@
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
+using EmptyKeys.UserInterface.Controls;
+using EmptyKeys.UserInterface.Generated;
+using EmptyKeys.UserInterface.Mvvm;
+using GameUILibrary.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Cameras;
@@ -12,33 +16,28 @@ using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
 using Welt.Models;
-using Welt.UI;
-using Welt.UI.Components;
 
 namespace Welt.Scenes
 {
     public class LoadScene : Scene
     {
         protected override Color BackColor => new Color(0.15f, 0.15f, 0.15f);
-
+        internal override UIRoot UI => new Loading();
+        internal override ViewModelBase DataContext { get; set; }
         private readonly World _world;
         private readonly IRenderer _renderer;
         private readonly SkyDomeRenderer _skyRenderer;
         private readonly PlayerRenderer _playerRenderer;
 
-        private int _loadingPercent;
-        private string _loadingText;
-
-        private readonly string[] _loadingTexts =
+        private static readonly string[] _texts =
         {
-            "Loading terrain...",
-            "Generating terrain...",
+            "Creating world...",
             "Building terrain...",
+            "Simulating world for a bit...",
             "Preparing level..."
         };
 
-        private SpriteBatch _sprite;
-        private SpriteFont _text;
+        private static int _textStep;
 
         public LoadScene(Game game, World worldToLoad) : base(game)
         {
@@ -48,36 +47,13 @@ namespace Welt.Scenes
             _playerRenderer = new PlayerRenderer(game.GraphicsDevice, Player.Current);
             _renderer = new SimpleRenderer(game.GraphicsDevice, _playerRenderer.Camera, _world);
             _skyRenderer = new SkyDomeRenderer(game.GraphicsDevice, _playerRenderer.Camera, _world);
-
-            _sprite = new SpriteBatch(game.GraphicsDevice);
-            _text = game.Content.Load<SpriteFont>("Fonts/console");
-            _loadingText = _loadingTexts[0];
-
-            AddComponent(new TextComponent(_loadingText, "status", GraphicsDevice)
+            var viewModel = new LoadingViewModel {LoadingStatusText = _texts[0]};
+            _renderer.LoadStepCompleted += (sender, args) =>
             {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Foreground = Color.White,
-                Margin = new BoundsBox(0, 100, 0, 40)
-            });
-            AddComponent(new TextComponent(worldToLoad.Name, "worldname", GraphicsDevice)
-            {
-                Foreground = Color.White,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new BoundsBox(40, 0, 0, 120)
-            });
-            AddComponent(new TextComponent(Player.Current.Username.ToUpper(), "playername", GraphicsDevice)
-            {
-                Foreground = Color.White,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new BoundsBox(40, 0, 0, 80)
-            });
-            AddComponent(new TextComponent("NO ADDITIONAL INFO", "info", GraphicsDevice)
-            {
-                Foreground = Color.White,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Margin = new BoundsBox(40, 0, 0, 40)
-            });
+                _textStep++;
+                viewModel.LoadingStatusText = _texts[_textStep];
+            };
+            DataContext = viewModel;
         }
 
         public override void Initialize()
@@ -85,9 +61,7 @@ namespace Welt.Scenes
             base.Initialize();
             _renderer.LoadStepCompleted += (sender, args) =>
             {
-                _loadingPercent++;
-                GetComponent("status")
-                    .Value.SetPropertyValue(TextComponent.TextProperty, _loadingTexts[_loadingPercent]);
+
             };
             new Thread(() =>
             {

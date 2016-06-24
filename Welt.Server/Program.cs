@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lidgren.Network;
+using Welt.Core.Server;
 
 namespace Welt.Server
 {
@@ -10,6 +12,8 @@ namespace Welt.Server
     {
         static void Main(string[] args)
         {
+            var server = new GameServer(new GameServerConfig());
+            
         }
     }
 }

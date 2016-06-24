@@ -1,0 +1,83 @@
+﻿<ek:UIRoot x:Class="UserInterface.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:UserInterface"
+             xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
+             xmlns:c="clr-namespace:EmptyKeys.UserInterface.Designer.Charts;assembly=EmptyKeys.UserInterface.Designer"
+             xmlns:cv="clr-namespace:UserInterface.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800"
+             FontFamily="Code 7x5"
+             FontSize="18"
+             >
+    <ek:UIRoot.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UserInterface;component/Dictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ek:UIRoot.Resources>
+    <Grid>
+        <Grid x:Name="MainButtons">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
+                <Button x:Name="spBtn" Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SinglePlayerButtonCommand}">
+                    Singleplayer
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                            Storyboard.TargetName="spMenu"
+                            Storyboard.TargetProperty="Opacity"
+                            Duration="00:00:00.2"
+                            To="1"
+                            >
+                                        <DoubleAnimation.EasingFunction>
+                                            <SineEase/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                            Storyboard.TargetName="mpMenu"
+                            Storyboard.TargetProperty="Opacity"
+                            Duration="00:00:00.2"
+                            To="0"
+                            >
+                                        <DoubleAnimation.EasingFunction>
+                                            <SineEase/>
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding MultiPlayerButtonCommand}" IsEnabled="False">Multiplayer</Button>
+                <Button Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SettingsButtonCommand}" IsEnabled="False">Settings</Button>
+                <Button Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding ExitButtonCommand}">Exit</Button>
+            </StackPanel>
+        </Grid>
+        <StackPanel x:Name="spMenu" Margin="261,201,0,199" HorizontalAlignment="Left" Width="400" Opacity="0">
+            <!--IsEnabled="{Binding SpMenuEnabled}"-->
+            <TextBlock HorizontalAlignment="Left">World Name</TextBlock>
+            <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding WorldName}" VerticalAlignment="Top" Width="241"/>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="game mode" VerticalAlignment="Top"/>
+            <RadioButton GroupName="gm">Survival</RadioButton>
+            <RadioButton GroupName="gm">Adventure</RadioButton>
+            <RadioButton GroupName="gm">Creative</RadioButton>
+            <CheckBox>Enable LAN</CheckBox>
+            <Button Command="{Binding CreateNewWorldCommand}" Height="50" Margin="0,20,0,10" HorizontalAlignment="Left">Create World</Button>
+        </StackPanel>
+        <StackPanel x:Name="mpMenu" Margin="261,201,0,128" HorizontalAlignment="Left" Width="400" Opacity="0" IsEnabled="{Binding MpMenuEnabled}" Visibility="{Binding MpMenuVisibility}">
+
+        </StackPanel>
+    </Grid>
+</ek:UIRoot>

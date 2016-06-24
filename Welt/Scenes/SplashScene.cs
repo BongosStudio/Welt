@@ -4,28 +4,31 @@
 
 using System;
 using System.Windows.Forms;
+using EmptyKeys.UserInterface.Controls;
+using EmptyKeys.UserInterface.Generated;
+using EmptyKeys.UserInterface.Mvvm;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Media;
 using Welt.Controllers;
-using Welt.UI;
-using Welt.UI.Components;
 
 namespace Welt.Scenes
 {
     public class SplashScene : Scene
     {
-        private const string SPLASH = "Images/splashscreen";
-        private float _o;
+        //private const string SPLASH = "Images/splashscreen";
+        //private float _o;
 
         protected override Color BackColor => Color.GhostWhite;
+        internal override UIRoot UI => new Splash();
+        internal override ViewModelBase DataContext { get; set; }
 
         public SplashScene(Game game) : base(game)
         {
-            AddComponent(new ImageComponent(SPLASH, "splash", -1, -1, game.GraphicsDevice)
-            {
-                Opacity = 0f,
-                HorizontalAlignment = HorizontalAlignment.Center
-            });
+            //AddComponent(new ImageComponent(SPLASH, "splash", -1, -1, game.GraphicsDevice)
+            //{
+            //    Opacity = 0f,
+            //    HorizontalAlignment = HorizontalAlignment.Center
+            //});
             Schedule(() =>
             {
                 SceneController.Load(new MainMenuScene(game));
@@ -38,7 +41,7 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             base.Initialize();
-            GetComponent("splash").Value.FadeIn(this, TimeSpan.FromSeconds(2));
+            //GetComponent("splash").Value.FadeIn(this, TimeSpan.FromSeconds(2));
         }
     }
 }

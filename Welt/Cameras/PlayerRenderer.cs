@@ -15,8 +15,6 @@ using Welt.Forge.Renderers;
 using Welt.Models;
 using Welt.Physics;
 using Welt.Types;
-using Welt.UI;
-using Welt.UI.Components;
 
 #endregion
 
@@ -162,7 +160,6 @@ namespace Welt.Cameras
         private TimeSpan _mLeftClickCooldown;
         private TimeSpan _mRightClickCooldown;
         private bool _mForceUpdate;
-        private ButtonComponent _resumeButton;
         public bool FreeCam;
 
         #endregion
