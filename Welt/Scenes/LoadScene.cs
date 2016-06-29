@@ -43,11 +43,15 @@ namespace Welt.Scenes
         {
             _world = worldToLoad;
             Player.Current.AssignWorld(_world);
-            _playerRenderer = new PlayerRenderer(game.GraphicsDevice, Player.Current);
-            _playerRenderer = new PlayerRenderer(game.GraphicsDevice, Player.Current);
+            _playerRenderer = new PlayerRenderer(game.GraphicsDevice);
             _renderer = new SimpleRenderer(game.GraphicsDevice, _playerRenderer.Camera, _world);
             _skyRenderer = new SkyDomeRenderer(game.GraphicsDevice, _playerRenderer.Camera, _world);
-            var viewModel = new LoadingViewModel {LoadingStatusText = _texts[0]};
+            var viewModel = new LoadingViewModel
+            {
+                LoadingStatusText = _texts[0],
+                WorldNameText = worldToLoad.Name,
+                WorldData = $"SEED: {worldToLoad.Seed}"
+            };
             _renderer.LoadStepCompleted += (sender, args) =>
             {
                 _textStep++;
@@ -59,10 +63,6 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             base.Initialize();
-            _renderer.LoadStepCompleted += (sender, args) =>
-            {
-
-            };
             new Thread(() =>
             {
                 _renderer.Initialize();

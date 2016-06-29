@@ -53,6 +53,7 @@ namespace Welt.Scenes
             base.Initialize();
             _previousKeyState = Keyboard.GetState();
             WeltGame.SetCursor(Cursors.Arrow);
+            UI.DataContext = DataContext;
             WeltGame.SetUI(UI, DataContext);
         }
 

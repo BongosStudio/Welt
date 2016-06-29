@@ -22,70 +22,34 @@ namespace Welt.Scenes
 
         public MainMenuScene(Game game) : base(game)
         {
-            //game.Window.AllowUserResizing = true;
-            //AddComponent(new ImageComponent("Images/welt", "background", GraphicsDevice)
-            //{
-            //    Opacity = 0.8f
-            //});
-
-            //var button = new ButtonComponent("Singleplayer", "spbutton", 300, 100, GraphicsDevice)
-            //{
-            //    TextHorizontalAlignment = HorizontalAlignment.Center,
-            //    BorderWidth = new BoundsBox(2, 2, 2, 2),
-            //    BackgroundActiveColor = Color.CadetBlue,
-            //    BackgroundColor = Color.LightSteelBlue,
-            //    ForegroundColor = Color.Black,
-            //    VerticalAlignment = VerticalAlignment.Center,
-            //    HorizontalAlignment = HorizontalAlignment.Center
-            //};
-
-            //button.MouseLeftDown += (sender, args) =>
-            //{
-            //    SceneController.Load(new LoadScene(game, new World("DEMO WORLD"))); // TODO: fetch world data
-            //};
-
-            //AddComponent(button);
             var viewModel = new MainMenuViewModel
             {              
-                ExitButtonCommand = new RelayCommand(o => { Game.Exit(); })
+                ExitButtonCommand = new RelayCommand(o => { Game.Exit(); }),
             };
             viewModel.SinglePlayerButtonCommand =
-                new RelayCommand(o =>
+                new RelayCommand(delegate
                 {
                     //SceneController.Load(new LoadScene(game, new World("DEMO WORLD")));
                     viewModel.SpMenuEnabled = true;
                 });
             viewModel.MultiPlayerButtonCommand = 
-                new RelayCommand(o =>
+                new RelayCommand(delegate
                 {
                     viewModel.SpMenuEnabled = false;
                 });
             viewModel.SettingsButtonCommand = 
-                new RelayCommand(o =>
+                new RelayCommand(delegate
                 {
-                    viewModel.SpMenuEnabled = false;
+                    viewModel.SpMenuEnabled = false; 
+                    
                 });
+            viewModel.CreateNewWorldCommand = new RelayCommand(o =>
+            {
+                SceneController.Load(new LoadScene(game,
+                    new World(viewModel.WorldName, 54321))); // TODO: fix the terrain generation. Maybe use Syhno's old style?
+            });
                 
             DataContext = viewModel;
         }
-
-        public override void Initialize()
-        {
-            
-            base.Initialize();
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            
-            base.Update(gameTime);
-
-        }
-
-        public override void Draw(GameTime time)
-        {
-            base.Draw(time);
-        }
-        
     }
 }

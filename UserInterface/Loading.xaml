@@ -7,9 +7,14 @@
              xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
              xmlns:c="clr-namespace:EmptyKeys.UserInterface.Designer.Charts;assembly=EmptyKeys.UserInterface.Designer"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" FontSize="18" FontFamily="Code 7x5">
     <Grid>
-        <TextBlock HorizontalAlignment="Right" Margin="0,0,10,10" TextAlignment="Right" TextWrapping="Wrap" Text="{Binding LoadingStatusText}" Width="112" FontFamily="Code 7x5" FontSize="18" Height="20" VerticalAlignment="Bottom"/>
+        <TextBlock HorizontalAlignment="Right" Margin="0,0,10,10" TextAlignment="Right" Text="{Binding LoadingStatusText}" VerticalAlignment="Bottom"/>
+        <StackPanel Height="130" VerticalAlignment="Bottom" Margin="0,0,159,0">
+            <TextBlock Text="{Binding UsernameText}"/>
+            <TextBlock Text="{Binding WorldNameText}"/>
+            <TextBlock Text="{Binding WorldData}"/>
+        </StackPanel>
 
     </Grid>
 </ek:UIRoot>

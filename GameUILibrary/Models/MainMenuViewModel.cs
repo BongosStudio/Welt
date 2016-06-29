@@ -30,10 +30,17 @@ namespace GameUILibrary.Models
             }
         }
         public Visibility SpMenuVisibility => SpMenuEnabled ? Visibility.Visible : Visibility.Collapsed;
-        public string WorldName { get; set; }
+        public string WorldName { get; set; } = "New World";
+        public string WorldSeed { get; set; } = "12345";
         public string GameType { get; set; }
         public bool EnableLan { get;set; }
+        public bool CreateNewWorldEnabled => WorldName.Length > 0;
         public ICommand CreateNewWorldCommand { get; set; }
+
+        public ICommand SetGameMode(string argument)
+        {
+            return new RelayCommand(o => GameType = argument);
+        }
         #endregion
         #region MultiPlayer
 

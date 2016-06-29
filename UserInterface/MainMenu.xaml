@@ -42,7 +42,7 @@
                                 </Storyboard>
                             </BeginStoryboard>
                         </EventTrigger>
-                        <EventTrigger RoutedEvent="Button.Click">
+                        <!--<EventTrigger RoutedEvent="Button.Click">
                             <BeginStoryboard>
                                 <Storyboard>
                                     <DoubleAnimation
@@ -57,7 +57,7 @@
                                     </DoubleAnimation>
                                 </Storyboard>
                             </BeginStoryboard>
-                        </EventTrigger>
+                        </EventTrigger>-->
                     </Button.Triggers>
                 </Button>
                 <Button Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding MultiPlayerButtonCommand}" IsEnabled="False">Multiplayer</Button>
@@ -65,19 +65,19 @@
                 <Button Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding ExitButtonCommand}">Exit</Button>
             </StackPanel>
         </Grid>
-        <StackPanel x:Name="spMenu" Margin="261,201,0,199" HorizontalAlignment="Left" Width="400" Opacity="0">
+        <StackPanel x:Name="spMenu" Margin="261,201,0,60" HorizontalAlignment="Left" Width="400" Opacity="0">
             <!--IsEnabled="{Binding SpMenuEnabled}"-->
             <TextBlock HorizontalAlignment="Left">World Name</TextBlock>
             <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding WorldName}" VerticalAlignment="Top" Width="241"/>
+            <TextBlock HorizontalAlignment="Left">Seed</TextBlock>
+            <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding WorldSeed}" VerticalAlignment="Top" Width="241"></TextBox>
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="game mode" VerticalAlignment="Top"/>
-            <RadioButton GroupName="gm">Survival</RadioButton>
-            <RadioButton GroupName="gm">Adventure</RadioButton>
-            <RadioButton GroupName="gm">Creative</RadioButton>
+            <RadioButton GroupName="gm" Command="{Binding SetGameMode}" CommandParameter="realistic" IsChecked="True">Realistic</RadioButton>
+            <RadioButton GroupName="gm" Command="{Binding SetGameMode}" CommandParameter="story">Story</RadioButton>
+            <RadioButton GroupName="gm" Command="{Binding SetGameMode}" CommandParameter="limitless">Limitless</RadioButton>
             <CheckBox>Enable LAN</CheckBox>
-            <Button Command="{Binding CreateNewWorldCommand}" Height="50" Margin="0,20,0,10" HorizontalAlignment="Left">Create World</Button>
+            <Button Command="{Binding CreateNewWorldCommand}" HorizontalAlignment="Left" Height="50">Create World</Button>
         </StackPanel>
-        <StackPanel x:Name="mpMenu" Margin="261,201,0,128" HorizontalAlignment="Left" Width="400" Opacity="0" IsEnabled="{Binding MpMenuEnabled}" Visibility="{Binding MpMenuVisibility}">
-
-        </StackPanel>
+        
     </Grid>
 </ek:UIRoot>

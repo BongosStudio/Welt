@@ -48,17 +48,19 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private TextBlock e_7;
         
-        private RadioButton e_8;
+        private TextBox e_8;
         
-        private RadioButton e_9;
+        private TextBlock e_9;
         
         private RadioButton e_10;
         
-        private CheckBox e_11;
+        private RadioButton e_11;
         
-        private Button e_12;
+        private RadioButton e_12;
         
-        private StackPanel mpMenu;
+        private CheckBox e_13;
+        
+        private Button e_14;
         
         public MainMenu() : 
                 base() {
@@ -119,23 +121,6 @@ namespace EmptyKeys.UserInterface.Generated {
             Storyboard.SetTargetName(spBtn_ET_0_AC_0_SB_TL_0, "spMenu");
             Storyboard.SetTargetProperty(spBtn_ET_0_AC_0_SB_TL_0, Button.OpacityProperty);
             spBtn_ET_0_AC_0_SB.Children.Add(spBtn_ET_0_AC_0_SB_TL_0);
-            EventTrigger spBtn_ET_1 = new EventTrigger(Button.ClickEvent, this.spBtn);
-            spBtn.Triggers.Add(spBtn_ET_1);
-            BeginStoryboard spBtn_ET_1_AC_0 = new BeginStoryboard();
-            spBtn_ET_1_AC_0.Name = "spBtn_ET_1_AC_0";
-            spBtn_ET_1.AddAction(spBtn_ET_1_AC_0);
-            Storyboard spBtn_ET_1_AC_0_SB = new Storyboard();
-            spBtn_ET_1_AC_0.Storyboard = spBtn_ET_1_AC_0_SB;
-            spBtn_ET_1_AC_0_SB.Name = "spBtn_ET_1_AC_0_SB";
-            FloatAnimation spBtn_ET_1_AC_0_SB_TL_0 = new FloatAnimation();
-            spBtn_ET_1_AC_0_SB_TL_0.Name = "spBtn_ET_1_AC_0_SB_TL_0";
-            spBtn_ET_1_AC_0_SB_TL_0.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 200));
-            spBtn_ET_1_AC_0_SB_TL_0.To = 0F;
-            SineEase spBtn_ET_1_AC_0_SB_TL_0_EA = new SineEase();
-            spBtn_ET_1_AC_0_SB_TL_0.EasingFunction = spBtn_ET_1_AC_0_SB_TL_0_EA;
-            Storyboard.SetTargetName(spBtn_ET_1_AC_0_SB_TL_0, "mpMenu");
-            Storyboard.SetTargetProperty(spBtn_ET_1_AC_0_SB_TL_0, Button.OpacityProperty);
-            spBtn_ET_1_AC_0_SB.Children.Add(spBtn_ET_1_AC_0_SB_TL_0);
             this.spBtn.FontFamily = new FontFamily("Code 7x5");
             this.spBtn.FontSize = 18F;
             this.spBtn.Content = "Singleplayer";
@@ -188,7 +173,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_0.Children.Add(this.spMenu);
             this.spMenu.Name = "spMenu";
             this.spMenu.Width = 400F;
-            this.spMenu.Margin = new Thickness(261F, 201F, 0F, 199F);
+            this.spMenu.Margin = new Thickness(261F, 201F, 0F, 60F);
             this.spMenu.HorizontalAlignment = HorizontalAlignment.Left;
             this.spMenu.Opacity = 0F;
             // e_5 element
@@ -211,54 +196,66 @@ namespace EmptyKeys.UserInterface.Generated {
             this.spMenu.Children.Add(this.e_7);
             this.e_7.Name = "e_7";
             this.e_7.HorizontalAlignment = HorizontalAlignment.Left;
-            this.e_7.VerticalAlignment = VerticalAlignment.Top;
-            this.e_7.Text = "game mode";
-            this.e_7.TextWrapping = TextWrapping.Wrap;
+            this.e_7.Text = "Seed";
             // e_8 element
-            this.e_8 = new RadioButton();
+            this.e_8 = new TextBox();
             this.spMenu.Children.Add(this.e_8);
             this.e_8.Name = "e_8";
-            this.e_8.Content = "Survival";
-            this.e_8.GroupName = "gm";
+            this.e_8.Width = 241F;
+            this.e_8.HorizontalAlignment = HorizontalAlignment.Left;
+            this.e_8.VerticalAlignment = VerticalAlignment.Top;
+            Binding binding_e_8_Text = new Binding("WorldSeed");
+            this.e_8.SetBinding(TextBox.TextProperty, binding_e_8_Text);
             // e_9 element
-            this.e_9 = new RadioButton();
+            this.e_9 = new TextBlock();
             this.spMenu.Children.Add(this.e_9);
             this.e_9.Name = "e_9";
-            this.e_9.Content = "Adventure";
-            this.e_9.GroupName = "gm";
+            this.e_9.HorizontalAlignment = HorizontalAlignment.Left;
+            this.e_9.VerticalAlignment = VerticalAlignment.Top;
+            this.e_9.Text = "game mode";
+            this.e_9.TextWrapping = TextWrapping.Wrap;
             // e_10 element
             this.e_10 = new RadioButton();
             this.spMenu.Children.Add(this.e_10);
             this.e_10.Name = "e_10";
-            this.e_10.Content = "Creative";
+            this.e_10.Content = "Realistic";
+            this.e_10.CommandParameter = "realistic";
+            this.e_10.IsChecked = true;
             this.e_10.GroupName = "gm";
+            Binding binding_e_10_Command = new Binding("SetGameMode");
+            this.e_10.SetBinding(RadioButton.CommandProperty, binding_e_10_Command);
             // e_11 element
-            this.e_11 = new CheckBox();
+            this.e_11 = new RadioButton();
             this.spMenu.Children.Add(this.e_11);
             this.e_11.Name = "e_11";
-            this.e_11.Content = "Enable LAN";
+            this.e_11.Content = "Story";
+            this.e_11.CommandParameter = "story";
+            this.e_11.GroupName = "gm";
+            Binding binding_e_11_Command = new Binding("SetGameMode");
+            this.e_11.SetBinding(RadioButton.CommandProperty, binding_e_11_Command);
             // e_12 element
-            this.e_12 = new Button();
+            this.e_12 = new RadioButton();
             this.spMenu.Children.Add(this.e_12);
             this.e_12.Name = "e_12";
-            this.e_12.Height = 50F;
-            this.e_12.Margin = new Thickness(0F, 20F, 0F, 10F);
-            this.e_12.HorizontalAlignment = HorizontalAlignment.Left;
-            this.e_12.Content = "Create World";
-            Binding binding_e_12_Command = new Binding("CreateNewWorldCommand");
-            this.e_12.SetBinding(Button.CommandProperty, binding_e_12_Command);
-            // mpMenu element
-            this.mpMenu = new StackPanel();
-            this.e_0.Children.Add(this.mpMenu);
-            this.mpMenu.Name = "mpMenu";
-            this.mpMenu.Width = 400F;
-            this.mpMenu.Margin = new Thickness(261F, 201F, 0F, 128F);
-            this.mpMenu.HorizontalAlignment = HorizontalAlignment.Left;
-            this.mpMenu.Opacity = 0F;
-            Binding binding_mpMenu_Visibility = new Binding("MpMenuVisibility");
-            this.mpMenu.SetBinding(StackPanel.VisibilityProperty, binding_mpMenu_Visibility);
-            Binding binding_mpMenu_IsEnabled = new Binding("MpMenuEnabled");
-            this.mpMenu.SetBinding(StackPanel.IsEnabledProperty, binding_mpMenu_IsEnabled);
+            this.e_12.Content = "Limitless";
+            this.e_12.CommandParameter = "limitless";
+            this.e_12.GroupName = "gm";
+            Binding binding_e_12_Command = new Binding("SetGameMode");
+            this.e_12.SetBinding(RadioButton.CommandProperty, binding_e_12_Command);
+            // e_13 element
+            this.e_13 = new CheckBox();
+            this.spMenu.Children.Add(this.e_13);
+            this.e_13.Name = "e_13";
+            this.e_13.Content = "Enable LAN";
+            // e_14 element
+            this.e_14 = new Button();
+            this.spMenu.Children.Add(this.e_14);
+            this.e_14.Name = "e_14";
+            this.e_14.Height = 50F;
+            this.e_14.HorizontalAlignment = HorizontalAlignment.Left;
+            this.e_14.Content = "Create World";
+            Binding binding_e_14_Command = new Binding("CreateNewWorldCommand");
+            this.e_14.SetBinding(Button.CommandProperty, binding_e_14_Command);
             FontManager.Instance.AddFont("Code 7x5", 18F, FontStyle.Regular, "Code_7x5_13.5_Regular");
         }
         

@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Welt.API.Forge;
 using Welt.Cameras;
 using Welt.Forge;
 using Welt.Forge.Renderers;
@@ -20,7 +21,7 @@ namespace Welt.Forge.Renderers
 {
     internal class SimpleRenderer : IRenderer
     {
-        private const byte BUILD_RANGE = 4;
+        private const byte BUILD_RANGE = 12;
         private const byte LIGHT_RANGE = BUILD_RANGE + 1;
         private const byte GENERATE_RANGE_LOW = LIGHT_RANGE + 1;
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;
@@ -184,16 +185,17 @@ namespace Welt.Forge.Renderers
             return chunk;
         }
 
-        private Chunk DoGenerate(Vector3I chunkIndex)
+        private IChunk DoGenerate(Vector3I chunkIndex)
         {
             var chunk = new Chunk(_world, chunkIndex);
-            return DoGenerate(chunk);
+            return DoGenerate(chunkIndex.X, chunkIndex.Z);
         }
 
-        private Chunk DoGenerate(Chunk chunk)
+        private IChunk DoGenerate(uint x, uint z)
         {
-            _world.Chunks[chunk.Index.X, chunk.Index.Z] = chunk;
-            _world.Generator.Generate(_world, chunk);
+            
+            var chunk = _world.Generator.GenerateChunk(_world, x, z);
+            _world.Chunks[x, z] = chunk;
             return chunk;
         }
 

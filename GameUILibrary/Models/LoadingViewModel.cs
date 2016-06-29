@@ -8,6 +8,9 @@ namespace GameUILibrary.Models
 {
     public class LoadingViewModel : ViewModelBase
     {
-        public string LoadingStatusText { get; set; } 
+        public string LoadingStatusText { get; set; }
+        public string UsernameText { get; set; }
+        public string WorldNameText { get; set; }
+        public string WorldData { get; set; }
     }
 }

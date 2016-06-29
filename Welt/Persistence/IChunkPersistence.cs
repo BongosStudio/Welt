@@ -3,6 +3,7 @@
 #endregion
 #region Using Statements
 
+using Welt.API.Forge;
 using Welt.Forge;
 using Welt.Types;
 
@@ -13,9 +14,9 @@ namespace Welt.Persistence
     public interface IChunkPersistence
     {
 
-        void Save(Chunk chunk);
+        void Save(IChunk chunk);
 
-        Chunk Load(Vector3I index);
+        IChunk Load(Vector3I index);
 
     }
 }

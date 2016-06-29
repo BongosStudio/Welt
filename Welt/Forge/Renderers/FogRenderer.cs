@@ -2,33 +2,45 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 
+using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Welt.Forge.Renderers
 {
-    public class FogRenderer
+    public class FogRenderer : IRenderer
     {
-        protected Texture2D FogTexture;
-        private readonly SpriteBatch _mSpriteBatch;
 
         public FogRenderer(GraphicsDevice device)
         {
-            _mSpriteBatch = new SpriteBatch(device);
         }
 
-        public void LoadContent()
+        public void Initialize()
         {
-            FogTexture = WeltGame.Instance.Content.Load<Texture2D>("Textures\\cloudMap");
+            throw new NotImplementedException();
         }
 
-        public void Draw()
+        public void Update(GameTime gameTime)
         {
-            //m_spriteBatch.Begin();
-            //var rectangle = new Rectangle(0, 0, 1000, 750); // TODO: viewport
-            //m_spriteBatch.GraphicsDevice.BlendState = BlendState.AlphaBlend;
-            //m_spriteBatch.Draw(FogTexture, new Vector2(0), rectangle, new Color(Color.DarkGray, 0.01f));
-            //m_spriteBatch.End();
+            throw new NotImplementedException();
         }
+
+        public void Draw(GameTime gameTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Stop()
+        {
+            throw new NotImplementedException();
+        }
+
+        public event EventHandler LoadStepCompleted;
     }
 }

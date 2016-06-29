@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Welt.API.Forge;
 using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
@@ -24,15 +25,13 @@ namespace Welt.Cameras
 
     public class PlayerRenderer
     {
-        public PlayerRenderer(GraphicsDevice graphicsDevice, Player player)
+        public PlayerRenderer(GraphicsDevice graphicsDevice)
         {
             _mGraphicsDevice = graphicsDevice;
-            Player = player;
             _mViewport = graphicsDevice.Viewport;
             Camera = new FirstPersonCamera(_mViewport);
             _mCameraController = new FirstPersonCameraController(Camera);
             _mPhysics = new PlayerPhysics(this);
-            _mFog = new FogRenderer(graphicsDevice);
             _mInput = InputController.CreateDefault();
             _mLeftClickCooldown = TimeSpan.Zero;
             _mRightClickCooldown = TimeSpan.Zero;
@@ -57,7 +56,6 @@ namespace Welt.Cameras
             // SelectionBlock
             SelectionBlock = content.Load<Model>("Models\\SelectionBlock");
             _mSelectionBlockTexture = content.Load<Texture2D>("Textures\\SelectionBlock");
-            _mFog.LoadContent();
         }
 
         #region Update
@@ -135,17 +133,15 @@ namespace Welt.Cameras
             {
                 RenderSelectionBlock(gameTime);
             }
-            _mFog.Draw();
         }
 
         #endregion
 
         #region Fields
-        
-        public readonly Player Player;       
+
+        public readonly Player Player = Player.Current;
         public readonly FirstPersonCamera Camera;
         private readonly FirstPersonCameraController _mCameraController;
-        private readonly FogRenderer _mFog;
 
         private Vector3 _mLookVector;
         private readonly InputController _mInput;

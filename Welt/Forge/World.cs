@@ -7,7 +7,8 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
-using Welt.Forge.Generators;
+using Welt.API.Forge.Generators;
+using Welt.Core.Forge.Generators;
 using Welt.Managers;
 using Welt.Models;
 using Welt.Persistence;
@@ -25,7 +26,7 @@ namespace Welt.Forge
         //public IChunkGenerator Generator = new SimpleTerrain();
         //public IChunkGenerator Generator = new FlatReferenceTerrain();
         //public IChunkGenerator Generator = new TerrainWithCaves();
-        public IChunkGenerator Generator = new DualLayerTerrainWithMediumValleysForRivers();
+        public IForgeGenerator Generator = new StandardGenerator();
 
         // Biomes
         //public IChunkGenerator Generator = new Tundra_Alpine();
@@ -40,9 +41,10 @@ namespace Welt.Forge
             Chunks = new ChunkManager(new ChunkPersistence());
             Name = name;
             Seed = 54321;
+            Size = 64;
         }
 
-        public World(string name, int seed) : this(name)
+        public World(string name, long seed) : this(name)
         {
             Seed = seed;
         }
@@ -94,7 +96,8 @@ namespace Welt.Forge
         //public const byte VIEW_CHUNKS_Z = 8;
         
         public string Name { get; }
-        public int Seed { get; }
+        public long Seed { get; }
+        public int Size { get; }
 
         public static uint Origin = 1000;
         //TODO UInt32 requires decoupling rendering coordinates to avoid float problems

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using Welt.API.Forge;
 using Welt.Forge;
 
 namespace Welt.IO
@@ -19,9 +20,9 @@ namespace Welt.IO
 
         public IEnumerable<ushort> Blocks;
 
-        public WireChunk(Chunk chunk)
+        public WireChunk(IChunk chunk)
         {
-            Blocks = chunk.Blocks.Select(b => b.Id);
+            Blocks = null;
         }
 
         public byte[] ToArray()

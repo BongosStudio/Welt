@@ -3,6 +3,7 @@
 #endregion
 #region Using Statements
 
+using Welt.API.Forge;
 using Welt.Forge;
 using Welt.Persistence;
 using Welt.Types;
@@ -12,7 +13,7 @@ using Welt.Types;
 namespace Welt.Managers
 {
 
-    public class ChunkManager : Dictionary2<Chunk>
+    public class ChunkManager : Dictionary2<IChunk>
     {
 
         private readonly IChunkPersistence _mPersistence;
@@ -30,57 +31,29 @@ namespace Welt.Managers
 
             BeforeRemove(chunk);
 
-            Chunk removed;
+            IChunk removed;
             TryRemove(KeyFromCoords(x, z), out removed);
 
         }
 
-        private void BeforeRemove(Chunk chunk)
+        private void BeforeRemove(IChunk chunk)
         {
             _mPersistence.Save(chunk);
         }
 
-        public Chunk Get(Vector3I index)
+        public IChunk Get(Vector3I index)
         {
             return this[index.X, index.Z];
         }
 
-        /* public override Chunk this[uint x, uint z]
-         {
-             get
-             {
-                 Chunk chunk = base[x, z];
-                 if (chunk == null)
-                 {
-                     Vector3i index = new Vector3i(x, 0, z);
-
-                     chunk = whenNull(index);
-                     base[x, z] = chunk; 
-                 }
-                 return chunk;
-             }
-             set
-             {
-                 base[x, z] = value;
-
-             }
-         }*/
-
-        /*
- * The idea of loading directly whenever accessing a null chunk was cool but theres much more to do in the worldrenderer.generate method
- * 
- * Needs more thinking and surely some major refactoring. 
- * 
- */
-
-        private Chunk WhenNull(Vector3I index)
+        private IChunk WhenNull(Vector3I index)
         {
             //return persistence.load(index);
             return null;
         }
 
 
-        public Chunk Load(Vector3I index)
+        public IChunk Load(Vector3I index)
         {
             return _mPersistence.Load(index);
         }

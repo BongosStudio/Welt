@@ -1,21 +1,13 @@
 ﻿#region Copyright
-// COPYRIGHT 2015 JUSTIN COX (CONJI)
+// COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
-#region Using Statements
 
 using System;
+using Welt.API;
 using Welt.Types;
 
-#endregion
-
-namespace Welt.Models
+namespace Welt.Forge
 {
-
-    public enum Cardinal
-    {
-        N, S, E, W, Ne, Nw, Se, Sw
-    }
-
     public static class Cardinals
     {
         //TODO N is +1
@@ -83,24 +75,24 @@ namespace Welt.Models
             throw new NotImplementedException("vector " + v + " does not map to a cardinal direction");
         }
 
-        public static Cardinal[] Adjacents(Cardinal from) {
+        public static Cardinal[] Adjacents(Cardinal from)
+        {
             switch (from)
             {
-                case Cardinal.N: return new Cardinal[] {Cardinal.E,Cardinal.W};
-                case Cardinal.Ne: return new Cardinal[] { Cardinal.S, Cardinal.W, Cardinal.E, Cardinal.N };
-                case Cardinal.E: return new Cardinal[] { Cardinal.N, Cardinal.S };
-                case Cardinal.Se: return new Cardinal[] { Cardinal.N, Cardinal.W, Cardinal.E, Cardinal.S };
-                case Cardinal.S: return new Cardinal[] { Cardinal.E, Cardinal.W };
-                case Cardinal.Sw: return new Cardinal[] { Cardinal.N, Cardinal.E, Cardinal.W, Cardinal.S };
-                case Cardinal.W: return new Cardinal[] { Cardinal.N, Cardinal.S };
-                case Cardinal.Nw: return new Cardinal[] { Cardinal.S, Cardinal.E, Cardinal.N, Cardinal.W };
+                case Cardinal.N: return new[] { Cardinal.E, Cardinal.W };
+                case Cardinal.Ne: return new[] { Cardinal.S, Cardinal.W, Cardinal.E, Cardinal.N };
+                case Cardinal.E: return new[] { Cardinal.N, Cardinal.S };
+                case Cardinal.Se: return new[] { Cardinal.N, Cardinal.W, Cardinal.E, Cardinal.S };
+                case Cardinal.S: return new[] { Cardinal.E, Cardinal.W };
+                case Cardinal.Sw: return new[] { Cardinal.N, Cardinal.E, Cardinal.W, Cardinal.S };
+                case Cardinal.W: return new[] { Cardinal.N, Cardinal.S };
+                case Cardinal.Nw: return new[] { Cardinal.S, Cardinal.E, Cardinal.N, Cardinal.W };
                 default:
                     break;
             }
             throw new NotImplementedException("unknown cardinal direction " + from);
-            
+
         }
 
     }
-
 }

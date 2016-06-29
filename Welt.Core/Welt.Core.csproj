@@ -46,6 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FastMath.cs" />
+    <Compile Include="Forge\BlockPalette.cs" />
+    <Compile Include="Forge\Chunk.cs" />
+    <Compile Include="Forge\ChunkManager.cs" />
+    <Compile Include="Forge\Floor.cs" />
+    <Compile Include="Forge\Generators\StandardGenerator.cs" />
+    <Compile Include="Forge\World.cs" />
     <Compile Include="Net\IMessage.cs" />
     <Compile Include="Net\MessageHandler.cs" />
     <Compile Include="Net\Messages\HandshakeMessage.cs" />
@@ -53,6 +60,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\GameServer.cs" />
     <Compile Include="Server\GameServerConfig.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Welt.API\Welt.API.csproj">
+      <Project>{E26D7EC7-4BE3-46C1-8185-608F2E649A2B}</Project>
+      <Name>Welt.API</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

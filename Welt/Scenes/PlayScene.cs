@@ -24,7 +24,7 @@ namespace Welt.Scenes
         private readonly World _mWorld;
         private readonly IRenderer _mRenderer;
         private HudRenderer _mHud;
-        private readonly Player _mPlayer;
+        private readonly Player _mPlayer = Player.Current;
         private readonly PlayerRenderer _mPlayerRenderer;
         private DiagnosticWorldRenderer _mWorldRenderer;
         private bool _mDiagnosticMode;
@@ -44,7 +44,6 @@ namespace Welt.Scenes
             _mRenderer = rendererToHandoff;
             _mSkyDomeRenderer = skyToHandoff;
             _mPlayerRenderer = playerToHandoff;
-            _mPlayer = playerToHandoff.Player;
             _mPreviousPauseMousePosition = new Vector2(FirstPersonCameraController.DefaultMouseState.X,
                 FirstPersonCameraController.DefaultMouseState.Y);
 
@@ -65,7 +64,6 @@ namespace Welt.Scenes
                 }
                 _mPlayer.IsPaused = !_mPlayer.IsPaused;
                 WeltGame.Instance.IsMouseVisible = !WeltGame.Instance.IsMouseVisible;
-                Console.WriteLine(viewModel.PauseMenuVisibility);
 
                 return true;
             }, Keys.Escape);

@@ -36,6 +36,7 @@ namespace Welt.Scenes
 
             var song = game.Content.Load<Song>("Music/feather");
             //MediaPlayer.Play(song);
+            
         }
 
         public override void Initialize()

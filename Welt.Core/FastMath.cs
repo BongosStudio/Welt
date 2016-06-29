@@ -1,22 +1,23 @@
 #region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
 using System;
 using System.Linq;
 
-namespace Welt
+namespace Welt.Core
 {
     public static class FastMath
     {
         #region Constants
 
         public const float E = 2.718282f;
-        public const float Log2E = 1.442695f;
-        public const float Log10E = 0.4342945f;
-        public const float Pi = 3.141593f;
-        public const float TwoPi = 6.283185f;
-        public const float PiOver2 = 1.570796f;
-        public const float PiOver4 = 0.7853982f;
+        public const float LOG2_E = 1.442695f;
+        public const float LOG10_E = 0.4342945f;
+        public const float PI = 3.141593f;
+        public const float TWO_PI = 6.283185f;
+        public const float PI_OVER2 = 1.570796f;
+        public const float PI_OVER4 = 0.7853982f;
 
         #endregion
 
@@ -225,6 +226,53 @@ namespace Welt
             }
 
             return ret;
+        }
+
+        #endregion
+
+        #region LongRandom
+
+        public sealed class LongRandom
+        {
+            public LongRandom()
+            {
+                _seed = NextRandom(int.MaxValue) & ((1L << 48) - 1);
+            }
+
+            public LongRandom(long seed)
+            {
+                _seed = (seed ^ LARGE_PRIME) & ((1L << 48) - 1);
+            }
+
+            public int Next(int n)
+            {
+                if (n <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(n), n, "n must be positive");
+
+                if ((n & -n) == n) // i.e., n is a power of 2
+                    return (int) ((n*(long) __next(31)) >> 31);
+
+                int bits, val;
+
+                do
+                {
+                    bits = __next(31);
+                    val = bits%n;
+                } while (bits - val + (n - 1) < 0);
+                return val;
+            }
+
+            private int __next(int bits)
+            {
+                _seed = (_seed*LARGE_PRIME + SMALL_PRIME) & ((1L << 48) - 1);
+                return (int) ((uint) _seed >> (48 - bits));
+            }
+
+            private long _seed;
+
+            private const long LARGE_PRIME = 0x5DEECE66DL;
+            private const long SMALL_PRIME = 0xBL;
+            
         }
 
         #endregion

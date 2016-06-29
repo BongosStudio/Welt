@@ -30,6 +30,14 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private TextBlock e_1;
         
+        private StackPanel e_2;
+        
+        private TextBlock e_3;
+        
+        private TextBlock e_4;
+        
+        private TextBlock e_5;
+        
         public Loading() : 
                 base() {
             this.Initialize();
@@ -48,6 +56,8 @@ namespace EmptyKeys.UserInterface.Generated {
         }
         
         private void InitializeComponent() {
+            this.FontFamily = new FontFamily("Code 7x5");
+            this.FontSize = 18F;
             // e_0 element
             this.e_0 = new Grid();
             this.Content = this.e_0;
@@ -56,17 +66,37 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_1 = new TextBlock();
             this.e_0.Children.Add(this.e_1);
             this.e_1.Name = "e_1";
-            this.e_1.Height = 20F;
-            this.e_1.Width = 112F;
             this.e_1.Margin = new Thickness(0F, 0F, 10F, 10F);
             this.e_1.HorizontalAlignment = HorizontalAlignment.Right;
             this.e_1.VerticalAlignment = VerticalAlignment.Bottom;
             this.e_1.TextAlignment = TextAlignment.Right;
-            this.e_1.TextWrapping = TextWrapping.Wrap;
-            this.e_1.FontFamily = new FontFamily("Code 7x5");
-            this.e_1.FontSize = 18F;
             Binding binding_e_1_Text = new Binding("LoadingStatusText");
             this.e_1.SetBinding(TextBlock.TextProperty, binding_e_1_Text);
+            // e_2 element
+            this.e_2 = new StackPanel();
+            this.e_0.Children.Add(this.e_2);
+            this.e_2.Name = "e_2";
+            this.e_2.Height = 130F;
+            this.e_2.Margin = new Thickness(0F, 0F, 159F, 0F);
+            this.e_2.VerticalAlignment = VerticalAlignment.Bottom;
+            // e_3 element
+            this.e_3 = new TextBlock();
+            this.e_2.Children.Add(this.e_3);
+            this.e_3.Name = "e_3";
+            Binding binding_e_3_Text = new Binding("UsernameText");
+            this.e_3.SetBinding(TextBlock.TextProperty, binding_e_3_Text);
+            // e_4 element
+            this.e_4 = new TextBlock();
+            this.e_2.Children.Add(this.e_4);
+            this.e_4.Name = "e_4";
+            Binding binding_e_4_Text = new Binding("WorldNameText");
+            this.e_4.SetBinding(TextBlock.TextProperty, binding_e_4_Text);
+            // e_5 element
+            this.e_5 = new TextBlock();
+            this.e_2.Children.Add(this.e_5);
+            this.e_5.Name = "e_5";
+            Binding binding_e_5_Text = new Binding("WorldData");
+            this.e_5.SetBinding(TextBlock.TextProperty, binding_e_5_Text);
             FontManager.Instance.AddFont("Code 7x5", 18F, FontStyle.Regular, "Code_7x5_13.5_Regular");
         }
     }

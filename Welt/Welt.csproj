@@ -78,9 +78,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Blocks\BlockFaceDirection.cs" />
     <Compile Include="Blocks\BlockTexture.cs" />
-    <Compile Include="Blocks\VertexBlockRenderer.cs" />
     <Compile Include="Blocks\VertexPositionDualTexture.cs" />
     <Compile Include="Blocks\VertexPositionTextureLight.cs" />
     <Compile Include="Blocks\VertexPositionTextureShade.cs" />
@@ -98,23 +96,8 @@
     <Compile Include="Entities\EntityData\EntityDataType.cs" />
     <Compile Include="Entities\LivingEntity.cs" />
     <Compile Include="Entities\PlayerEntity.cs" />
-    <Compile Include="FastMath.cs" />
-    <Compile Include="Forge\Biome\Biome.cs" />
-    <Compile Include="Forge\Biome\Desert_Subtropical.cs" />
-    <Compile Include="Forge\Biome\Grassland_Temperate.cs" />
-    <Compile Include="Forge\Biome\Tundra_Alpine.cs" />
-    <Compile Include="Forge\Block.cs" />
+    <Compile Include="Forge\Cardinals.cs" />
     <Compile Include="Forge\Chunk.cs" />
-    <Compile Include="Forge\Generators\Decorations\IDecorGenerator.cs" />
-    <Compile Include="Forge\Generators\Decorations\TreeDecorator.cs" />
-    <Compile Include="Forge\Generators\DualLayerTerrainWithMediumValleysForRivers.cs" />
-    <Compile Include="Forge\Generators\FlatReferenceTerrain.cs" />
-    <Compile Include="Forge\Generators\IChunkGenerator.cs" />
-    <Compile Include="Forge\Generators\PerlinNoise2D.cs" />
-    <Compile Include="Forge\Generators\PerlinSimplexNoise.cs" />
-    <Compile Include="Forge\Generators\SimpleTerrain.cs" />
-    <Compile Include="Forge\Generators\TerrainWithCaves.cs" />
-    <Compile Include="Forge\MapTools.cs" />
     <Compile Include="Forge\Renderers\DiagnosticWorldRenderer.cs" />
     <Compile Include="Forge\Renderers\FogRenderer.cs" />
     <Compile Include="Forge\Renderers\IRenderer.cs" />
@@ -133,7 +116,6 @@
     <Compile Include="Managers\TaskManager.cs" />
     <Compile Include="Models\BlockContainer.cs" />
     <Compile Include="Models\BlockStack.cs" />
-    <Compile Include="Models\Cardinal.cs" />
     <Compile Include="Models\ChunkState.cs" />
     <Compile Include="Models\InventoryContainer.cs" />
     <Compile Include="Models\Maybe.cs" />
@@ -304,12 +286,13 @@
     <Compile Include="MonoGame.Extended\ViewportAdapters\ViewportAdapter.cs" />
     <Compile Include="MonoGame.Extended\ViewportAdapters\WindowViewportAdapter.cs" />
     <Compile Include="Persistence\ChunkPersistence.cs" />
-    <Compile Include="Persistence\FakeChunkPersistence.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
     <Compile Include="Physics\PlayerPhysics.cs" />
     <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="Processors\IChunkProcessor.cs" />
+    <Compile Include="Processors\ImmersionProcessor.cs" />
     <Compile Include="Processors\LightingChunkProcessor.cs" />
+    <Compile Include="Processors\ReflectionProcessor.cs" />
     <Compile Include="Processors\VertexBuildChunkProcessor.cs" />
     <Compile Include="Profiling\FrameRateCounter.cs" />
     <Compile Include="Profiling\Utility.cs" />
@@ -428,6 +411,10 @@
     <ProjectReference Include="..\Welt.API\Welt.API.csproj">
       <Project>{E26D7EC7-4BE3-46C1-8185-608F2E649A2B}</Project>
       <Name>Welt.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Welt.Core\Welt.Core.csproj">
+      <Project>{813DF234-8FFD-4C3A-8231-D6296C221DF1}</Project>
+      <Name>Welt.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

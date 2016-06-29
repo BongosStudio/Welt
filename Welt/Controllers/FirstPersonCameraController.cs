@@ -6,6 +6,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
+using Welt.Models;
 
 #endregion
 

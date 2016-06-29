@@ -66,12 +66,13 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_1.Name = "e_1";
             this.e_1.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_1.VerticalAlignment = VerticalAlignment.Center;
-            Binding binding_e_1_Visibility = new Binding("PauseMenuVisibility");
+            Binding binding_e_1_Visibility = new Binding("PauseMenuVisiblity");
             this.e_1.SetBinding(StackPanel.VisibilityProperty, binding_e_1_Visibility);
             // e_2 element
             this.e_2 = new Button();
             this.e_1.Children.Add(this.e_2);
             this.e_2.Name = "e_2";
+            this.e_2.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_2.FontFamily = new FontFamily("Code 7x5");
             this.e_2.FontSize = 18F;
             this.e_2.Content = "Resume";
@@ -82,6 +83,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_3 = new Button();
             this.e_1.Children.Add(this.e_3);
             this.e_3.Name = "e_3";
+            this.e_3.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_3.FontFamily = new FontFamily("Code 7x5");
             this.e_3.FontSize = 18F;
             this.e_3.Content = "Options";
@@ -92,6 +94,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_4 = new Button();
             this.e_1.Children.Add(this.e_4);
             this.e_4.Name = "e_4";
+            this.e_4.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_4.FontFamily = new FontFamily("Code 7x5");
             this.e_4.FontSize = 18F;
             this.e_4.Content = "Quit";

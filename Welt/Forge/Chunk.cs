@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Welt.API;
 using Welt.API.Forge;
 using Welt.Blocks;
 using Welt.Models;
@@ -104,7 +105,7 @@ namespace Welt.Forge
             //comment this line : you should have nothing on screen, else you ve been setting blocks directly in array !
             try
             {
-                Blocks[x*FlattenOffset + z*Size.Y + y] = b;
+                Blocks.SetBlock(x, y, z, b);
             }
             catch (IndexOutOfRangeException e)
             {
@@ -133,7 +134,7 @@ namespace Welt.Forge
             //handle the normal simple case
             if (relx >= 0 && relz >= 0 && relx < Size.X && relz < Size.Z)
             {
-                var b = Blocks[relx*FlattenOffset + relz*Size.Y + rely];
+                var b = Blocks.GetBlock((uint) relx, (uint) rely, (uint) relz);
                 return b;
             }
 
@@ -174,7 +175,7 @@ namespace Welt.Forge
                 //happens at current world bounds
                 return new Block(BlockType.ROCK);
             }
-            var block = nChunk.Blocks[x*FlattenOffset + z*Size.Y + rely];
+            var block = nChunk.Blocks.GetBlock((uint) relx, (uint) rely, (uint) relz);
             return block;
         }
 
@@ -214,13 +215,13 @@ namespace Welt.Forge
         public short GrassVertexCount;
 
         /// <summary>
-        /// Contains blocks as a flattened array.
+        /// Contains blocks in an <see cref="IBlockPalette"/>
         /// </summary>
-        public Block[] Blocks;
+        public IBlockPalette Blocks { get; }
         /// <summary>
         /// Contains heights as a multidimensional array.
         /// </summary>
-        public byte[,] HeightMap;
+        public byte[,] HeightMap { get; }
 
         /* 
         For accessing array for x,z,y coordianate use the pattern: Blocks[x * Chunk.FlattenOffset + z * Chunk.SIZE.Y + y]
@@ -268,7 +269,7 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mN == null) _mN = World.Chunks[Index.X, Index.Z + 1];
+                if (_mN == null) _mN = World.Chunks[Index.X, Index.Z + 1] as Chunk;
                 if (_mN != null) _mN._mS = this;
                 return _mN;
             }
@@ -278,7 +279,7 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mS == null) _mS = World.Chunks[Index.X, Index.Z - 1];
+                if (_mS == null) _mS = World.Chunks[Index.X, Index.Z - 1] as Chunk;
                 if (_mS != null) _mS._mN = this;
                 return _mS;
             }
@@ -288,7 +289,7 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mE == null) _mE = World.Chunks[Index.X - 1, Index.Z];
+                if (_mE == null) _mE = World.Chunks[Index.X - 1, Index.Z] as Chunk;
                 if (_mE != null) _mE._mW = this;
                 return _mE;
             }
@@ -298,19 +299,19 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mW == null) _mW = World.Chunks[Index.X + 1, Index.Z];
+                if (_mW == null) _mW = World.Chunks[Index.X + 1, Index.Z] as Chunk;
                 if (_mW != null) _mW._mE = this;
                 return _mW;
             }
         }
 
-        public Chunk Nw => _mNw ?? (_mNw = World.Chunks[Index.X + 1, Index.Z + 1]);
+        public Chunk Nw => _mNw ?? (_mNw = World.Chunks[Index.X + 1, Index.Z + 1] as Chunk);
 
-        public Chunk Ne => _mNe ?? (_mNe = World.Chunks[Index.X - 1, Index.Z + 1]);
+        public Chunk Ne => _mNe ?? (_mNe = World.Chunks[Index.X - 1, Index.Z + 1] as Chunk);
 
-        public Chunk Sw => _mSw ?? (_mSw = World.Chunks[Index.X + 1, Index.Z - 1]);
+        public Chunk Sw => _mSw ?? (_mSw = World.Chunks[Index.X + 1, Index.Z - 1] as Chunk);
 
-        public Chunk Se => _mSe ?? (_mSe = World.Chunks[Index.X - 1, Index.Z - 1]);
+        public Chunk Se => _mSe ?? (_mSe = World.Chunks[Index.X - 1, Index.Z - 1] as Chunk);
 
         public Chunk GetNeighbour(Cardinal c)
         {

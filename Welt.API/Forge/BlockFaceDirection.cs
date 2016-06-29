@@ -1,7 +1,7 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
-namespace Welt.Blocks
+namespace Welt.API.Forge
 {
     public enum BlockFaceDirection
     {

@@ -7,6 +7,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Welt.API.Forge;
 using Welt.Controllers;
 using Welt.Forge;
 using Welt.Models;
@@ -69,7 +70,7 @@ namespace Welt.Cameras
                 for (var zz = 0; z < Chunk.Size.Z; z++)
                 {
                     var y = chunk.HeightMap[xx, zz];
-                    var blockcheck = chunk.Blocks[xx*Chunk.FlattenOffset + zz*Chunk.Size.Y + y].Id;
+                    var blockcheck = chunk.Blocks[xx*Chunk.FlattenOffset + zz*Chunk.Size.Y + y];
                     var index = xx * Chunk.Size.X + zz;
                     switch (blockcheck)
                     {

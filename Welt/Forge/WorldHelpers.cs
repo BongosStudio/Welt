@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Welt.Forge
 {
@@ -27,6 +30,12 @@ namespace Welt.Forge
                 }
             }
             return count/total >= integrity;
+        }
+
+        public static long GetSeedFromString(this string input)
+        {
+            return Encoding.ASCII.GetBytes(input)
+                .Aggregate<byte, long>(0, (current, b) => (current + b)*input.GetHashCode());
         }
     }
 }

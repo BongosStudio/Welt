@@ -7,11 +7,12 @@ using System;
 using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Welt.API.Forge;
 using Welt.Blocks;
 using Welt.Cameras;
 using Welt.Forge;
 using Welt.Models;
-using static Welt.FastMath;
+using static Welt.Core.FastMath;
 
 #endregion
 

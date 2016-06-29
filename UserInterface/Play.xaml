@@ -16,11 +16,10 @@
         </ResourceDictionary>
     </ek:UIRoot.Resources>
     <Grid>
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="{Binding PauseMenuVisibility}">
-            <Button Style="{DynamicResource ButtonAnimStyle}" Command="{Binding ResumeButtonCommand}" FontFamily="Code 7x5" FontSize="18">Resume</Button>
-            <Button Style="{DynamicResource ButtonAnimStyle}" Command="{Binding OptionsButtonCommand}" FontFamily="Code 7x5" FontSize="18">Options</Button>
-            <Button Style="{DynamicResource ButtonAnimStyle}" Command="{Binding QuitButtonCommand}" FontFamily="Code 7x5" FontSize="18">Quit</Button>
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="{Binding PauseMenuVisiblity}">
+            <Button Style="{DynamicResource ButtonAnimStyle}" Command="{Binding ResumeButtonCommand}" FontFamily="Code 7x5" FontSize="18" HorizontalAlignment="Left">Resume</Button>
+            <Button Style="{DynamicResource ButtonAnimStyle}" Command="{Binding OptionsButtonCommand}" FontFamily="Code 7x5" FontSize="18" HorizontalAlignment="Left">Options</Button>
+            <Button Style="{DynamicResource ButtonAnimStyle}" Command="{Binding QuitButtonCommand}" FontFamily="Code 7x5" FontSize="18" HorizontalAlignment="Left">Quit</Button>
         </StackPanel>
-
     </Grid>
 </ek:UIRoot>
