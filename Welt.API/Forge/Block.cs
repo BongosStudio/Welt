@@ -64,6 +64,7 @@ namespace Welt.API.Forge
                 hashCode = (hashCode*397) ^ B.GetHashCode();
                 hashCode = (hashCode*397) ^ Sun.GetHashCode();
                 hashCode = (hashCode*397) ^ Id;
+                hashCode = (hashCode*397) ^ Metadata;
                 return hashCode;
             }
         }
@@ -71,22 +72,33 @@ namespace Welt.API.Forge
         public byte R, G, B;
         public byte Sun;
         public ushort Id;
+        public byte Metadata;
         // Metadata will not be implemented due to the fact that we will have over 65k block spaces. 
         // Yes, it's useful for determining groupings, but it will cut data size down by 1 byte per
         // block. That's over 65k bytes and is completely worth it if you ask me. 
 
-        public Block(ushort blockId)
+        public Block(ushort blockId) : this(blockId, 0x00)
+        {
+
+        }
+
+        public Block(ushort blockId, byte metadata)
         {
             Id = blockId;
             Sun = 0;
             R = 0;
             G = 0;
             B = 0;
+            Metadata = metadata;
         }
 
         public static bool operator ==(Block left, Block right)
         {
-            return left.Id == right.Id;
+            return left.Id == right.Id &&
+                   left.Metadata == right.Metadata &&
+                   left.R == right.R &&
+                   left.G == right.G &&
+                   left.B == right.B;
         }
 
         public static bool operator !=(Block left, Block right)
