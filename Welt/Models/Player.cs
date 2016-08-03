@@ -18,7 +18,7 @@ namespace Welt.Models
     {
         public static Player Current;
         #region Fields
-        public World World;
+        public WorldObject World;
         public PlayerEntity Entity;
 
         public Vector3 Position;
@@ -56,7 +56,7 @@ namespace Welt.Models
             Current = player;
         }
        
-        public void AssignWorld(World world)
+        public void AssignWorld(WorldObject world)
         {
             World = world;
             Entity = new PlayerEntity();

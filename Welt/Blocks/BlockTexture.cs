@@ -17,9 +17,9 @@ namespace Welt.Blocks
         StoneSlabSide,
         StoneSlabTop,
         Brick,
-        TNTSide,
-        TNTTop,
-        TNTBottom,
+        TntSide,
+        TntTop,
+        TntBottom,
         SpooderWeb,
         Rose,
         Dandelion,
@@ -45,7 +45,7 @@ namespace Welt.Blocks
 
     public static class TextureHelper
     {
-        public const int Textureatlassize = 16;
+        public const int TextureAtlasSize = 16;
         public static Dictionary<int, Vector2[]> UvMappings;
 
         static TextureHelper()
@@ -53,7 +53,7 @@ namespace Welt.Blocks
             BuildUvMappings();
         }
 
-        private static Dictionary<int, Vector2[]> BuildUvMappings()
+        private static void BuildUvMappings()
         {
             UvMappings = new Dictionary<int, Vector2[]>();
             for (var i = 0; i < (int) BlockTexture.Maximum; i++)
@@ -65,7 +65,6 @@ namespace Welt.Blocks
                 UvMappings.Add((i*6) + 4, GetUvMapping(i, BlockFaceDirection.ZIncreasing));
                 UvMappings.Add((i*6) + 5, GetUvMapping(i, BlockFaceDirection.ZDecreasing));
             }
-            return UvMappings;
         }
 
         #region GetUVMapping
@@ -73,12 +72,12 @@ namespace Welt.Blocks
         public static Vector2[] GetUvMapping(int texture, BlockFaceDirection faceDir)
         {
             var textureIndex = texture;
-            // Assumes a texture atlas of 8x8 textures
+            // Assumes a texture atlas of 16x16 textures  
 
-            var y = textureIndex/Textureatlassize;
-            var x = textureIndex%Textureatlassize;
+            var y = textureIndex/TextureAtlasSize;
+            var x = textureIndex%TextureAtlasSize;
 
-            var ofs = 1f/Textureatlassize;
+            const float ofs = 1f/TextureAtlasSize;
 
             var yOfs = y*ofs;
             var xOfs = x*ofs;

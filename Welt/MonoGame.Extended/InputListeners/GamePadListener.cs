@@ -159,7 +159,7 @@ namespace Welt.MonoGame.Extended.InputListeners
         /// </summary>
         public float ThumbstickDownTreshold { get; }
 
-        private static readonly bool[] _gamePadConnections = new bool[4];
+        private static readonly bool[] GamePadConnections = new bool[4];
 
         private float _vibrationStrengthLeft;
         private float _vibrationStrengthRight;
@@ -401,9 +401,9 @@ namespace Welt.MonoGame.Extended.InputListeners
 
             foreach (PlayerIndex index in Enum.GetValues(typeof(PlayerIndex)))
             {
-                if (GamePad.GetState(index).IsConnected ^ _gamePadConnections[(int) index])  // We need more XORs in this world
+                if (GamePad.GetState(index).IsConnected ^ GamePadConnections[(int) index])  // We need more XORs in this WorldObject
                 {
-                    _gamePadConnections[(int) index] = !_gamePadConnections[(int) index];
+                    GamePadConnections[(int) index] = !GamePadConnections[(int) index];
                     ControllerConnectionChanged.Raise(null, 
                         new GamePadEventArgs(GamePadState.Default, GamePad.GetState(index), TimeSpan.Zero, index));
                 }

@@ -12,7 +12,7 @@ namespace Welt.API.Forge.Generators
         int SpawnZ { get; set; }
 
         void Initialize(IWorld world);
-        IChunk GenerateChunk(IWorld world, uint x, uint z);
+        void GenerateChunk(IWorld world, IChunk chunk);
 
     }
 }

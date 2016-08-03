@@ -5,6 +5,7 @@ namespace Welt.API.Forge.Generators
 {
     public interface IDecorationGenerator
     {
-         
+        void Decorate(IChunk chunk);
+        void Decorate(IChunk chunk, uint x, uint z);
     }
 }

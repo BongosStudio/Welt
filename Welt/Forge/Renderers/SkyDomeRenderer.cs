@@ -15,7 +15,7 @@ namespace Welt.Forge.Renderers
 {
     public class SkyDomeRenderer : IRenderer
     {
-        public SkyDomeRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, World world)
+        public SkyDomeRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, WorldObject world)
         {
             _mGraphicsDevice = graphicsDevice;
             _mCamera = camera;
@@ -152,7 +152,7 @@ namespace Welt.Forge.Renderers
 
         private readonly GraphicsDevice _mGraphicsDevice;
         private readonly FirstPersonCamera _mCamera;
-        private readonly World _mWorld;
+        private readonly WorldObject _mWorld;
 
         #region Atmospheric settings
 

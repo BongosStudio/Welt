@@ -44,32 +44,32 @@ namespace Welt.MonoGame.Extended
     [DebuggerDisplay("{ToString(),nq}")]
     public struct Angle : IComparable<Angle>, IEquatable<Angle>
     {
-        private const float _tau = (float)(Math.PI * 2.0);
-        private const float _tauInv = (float)(0.5 / Math.PI);
-        private const float _degreeRadian = (float)(Math.PI / 180.0);
-        private const float _radianDegree = (float)(180.0 / Math.PI);
-        private const float _gradianRadian = (float)(Math.PI / 200.0);
-        private const float _radianGradian = (float)(200.0 / Math.PI);
+        private const float TAU = (float)(Math.PI * 2.0);
+        private const float TAU_INV = (float)(0.5 / Math.PI);
+        private const float DEGREE_RADIAN = (float)(Math.PI / 180.0);
+        private const float RADIAN_DEGREE = (float)(180.0 / Math.PI);
+        private const float GRADIAN_RADIAN = (float)(Math.PI / 200.0);
+        private const float RADIAN_GRADIAN = (float)(200.0 / Math.PI);
 
         [DataMember]
         public float Radians { get; set; }
 
         public float Degrees
         {
-            get { return Radians * _radianDegree; }
-            set { Radians = value * _degreeRadian; }
+            get { return Radians * RADIAN_DEGREE; }
+            set { Radians = value * DEGREE_RADIAN; }
         }
 
         public float Gradians
         {
-            get { return Radians * _radianGradian; }
-            set { Radians = value * _gradianRadian; }
+            get { return Radians * RADIAN_GRADIAN; }
+            set { Radians = value * GRADIAN_RADIAN; }
         }
 
         public float Revolutions
         {
-            get { return Radians * _tauInv; }
-            set { Radians = value * _tau; }
+            get { return Radians * TAU_INV; }
+            set { Radians = value * TAU; }
         }
 
         public Angle(float value, AngleType angleType = AngleType.Radian)
@@ -83,13 +83,13 @@ namespace Welt.MonoGame.Extended
                     Radians = value;
                     break;
                 case AngleType.Degree:
-                    Radians = value * _degreeRadian;
+                    Radians = value * DEGREE_RADIAN;
                     break;
                 case AngleType.Revolution:
-                    Radians = value * _tau;
+                    Radians = value * TAU;
                     break;
                 case AngleType.Gradian:
-                    Radians = value * _gradianRadian;
+                    Radians = value * GRADIAN_RADIAN;
                     break;
             }
         }
@@ -113,16 +113,16 @@ namespace Welt.MonoGame.Extended
 
         public void Wrap()
         {
-            var angle = Radians % _tau;
-            if (angle <= Math.PI) angle += _tau;
-            if (angle > Math.PI) angle -= _tau;
+            var angle = Radians % TAU;
+            if (angle <= Math.PI) angle += TAU;
+            if (angle > Math.PI) angle -= TAU;
             Radians = angle;
         }
 
         public void WrapPositive()
         {
-            Radians %= _tau;
-            if (Radians < 0d) Radians += _tau;
+            Radians %= TAU;
+            if (Radians < 0d) Radians += TAU;
             Radians = Radians;
         }
 

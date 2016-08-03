@@ -13,13 +13,13 @@ namespace Welt.Core.Forge
         private readonly Block[] _palette;
         private readonly byte[] _indexed;
 
-        private const int FLATTEN_OFFSET = Chunk.DEPTH*16;
+        public const int FlattenOffset = Chunk.Depth*16;
 
         public BlockPalette()
         {
             _palette = new Block[byte.MaxValue]; // TODO: maybe we should change the size? With light
                                                  // being custom, this may be a problem in the future
-            _indexed = new byte[Chunk.WIDTH*Chunk.DEPTH*16];
+            _indexed = new byte[Chunk.Width*Chunk.Depth*16];
         }
 
         public Block GetBlock(uint x, uint y, uint z)
@@ -111,6 +111,7 @@ namespace Welt.Core.Forge
             //         |    BYTE : block metadata
             //         |
             //         |
+            throw new NotImplementedException();
         }
 
         public bool IsEmpty()
@@ -123,7 +124,7 @@ namespace Welt.Core.Forge
 
         private static uint FlattenIndex(uint x, uint y, uint z)
         {
-            return x*FLATTEN_OFFSET + z*16 + y;
+            return x*FlattenOffset + z*16 + y;
         }
 
         private bool TryGetIndex(Block block, out byte index)

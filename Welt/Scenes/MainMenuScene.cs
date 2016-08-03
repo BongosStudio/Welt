@@ -29,7 +29,7 @@ namespace Welt.Scenes
             viewModel.SinglePlayerButtonCommand =
                 new RelayCommand(delegate
                 {
-                    //SceneController.Load(new LoadScene(game, new World("DEMO WORLD")));
+                    //SceneController.Load(new LoadScene(game, new WorldObject("DEMO WORLD")));
                     viewModel.SpMenuEnabled = true;
                 });
             viewModel.MultiPlayerButtonCommand = 
@@ -46,7 +46,7 @@ namespace Welt.Scenes
             viewModel.CreateNewWorldCommand = new RelayCommand(o =>
             {
                 SceneController.Load(new LoadScene(game,
-                    new World(viewModel.WorldName, 54321))); // TODO: fix the terrain generation. Maybe use Syhno's old style?
+                    new WorldObject(viewModel.WorldName, 54321))); // TODO: fix the terrain generation. Maybe use Syhno's old style?
             });
                 
             DataContext = viewModel;

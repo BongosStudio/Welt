@@ -32,7 +32,7 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private StackPanel e_1;
         
-        private Button spBtn;
+        private Button SpBtn;
         
         private Button e_2;
         
@@ -40,7 +40,7 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private Button e_4;
         
-        private StackPanel spMenu;
+        private StackPanel SpMenu;
         
         private TextBlock e_5;
         
@@ -97,36 +97,36 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_1.Name = "e_1";
             this.e_1.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_1.VerticalAlignment = VerticalAlignment.Center;
-            // spBtn element
-            this.spBtn = new Button();
-            this.e_1.Children.Add(this.spBtn);
-            this.spBtn.Name = "spBtn";
-            this.spBtn.Height = 50F;
-            this.spBtn.Width = 200F;
-            this.spBtn.HorizontalAlignment = HorizontalAlignment.Left;
-            EventTrigger spBtn_ET_0 = new EventTrigger(Button.ClickEvent, this.spBtn);
-            spBtn.Triggers.Add(spBtn_ET_0);
-            BeginStoryboard spBtn_ET_0_AC_0 = new BeginStoryboard();
-            spBtn_ET_0_AC_0.Name = "spBtn_ET_0_AC_0";
-            spBtn_ET_0.AddAction(spBtn_ET_0_AC_0);
-            Storyboard spBtn_ET_0_AC_0_SB = new Storyboard();
-            spBtn_ET_0_AC_0.Storyboard = spBtn_ET_0_AC_0_SB;
-            spBtn_ET_0_AC_0_SB.Name = "spBtn_ET_0_AC_0_SB";
-            FloatAnimation spBtn_ET_0_AC_0_SB_TL_0 = new FloatAnimation();
-            spBtn_ET_0_AC_0_SB_TL_0.Name = "spBtn_ET_0_AC_0_SB_TL_0";
-            spBtn_ET_0_AC_0_SB_TL_0.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 200));
-            spBtn_ET_0_AC_0_SB_TL_0.To = 1F;
-            SineEase spBtn_ET_0_AC_0_SB_TL_0_EA = new SineEase();
-            spBtn_ET_0_AC_0_SB_TL_0.EasingFunction = spBtn_ET_0_AC_0_SB_TL_0_EA;
-            Storyboard.SetTargetName(spBtn_ET_0_AC_0_SB_TL_0, "spMenu");
-            Storyboard.SetTargetProperty(spBtn_ET_0_AC_0_SB_TL_0, Button.OpacityProperty);
-            spBtn_ET_0_AC_0_SB.Children.Add(spBtn_ET_0_AC_0_SB_TL_0);
-            this.spBtn.FontFamily = new FontFamily("Code 7x5");
-            this.spBtn.FontSize = 18F;
-            this.spBtn.Content = "Singleplayer";
-            Binding binding_spBtn_Command = new Binding("SinglePlayerButtonCommand");
-            this.spBtn.SetBinding(Button.CommandProperty, binding_spBtn_Command);
-            this.spBtn.SetResourceReference(Button.StyleProperty, "ButtonAnimStyle");
+            // SpBtn element
+            this.SpBtn = new Button();
+            this.e_1.Children.Add(this.SpBtn);
+            this.SpBtn.Name = "SpBtn";
+            this.SpBtn.Height = 50F;
+            this.SpBtn.Width = 200F;
+            this.SpBtn.HorizontalAlignment = HorizontalAlignment.Left;
+            EventTrigger SpBtn_ET_0 = new EventTrigger(Button.ClickEvent, this.SpBtn);
+            SpBtn.Triggers.Add(SpBtn_ET_0);
+            BeginStoryboard SpBtn_ET_0_AC_0 = new BeginStoryboard();
+            SpBtn_ET_0_AC_0.Name = "SpBtn_ET_0_AC_0";
+            SpBtn_ET_0.AddAction(SpBtn_ET_0_AC_0);
+            Storyboard SpBtn_ET_0_AC_0_SB = new Storyboard();
+            SpBtn_ET_0_AC_0.Storyboard = SpBtn_ET_0_AC_0_SB;
+            SpBtn_ET_0_AC_0_SB.Name = "SpBtn_ET_0_AC_0_SB";
+            FloatAnimation SpBtn_ET_0_AC_0_SB_TL_0 = new FloatAnimation();
+            SpBtn_ET_0_AC_0_SB_TL_0.Name = "SpBtn_ET_0_AC_0_SB_TL_0";
+            SpBtn_ET_0_AC_0_SB_TL_0.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 200));
+            SpBtn_ET_0_AC_0_SB_TL_0.To = 1F;
+            SineEase SpBtn_ET_0_AC_0_SB_TL_0_EA = new SineEase();
+            SpBtn_ET_0_AC_0_SB_TL_0.EasingFunction = SpBtn_ET_0_AC_0_SB_TL_0_EA;
+            Storyboard.SetTargetName(SpBtn_ET_0_AC_0_SB_TL_0, "SpMenu");
+            Storyboard.SetTargetProperty(SpBtn_ET_0_AC_0_SB_TL_0, Button.OpacityProperty);
+            SpBtn_ET_0_AC_0_SB.Children.Add(SpBtn_ET_0_AC_0_SB_TL_0);
+            this.SpBtn.FontFamily = new FontFamily("Code 7x5");
+            this.SpBtn.FontSize = 18F;
+            this.SpBtn.Content = "Singleplayer";
+            Binding binding_SpBtn_Command = new Binding("SinglePlayerButtonCommand");
+            this.SpBtn.SetBinding(Button.CommandProperty, binding_SpBtn_Command);
+            this.SpBtn.SetResourceReference(Button.StyleProperty, "ButtonAnimStyle");
             // e_2 element
             this.e_2 = new Button();
             this.e_1.Children.Add(this.e_2);
@@ -168,23 +168,23 @@ namespace EmptyKeys.UserInterface.Generated {
             Binding binding_e_4_Command = new Binding("ExitButtonCommand");
             this.e_4.SetBinding(Button.CommandProperty, binding_e_4_Command);
             this.e_4.SetResourceReference(Button.StyleProperty, "ButtonAnimStyle");
-            // spMenu element
-            this.spMenu = new StackPanel();
-            this.e_0.Children.Add(this.spMenu);
-            this.spMenu.Name = "spMenu";
-            this.spMenu.Width = 400F;
-            this.spMenu.Margin = new Thickness(261F, 201F, 0F, 60F);
-            this.spMenu.HorizontalAlignment = HorizontalAlignment.Left;
-            this.spMenu.Opacity = 0F;
+            // SpMenu element
+            this.SpMenu = new StackPanel();
+            this.e_0.Children.Add(this.SpMenu);
+            this.SpMenu.Name = "SpMenu";
+            this.SpMenu.Width = 400F;
+            this.SpMenu.Margin = new Thickness(261F, 201F, 0F, 60F);
+            this.SpMenu.HorizontalAlignment = HorizontalAlignment.Left;
+            this.SpMenu.Opacity = 0F;
             // e_5 element
             this.e_5 = new TextBlock();
-            this.spMenu.Children.Add(this.e_5);
+            this.SpMenu.Children.Add(this.e_5);
             this.e_5.Name = "e_5";
             this.e_5.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_5.Text = "World Name";
             // e_6 element
             this.e_6 = new TextBox();
-            this.spMenu.Children.Add(this.e_6);
+            this.SpMenu.Children.Add(this.e_6);
             this.e_6.Name = "e_6";
             this.e_6.Width = 241F;
             this.e_6.HorizontalAlignment = HorizontalAlignment.Left;
@@ -193,13 +193,13 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_6.SetBinding(TextBox.TextProperty, binding_e_6_Text);
             // e_7 element
             this.e_7 = new TextBlock();
-            this.spMenu.Children.Add(this.e_7);
+            this.SpMenu.Children.Add(this.e_7);
             this.e_7.Name = "e_7";
             this.e_7.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_7.Text = "Seed";
             // e_8 element
             this.e_8 = new TextBox();
-            this.spMenu.Children.Add(this.e_8);
+            this.SpMenu.Children.Add(this.e_8);
             this.e_8.Name = "e_8";
             this.e_8.Width = 241F;
             this.e_8.HorizontalAlignment = HorizontalAlignment.Left;
@@ -208,7 +208,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_8.SetBinding(TextBox.TextProperty, binding_e_8_Text);
             // e_9 element
             this.e_9 = new TextBlock();
-            this.spMenu.Children.Add(this.e_9);
+            this.SpMenu.Children.Add(this.e_9);
             this.e_9.Name = "e_9";
             this.e_9.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_9.VerticalAlignment = VerticalAlignment.Top;
@@ -216,7 +216,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_9.TextWrapping = TextWrapping.Wrap;
             // e_10 element
             this.e_10 = new RadioButton();
-            this.spMenu.Children.Add(this.e_10);
+            this.SpMenu.Children.Add(this.e_10);
             this.e_10.Name = "e_10";
             this.e_10.Content = "Realistic";
             this.e_10.CommandParameter = "realistic";
@@ -226,7 +226,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_10.SetBinding(RadioButton.CommandProperty, binding_e_10_Command);
             // e_11 element
             this.e_11 = new RadioButton();
-            this.spMenu.Children.Add(this.e_11);
+            this.SpMenu.Children.Add(this.e_11);
             this.e_11.Name = "e_11";
             this.e_11.Content = "Story";
             this.e_11.CommandParameter = "story";
@@ -235,7 +235,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_11.SetBinding(RadioButton.CommandProperty, binding_e_11_Command);
             // e_12 element
             this.e_12 = new RadioButton();
-            this.spMenu.Children.Add(this.e_12);
+            this.SpMenu.Children.Add(this.e_12);
             this.e_12.Name = "e_12";
             this.e_12.Content = "Limitless";
             this.e_12.CommandParameter = "limitless";
@@ -244,12 +244,12 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_12.SetBinding(RadioButton.CommandProperty, binding_e_12_Command);
             // e_13 element
             this.e_13 = new CheckBox();
-            this.spMenu.Children.Add(this.e_13);
+            this.SpMenu.Children.Add(this.e_13);
             this.e_13.Name = "e_13";
             this.e_13.Content = "Enable LAN";
             // e_14 element
             this.e_14 = new Button();
-            this.spMenu.Children.Add(this.e_14);
+            this.SpMenu.Children.Add(this.e_14);
             this.e_14.Name = "e_14";
             this.e_14.Height = 50F;
             this.e_14.HorizontalAlignment = HorizontalAlignment.Left;

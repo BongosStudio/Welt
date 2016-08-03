@@ -231,8 +231,8 @@ namespace WeltLauncher.MdXaml
             //return text;
         }
 
-        private static readonly Regex _newlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
-        private static readonly Regex _newlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
+        private static readonly Regex NewlinesLeadingTrailing = new Regex(@"^\n+|\n+\z", RegexOptions.Compiled);
+        private static readonly Regex NewlinesMultiple = new Regex(@"\n{2,}", RegexOptions.Compiled);
         private static Regex _leadingWhitespace = new Regex(@"^[ ]*", RegexOptions.Compiled);
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace WeltLauncher.MdXaml
             }
 
             // split on two or more newlines
-            var grafs = _newlinesMultiple.Split(_newlinesLeadingTrailing.Replace(text, ""));
+            var grafs = NewlinesMultiple.Split(NewlinesLeadingTrailing.Replace(text, ""));
 
             return grafs.Select(g => Create<Paragraph, Inline>(RunSpanGamut(g)));
         }
@@ -314,7 +314,7 @@ namespace WeltLauncher.MdXaml
                 , NEST_DEPTH));
         }
 
-        private static readonly Regex _imageInline = new Regex(
+        private static readonly Regex ImageInline = new Regex(
             $@"
                 (                           # wrap whole match in $1
                     !\[
@@ -336,7 +336,7 @@ namespace WeltLauncher.MdXaml
                 )",
                   RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _anchorInline = new Regex(
+        private static readonly Regex AnchorInline = new Regex(
             $@"
                 (                           # wrap whole match in $1
                     \[
@@ -371,7 +371,7 @@ namespace WeltLauncher.MdXaml
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate(text, _imageInline, ImageInlineEvaluator, defaultHandler);
+            return Evaluate(text, ImageInline, ImageInlineEvaluator, defaultHandler);
         }
 
         private Inline ImageInlineEvaluator(Match match)
@@ -448,7 +448,7 @@ namespace WeltLauncher.MdXaml
             }
 
             // Next, inline-style links: [link text](url "optional title") or [link text](url "optional title")
-            return Evaluate(text, _anchorInline, AnchorInlineEvaluator, defaultHandler);
+            return Evaluate(text, AnchorInline, AnchorInlineEvaluator, defaultHandler);
         }
 
         private Inline AnchorInlineEvaluator(Match match)
@@ -473,7 +473,7 @@ namespace WeltLauncher.MdXaml
             return result;
         }
 
-        private static readonly Regex _headerSetext = new Regex(@"
+        private static readonly Regex HeaderSetext = new Regex(@"
                 ^(.+?)
                 [ ]*
                 \n
@@ -482,7 +482,7 @@ namespace WeltLauncher.MdXaml
                 \n+",
     RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _headerAtx = new Regex(@"
+        private static readonly Regex HeaderAtx = new Regex(@"
                 ^(\#{1,6})  # $1 = string of #'s
                 [ ]*
                 (.+?)       # $2 = Header text
@@ -514,8 +514,8 @@ namespace WeltLauncher.MdXaml
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate<Block>(text, _headerSetext, m => SetextHeaderEvaluator(m),
-                s => Evaluate<Block>(s, _headerAtx, m => AtxHeaderEvaluator(m), defaultHandler));
+            return Evaluate<Block>(text, HeaderSetext, m => SetextHeaderEvaluator(m),
+                s => Evaluate<Block>(s, HeaderAtx, m => AtxHeaderEvaluator(m), defaultHandler));
         }
 
         private Block SetextHeaderEvaluator(Match match)
@@ -587,7 +587,7 @@ namespace WeltLauncher.MdXaml
             return block;
         }
 
-        private static readonly Regex _horizontalRules = new Regex(@"
+        private static readonly Regex HorizontalRules = new Regex(@"
             ^[ ]{0,3}         # Leading space
                 ([-*_])       # $1: First marker
                 (?>           # Repeated marker group
@@ -614,7 +614,7 @@ namespace WeltLauncher.MdXaml
                 throw new ArgumentNullException(nameof(text));
             }
 
-            return Evaluate(text, _horizontalRules, RuleEvaluator, defaultHandler);
+            return Evaluate(text, HorizontalRules, RuleEvaluator, defaultHandler);
         }
 
         private Block RuleEvaluator(Match match)
@@ -639,7 +639,7 @@ namespace WeltLauncher.MdXaml
             return container;
         }
 
-        private static readonly string _wholeList = string.Format(@"
+        private static readonly string WholeList = string.Format(@"
             (                               # $1 = whole list
               (                             # $2
                 [ ]{{0,{1}}}
@@ -659,10 +659,10 @@ namespace WeltLauncher.MdXaml
               )
             )", $"(?:{MARKER_UL}|{MARKER_OL})", TAB_WIDTH - 1);
 
-        private static readonly Regex _listNested = new Regex(@"^" + _wholeList,
+        private static readonly Regex ListNested = new Regex(@"^" + WholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
-        private static readonly Regex _listTopLevel = new Regex(@"(?:(?<=\n\n)|\A\n?)" + _wholeList,
+        private static readonly Regex ListTopLevel = new Regex(@"(?:(?<=\n\n)|\A\n?)" + WholeList,
             RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
 
         /// <summary>
@@ -678,9 +678,9 @@ namespace WeltLauncher.MdXaml
             // We use a different prefix before nested lists than top-level lists.
             // See extended comment in _ProcessListItems().
             if (_listLevel > 0)
-                return Evaluate(text, _listNested, ListEvaluator, defaultHandler);
+                return Evaluate(text, ListNested, ListEvaluator, defaultHandler);
             else
-                return Evaluate(text, _listTopLevel, ListEvaluator, defaultHandler);
+                return Evaluate(text, ListTopLevel, ListEvaluator, defaultHandler);
         }
 
         private Block ListEvaluator(Match match)
@@ -778,7 +778,7 @@ namespace WeltLauncher.MdXaml
             }
         }
 
-        private static readonly Regex _codeSpan = new Regex(@"
+        private static readonly Regex CodeSpan = new Regex(@"
                     (?<!\\)   # Character before opening ` can't be a backslash
                     (`+)      # $1 = Opening run of `
                     (.+?)     # $2 = The code block
@@ -818,7 +818,7 @@ namespace WeltLauncher.MdXaml
             //          ... type <code>`bar`</code> ...         
             //
 
-            return Evaluate(text, _codeSpan, CodeSpanEvaluator, defaultHandler);
+            return Evaluate(text, CodeSpan, CodeSpanEvaluator, defaultHandler);
         }
 
         private Inline CodeSpanEvaluator(Match match)
@@ -841,14 +841,14 @@ namespace WeltLauncher.MdXaml
             return result;
         }
 
-        private static readonly Regex _bold = new Regex(@"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
+        private static readonly Regex Bold = new Regex(@"(\*\*|__) (?=\S) (.+?[*_]*) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static readonly Regex _strictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
+        private static readonly Regex StrictBold = new Regex(@"([\W_]|^) (\*\*|__) (?=\S) ([^\r]*?\S[\*_]*) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly Regex _italic = new Regex(@"(\*|_) (?=\S) (.+?) (?<=\S) \1",
+        private static readonly Regex Italic = new Regex(@"(\*|_) (?=\S) (.+?) (?<=\S) \1",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
-        private static readonly Regex _strictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
+        private static readonly Regex StrictItalic = new Regex(@"([\W_]|^) (\*|_) (?=\S) ([^\r\*_]*?\S) \2 ([\W_]|$)",
             RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Compiled);
 
         /// <summary>
@@ -864,14 +864,14 @@ namespace WeltLauncher.MdXaml
             // <strong> must go first, then <em>
             if (StrictBoldItalic)
             {
-                return Evaluate<Inline>(text, _strictBold, m => BoldEvaluator(m, 3),
-                    s1 => Evaluate<Inline>(s1, _strictItalic, m => ItalicEvaluator(m, 3),
+                return Evaluate<Inline>(text, StrictBold, m => BoldEvaluator(m, 3),
+                    s1 => Evaluate<Inline>(s1, StrictItalic, m => ItalicEvaluator(m, 3),
                     s2 => defaultHandler(s2)));
             }
             else
             {
-                return Evaluate<Inline>(text, _bold, m => BoldEvaluator(m, 2),
-                   s1 => Evaluate<Inline>(s1, _italic, m => ItalicEvaluator(m, 2),
+                return Evaluate<Inline>(text, Bold, m => BoldEvaluator(m, 2),
+                   s1 => Evaluate<Inline>(s1, Italic, m => ItalicEvaluator(m, 2),
                    s2 => defaultHandler(s2)));
             }
         }
@@ -898,14 +898,14 @@ namespace WeltLauncher.MdXaml
             return Create<Bold, Inline>(RunSpanGamut(content));
         }
 
-        private static readonly Regex _outDent = new Regex(@"^[ ]{1," + TAB_WIDTH + @"}", RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex OutDent = new Regex(@"^[ ]{1," + TAB_WIDTH + @"}", RegexOptions.Multiline | RegexOptions.Compiled);
 
         /// <summary>
         /// Remove one level of line-leading spaces
         /// </summary>
         private string Outdent(string block)
         {
-            return _outDent.Replace(block, "");
+            return OutDent.Replace(block, "");
         }
 
         /// <summary>
@@ -1032,7 +1032,7 @@ namespace WeltLauncher.MdXaml
             }
         }
 
-        private static readonly Regex _eoln = new Regex("\\s+");
+        private static readonly Regex Eoln = new Regex("\\s+");
 
         public IEnumerable<Inline> DoText(string text)
         {
@@ -1041,7 +1041,7 @@ namespace WeltLauncher.MdXaml
                 throw new ArgumentNullException(nameof(text));
             }
 
-            var t = _eoln.Replace(text, " ");
+            var t = Eoln.Replace(text, " ");
             yield return new Run(t);
         }
     }

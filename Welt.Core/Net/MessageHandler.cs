@@ -10,7 +10,7 @@ namespace Welt.Core.Net
 {
     public class MessageHandler
     {
-        private static readonly IMessage[] _messageTypes = new IMessage[256];
+        protected static readonly IMessage[] MessageTypes = new IMessage[256];
 
         public static void Initialize()
         {
@@ -18,13 +18,13 @@ namespace Welt.Core.Net
                 .Where(t => typeof (IMessage).IsAssignableFrom(t))
                 .Select(type => (IMessage) Activator.CreateInstance(type, BindingFlags.CreateInstance)))
             {
-                _messageTypes[m.Id] = m;
+                MessageTypes[m.Id] = m;
             }
         }
 
         public static IMessage GetMessage(byte id)
         {
-            return _messageTypes[id];
+            return MessageTypes[id];
         }
     }
 }

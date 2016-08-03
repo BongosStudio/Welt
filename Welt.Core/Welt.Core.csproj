@@ -47,15 +47,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FastMath.cs" />
+    <Compile Include="Forge\Biomes\ForestBiomeGenerator.cs" />
     <Compile Include="Forge\BlockPalette.cs" />
+    <Compile Include="Forge\Botany\TreeTypes.cs" />
     <Compile Include="Forge\Chunk.cs" />
     <Compile Include="Forge\ChunkManager.cs" />
+    <Compile Include="Forge\EventArgs.cs" />
     <Compile Include="Forge\Floor.cs" />
+    <Compile Include="Forge\Generators\Decorations\TreeDecorator.cs" />
     <Compile Include="Forge\Generators\StandardGenerator.cs" />
+    <Compile Include="Forge\Weather\WeatherEngine.cs" />
     <Compile Include="Forge\World.cs" />
     <Compile Include="Net\IMessage.cs" />
+    <Compile Include="Net\MessageDirection.cs" />
     <Compile Include="Net\MessageHandler.cs" />
-    <Compile Include="Net\Messages\HandshakeMessage.cs" />
     <Compile Include="Net\MessageType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\GameServer.cs" />
@@ -66,6 +71,15 @@
       <Project>{E26D7EC7-4BE3-46C1-8185-608F2E649A2B}</Project>
       <Name>Welt.API</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Forge\Blocks\" />
+    <Folder Include="Forge\Generators\Caves\" />
+    <Folder Include="Net\Messages\Clientbound\" />
+    <Folder Include="Net\Messages\Serverbound\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Net\Messages\net-protocol.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

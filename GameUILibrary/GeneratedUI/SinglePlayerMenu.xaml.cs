@@ -26,7 +26,7 @@ namespace EmptyKeys.UserInterface.Generated {
     [GeneratedCodeAttribute("Empty Keys UI Generator", "2.2.0.0")]
     public partial class SinglePlayerMenu : UIRoot {
         
-        private Grid e_0;
+        private Grid _e0;
         
         public SinglePlayerMenu() : 
                 base() {
@@ -47,9 +47,9 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private void InitializeComponent() {
             // e_0 element
-            this.e_0 = new Grid();
-            this.Content = this.e_0;
-            this.e_0.Name = "e_0";
+            this._e0 = new Grid();
+            this.Content = this._e0;
+            this._e0.Name = "e_0";
             FontManager.Instance.AddFont("Code 7x5", 18F, FontStyle.Regular, "Code_7x5_13.5_Regular");
         }
     }

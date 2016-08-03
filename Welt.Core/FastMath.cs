@@ -12,19 +12,19 @@ namespace Welt.Core
         #region Constants
 
         public const float E = 2.718282f;
-        public const float LOG2_E = 1.442695f;
-        public const float LOG10_E = 0.4342945f;
-        public const float PI = 3.141593f;
-        public const float TWO_PI = 6.283185f;
-        public const float PI_OVER2 = 1.570796f;
-        public const float PI_OVER4 = 0.7853982f;
+        public const float Log2E = 1.442695f;
+        public const float Log10E = 0.4342945f;
+        public const float Pi = 3.141593f;
+        public const float TwoPi = 6.283185f;
+        public const float PiOver2 = 1.570796f;
+        public const float PiOver4 = 0.7853982f;
 
         #endregion
 
         #region Private Properties
 
-        private static readonly Random _random = new Random();
-        private static readonly object _rLock = new object();
+        private static readonly Random Random = new Random();
+        private static readonly object RLock = new object();
 
         #endregion
 
@@ -86,33 +86,33 @@ namespace Welt.Core
 
         public static int NextRandom(int max)
         {
-            lock (_rLock)
+            lock (RLock)
             {
-                return _random.Next(max);
+                return Random.Next(max);
             }
         }
 
         public static int NextRandom(int min, int max)
         {
-            lock (_rLock)
+            lock (RLock)
             {
-                return _random.Next(min, max);
+                return Random.Next(min, max);
             }
         }
 
         public static double NextRandomDouble()
         {
-            lock (_rLock)
+            lock (RLock)
             {
-                return _random.NextDouble();
+                return Random.NextDouble();
             }
         }
 
         public static bool NextRandomBoolean()
         {
-            lock (_rLock)
+            lock (RLock)
             {
-                return _random.Next(2) == 1;
+                return Random.Next(2) == 1;
             }
         }
 

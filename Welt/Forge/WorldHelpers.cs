@@ -14,7 +14,7 @@ namespace Welt.Forge
             return x*flattenOffset + z*maxY + y;
         }
 
-        public static bool IsGroupingNear(this World world, Vector3 focalPoint, Vector3 distance, ushort block, float integrity)
+        public static bool IsGroupingNear(this WorldObject world, Vector3 focalPoint, Vector3 distance, ushort block, float integrity)
         {
             var count = 0;
             var total = 0;

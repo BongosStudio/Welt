@@ -16,7 +16,7 @@ namespace Welt.MonoGame.Extended.Graphics.Batching
     internal class DeferredBatchQueuer<TVertexType> : BatchQueuer<TVertexType>
         where TVertexType : struct, IVertexType
     {
-        private const int InitialOperationsCapacity = 25;
+        private const int INITIAL_OPERATIONS_CAPACITY = 25;
 
         // the draw operations buffer
         private BatchDrawOperation[] _operations;
@@ -47,8 +47,8 @@ namespace Welt.MonoGame.Extended.Graphics.Batching
             _vertices = new TVertexType[BatchDrawer.MaximumVerticesCount];
             _indices = new short[BatchDrawer.MaximumIndicesCount];
             _sortKeysValuesAction = sortKeysValuesAction;
-            _operationSortKeys = new uint[InitialOperationsCapacity];
-            _operations = new BatchDrawOperation[InitialOperationsCapacity];
+            _operationSortKeys = new uint[INITIAL_OPERATIONS_CAPACITY];
+            _operations = new BatchDrawOperation[INITIAL_OPERATIONS_CAPACITY];
         }
 
         private void CreateNewDrawOperationIfNecessary(IDrawContext drawContext, PrimitiveType primitiveType, int vertexCount, int indexCount, uint sortKey)

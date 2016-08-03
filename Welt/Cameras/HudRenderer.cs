@@ -18,7 +18,7 @@ namespace Welt.Cameras
 {
     public class HudRenderer
     {
-        public HudRenderer(GraphicsDevice device, World world, PlayerRenderer playerRenderer)
+        public HudRenderer(GraphicsDevice device, WorldObject world, PlayerRenderer playerRenderer)
         {
             _mGraphicsDevice = device;
             PlayerRenderer = playerRenderer;
@@ -60,36 +60,36 @@ namespace Welt.Cameras
             var x = (uint) PlayerRenderer.Camera.Position.X;
             var z = (uint) PlayerRenderer.Camera.Position.Z;
 
-            var cx = x/Chunk.Size.X;
-            var cz = z/Chunk.Size.Z;
+            var cx = x/ChunkObject.Size.X;
+            var cz = z/ChunkObject.Size.Z;
 
-            var chunk = World.Chunks[cx, cz];
+            var chunk = World.GetChunk(cx, cz);
 
-            for (var xx = 0; xx < Chunk.Size.X; xx++)
+            for (var xx = 0; xx < ChunkObject.Size.X; xx++)
             {
-                for (var zz = 0; z < Chunk.Size.Z; z++)
+                for (var zz = 0; z < ChunkObject.Size.Z; z++)
                 {
                     var y = chunk.HeightMap[xx, zz];
-                    var blockcheck = chunk.Blocks[xx*Chunk.FlattenOffset + zz*Chunk.Size.Y + y];
-                    var index = xx * Chunk.Size.X + zz;
+                    var blockcheck = chunk.GetBlock(xx, y, zz).Id;
+                    var index = xx * ChunkObject.Size.X + zz;
                     switch (blockcheck)
                     {
-                        case BlockType.GRASS:
+                        case BlockType.Grass:
                             _mMaptexture[index] = new Color(0, y, 0);
                             break;
-                        case BlockType.DIRT:
+                        case BlockType.Dirt:
                             _mMaptexture[index] = Color.Khaki;
                             break;
-                        case BlockType.SNOW:
+                        case BlockType.Snow:
                             _mMaptexture[index] = new Color(y, y, y);
                             break;
-                        case BlockType.SAND:
+                        case BlockType.Sand:
                             _mMaptexture[index] = new Color(193 + y / 2, 154 + y / 2, 107 + y / 2);
                             break;
-                        case BlockType.WATER:
+                        case BlockType.Water:
                             _mMaptexture[index] = new Color(0, 0, y + 64);
                             break;
-                        case BlockType.LEAVES:
+                        case BlockType.Leaves:
                             _mMaptexture[index] = new Color(0, 128, 0);
                             break;
                         default:
@@ -99,16 +99,16 @@ namespace Welt.Cameras
                 }
             }
 
-            //for (var xx = 0; xx < Chunk.Size.X; xx++)
+            //for (var xx = 0; xx < ChunkObject.Size.X; xx++)
             //{
-            //    for (var zz = 0; zz < Chunk.Size.Z; zz++)
+            //    for (var zz = 0; zz < ChunkObject.Size.Z; zz++)
             //    {
-            //        var offset = xx*Chunk.FlattenOffset + zz*Chunk.Size.Y;
-            //        for (int y = Chunk.Max.Y; y > 0; y--)
+            //        var offset = xx*ChunkObject.FlattenOffset + zz*ChunkObject.Size.Y;
+            //        for (int y = ChunkObject.Max.Y; y > 0; y--)
             //        {
             //            var blockcheck = chunk.Blocks[offset + y].Id;
             //            if (blockcheck == BlockType.None) continue;
-            //            var index = xx*(Chunk.Size.X) + zz;
+            //            var index = xx*(ChunkObject.Size.X) + zz;
             //            switch (blockcheck)
             //            {
             //                case BlockType.Grass:
@@ -165,7 +165,7 @@ namespace Welt.Cameras
                 {
                     _mBlockPos.X = i*8 + 650;
                     _mBlockPos.Y = j*8 + 20;
-                    _mSpriteBatchmap.Draw(_mMinimapTex, _mBlockPos, _mMaptexture[i*Chunk.Size.X + j]);
+                    _mSpriteBatchmap.Draw(_mMinimapTex, _mBlockPos, _mMaptexture[i*ChunkObject.Size.X + j]);
                 }
             }
             _mSpriteBatchmap.End();
@@ -183,7 +183,7 @@ namespace Welt.Cameras
         private SpriteBatch _mSpriteBatchmap;
         private Texture2D _mMinimapTex;
         private Color _mMinimapBgCol = new Color(150, 150, 150, 150);
-        private readonly Color[] _mMaptexture = new Color[Chunk.Size.X*Chunk.Size.Z];
+        private readonly Color[] _mMaptexture = new Color[ChunkObject.Size.X*ChunkObject.Size.Z];
         private Rectangle _mMinimapBgRect = new Rectangle(650, 20, 64, 64);
         private Rectangle _mBlockPos = new Rectangle(0, 0, 8, 8);
 
@@ -191,7 +191,7 @@ namespace Welt.Cameras
 
         private readonly GraphicsDevice _mGraphicsDevice;
         public readonly PlayerRenderer PlayerRenderer;
-        public readonly World World;
+        public readonly WorldObject World;
 
         public bool ShowMinimap = false;
 

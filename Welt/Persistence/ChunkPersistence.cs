@@ -14,7 +14,7 @@ namespace Welt.Persistence
     {
         /*
 
-        Chunk persistence follows this format:
+        ChunkObject persistence follows this format:
         FileName: c_x_z.w (ie: c_1_12.w)
         Directory: world_name/chunks/ (ie: myworld/chunks/)
 

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Welt.API.Forge;
 using Welt.Forge;
+using Welt.Logic.Forge;
 
 namespace Welt.Models
 {
@@ -23,7 +24,7 @@ namespace Welt.Models
         public bool TryMerge(ref BlockStack stack)
         {
             if (stack.Block != Block && Block.Id != 0) return false;
-            var size = Block.GetStackSize(Block.Id);
+            var size = BlockLogic.GetStackSize(Block.Id);
             if (stack.Count + Count > size)
             {
                 if (stack.Count + Count > size*2) return false;

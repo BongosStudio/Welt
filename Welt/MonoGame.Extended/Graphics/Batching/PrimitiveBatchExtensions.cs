@@ -6,8 +6,8 @@ namespace Welt.MonoGame.Extended.Graphics.Batching
 {
     public static class PrimitiveBatchExtensions
     {
-        private static readonly VertexPositionColorTexture[] _spriteItemVertices = new VertexPositionColorTexture[4];
-        private static readonly short[] _spriteItemIndices = {
+        private static readonly VertexPositionColorTexture[] SpriteItemVertices = new VertexPositionColorTexture[4];
+        private static readonly short[] SpriteItemIndices = {
             0,
             1,
             2,
@@ -85,49 +85,49 @@ namespace Welt.MonoGame.Extended.Graphics.Batching
                 SetSpriteItemVerticesWithRotation(position.X, position.Y, -origin1.X, -origin1.Y, width, height, (float)Math.Sin(rotation), (float)Math.Cos(rotation), color1, textureCoordinateTopLeft, textureCoordinateBottomRight, position.Z);
             }
 
-            primitiveBatch.Draw(drawContext, PrimitiveType.TriangleList, _spriteItemVertices, _spriteItemIndices, sortKey);
+            primitiveBatch.Draw(drawContext, PrimitiveType.TriangleList, SpriteItemVertices, SpriteItemIndices, sortKey);
         }
 
         private static void SetSpriteItemVerticesWithRotation(float x, float y, float dx, float dy, float w, float h, float sin, float cos, Color color, Vector2 topLeftTextureCoordinate, Vector2 bottomRightTextureCoordinate, float depth)
         {
             var topLeftPosition = new Vector3(x + dx * cos - dy * sin, y + dx * sin + dy * cos, depth);
             var topLeftVertex = new VertexPositionColorTexture(topLeftPosition, color, topLeftTextureCoordinate);
-            _spriteItemVertices[0] = topLeftVertex;
+            SpriteItemVertices[0] = topLeftVertex;
 
             var topRightPosition = new Vector3(x + (dx + w) * cos - dy * sin, y + (dx + w) * sin + dy * cos, depth);
             var topRightTextureCoordinate = new Vector2(bottomRightTextureCoordinate.X, topLeftTextureCoordinate.Y);
             var topRightVertex = new VertexPositionColorTexture(topRightPosition, color, topRightTextureCoordinate);
-            _spriteItemVertices[1] = topRightVertex;
+            SpriteItemVertices[1] = topRightVertex;
 
             var bottomLeftPosition = new Vector3(x + dx * cos - (dy + h) * sin, y + dx * sin + (dy + h) * cos, depth);
             var bottomLeftTextureCoordinate = new Vector2(topLeftTextureCoordinate.X, bottomRightTextureCoordinate.Y);
             var bottomLeftVertex = new VertexPositionColorTexture(bottomLeftPosition, color, bottomLeftTextureCoordinate);
-            _spriteItemVertices[2] = bottomLeftVertex;
+            SpriteItemVertices[2] = bottomLeftVertex;
 
             var bottomRightPosition = new Vector3(x + (dx + w) * cos - (dy + h) * sin, y + (dx + w) * sin + (dy + h) * cos, depth);
             var bottomRightVertex = new VertexPositionColorTexture(bottomRightPosition, color, bottomRightTextureCoordinate);
-            _spriteItemVertices[3] = bottomRightVertex;
+            SpriteItemVertices[3] = bottomRightVertex;
         }
 
         private static void SetSpriteItemVerticesNoRotation(float x, float y, float w, float h, Color color, Vector2 topLeftTextureCoordinate, Vector2 bottomRightTextureCoordinate, float depth)
         {
             var topLeftPosition = new Vector3(x, y, depth);
             var topLeftVertex = new VertexPositionColorTexture(topLeftPosition, color, topLeftTextureCoordinate);
-            _spriteItemVertices[0] = topLeftVertex;
+            SpriteItemVertices[0] = topLeftVertex;
 
             var topRightPosition = new Vector3(x + w, y, depth);
             var topRightTextureCoordinate = new Vector2(bottomRightTextureCoordinate.X, topLeftTextureCoordinate.Y);
             var topRightVertex = new VertexPositionColorTexture(topRightPosition, color, topRightTextureCoordinate);
-            _spriteItemVertices[1] = topRightVertex;
+            SpriteItemVertices[1] = topRightVertex;
 
             var bottomLeftPosition = new Vector3(x, y + h, depth);
             var bottomLeftTextureCoordinate = new Vector2(topLeftTextureCoordinate.X, bottomRightTextureCoordinate.Y);
             var bottomLeftVertex = new VertexPositionColorTexture(bottomLeftPosition, color, bottomLeftTextureCoordinate);
-            _spriteItemVertices[2] = bottomLeftVertex;
+            SpriteItemVertices[2] = bottomLeftVertex;
 
             var bottomRightPosition = new Vector3(x + w, y + h, depth);
             var bottomRightVertex = new VertexPositionColorTexture(bottomRightPosition, color, bottomRightTextureCoordinate);
-            _spriteItemVertices[3] = bottomRightVertex;
+            SpriteItemVertices[3] = bottomRightVertex;
         }
     }
 }

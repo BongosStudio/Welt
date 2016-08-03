@@ -9,7 +9,7 @@ namespace Welt.MonoGame.Extended.Particles.Modifiers
         public float MaxSpeed { get; set; }
 
         // Note: not the real-life one
-        private const float _gravConst = 100000f;
+        private const float GRAV_CONST = 100000f;
 
         public void Update(float elapsedSeconds, ParticleBuffer.ParticleIterator iterator) {
             while (iterator.HasNext) {
@@ -18,7 +18,7 @@ namespace Welt.MonoGame.Extended.Particles.Modifiers
 
                 var distance2 = diff.LengthSquared();
 
-                var speedGain = _gravConst * Mass / distance2 * elapsedSeconds;
+                var speedGain = GRAV_CONST * Mass / distance2 * elapsedSeconds;
                 // normalize distances and multiply by speedGain
                 diff.Normalize();
                 particle->Velocity += diff * speedGain;

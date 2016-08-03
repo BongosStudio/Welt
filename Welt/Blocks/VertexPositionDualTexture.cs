@@ -57,15 +57,9 @@ namespace Welt.Blocks
             set { _mAoWeight = value; }
         }
 
-        public static int SizeInBytes
-        {
-            get { return sizeof (float)*8; }
-        }
+        public static int SizeInBytes => sizeof (float)*8;
 
-        VertexDeclaration IVertexType.VertexDeclaration
-        {
-            get { return VertexDeclaration; }
-        }
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
         public override string ToString()
         {

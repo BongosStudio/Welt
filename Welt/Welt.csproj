@@ -86,6 +86,8 @@
     <Compile Include="Cameras\FirstPersonCamera.cs" />
     <Compile Include="Cameras\HudRenderer.cs" />
     <Compile Include="Cameras\PlayerRenderer.cs" />
+    <Compile Include="Console\ThrowHelper.cs" />
+    <Compile Include="Console\ThrowType.cs" />
     <Compile Include="Controllers\FirstPersonCameraController.cs" />
     <Compile Include="Controllers\InputController.cs" />
     <Compile Include="Controllers\SceneController.cs" />
@@ -96,17 +98,21 @@
     <Compile Include="Entities\EntityData\EntityDataType.cs" />
     <Compile Include="Entities\LivingEntity.cs" />
     <Compile Include="Entities\PlayerEntity.cs" />
+    <Compile Include="Forge\BlockTextureModel.cs" />
+    <Compile Include="Forge\Builders\ChunkBuilder.cs" />
+    <Compile Include="Forge\Builders\DefaultMeshBuilder.cs" />
+    <Compile Include="Forge\Builders\IMeshBuilder.cs" />
+    <Compile Include="Forge\Builders\TextureBuilder.cs" />
+    <Compile Include="Forge\Builders\WorldBuilder.cs" />
     <Compile Include="Forge\Cardinals.cs" />
-    <Compile Include="Forge\Chunk.cs" />
-    <Compile Include="Forge\Renderers\DiagnosticWorldRenderer.cs" />
+    <Compile Include="Forge\Mesh.cs" />
     <Compile Include="Forge\Renderers\FogRenderer.cs" />
     <Compile Include="Forge\Renderers\IRenderer.cs" />
     <Compile Include="Forge\Renderers\SimpleRenderer.cs" />
     <Compile Include="Forge\Renderers\SkyDomeRenderer.cs" />
-    <Compile Include="Forge\Renderers\ThreadedWorldRenderer.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
-    <Compile Include="Forge\World.cs" />
     <Compile Include="Forge\WorldHelpers.cs" />
+    <Compile Include="Handlers\InputHandlers.cs" />
     <Compile Include="IO\InputMap.cs" />
     <Compile Include="IO\WireChunk.cs" />
     <Compile Include="Logger.cs" />
@@ -294,6 +300,7 @@
     <Compile Include="Processors\LightingChunkProcessor.cs" />
     <Compile Include="Processors\ReflectionProcessor.cs" />
     <Compile Include="Processors\VertexBuildChunkProcessor.cs" />
+    <Compile Include="Processors\WorldRenderingProcessor.cs" />
     <Compile Include="Profiling\FrameRateCounter.cs" />
     <Compile Include="Profiling\Utility.cs" />
     <Compile Include="Program.cs" />
@@ -400,7 +407,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Console\" />
+    <Folder Include="Forge\Providers\" />
     <Folder Include="Forge\Renderers\ParticleSystems\" />
   </ItemGroup>
   <ItemGroup>

@@ -26,21 +26,14 @@ namespace Welt.Scenes
         public bool IsEnabled;
         public static TaskManager TaskManager { get; } = new TaskManager();
         public static SceneController Controller;
-
-        protected static bool IsDrawing;
-        protected static bool IsPaused;
         
         protected virtual Color BackColor { get; } = Color.CornflowerBlue;
         protected InputController InputController { get; } = InputController.CreateDefault();
-
-        private KeyboardState _previousKeyState;
-        private readonly Dictionary<Keys[], Func<bool>> _keyMap; 
 
         protected Scene(Game game) : base(game)
         {
             IsEnabled = true;
             Opacity = 1;
-            _keyMap = new Dictionary<Keys[], Func<bool>>();
         }
 
         public virtual void OnExiting(object sender, EventArgs args)
@@ -51,7 +44,6 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             base.Initialize();
-            _previousKeyState = Keyboard.GetState();
             WeltGame.SetCursor(Cursors.Arrow);
             UI.DataContext = DataContext;
             WeltGame.SetUI(UI, DataContext);
@@ -60,21 +52,7 @@ namespace Welt.Scenes
         public new virtual void Update(GameTime time)
         {
             SceneUpdate?.Invoke(this, EventArgs.Empty);
-            var currentKeyState = Keyboard.GetState();
-            if (currentKeyState != _previousKeyState)
-            {
-                var pressedKeys = currentKeyState.GetPressedKeys();
-
-                foreach (
-                    var kvp in
-                        _keyMap.Where(
-                            kvp =>
-                                kvp.Key.All(key => pressedKeys.Contains(key)) && kvp.Key.Length == pressedKeys.Length))
-                {
-                    kvp.Value.Invoke();
-                }
-                _previousKeyState = currentKeyState;
-            }
+            InputController.Update(time);
             TaskManager.Update(time);
             //UI.Update(time);
         }
@@ -117,9 +95,9 @@ namespace Welt.Scenes
             TaskManager.Queue(action, ticks);
         }
 
-        protected void AssignKeyToEvent(Func<bool> func, params Keys[] keys)
+        protected void AssignKeyToEvent(Action action, InputController.InputAction check)
         {
-            _keyMap.Add(keys, func);
+            InputController.Assign(action, check);
         }
 
         #region Events

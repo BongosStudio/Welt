@@ -10,16 +10,20 @@ using Welt.Models;
 
 namespace Welt.Logic.Forge
 {
+
+    // THIS IS ALL BEING MOVED. 
+
+    
     public class BlockLogic
     {
-        public static bool GetRightClick(World world, Vector3 position, Player player)
+        public static bool GetRightClick(WorldObject world, Vector3 position, Player player)
         {
             var block = world.GetBlock(position);
             
             switch (block.Id)
             {
-                case BlockType.RED_FLOWER:
-                    world.SetBlock(position, new Block(BlockType.LAVA));
+                case BlockType.RedFlower:
+                    world.SetBlock(position, new Block(BlockType.Lava));
                     return true;
                 default:
                     return false;
@@ -27,7 +31,7 @@ namespace Welt.Logic.Forge
 
         }
 
-        public static Vector3 DetermineTarget(World world, Vector3 original, Vector3 adjacent)
+        public static Vector3 DetermineTarget(WorldObject world, Vector3 original, Vector3 adjacent)
         {
             var block = world.GetBlock(original).Id;
             if (IsCapBlock(block) || IsGrassBlock(block) || IsPlantBlock(block)) return original;
@@ -45,27 +49,27 @@ namespace Welt.Logic.Forge
         {
             switch (id)
             {
-                case BlockType.LAVA:
+                case BlockType.Lava:
                     red = 14;
                     green = 4;
                     blue = 0;
                     return;
-                case BlockType.RED_FLOWER:
+                case BlockType.RedFlower:
                     red = 10;
                     green = 0;
                     blue = 0;
                     return;
-                case BlockType.SNOW:
+                case BlockType.Snow:
                     red = 1;
                     green = 1;
                     blue = 1;
                     return;
-                case BlockType.WATER:
+                case BlockType.Water:
                     red = 0;
                     green = 1;
                     blue = 3;
                     return;
-                case BlockType.TORCH:
+                case BlockType.Torch:
                     red = 10;
                     green = 0;
                     blue = 10;
@@ -82,7 +86,7 @@ namespace Welt.Logic.Forge
         {
             switch (id)
             {
-                case BlockType.SNOW:
+                case BlockType.Snow:
                     return new BoundingBox(position, position + new Vector3(1, 0.1f, 1));
                 default:
                     return new BoundingBox(position, position + new Vector3(1, 1, 1));
@@ -91,12 +95,12 @@ namespace Welt.Logic.Forge
 
         public static BlockTexture GetTexture(ushort blockType)
         {
-            return GetTexture(blockType, BlockFaceDirection.Maximum, BlockType.NONE);
+            return GetTexture(blockType, BlockFaceDirection.None, BlockType.None);
         }
 
         public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir)
         {
-            return GetTexture(blockType, faceDir, BlockType.NONE);
+            return GetTexture(blockType, faceDir, BlockType.None);
         }
 
         public static uint GetCost(ushort type)
@@ -106,7 +110,7 @@ namespace Welt.Logic.Forge
 
         public static bool IsCapBlock(ushort type)
         {
-            if (type == BlockType.SNOW) return true;
+            if (type == BlockType.Snow) return true;
             return false;
         }
 
@@ -117,28 +121,28 @@ namespace Welt.Logic.Forge
 
         public static bool IsSolidBlock(ushort type)
         {
-            return type != BlockType.WATER && type != BlockType.NONE && type != BlockType.SNOW && type != BlockType.RED_FLOWER && type != BlockType.LONG_GRASS;
+            return type != BlockType.Water && type != BlockType.None && type != BlockType.Snow && type != BlockType.RedFlower && type != BlockType.LongGrass;
         }
 
         public static bool IsPlantBlock(ushort type)
         {
-            return type == BlockType.RED_FLOWER;
+            return type == BlockType.RedFlower;
         }
 
         public static bool IsGrassBlock(ushort type)
         {
-            return type == BlockType.LONG_GRASS;
+            return type == BlockType.LongGrass;
         }
 
         public static bool IsTransparentBlock(ushort type)
         {
-            return type == BlockType.NONE || type == BlockType.WATER || type == BlockType.LEAVES || type == BlockType.SNOW ||
-                   type == BlockType.RED_FLOWER || type == BlockType.ROCK || type == BlockType.LONG_GRASS;
+            return type == BlockType.None || type == BlockType.Water || type == BlockType.Leaves || type == BlockType.Snow ||
+                   type == BlockType.RedFlower || type == BlockType.Rock || type == BlockType.LongGrass;
         }
 
         public static bool IsDiggable(ushort type)
         {
-            return type != BlockType.WATER;
+            return type != BlockType.Water;
         }
 
         #region GetTexture
@@ -154,9 +158,9 @@ namespace Welt.Logic.Forge
         {
             switch (blockType)
             {
-                case BlockType.DIRT:
+                case BlockType.Dirt:
                     return BlockTexture.Dirt;
-                case BlockType.GRASS:
+                case BlockType.Grass:
                     switch (faceDir)
                     {
                         case BlockFaceDirection.XIncreasing:
@@ -171,17 +175,17 @@ namespace Welt.Logic.Forge
                         default:
                             return BlockTexture.Rock;
                     }
-                case BlockType.LAVA:
+                case BlockType.Lava:
                     return BlockTexture.Lava;
-                case BlockType.LEAVES:
+                case BlockType.Leaves:
                     return BlockTexture.Leaves;
-                case BlockType.ROCK:
+                case BlockType.Rock:
                     return BlockTexture.Rock;
-                case BlockType.SAND:
+                case BlockType.Sand:
                     return BlockTexture.Sand;
-                case BlockType.SNOW:
+                case BlockType.Snow:
                     return BlockTexture.Snow;
-                case BlockType.TREE:
+                case BlockType.Tree:
                     switch (faceDir)
                     {
                         case BlockFaceDirection.XIncreasing:
@@ -195,13 +199,13 @@ namespace Welt.Logic.Forge
                         default:
                             return BlockTexture.Rock;
                     }
-                case BlockType.WATER:
+                case BlockType.Water:
                     return BlockTexture.Water;
-                case BlockType.RED_FLOWER:
+                case BlockType.RedFlower:
                     return BlockTexture.Rose;
-                case BlockType.LONG_GRASS:
+                case BlockType.LongGrass:
                     return BlockTexture.Grass;
-                case BlockType.TORCH:
+                case BlockType.Torch:
                     return BlockTexture.Torch;
                 default:
                     return BlockTexture.Rock;

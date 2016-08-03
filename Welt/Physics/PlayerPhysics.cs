@@ -11,6 +11,7 @@ using Welt.API.Forge;
 using Welt.Blocks;
 using Welt.Cameras;
 using Welt.Forge;
+using Welt.Logic.Forge;
 using Welt.Models;
 using static Welt.Core.FastMath;
 
@@ -128,7 +129,7 @@ namespace Welt.Physics
             var footPosition = _mPlayer.Position + new Vector3(0f, -1.5f, 0f);
             var headPosition = _mPlayer.Position + new Vector3(0f, 0.1f, 0f);
             // adjust to if in water
-            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.WATER;
+            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.Water;
 
             var velocity = GetPlayerGravity()*(float) gameTime.ElapsedGameTime.TotalSeconds;
             var min = _mPlayer.Entity.IsInWater ? -MAX_VELOCITY_WATER : -MAX_VELOCITY;
@@ -138,8 +139,8 @@ namespace Welt.Physics
 
             //TODO _isAboveSnowline = headPosition.Y > WorldSettings.SNOWLINE;
 
-            if (Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) ||
-                Block.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
+            if (BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) ||
+                BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
             {
                 var standingOnBlock = _mPlayer.World.GetBlock(footPosition).Id;
                 var hittingHeadOnBlock = _mPlayer.World.GetBlock(headPosition).Id;
@@ -147,7 +148,7 @@ namespace Welt.Physics
                 // TODO: fall damage
 
                 // If the player has their head stuck in a block, push them down.
-                if (Block.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
+                if (BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
                 {
                     var blockIn = (int) (headPosition.Y);
                     _mPlayer.Position.Y = blockIn - 0.15f;
@@ -155,7 +156,7 @@ namespace Welt.Physics
 
                 // If the player is stuck in the ground, bring them out.
                 // This happens because we're standing on a block at -1.5, but stuck in it at -1.4, so -1.45 is the sweet spot.
-                if (Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id))
+                if (BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id))
                 {
                     var blockOn = (int) (footPosition.Y);
                     _mPlayer.Position.Y = (float) (blockOn + 1 + 1.45);
@@ -166,15 +167,15 @@ namespace Welt.Physics
                 // Logic for standing on a block.
                 switch (standingOnBlock)
                 {
-                    case BlockType.WATER:
+                    case BlockType.Water:
                         // play swimming sound
                         break;
-                    case BlockType.DIRT:
+                    case BlockType.Dirt:
                         // play dirt sound
                         break;
-                    case BlockType.GRASS:
-                    case BlockType.LONG_GRASS:
-                    case BlockType.LEAVES:
+                    case BlockType.Grass:
+                    case BlockType.LongGrass:
+                    case BlockType.Leaves:
                         // play rustling mix with grass movement
                         // maybe make an easter egg where it plays the pokemon thing with "A WILD BLAHBLAHBLAH APPEARED"?
                         // Idk, I like that idea so I may do it.
@@ -184,7 +185,7 @@ namespace Welt.Physics
                 //Logic for bumping your head on a block.
                 switch (hittingHeadOnBlock)
                 {
-                    case BlockType.LAVA:
+                    case BlockType.Lava:
                         // set the player on fire
                         break;
                 }
@@ -211,7 +212,7 @@ namespace Welt.Physics
                     _mPlayer.Position.Y += 0.05f;
                 }
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                else if ((Block.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
+                else if ((BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
                 {
                     _mPlayer.Velocity.Y = PLAYERJUMPVELOCITY;
                     var amountBelowSurface = ((ushort) footPosition.Y) + 1 - footPosition.Y;
@@ -271,9 +272,9 @@ namespace Welt.Physics
             var midBodyPoint = movePosition + new Vector3(0, -0.7f, 0);
             var lowerBodyPoint = movePosition + new Vector3(0, -1.4f, 0);
 
-            if (!Block.IsSolidBlock(_mPlayer.World.GetBlock(movePosition).Id) &&
-                !Block.IsSolidBlock(_mPlayer.World.GetBlock(lowerBodyPoint).Id) &&
-                !Block.IsSolidBlock(_mPlayer.World.GetBlock(midBodyPoint).Id))
+            if (!BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(movePosition).Id) &&
+                !BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(lowerBodyPoint).Id) &&
+                !BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(midBodyPoint).Id))
             {
                 _mPlayer.Position = _mPlayer.Position + moveVector;
                 if (moveVector != Vector3.Zero)

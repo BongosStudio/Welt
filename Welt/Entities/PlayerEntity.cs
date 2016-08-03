@@ -14,7 +14,7 @@ namespace Welt.Entities
 
         public PlayerEntity()
         {
-            Inventory = new InventoryContainer {[0] = new BlockStack(new Block(BlockType.DIRT))};
+            Inventory = new InventoryContainer {[0] = new BlockStack(new Block(BlockType.Dirt))};
         }
     }
 }

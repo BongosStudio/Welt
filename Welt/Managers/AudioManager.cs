@@ -11,10 +11,10 @@ namespace Welt.Managers
 {
     public class AudioManager
     {
-        public const string BUTTON_SOUND = "Sounds/menu-button";
-        public const string WAVES_SOUND = "Sounds/waves";
+        public const string ButtonSound = "Sounds/menu-button";
+        public const string WavesSound = "Sounds/waves";
 
-        public const string FEATHER_SONG = "Music/Feather";
+        public const string FeatherSong = "Music/Feather";
 
         private static Dictionary<string, Song> _songs = new Dictionary<string, Song>();
         private static Dictionary<string, SoundEffectInstance> _sounds = new Dictionary<string, SoundEffectInstance>();  

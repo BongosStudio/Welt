@@ -4,37 +4,37 @@ namespace Welt.MonoGame.Extended
 {
     public class FramesPerSecondCounterComponent : DrawableGameComponent
     {
-        FramesPerSecondCounter fpsCounter;
+        FramesPerSecondCounter _fpsCounter;
 
         public FramesPerSecondCounterComponent(Game game, int maximumSamples = 100)
             : base(game)
         {
-            fpsCounter = new FramesPerSecondCounter(maximumSamples);
+            _fpsCounter = new FramesPerSecondCounter(maximumSamples);
         }
 
         public long TotalFrames
         {
-            get { return fpsCounter.TotalFrames; }
+            get { return _fpsCounter.TotalFrames; }
         }
 
         public float AverageFramesPerSecond
         {
-            get { return fpsCounter.AverageFramesPerSecond; }
+            get { return _fpsCounter.AverageFramesPerSecond; }
         }
 
         public float CurrentFramesPerSecond
         {
-            get { return fpsCounter.CurrentFramesPerSecond; }
+            get { return _fpsCounter.CurrentFramesPerSecond; }
         }
 
         public int MaximumSamples
         {
-            get { return fpsCounter.MaximumSamples; }
+            get { return _fpsCounter.MaximumSamples; }
         }
 
         public void Reset()
         {
-            fpsCounter.Reset();
+            _fpsCounter.Reset();
         }
 
         public override void Update(GameTime gameTime)
@@ -44,7 +44,7 @@ namespace Welt.MonoGame.Extended
 
         public override void Draw(GameTime gameTime)
         {
-            fpsCounter.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            _fpsCounter.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             base.Draw(gameTime);
         }
     }

@@ -15,6 +15,7 @@ using GameUILibrary.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Welt.Console;
 using Welt.Controllers;
 using Welt.Forge;
 using Welt.Managers;
@@ -86,6 +87,12 @@ namespace Welt
 
         protected override void Initialize()
         {
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                ThrowHelper.Throw<Exception>(args.ExceptionObject,
+                    args.IsTerminating ? ThrowType.Severe : ThrowType.Error);
+            };
+
             IsMouseVisible = true;
             Window.ClientSizeChanged += (sender, args) =>
             {

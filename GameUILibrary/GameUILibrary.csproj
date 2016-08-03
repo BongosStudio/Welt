@@ -65,9 +65,6 @@
     <Compile Include="GeneratedUI\MainMenu.xaml_bindings.cs" />
     <Compile Include="GeneratedUI\Play.xaml.cs" />
     <Compile Include="GeneratedUI\Play.xaml_bindings.cs" />
-    <Compile Include="GeneratedUI\Root.cs" />
-    <Compile Include="GeneratedUI\Root.xaml.cs" />
-    <Compile Include="GeneratedUI\Root.xaml_bindings.cs" />
     <Compile Include="GeneratedUI\SinglePlayerMenu.xaml.cs" />
     <Compile Include="GeneratedUI\SinglePlayerMenu.xaml_bindings.cs" />
     <Compile Include="GeneratedUI\Splash.xaml.cs" />

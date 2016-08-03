@@ -12,7 +12,7 @@ namespace Welt
 {
     public static class Logger
     {
-        private static readonly Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
+        private static readonly Socket Socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
             ProtocolType.Udp);
 
         private static string _toSend;

@@ -6,11 +6,10 @@ using System;
 
 namespace Welt.Core.Net
 {
-    [Flags]
-    public enum MessageType : byte
+    public enum MessageType
     {
-        Incoming = 0 << 0,
-        Outgoing = 1 << 0,
-
+        Handshake,
+        Gameplay,
+        Data
     }
 }

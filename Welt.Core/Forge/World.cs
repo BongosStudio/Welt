@@ -3,6 +3,7 @@
 #endregion
 
 using System;
+using System.Runtime.CompilerServices;
 using Welt.API.Forge;
 using Welt.API.Forge.Generators;
 
@@ -15,7 +16,7 @@ namespace Welt.Core.Forge
         public int Size { get; }
         public IForgeGenerator Generator { get; }
 
-        private readonly ChunkManager _manager;
+        protected readonly ChunkManager Manager;
 
         public World(string name, IForgeGenerator gen)
         {
@@ -24,7 +25,7 @@ namespace Welt.Core.Forge
             Seed = random.Next(int.MaxValue)*name.GetHashCode();
             Size = 32;
             Generator = gen;
-            _manager = new ChunkManager(this);
+            Manager = new ChunkManager(this);
         }
 
         public World(string name, long seed, IForgeGenerator gen)
@@ -33,7 +34,7 @@ namespace Welt.Core.Forge
             Seed = seed;
             Size = 32;
             Generator = gen;
-            _manager = new ChunkManager(this);
+            Manager = new ChunkManager(this);
         }
 
         /// <summary>
@@ -44,8 +45,9 @@ namespace Welt.Core.Forge
         /// <returns></returns>
         public Chunk CreateChunk(uint x, uint z)
         {
-            var chunk = Generator.GenerateChunk(this, x, z) as Chunk;
-            SetChunk(x, z, chunk);
+            var chunk = new Chunk(this, x, z);
+            Generator.GenerateChunk(this, chunk);
+            _SetChunk(x, z, chunk, ChunkChangedEventArgs.ChunkChangedAction.Created);
             return chunk;
         }
 
@@ -55,38 +57,59 @@ namespace Welt.Core.Forge
         /// <returns></returns>
         public Chunk CreateChunkInMemory(uint x, uint z)
         {
-            return Generator.GenerateChunk(this, x, z) as Chunk;
+            var chunk = new Chunk(this, x, z);
+            Generator.GenerateChunk(this, chunk);
+            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Created));
+            return chunk;
         }
 
-        public IChunk GetChunk(uint x, uint z)
+        public Chunk CreateChunkWithoutGeneration(uint x, uint z)
         {
-            return _manager.GetChunk(x, z);
+            var chunk = new Chunk(this, x, z);
+            return chunk;
         }
 
-        public void SetChunk(uint x, uint z, IChunk value)
+        public virtual IChunk GetChunk(uint x, uint z)
         {
-            _manager.SetChunk(x, z, (Chunk) value);
+            var chunk = Manager.GetChunk(x, z) ?? CreateChunk(x, z);
+            return chunk;
         }
 
-        public void RemoveChunk(uint x, uint z)
+        public virtual void SetChunk(uint x, uint z, IChunk value)
         {
-            _manager.RemoveChunk(x, z);
+            _SetChunk(x, z, value, ChunkChangedEventArgs.ChunkChangedAction.Adjusted);
         }
 
-        public Block GetBlock(uint x, uint y, uint z)
+        private void _SetChunk(uint x, uint z, IChunk value, ChunkChangedEventArgs.ChunkChangedAction action)
         {
-            if (x >= Size*Chunk.WIDTH || z >= Size*Chunk.DEPTH || y >= Chunk.HEIGHT)
+            Manager.SetChunk(x, z, (Chunk) value);
+            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, action));
+        }
+
+        public virtual void RemoveChunk(uint x, uint z)
+        {
+            Manager.RemoveChunk(x, z);
+            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Destroyed));
+        }
+
+        public virtual Block GetBlock(uint x, uint y, uint z)
+        {
+            if (x >= Size*Chunk.Width || z >= Size*Chunk.Depth || y >= Chunk.Height)
                 throw new ArgumentOutOfRangeException();
-            var chunk = GetChunk(x/Chunk.WIDTH, z/Chunk.DEPTH);
-            return chunk.GetBlock((int) (x%Chunk.WIDTH), (int) y, (int) (z%Chunk.DEPTH));
+            var chunk = GetChunk(x/Chunk.Width, z/Chunk.Depth);
+            return chunk.GetBlock((int) (x%Chunk.Width), (int) y, (int) (z%Chunk.Depth));
         }
 
-        public void SetBlock(uint x, uint y, uint z, Block value)
+        public virtual void SetBlock(uint x, uint y, uint z, Block value)
         {
-            if (x >= Size * Chunk.WIDTH || z >= Size * Chunk.DEPTH || y >= Chunk.HEIGHT)
+            if (x >= Size*Chunk.Width || z >= Size*Chunk.Depth || y >= Chunk.Height)
                 throw new ArgumentOutOfRangeException();
-            var chunk = GetChunk(x / Chunk.WIDTH, z / Chunk.DEPTH);
-            chunk.SetBlock((int) (x%Chunk.WIDTH), (int) y, (int) (z%Chunk.DEPTH), value);
+            var chunk = GetChunk(x/Chunk.Width, z/Chunk.Depth);
+            chunk.SetBlock((int) (x%Chunk.Width), (int) y, (int) (z%Chunk.Depth), value);
+            BlockChanged?.Invoke(this, new BlockChangedEventArgs(x, y, z));
         }
+
+        public event EventHandler<BlockChangedEventArgs> BlockChanged;
+        public event EventHandler<ChunkChangedEventArgs> ChunkChanged;
     }
 }

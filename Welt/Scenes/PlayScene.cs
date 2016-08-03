@@ -21,12 +21,12 @@ namespace Welt.Scenes
 {
     public class PlayScene : Scene
     {
-        private readonly World _mWorld;
+        private readonly WorldObject _mWorld;
         private readonly IRenderer _mRenderer;
         private HudRenderer _mHud;
         private readonly Player _mPlayer = Player.Current;
         private readonly PlayerRenderer _mPlayerRenderer;
-        private DiagnosticWorldRenderer _mWorldRenderer;
+        private SimpleRenderer _mWorldRenderer;
         private bool _mDiagnosticMode;
         private bool _mReleaseMouse;
         private KeyboardState _mOldKeyboardState;
@@ -37,7 +37,7 @@ namespace Welt.Scenes
         internal override UIRoot UI => new Play();
         internal override ViewModelBase DataContext { get; set; }
 
-        public PlayScene(Game game, World worldToHandoff, IRenderer rendererToHandoff, SkyDomeRenderer skyToHandoff,
+        public PlayScene(Game game, WorldObject worldToHandoff, IRenderer rendererToHandoff, SkyDomeRenderer skyToHandoff,
             PlayerRenderer playerToHandoff) : base(game)
         {
             _mWorld = worldToHandoff;
@@ -59,14 +59,14 @@ namespace Welt.Scenes
                 }
                 else
                 {
-                    Mouse.SetPosition((int)_mPreviousPauseMousePosition.X, (int)_mPreviousPauseMousePosition.Y);
+                    Mouse.SetPosition((int) _mPreviousPauseMousePosition.X, (int) _mPreviousPauseMousePosition.Y);
                     viewModel.PauseMenuVisibility = Visibility.Visible;
                 }
                 _mPlayer.IsPaused = !_mPlayer.IsPaused;
                 WeltGame.Instance.IsMouseVisible = !WeltGame.Instance.IsMouseVisible;
 
-                return true;
-            }, Keys.Escape);
+            }, InputController.InputAction.Escape);
+            
             DataContext = viewModel;
         }
 
@@ -81,14 +81,14 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayerRenderer);
-            _mWorldRenderer = new DiagnosticWorldRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
+            _mWorldRenderer = new SimpleRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
             
             base.Initialize();                  
             _mHud.Initialize();
 
             #region choose renderer
 
-            //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, world);          
+            //renderer = new ThreadedWorldRenderer(GraphicsDevice, player1Renderer.camera, WorldObject);          
             _mWorldRenderer.Initialize();
 
             #endregion
@@ -97,46 +97,7 @@ namespace Welt.Scenes
 
             #region Initialize Keys
 
-            AssignKeyToEvent(() =>
-            {
-                SceneController.GraphicsManager.ToggleFullScreen();
-                return true;
-            }, Keys.F11);
-            AssignKeyToEvent(() =>
-            {
-                _mPlayerRenderer.FreeCam = !_mPlayerRenderer.FreeCam;
-                return true;
-            }, Keys.F1);
-            AssignKeyToEvent(() =>
-            {
-                Game.Exit();
-                return true;
-            }, Keys.LeftShift, Keys.Escape);
-            AssignKeyToEvent(() =>
-            {
-                // TODO: show console
-                return true;
-            }, Keys.OemTilde);
             
-            //AssignKeyToEvent(() =>
-            //{
-            //    if (_mPlayer.IsPaused)
-            //    {
-            //        _mPreviousPauseMousePosition = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-            //        Mouse.SetPosition(FirstPersonCameraController.DefaultMouseState.X,
-            //            FirstPersonCameraController.DefaultMouseState.Y);
-            //    }
-            //    else
-            //    {
-            //        Mouse.SetPosition((int) _mPreviousPauseMousePosition.X, (int) _mPreviousPauseMousePosition.Y);
-            //    }
-            //    _mPlayer.IsPaused = !_mPlayer.IsPaused;
-            //    WeltGame.Instance.IsMouseVisible = !WeltGame.Instance.IsMouseVisible;
-                 
-            //    return true;
-            //}, Keys.Escape);
-            
-            AssignHotbarKeys();
 
             #endregion
 
@@ -233,14 +194,14 @@ namespace Welt.Scenes
             if (_mOldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
             {
                 _mWorld.DayMode = !_mWorld.DayMode;
-                //Debug.WriteLine("Day Mode is " + world.dayMode);
+                //Debug.WriteLine("Day Mode is " + WorldObject.dayMode);
             }
 
             //day cycle/nightMode
             if (_mOldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
             {
                 _mWorld.NightMode = !_mWorld.NightMode;
-                //Debug.WriteLine("Day/Night Mode is " + world.nightMode);
+                //Debug.WriteLine("Day/Night Mode is " + WorldObject.nightMode);
             }
 
             // Allows the game to exit
@@ -341,7 +302,7 @@ namespace Welt.Scenes
         #region Update
 
         /// <summary>
-        /// Allows the game to run logic such as updating the world,
+        /// Allows the game to run logic such as updating the WorldObject,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
@@ -390,8 +351,6 @@ namespace Welt.Scenes
 
         private void AssignHotbarKeys()
         {
-            AssignKeyToEvent(() => true, Keys.D1);
-            AssignKeyToEvent(() => true, Keys.D2);
         }
 
         #endregion

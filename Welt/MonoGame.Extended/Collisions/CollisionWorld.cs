@@ -31,7 +31,7 @@ namespace Welt.MonoGame.Extended.Collisions
         public CollisionGrid CreateGrid(int[] data, int columns, int rows, int cellWidth, int cellHeight)
         {
             if (_grid != null)
-                throw new InvalidOperationException("Only one collision grid can be created per world");
+                throw new InvalidOperationException("Only one collision grid can be created per WorldObject");
 
             _grid = new CollisionGrid(data, columns, rows, cellWidth, cellHeight);
             return _grid;

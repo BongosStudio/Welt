@@ -40,7 +40,7 @@ namespace Welt.Cameras
         public void Initialize()
         {
             Camera.Initialize();
-            Camera.Position = new Vector3(World.Origin*Chunk.Size.X, Chunk.Size.Y, World.Origin*Chunk.Size.Z);
+            Camera.Position = new Vector3(WorldObject.Origin*ChunkObject.Size.X, ChunkObject.Size.Y, WorldObject.Origin*ChunkObject.Size.Z);
             // TODO: change the Y of the spawn position so we don't fall please?
             Player.Position = Camera.Position;
             Camera.LookAt(Vector3.Forward);
@@ -180,7 +180,7 @@ namespace Welt.Cameras
 
             identity = Matrix.Multiply(matrixB, matrixA); // the final position of the block
 
-            // set up the World, View and Projection
+            // set up the WorldObject, View and Projection
             _mSelectionBlockEffect.World = identity;
             _mSelectionBlockEffect.View = Camera.View;
             _mSelectionBlockEffect.Projection = Camera.Projection;
@@ -217,7 +217,7 @@ namespace Welt.Cameras
             {
                 var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
-                if (block.Id != BlockType.NONE && (waterSelectable || block.Id != BlockType.WATER))
+                if (block.Id != BlockType.None && (waterSelectable || block.Id != BlockType.Water))
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);
                     
@@ -237,7 +237,7 @@ namespace Welt.Cameras
                 var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
                 
-                if (Player.World.GetBlock(targetPoint).Id != BlockType.NONE) continue;
+                if (Player.World.GetBlock(targetPoint).Id != BlockType.None) continue;
                 Player.CurrentSelectedAdjacent = new PositionedBlock(targetPoint, block);
                 break;
             }

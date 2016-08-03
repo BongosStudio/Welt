@@ -31,10 +31,10 @@ namespace WeltLauncher
         private void CheckVersion()
         {
             var client = new HttpClient();
-            var version = client.GetStringAsync(ApiResources.GetUrl(ApiResources.RESX_LAUNCHER_VER)).Result;
+            var version = client.GetStringAsync(ApiResources.GetUrl(ApiResources.ResxLauncherVer)).Result;
             if (version == LAUNCHER_VERSION) return;
             MessageBox.Show("An update is available. The launcher will now install and restart.", "", MessageBoxButton.OK);
-            var data = client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.RESX_LAUNCHER)).Result;
+            var data = client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.ResxLauncher)).Result;
             File.WriteAllBytes($"Welt-{LAUNCHER_VERSION}.exe", data);
             Process.Start($"Welt-{LAUNCHER_VERSION}.exe", AppDomain.CurrentDomain.FriendlyName);
             Shutdown();

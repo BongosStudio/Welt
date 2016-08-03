@@ -43,7 +43,7 @@ namespace WeltLauncher.Pages
                         confirm_password = ConfirmPasswordTxt.Password
                     });
                 var web = new WebClient {Headers = {["Content-Type"] = "application/json"}};
-                var response = await web.UploadStringTaskAsync(ApiResources.GetUrl(ApiResources.AUTH_REG), json.ToString());
+                var response = await web.UploadStringTaskAsync(ApiResources.GetUrl(ApiResources.AuthReg), json.ToString());
                 var jr = JObject.Parse(response);
                 var token = jr["token"].ToString(); // TODO: use this lol
                 ResponseTxt.Text = $"{jr["message"]} with the token {token}";           

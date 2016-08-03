@@ -29,7 +29,7 @@ namespace WeltLauncher.Pages
     public partial class Home : UserControl
     {
         private readonly AuthService _auth;
-        private static readonly HttpClient _client = new HttpClient();
+        private static readonly HttpClient Client = new HttpClient();
         private static bool _hasInstalledUpdates = false;
         private static Task _updateTask;
 
@@ -81,14 +81,14 @@ namespace WeltLauncher.Pages
 
                 #region Download the new game
 
-                var game = await _client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.RESX_DL));
+                var game = await Client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.ResxDl));
                 File.WriteAllBytes("Welt.exe", game);
 
                 #endregion
 
                 #region Download resource objects
 
-                var resourceJson = JArray.Parse(await _client.GetStringAsync(ApiResources.GetUrl(ApiResources.RESX_OBJ)));
+                var resourceJson = JArray.Parse(await Client.GetStringAsync(ApiResources.GetUrl(ApiResources.ResxObj)));
                 foreach (var r in resourceJson.Select(j => (JObject) j))
                 {
                     var file = r["file"].ToString();
@@ -96,7 +96,7 @@ namespace WeltLauncher.Pages
                     StatusTxt.Text = $"Installing {file}.";
                     // this means it belongs in a directory
                     if (file.Contains("\\")) Directory.CreateDirectory(file.Substring(0, file.LastIndexOf('\\')));
-                    var data = await _client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.RESX_DL + url));
+                    var data = await Client.GetByteArrayAsync(ApiResources.GetUrl(ApiResources.ResxDl + url));
                     File.WriteAllBytes(file, data);
                 }
 
@@ -113,7 +113,7 @@ namespace WeltLauncher.Pages
         {
             if (_hasInstalledUpdates) return false;
             var clientv = MainWindow.Settings["version"];
-            var gamev = await _client.GetStringAsync(ApiResources.GetUrl(ApiResources.RESX_VER));
+            var gamev = await Client.GetStringAsync(ApiResources.GetUrl(ApiResources.ResxVer));
             MainWindow.Settings.Save();
             return gamev != clientv;
         }
@@ -124,7 +124,7 @@ namespace WeltLauncher.Pages
             try
             {
                 var builder = new StringBuilder();
-                var response = JArray.Parse(client.DownloadString(ApiResources.GetUrl(ApiResources.CHANGELOG)));
+                var response = JArray.Parse(client.DownloadString(ApiResources.GetUrl(ApiResources.Changelog)));
                 foreach (var ja in response.Reverse())
                 {
                     builder.Append($"{ja["date"]}\r\n===========\r\n\r\n{ja["text"]}\r\n\r\n");

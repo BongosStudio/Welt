@@ -24,22 +24,22 @@ namespace Welt.Scenes
         protected override Color BackColor => new Color(0.15f, 0.15f, 0.15f);
         internal override UIRoot UI => new Loading();
         internal override ViewModelBase DataContext { get; set; }
-        private readonly World _world;
+        private readonly WorldObject _world;
         private readonly IRenderer _renderer;
         private readonly SkyDomeRenderer _skyRenderer;
         private readonly PlayerRenderer _playerRenderer;
 
-        private static readonly string[] _texts =
+        private static readonly string[] Texts =
         {
-            "Creating world...",
+            "Creating WorldObject...",
             "Building terrain...",
-            "Simulating world for a bit...",
+            "Simulating WorldObject for a bit...",
             "Preparing level..."
         };
 
         private static int _textStep;
 
-        public LoadScene(Game game, World worldToLoad) : base(game)
+        public LoadScene(Game game, WorldObject worldToLoad) : base(game)
         {
             _world = worldToLoad;
             Player.Current.AssignWorld(_world);
@@ -48,14 +48,14 @@ namespace Welt.Scenes
             _skyRenderer = new SkyDomeRenderer(game.GraphicsDevice, _playerRenderer.Camera, _world);
             var viewModel = new LoadingViewModel
             {
-                LoadingStatusText = _texts[0],
+                LoadingStatusText = Texts[0],
                 WorldNameText = worldToLoad.Name,
                 WorldData = $"SEED: {worldToLoad.Seed}"
             };
             _renderer.LoadStepCompleted += (sender, args) =>
             {
                 _textStep++;
-                viewModel.LoadingStatusText = _texts[_textStep];
+                viewModel.LoadingStatusText = Texts[_textStep];
             };
             DataContext = viewModel;
         }
@@ -91,7 +91,7 @@ namespace Welt.Scenes
             _playerRenderer.LoadContent(WeltGame.Instance.Content);
         }
 
-        public void Handoff(out World world, out IRenderer renderer, out SkyDomeRenderer sky,
+        public void Handoff(out WorldObject world, out IRenderer renderer, out SkyDomeRenderer sky,
             out PlayerRenderer playerRenderer, out Player player)
         {
             world = _world;

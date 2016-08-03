@@ -45,6 +45,7 @@
     <Compile Include="Forge\Block.cs" />
     <Compile Include="Forge\BlockFaceDirection.cs" />
     <Compile Include="Forge\Generators\IBiomeGenerator.cs" />
+    <Compile Include="Forge\Generators\ICaveGenerator.cs" />
     <Compile Include="Forge\Generators\IDecorationGenerator.cs" />
     <Compile Include="Forge\IBlockPalette.cs" />
     <Compile Include="Forge\IChunk.cs" />
@@ -52,8 +53,14 @@
     <Compile Include="Forge\IFloor.cs" />
     <Compile Include="Forge\IWorld.cs" />
     <Compile Include="Forge\IWorldSystem.cs" />
+    <Compile Include="Forge\Weather\IWeatherEngine.cs" />
+    <Compile Include="Forge\Weather\WeatherType.cs" />
+    <Compile Include="NamespaceDocs.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Entities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

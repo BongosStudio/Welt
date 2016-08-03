@@ -23,14 +23,14 @@
     <Grid>
         <Grid x:Name="MainButtons">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
-                <Button x:Name="spBtn" Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SinglePlayerButtonCommand}">
+                <Button x:Name="SpBtn" Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SinglePlayerButtonCommand}">
                     Singleplayer
                     <Button.Triggers>
                         <EventTrigger RoutedEvent="Button.Click">
                             <BeginStoryboard>
                                 <Storyboard>
                                     <DoubleAnimation
-                            Storyboard.TargetName="spMenu"
+                            Storyboard.TargetName="SpMenu"
                             Storyboard.TargetProperty="Opacity"
                             Duration="00:00:00.2"
                             To="1"
@@ -65,7 +65,7 @@
                 <Button Style="{DynamicResource ButtonAnimStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding ExitButtonCommand}">Exit</Button>
             </StackPanel>
         </Grid>
-        <StackPanel x:Name="spMenu" Margin="261,201,0,60" HorizontalAlignment="Left" Width="400" Opacity="0">
+        <StackPanel x:Name="SpMenu" Margin="261,201,0,60" HorizontalAlignment="Left" Width="400" Opacity="0">
             <!--IsEnabled="{Binding SpMenuEnabled}"-->
             <TextBlock HorizontalAlignment="Left">World Name</TextBlock>
             <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding WorldName}" VerticalAlignment="Top" Width="241"/>

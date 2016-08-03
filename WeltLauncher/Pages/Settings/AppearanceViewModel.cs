@@ -14,8 +14,8 @@ namespace WeltLauncher.Pages.Settings
     /// </summary>
     public class AppearanceViewModel : NotifyPropertyChanged
     {
-        private const string FontSmall = "small";
-        private const string FontLarge = "large";
+        private const string FONT_SMALL = "small";
+        private const string FONT_LARGE = "large";
 
         // 9 accent colors from metro design principles
         /*private Color[] accentColors = new Color[]{
@@ -32,9 +32,9 @@ namespace WeltLauncher.Pages.Settings
 
         // 20 accent colors from Windows Phone 8
 
-        private Color selectedAccentColor;
-        private Link selectedTheme;
-        private string selectedFontSize;
+        private Color _selectedAccentColor;
+        private Link _selectedTheme;
+        private string _selectedFontSize;
 
         public AppearanceViewModel()
         {
@@ -42,7 +42,7 @@ namespace WeltLauncher.Pages.Settings
             Themes.Add(new Link {DisplayName = "dark", Source = AppearanceManager.DarkThemeSource});
             Themes.Add(new Link {DisplayName = "light", Source = AppearanceManager.LightThemeSource});
             LoadFromSettings();
-            SelectedFontSize = AppearanceManager.Current.FontSize == FontSize.Large ? FontLarge : FontSmall;
+            SelectedFontSize = AppearanceManager.Current.FontSize == FontSize.Large ? FONT_LARGE : FONT_SMALL;
             SyncThemeAndColor();
 
             AppearanceManager.Current.PropertyChanged += OnAppearanceManagerPropertyChanged;
@@ -96,7 +96,7 @@ namespace WeltLauncher.Pages.Settings
 
         public LinkCollection Themes { get; } = new LinkCollection();
 
-        public string[] FontSizes => new[] { FontSmall, FontLarge };
+        public string[] FontSizes => new[] { FONT_SMALL, FONT_LARGE };
 
         public Color[] AccentColors { get; } = {
             Color.FromRgb(0xa4, 0xc4, 0x00),   // lime
@@ -123,12 +123,12 @@ namespace WeltLauncher.Pages.Settings
 
         public Link SelectedTheme
         {
-            get { return selectedTheme; }
+            get { return _selectedTheme; }
             set
             {
-                if (selectedTheme != value)
+                if (_selectedTheme != value)
                 {
-                    selectedTheme = value;
+                    _selectedTheme = value;
                     OnPropertyChanged("SelectedTheme");
 
                     // and update the actual theme
@@ -139,27 +139,27 @@ namespace WeltLauncher.Pages.Settings
 
         public string SelectedFontSize
         {
-            get { return selectedFontSize; }
+            get { return _selectedFontSize; }
             set
             {
-                if (selectedFontSize != value)
+                if (_selectedFontSize != value)
                 {
-                    selectedFontSize = value;
+                    _selectedFontSize = value;
                     OnPropertyChanged("SelectedFontSize");
-                    MainWindow.Settings["font_size"] = value == FontLarge ? "large" : "small";
-                    AppearanceManager.Current.FontSize = value == FontLarge ? FontSize.Large : FontSize.Small;
+                    MainWindow.Settings["font_size"] = value == FONT_LARGE ? "large" : "small";
+                    AppearanceManager.Current.FontSize = value == FONT_LARGE ? FontSize.Large : FontSize.Small;
                 }
             }
         }
 
         public Color SelectedAccentColor
         {
-            get { return selectedAccentColor; }
+            get { return _selectedAccentColor; }
             set
             {
-                if (selectedAccentColor != value)
+                if (_selectedAccentColor != value)
                 {
-                    selectedAccentColor = value;
+                    _selectedAccentColor = value;
                     OnPropertyChanged("SelectedAccentColor");
 
                     AppearanceManager.Current.AccentColor = value;

@@ -8,7 +8,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
 using Welt.Blocks;
+using Welt.Core.Forge;
 using Welt.Forge;
+using Welt.Forge.Builders;
+using Welt.Logic.Forge;
 using Welt.Types;
 
 // ReSharper disable PossibleLossOfFraction
@@ -29,7 +32,7 @@ namespace Welt.Processors
 
         #region BuildVertexList
 
-        private void BuildVertexList(Chunk chunk)
+        private void BuildVertexList(ChunkBuilder chunk)
         {
             //lowestNoneBlock and highestNoneBlock come from the terrain gen (Eventually, if the terraingen did not set them you gain nothing)
             //and digging is handled correctly too 
@@ -37,35 +40,32 @@ namespace Welt.Processors
 
             var yLow = (byte) (chunk.LowestNoneBlock.Y == 0 ? 0 : chunk.LowestNoneBlock.Y - 1);
             var yHigh =
-                (byte) (chunk.HighestSolidBlock.Y == Chunk.Size.Y ? Chunk.Size.Y : chunk.HighestSolidBlock.Y + 1);
+                (byte) (chunk.HighestSolidBlock.Y == Chunk.Height ? Chunk.Height : chunk.HighestSolidBlock.Y + 1);
 
-            for (byte x = 0; x < Chunk.Size.X; x++)
+            for (byte x = 0; x < Chunk.Width; x++)
             {
-                for (byte z = 0; z < Chunk.Size.Z; z++)
+                for (byte z = 0; z < Chunk.Depth; z++)
                 {
-                    var offset = x*Chunk.FlattenOffset + z*Chunk.Size.Y;
-                        // we don't want this x-z value to be calculated each in in y-loop!
-
-                    #region ylow and yhigh on chunk borders
+                    #region ylow and yhigh on ChunkObject borders
 
                     if (x == 0)
                     {
-                        if (chunk.E == null)
+                        if (chunk.OwnedChunk.E == null)
                         {
-                            yHigh = Chunk.Size.Y;
+                            yHigh = byte.MaxValue/2;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.E.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.E.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.OwnedChunk.E.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.OwnedChunk.E.LowestNoneBlock.Y);
                         }
                     }
-                    else if (x == Chunk.Max.X)
+                    else if (x == Chunk.Width - 1)
                     {
                         if (chunk.W == null)
                         {
-                            yHigh = Chunk.Size.Y;
+                            yHigh = ChunkObject.Size.Y;
                             yLow = 0;
                         }
                         else
@@ -79,7 +79,7 @@ namespace Welt.Processors
                     {
                         if (chunk.S == null)
                         {
-                            yHigh = Chunk.Size.Y;
+                            yHigh = ChunkObject.Size.Y;
                             yLow = 0;
                         }
                         else
@@ -88,11 +88,11 @@ namespace Welt.Processors
                             yLow = Math.Min(yLow, chunk.S.LowestNoneBlock.Y);
                         }
                     }
-                    else if (z == Chunk.Max.Z)
+                    else if (z == ChunkObject.Max.Z)
                     {
                         if (chunk.N == null)
                         {
-                            yHigh = Chunk.Size.Y;
+                            yHigh = ChunkObject.Size.Y;
                             yLow = 0;
                         }
                         else
@@ -104,20 +104,22 @@ namespace Welt.Processors
 
                     #endregion
 
+                    // TODO: change these to meshes instead of having to build each time there's a new one
                     for (var y = yLow; y < yHigh; y++)
                     {
-                        if (chunk.Blocks[offset + y].Id == BlockType.NONE) continue;
-                        if (Block.IsPlantBlock(chunk.Blocks[offset + y].Id))
+                        var b = chunk.GetBlock(x, y, z);
+                        if (b.Id == BlockType.None) continue;
+                        if (BlockLogic.IsPlantBlock(b.Id))
                         {
-                            BuildPlantVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
+                            BuildPlantVertexList(b, chunk, new Vector3I(x, y, z));
                         }
-                        else if (Block.IsGrassBlock(chunk.Blocks[offset + y].Id))
+                        else if (BlockLogic.IsGrassBlock(b.Id))
                         {
-                            BuildGrassVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
+                            BuildGrassVertexList(b, chunk, new Vector3I(x, y, z));
                         }
                         else
                         {
-                            BuildBlockVertexList(chunk.Blocks[offset + y], chunk, new Vector3I(x, y, z));
+                            BuildBlockVertexList(b, chunk, new Vector3I(x, y, z));
                         }
                     }
                 }
@@ -152,14 +154,14 @@ namespace Welt.Processors
                 }
             }
 
-            chunk.Dirty = false;
+            chunk.IsModified = false;
         }
 
         #endregion
 
         #region BuildBlockVertexList
 
-        private void BuildBlockVertexList(Block block, Chunk chunk, Vector3I chunkRelativePosition)
+        private void BuildBlockVertexList(Block block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
         {
 
             var blockPosition = chunk.Position + chunkRelativePosition;
@@ -170,7 +172,7 @@ namespace Welt.Processors
             var z = (sbyte) chunkRelativePosition.Z;
 
 
-            var solidBlock = new Block(BlockType.ROCK);
+            var solidBlock = new Block(BlockType.Rock);
 
             var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
             var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
@@ -210,7 +212,7 @@ namespace Welt.Processors
 
 
             // XDecreasing
-            if (Block.IsTransparentBlock(blockMidW.Id) && block.Id != blockMidW.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidW.Id) && block.Id != blockMidW.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
@@ -240,7 +242,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.IsTransparentBlock(blockMidE.Id) && block.Id != blockMidE.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidE.Id) && block.Id != blockMidE.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
@@ -270,7 +272,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.IsTransparentBlock(blockBotM.Id) && block.Id != blockBotM.Id)
+            if (BlockLogic.IsTransparentBlock(blockBotM.Id) && block.Id != blockBotM.Id)
             {
                 sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun)/4);
                 sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun)/4);
@@ -300,7 +302,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.IsTransparentBlock(blockTopM.Id) && block.Id != blockTopM.Id)
+            if (BlockLogic.IsTransparentBlock(blockTopM.Id) && block.Id != blockTopM.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun)/4);
@@ -330,7 +332,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.IsTransparentBlock(blockMidS.Id) && block.Id != blockMidS.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidS.Id) && block.Id != blockMidS.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
@@ -360,7 +362,7 @@ namespace Welt.Processors
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
                     block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.IsTransparentBlock(blockMidN.Id) && block.Id != blockMidN.Id)
+            if (BlockLogic  .IsTransparentBlock(blockMidN.Id) && block.Id != blockMidN.Id)
             {
                 sunTl = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
                 sunTr = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
@@ -396,7 +398,7 @@ namespace Welt.Processors
 
         #region BuildPlantVertexList
 
-        private void BuildPlantVertexList(Block block, Chunk chunk, Vector3I chunkRelativePosition)
+        private void BuildPlantVertexList(Block block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
         {
 
             var blockPosition = chunk.Position + chunkRelativePosition;
@@ -413,35 +415,35 @@ namespace Welt.Processors
 
             //Block solidBlock = new Block(BlockType.Rock);
 
-            //blockTopNW = chunk.GetBlock(X - 1, Y + 1, Z + 1);
-            //blockTopN = chunk.GetBlock(X, Y + 1, Z + 1);
-            //blockTopNE = chunk.GetBlock(X + 1, Y + 1, Z + 1);
-            //blockTopW = chunk.GetBlock(X - 1, Y + 1, Z);
-            //blockTopM = chunk.GetBlock(X, Y + 1, Z);
-            //blockTopE = chunk.GetBlock(X + 1, Y + 1, Z);
-            //blockTopSW = chunk.GetBlock(X - 1, Y + 1, Z - 1);
-            //blockTopS = chunk.GetBlock(X, Y + 1, Z - 1);
-            //blockTopSE = chunk.GetBlock(X + 1, Y + 1, Z - 1);
+            //blockTopNW = ChunkObject.GetBlock(X - 1, Y + 1, Z + 1);
+            //blockTopN = ChunkObject.GetBlock(X, Y + 1, Z + 1);
+            //blockTopNE = ChunkObject.GetBlock(X + 1, Y + 1, Z + 1);
+            //blockTopW = ChunkObject.GetBlock(X - 1, Y + 1, Z);
+            //blockTopM = ChunkObject.GetBlock(X, Y + 1, Z);
+            //blockTopE = ChunkObject.GetBlock(X + 1, Y + 1, Z);
+            //blockTopSW = ChunkObject.GetBlock(X - 1, Y + 1, Z - 1);
+            //blockTopS = ChunkObject.GetBlock(X, Y + 1, Z - 1);
+            //blockTopSE = ChunkObject.GetBlock(X + 1, Y + 1, Z - 1);
 
-            //blockMidNW = chunk.GetBlock(X - 1, Y, Z + 1);
-            //blockMidN = chunk.GetBlock(X, Y, Z + 1);
-            //blockMidNE = chunk.GetBlock(X + 1, Y, Z + 1);
-            //blockMidW = chunk.GetBlock(X - 1, Y, Z);
-            //blockMidM = chunk.GetBlock(X, Y, Z);
-            //blockMidE = chunk.GetBlock(X + 1, Y, Z);
-            //blockMidSW = chunk.GetBlock(X - 1, Y, Z - 1);
-            //blockMidS = chunk.GetBlock(X, Y, Z - 1);
-            //blockMidSE = chunk.GetBlock(X + 1, Y, Z - 1);
+            //blockMidNW = ChunkObject.GetBlock(X - 1, Y, Z + 1);
+            //blockMidN = ChunkObject.GetBlock(X, Y, Z + 1);
+            //blockMidNE = ChunkObject.GetBlock(X + 1, Y, Z + 1);
+            //blockMidW = ChunkObject.GetBlock(X - 1, Y, Z);
+            //blockMidM = ChunkObject.GetBlock(X, Y, Z);
+            //blockMidE = ChunkObject.GetBlock(X + 1, Y, Z);
+            //blockMidSW = ChunkObject.GetBlock(X - 1, Y, Z - 1);
+            //blockMidS = ChunkObject.GetBlock(X, Y, Z - 1);
+            //blockMidSE = ChunkObject.GetBlock(X + 1, Y, Z - 1);
 
-            //blockBotNW = chunk.GetBlock(X - 1, Y - 1, Z + 1);
-            //blockBotN = chunk.GetBlock(X, Y - 1, Z + 1);
-            //blockBotNE = chunk.GetBlock(X + 1, Y - 1, Z + 1);
-            //blockBotW = chunk.GetBlock(X - 1, Y - 1, Z);
-            //blockBotM = chunk.GetBlock(X, Y - 1, Z);
-            //blockBotE = chunk.GetBlock(X + 1, Y - 1, Z);
-            //blockBotSW = chunk.GetBlock(X - 1, Y - 1, Z - 1);
-            //blockBotS = chunk.GetBlock(X, Y - 1, Z - 1);
-            //blockBotSE = chunk.GetBlock(X + 1, Y - 1, Z - 1);
+            //blockBotNW = ChunkObject.GetBlock(X - 1, Y - 1, Z + 1);
+            //blockBotN = ChunkObject.GetBlock(X, Y - 1, Z + 1);
+            //blockBotNE = ChunkObject.GetBlock(X + 1, Y - 1, Z + 1);
+            //blockBotW = ChunkObject.GetBlock(X - 1, Y - 1, Z);
+            //blockBotM = ChunkObject.GetBlock(X, Y - 1, Z);
+            //blockBotE = ChunkObject.GetBlock(X + 1, Y - 1, Z);
+            //blockBotSW = ChunkObject.GetBlock(X - 1, Y - 1, Z - 1);
+            //blockBotS = ChunkObject.GetBlock(X, Y - 1, Z - 1);
+            //blockBotSE = ChunkObject.GetBlock(X + 1, Y - 1, Z - 1);
 
             //float sunTR, sunTL, sunBR, sunBL;
             //float redTR, redTL, redBR, redBL;
@@ -485,7 +487,7 @@ namespace Welt.Processors
 
         #region BuildGrassVertexList
 
-        private void BuildGrassVertexList(Block block, Chunk chunk, Vector3I chunkRelativePosition)
+        private void BuildGrassVertexList(Block block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
         {
 
             var blockPosition = chunk.Position + chunkRelativePosition;
@@ -502,35 +504,35 @@ namespace Welt.Processors
 
             //Block solidBlock = new Block(BlockType.Rock);
 
-            //blockTopNW = chunk.GetBlock(X - 1, Y + 1, Z + 1);
-            //blockTopN = chunk.GetBlock(X, Y + 1, Z + 1);
-            //blockTopNE = chunk.GetBlock(X + 1, Y + 1, Z + 1);
-            //blockTopW = chunk.GetBlock(X - 1, Y + 1, Z);
-            //blockTopM = chunk.GetBlock(X, Y + 1, Z);
-            //blockTopE = chunk.GetBlock(X + 1, Y + 1, Z);
-            //blockTopSW = chunk.GetBlock(X - 1, Y + 1, Z - 1);
-            //blockTopS = chunk.GetBlock(X, Y + 1, Z - 1);
-            //blockTopSE = chunk.GetBlock(X + 1, Y + 1, Z - 1);
+            //blockTopNW = ChunkObject.GetBlock(X - 1, Y + 1, Z + 1);
+            //blockTopN = ChunkObject.GetBlock(X, Y + 1, Z + 1);
+            //blockTopNE = ChunkObject.GetBlock(X + 1, Y + 1, Z + 1);
+            //blockTopW = ChunkObject.GetBlock(X - 1, Y + 1, Z);
+            //blockTopM = ChunkObject.GetBlock(X, Y + 1, Z);
+            //blockTopE = ChunkObject.GetBlock(X + 1, Y + 1, Z);
+            //blockTopSW = ChunkObject.GetBlock(X - 1, Y + 1, Z - 1);
+            //blockTopS = ChunkObject.GetBlock(X, Y + 1, Z - 1);
+            //blockTopSE = ChunkObject.GetBlock(X + 1, Y + 1, Z - 1);
 
-            //blockMidNW = chunk.GetBlock(X - 1, Y, Z + 1);
-            //blockMidN = chunk.GetBlock(X, Y, Z + 1);
-            //blockMidNE = chunk.GetBlock(X + 1, Y, Z + 1);
-            //blockMidW = chunk.GetBlock(X - 1, Y, Z);
-            //blockMidM = chunk.GetBlock(X, Y, Z);
-            //blockMidE = chunk.GetBlock(X + 1, Y, Z);
-            //blockMidSW = chunk.GetBlock(X - 1, Y, Z - 1);
-            //blockMidS = chunk.GetBlock(X, Y, Z - 1);
-            //blockMidSE = chunk.GetBlock(X + 1, Y, Z - 1);
+            //blockMidNW = ChunkObject.GetBlock(X - 1, Y, Z + 1);
+            //blockMidN = ChunkObject.GetBlock(X, Y, Z + 1);
+            //blockMidNE = ChunkObject.GetBlock(X + 1, Y, Z + 1);
+            //blockMidW = ChunkObject.GetBlock(X - 1, Y, Z);
+            //blockMidM = ChunkObject.GetBlock(X, Y, Z);
+            //blockMidE = ChunkObject.GetBlock(X + 1, Y, Z);
+            //blockMidSW = ChunkObject.GetBlock(X - 1, Y, Z - 1);
+            //blockMidS = ChunkObject.GetBlock(X, Y, Z - 1);
+            //blockMidSE = ChunkObject.GetBlock(X + 1, Y, Z - 1);
 
-            //blockBotNW = chunk.GetBlock(X - 1, Y - 1, Z + 1);
-            //blockBotN = chunk.GetBlock(X, Y - 1, Z + 1);
-            //blockBotNE = chunk.GetBlock(X + 1, Y - 1, Z + 1);
-            //blockBotW = chunk.GetBlock(X - 1, Y - 1, Z);
-            //blockBotM = chunk.GetBlock(X, Y - 1, Z);
-            //blockBotE = chunk.GetBlock(X + 1, Y - 1, Z);
-            //blockBotSW = chunk.GetBlock(X - 1, Y - 1, Z - 1);
-            //blockBotS = chunk.GetBlock(X, Y - 1, Z - 1);
-            //blockBotSE = chunk.GetBlock(X + 1, Y - 1, Z - 1);
+            //blockBotNW = ChunkObject.GetBlock(X - 1, Y - 1, Z + 1);
+            //blockBotN = ChunkObject.GetBlock(X, Y - 1, Z + 1);
+            //blockBotNE = ChunkObject.GetBlock(X + 1, Y - 1, Z + 1);
+            //blockBotW = ChunkObject.GetBlock(X - 1, Y - 1, Z);
+            //blockBotM = ChunkObject.GetBlock(X, Y - 1, Z);
+            //blockBotE = ChunkObject.GetBlock(X + 1, Y - 1, Z);
+            //blockBotSW = ChunkObject.GetBlock(X - 1, Y - 1, Z - 1);
+            //blockBotS = ChunkObject.GetBlock(X, Y - 1, Z - 1);
+            //blockBotSE = ChunkObject.GetBlock(X + 1, Y - 1, Z - 1);
 
             //float sunTR, sunTL, sunBR, sunBL;
             //float redTR, redTL, redBR, redBL;
@@ -572,10 +574,10 @@ namespace Welt.Processors
 
         #endregion
 
-        public void BuildGrassVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        public void BuildGrassVertices(ChunkBuilder chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             ushort blockType, float sunLight, Color localLight)
         {
-            var texture = Block.GetTexture(blockType);
+            var texture = BlockLogic.GetTexture(blockType);
 
             var uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.3f, 1, 1),
@@ -668,10 +670,10 @@ namespace Welt.Processors
 
         #region BuildPlantVertices
 
-        public void BuildPlantVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        public void BuildPlantVertices(ChunkBuilder chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             ushort blockType, float sunLight, Color localLight)
         {
-            var texture = Block.GetTexture(blockType);
+            var texture = BlockLogic.GetTexture(blockType);
 
             var uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.5f, 1, 1),
@@ -722,19 +724,19 @@ namespace Welt.Processors
 
         #region BuildFaceVertices
 
-        public void BuildFaceVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        public void BuildFaceVertices(ChunkBuilder chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             BlockFaceDirection faceDir, ushort blockType, float sunLightTl, float sunLightTr, float sunLightBl,
             float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr)
         {
-            var texture = Block.GetTexture(blockType, faceDir);
+            var texture = BlockLogic.GetTexture(blockType, faceDir);
 
             var faceIndex = (int) faceDir;
 
             var uvList = TextureHelper.UvMappings[(int) texture*6 + faceIndex];
 
             float height = 1;
-            if (Block.IsCapBlock(blockType)) height = 0.1f;
-            if (Block.IsHalfBlock(blockType)) height = 0.5f;
+            if (BlockLogic.IsCapBlock(blockType)) height = 0.1f;
+            if (BlockLogic.IsHalfBlock(blockType)) height = 0.5f;
             switch (faceDir)
             {
                 case BlockFaceDirection.XIncreasing:
@@ -831,10 +833,10 @@ namespace Welt.Processors
 
         #endregion
 
-        private void AddVertex(Chunk chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        private void AddVertex(ChunkBuilder chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
             Vector3 vertexAdd, Vector3 normal, Vector2 uv1, float sunLight, Color localLight)
         {
-            if (blockType != BlockType.WATER)
+            if (blockType != BlockType.Water)
             {
                 chunk.VertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1, sunLight,
                     localLight.ToVector3()));
@@ -848,10 +850,10 @@ namespace Welt.Processors
 
         #region AddIndex
 
-        private void AddIndex(Chunk chunk, ushort blockType, short i1, short i2, short i3, short i4, short i5,
+        private void AddIndex(ChunkBuilder chunk, ushort blockType, short i1, short i2, short i3, short i4, short i5,
             short i6)
         {
-            if (blockType != BlockType.WATER)
+            if (blockType != BlockType.Water)
             {
                 chunk.IndexList.Add((short) (chunk.VertexCount + i1));
                 chunk.IndexList.Add((short) (chunk.VertexCount + i2));
@@ -875,7 +877,7 @@ namespace Welt.Processors
 
         #endregion
 
-        public void ProcessChunk(Chunk chunk)
+        public void ProcessChunk(ChunkBuilder chunk)
         {
             chunk.Clear();
             BuildVertexList(chunk);

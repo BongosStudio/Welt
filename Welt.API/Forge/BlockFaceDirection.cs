@@ -1,16 +1,20 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
+using System;
+
 namespace Welt.API.Forge
 {
-    public enum BlockFaceDirection
+    [Flags]
+    public enum BlockFaceDirection : byte
     {
-        XIncreasing = 0,
-        XDecreasing = 1,
-        YIncreasing = 2,
-        YDecreasing = 3,
-        ZIncreasing = 4,
-        ZDecreasing = 5,
-        Maximum
+        None,
+        XIncreasing = 1 << 0,
+        XDecreasing = 1 << 1,
+        YIncreasing = 1 << 2,
+        YDecreasing = 1 << 3,
+        ZIncreasing = 1 << 4,
+        ZDecreasing = 1 << 5
     }
 }

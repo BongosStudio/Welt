@@ -22,8 +22,8 @@ namespace Welt.MonoGame.Extended.Collections
     /// <typeparam name="T">The type of the elements in the deque.</typeparam>
     public class Deque<T> : IList<T>
     {
-        private const int _defaultCapacity = 4;
-        private static readonly T[] _emptyArray = new T[0];
+        private const int DEFAULT_CAPACITY = 4;
+        private static readonly T[] EmptyArray = new T[0];
         private T[] _items;
         private int _frontArrayIndex;
         private Func<int, int> _resizeFunction = Deque.DefaultResizeFunction;
@@ -74,7 +74,7 @@ namespace Welt.MonoGame.Extended.Collections
 
                 if (value == 0)
                 {
-                    _items = _emptyArray;
+                    _items = EmptyArray;
                     return;
                 }
 
@@ -157,7 +157,7 @@ namespace Welt.MonoGame.Extended.Collections
         /// </remarks>
         public Deque()
         {
-            _items = _emptyArray;
+            _items = EmptyArray;
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Welt.MonoGame.Extended.Collections
 
             if (count == 0)
             {
-                _items = _emptyArray;
+                _items = EmptyArray;
             }
             else
             {
@@ -225,7 +225,7 @@ namespace Welt.MonoGame.Extended.Collections
                 throw new ArgumentOutOfRangeException(nameof(capacity), "Capacity was less than zero.");
             }
 
-            _items = capacity == 0 ? _emptyArray : new T[capacity];
+            _items = capacity == 0 ? EmptyArray : new T[capacity];
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Welt.MonoGame.Extended.Collections
             {
                 return;
             }
-            var newCapacity = _defaultCapacity;
+            var newCapacity = DEFAULT_CAPACITY;
             if (_items.Length > 0)
             {
                 newCapacity = _resizeFunction(_items.Length);

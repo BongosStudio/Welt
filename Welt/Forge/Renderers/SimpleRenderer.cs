@@ -10,7 +10,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
 using Welt.Cameras;
+using Welt.Core.Forge;
 using Welt.Forge;
+using Welt.Forge.Builders;
 using Welt.Forge.Renderers;
 using Welt.IO;
 using Welt.Models;
@@ -27,43 +29,26 @@ namespace Welt.Forge.Renderers
         private const byte GENERATE_RANGE_HIGH = GENERATE_RANGE_LOW;
         private readonly FirstPersonCamera _mCamera;
         private readonly GraphicsDevice _graphicsDevice;
-        private readonly World _world;
-        private LightingChunkProcessor _lightingChunkProcessor;
+        private readonly WorldBuilder _world;
         protected Effect SolidBlockEffect;
         protected Texture2D TextureAtlas;
         private float _mTod;
         private bool _mIsRunning;
-        private bool _mIsInitialized;
-        private VertexBuildChunkProcessor _mVertexBuildChunkProcessor;
         protected Effect WaterBlockEffect;
         protected Effect GrassBlockEffect;
 
-        public SimpleRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, World world)
+        public SimpleRenderer(GraphicsDevice graphicsDevice, FirstPersonCamera camera, WorldBuilder world)
         {
             _graphicsDevice = graphicsDevice;
             _mCamera = camera;
             _world = world;
             _world.Renderer = this;
             _mIsRunning = true;
-            _mIsInitialized = false;
         }
 
         public void Initialize()
         {
-            if (_mIsInitialized) return;
-            _mVertexBuildChunkProcessor = new VertexBuildChunkProcessor(_graphicsDevice);
-            _lightingChunkProcessor = new LightingChunkProcessor();
-
-            Debug.WriteLine("Generate initial chunks");
-            _world.VisitChunks(DoGenerate, GENERATE_RANGE_HIGH);
-            LoadStepCompleted?.Invoke(this, EventArgs.Empty);
-            Debug.WriteLine("Light initial chunks");
-            _world.VisitChunks(DoLighting, LIGHT_RANGE);
-            LoadStepCompleted?.Invoke(this, EventArgs.Empty);
-            Debug.WriteLine("Build initial chunks");
-            _world.VisitChunks(DoBuild, BUILD_RANGE);
-            LoadStepCompleted?.Invoke(this, EventArgs.Empty);
-            _mIsInitialized = true;
+            
         }
 
         public void LoadContent(ContentManager content)
@@ -93,24 +78,8 @@ namespace Welt.Forge.Renderers
         }
 
         public event EventHandler LoadStepCompleted;
-
-        public void RebuildChunk(Chunk rebuildChunk)
-        {
-            switch (rebuildChunk.State)
-            {
-                case ChunkState.AwaitingRelighting:
-                    DoLighting(rebuildChunk);
-                    DoBuild(rebuildChunk);
-                    rebuildChunk.State = ChunkState.Ready;
-                    break;
-                case ChunkState.AwaitingRebuild:
-                    DoBuild(rebuildChunk);
-                    rebuildChunk.State = ChunkState.Ready;
-                    break;
-            }
-        }
-
-        public void DoLightFor(Chunk chunk)
+        
+        public void DoLightFor(ChunkBuilder chunk)
         {
             _lightingChunkProcessor.ProcessChunk(chunk);
         }
@@ -119,9 +88,9 @@ namespace Welt.Forge.Renderers
 
         private void DrawSolid(GameTime gameTime)
         {
-            _mTod = _world.Tod;
+            _mTod = _world.TimeOfDay;
 
-            SolidBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
+            SolidBlockEffect.Parameters["WorldObject"].SetValue(Matrix.Identity);
             SolidBlockEffect.Parameters["View"].SetValue(_mCamera.View);
             SolidBlockEffect.Parameters["Projection"].SetValue(_mCamera.Projection);
             SolidBlockEffect.Parameters["CameraPosition"].SetValue(_mCamera.Position);
@@ -147,7 +116,7 @@ namespace Welt.Forge.Renderers
             {
                 pass.Apply();
 
-                foreach (var chunk in _world.Chunks.Values.Where(chunk => chunk != null))
+                foreach (var chunk in _world.Chunks.Where(c => !c.IsGenerated))
                 {
                     if (chunk.State != ChunkState.Ready) RebuildChunk(chunk);
                     if (!chunk.BoundingBox.Intersects(viewFrustum) || chunk.IndexBuffer == null) continue;
@@ -161,41 +130,41 @@ namespace Welt.Forge.Renderers
 
         #endregion
 
-        private Chunk DoLighting(Vector3I chunkIndex)
+        private ChunkBuilder DoLighting(Vector3I chunkIndex)
         {
-            var chunk = _world.Chunks[chunkIndex.X, chunkIndex.Z];
+            var chunk = (ChunkBuilder) _world.World.GetChunk(chunkIndex.X, chunkIndex.Z);
+            
             return DoLighting(chunk);
         }
 
-        private Chunk DoLighting(Chunk chunk)
+        private ChunkBuilder DoLighting(ChunkBuilder chunk)
         {
             _lightingChunkProcessor.ProcessChunk(chunk);
             return chunk;
         }
 
-        private Chunk DoBuild(Vector3I chunkIndex)
+        private ChunkBuilder DoBuild(Vector3I chunkIndex)
         {
-            var chunk = _world.Chunks[chunkIndex.X, chunkIndex.Z];
+            var chunk = (Chunk) _world.World.GetChunk(chunkIndex.X, chunkIndex.Z);
             return DoBuild(chunk);
         }
 
-        private Chunk DoBuild(Chunk chunk)
+        private ChunkBuilder DoBuild(Chunk chunk)
         {
             _mVertexBuildChunkProcessor.ProcessChunk(chunk);
             return chunk;
         }
 
-        private IChunk DoGenerate(Vector3I chunkIndex)
+        private ChunkBuilder DoGenerate(Vector3I chunkIndex)
         {
-            var chunk = new Chunk(_world, chunkIndex);
-            return DoGenerate(chunkIndex.X, chunkIndex.Z);
+
         }
 
-        private IChunk DoGenerate(uint x, uint z)
+        private ChunkBuilder DoGenerate(uint x, uint z)
         {
-            
-            var chunk = _world.Generator.GenerateChunk(_world, x, z);
-            _world.Chunks[x, z] = chunk;
+            var chunk = new ChunkBuilder(_world, x, z);  
+            _world.Generator.GenerateChunk(_world, chunk);
+            _world.SetChunk(x, z, chunk);
             return chunk;
         }
 
@@ -206,7 +175,7 @@ namespace Welt.Forge.Renderers
         private void DrawGrass(GameTime time)
         {
             _mWaveTime += 0.05f;
-            GrassBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
+            GrassBlockEffect.Parameters["WorldObject"].SetValue(Matrix.Identity);
             GrassBlockEffect.Parameters["View"].SetValue(_mCamera.View);
             GrassBlockEffect.Parameters["Projection"].SetValue(_mCamera.Projection);
             GrassBlockEffect.Parameters["CameraPosition"].SetValue(_mCamera.Position);
@@ -221,16 +190,16 @@ namespace Welt.Forge.Renderers
             {
                 pass.Apply();
 
-                foreach (var chunk in from chunk in _world.Chunks.Values
+                foreach (var chunk in from chunk in _world.Chunks
                                       where chunk != null
                                       where chunk.BoundingBox.Intersects(viewFrustum)
-                                      //where chunk.GrassVertexBuffer != null
-                                      //where chunk.GrassIndexBuffer.IndexCount > 0
+                                      //where ChunkObject.GrassVertexBuffer != null
+                                      //where ChunkObject.GrassIndexBuffer.IndexCount > 0
                                       select chunk)
                 {
-                    //_graphicsDevice.SetVertexBuffer(chunk.GrassVertexBuffer);
-                    //_graphicsDevice.Indices = chunk.GrassIndexBuffer;
-                    //_graphicsDevice.DrawIndexPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.GrassVertexCount);
+                    //_graphicsDevice.SetVertexBuffer(ChunkObject.GrassVertexBuffer);
+                    //_graphicsDevice.Indices = ChunkObject.GrassIndexBuffer;
+                    //_graphicsDevice.DrawIndexPrimitives(PrimitiveType.TriangleList, 0, 0, ChunkObject.GrassVertexCount);
                 }
             }
         }
@@ -247,7 +216,7 @@ namespace Welt.Forge.Renderers
 
             _mTod = _world.Tod;
             
-            WaterBlockEffect.Parameters["World"].SetValue(Matrix.Identity);
+            WaterBlockEffect.Parameters["WorldObject"].SetValue(Matrix.Identity);
             WaterBlockEffect.Parameters["View"].SetValue(_mCamera.View);
             WaterBlockEffect.Parameters["Projection"].SetValue(_mCamera.Projection);
             WaterBlockEffect.Parameters["CameraPosition"].SetValue(_mCamera.Position);
@@ -274,7 +243,7 @@ namespace Welt.Forge.Renderers
             {
                 pass.Apply();
 
-                foreach (var chunk in from chunk in _world.Chunks.Values
+                foreach (var chunk in from chunk in _world.Chunks
                     where chunk != null
                     where chunk.BoundingBox.Intersects(viewFrustum) && chunk.WaterVertexBuffer != null
                     where chunk.WaterIndexBuffer.IndexCount > 0

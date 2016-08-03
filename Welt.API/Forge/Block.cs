@@ -2,6 +2,9 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 
+using System;
+using System.Collections.Generic;
+
 namespace Welt.API.Forge
 {
     //public enum BlockType : ushort
@@ -24,20 +27,20 @@ namespace Welt.API.Forge
 
     public class BlockType
     {
-        public const ushort NONE = 0;
-        public const ushort DIRT = 1;
-        public const ushort GRASS = 2;
-        public const ushort LAVA = 3;
-        public const ushort LEAVES = 4;
-        public const ushort ROCK = 5;
-        public const ushort SAND = 6;
-        public const ushort TREE = 7;
-        public const ushort SNOW = 8;
-        public const ushort RED_FLOWER = 9;
-        public const ushort LONG_GRASS = 10;
-        public const ushort TORCH = 90;
-        public const ushort WATER = 182;
-        public const ushort MAXIMUM = ushort.MaxValue;
+        public const ushort None = 0;
+        public const ushort Dirt = 1;
+        public const ushort Grass = 2;
+        public const ushort Lava = 3;
+        public const ushort Leaves = 4;
+        public const ushort Rock = 5;
+        public const ushort Sand = 6;
+        public const ushort Tree = 7;
+        public const ushort Snow = 8;
+        public const ushort RedFlower = 9;
+        public const ushort LongGrass = 10;
+        public const ushort Torch = 90;
+        public const ushort Water = 182;
+        public const ushort Maximum = ushort.MaxValue;
     }
 
     #region Block structure
@@ -69,13 +72,12 @@ namespace Welt.API.Forge
             }
         }
 
+        public static List<Type> RegisteredTypes = new List<Type>(); 
+
         public byte R, G, B;
         public byte Sun;
         public ushort Id;
         public byte Metadata;
-        // Metadata will not be implemented due to the fact that we will have over 65k block spaces. 
-        // Yes, it's useful for determining groupings, but it will cut data size down by 1 byte per
-        // block. That's over 65k bytes and is completely worth it if you ask me. 
 
         public Block(ushort blockId) : this(blockId, 0x00)
         {
@@ -90,6 +92,7 @@ namespace Welt.API.Forge
             G = 0;
             B = 0;
             Metadata = metadata;
+            if (!RegisteredTypes.Contains(GetType())) RegisteredTypes.Add(GetType());
         }
 
         public static bool operator ==(Block left, Block right)
