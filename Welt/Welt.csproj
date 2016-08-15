@@ -106,6 +106,7 @@
     <Compile Include="Forge\Builders\WorldBuilder.cs" />
     <Compile Include="Forge\Cardinals.cs" />
     <Compile Include="Forge\Mesh.cs" />
+    <Compile Include="Forge\Processors\LightingProcessor.cs" />
     <Compile Include="Forge\Renderers\FogRenderer.cs" />
     <Compile Include="Forge\Renderers\IRenderer.cs" />
     <Compile Include="Forge\Renderers\SimpleRenderer.cs" />

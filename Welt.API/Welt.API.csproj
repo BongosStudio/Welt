@@ -51,6 +51,8 @@
     <Compile Include="Forge\IChunk.cs" />
     <Compile Include="Forge\Generators\IForgeGenerator.cs" />
     <Compile Include="Forge\IFloor.cs" />
+    <Compile Include="Forge\IGalaxy.cs" />
+    <Compile Include="Forge\IGalQuadrant.cs" />
     <Compile Include="Forge\IWorld.cs" />
     <Compile Include="Forge\IWorldSystem.cs" />
     <Compile Include="Forge\Weather\IWeatherEngine.cs" />

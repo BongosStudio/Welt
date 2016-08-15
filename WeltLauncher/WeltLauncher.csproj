@@ -90,6 +90,7 @@
     <Compile Include="Core\Models\SettingsFile.cs" />
     <Compile Include="Core\Net\AuthService.cs" />
     <Compile Include="Core\Net\JsonContent.cs" />
+    <Compile Include="Core\Net\ResourceDownloader.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -25,7 +25,7 @@ namespace WeltLauncher.Core
 #if DEBUG
             return TestUrl + endpoint;
 #else
-            return RELEASE_URL + endpoint;
+            return ReleaseUrl + endpoint;
 #endif
         }
     }
