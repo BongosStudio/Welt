@@ -15,6 +15,8 @@ namespace Welt.Core.Forge
         public long Seed { get; }
         public int Size { get; }
         public IForgeGenerator Generator { get; }
+        public IWorldSystem System { get; }
+        public int SystemIndex { get; }
 
         protected readonly ChunkManager Manager;
 
@@ -26,6 +28,9 @@ namespace Welt.Core.Forge
             Size = 32;
             Generator = gen;
             Manager = new ChunkManager(this);
+
+            System = null;
+            SystemIndex = 0;
         }
 
         public World(string name, long seed, IForgeGenerator gen)
@@ -35,6 +40,9 @@ namespace Welt.Core.Forge
             Size = 32;
             Generator = gen;
             Manager = new ChunkManager(this);
+
+            System = null;
+            SystemIndex = 0;
         }
 
         /// <summary>

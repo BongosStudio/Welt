@@ -16,6 +16,8 @@ namespace Welt.API.Forge
         long Seed { get; }
         int Size { get; }
         IForgeGenerator Generator { get; }
+        IWorldSystem System { get; }
+        int SystemIndex { get; }
 
         IChunk GetChunk(uint x, uint z);
         void SetChunk(uint x, uint z, IChunk value);

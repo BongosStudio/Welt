@@ -53,10 +53,12 @@
     <Compile Include="Forge\IFloor.cs" />
     <Compile Include="Forge\IGalaxy.cs" />
     <Compile Include="Forge\IGalQuadrant.cs" />
+    <Compile Include="Forge\ILightPalette.cs" />
     <Compile Include="Forge\IWorld.cs" />
     <Compile Include="Forge\IWorldSystem.cs" />
     <Compile Include="Forge\Weather\IWeatherEngine.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
+    <Compile Include="Forge\LightStruct.cs" />
     <Compile Include="NamespaceDocs.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -45,7 +45,7 @@ namespace Welt.API.Forge
 
     #region Block structure
 
-    public struct Block
+    public abstract class Block
     {
         public bool Equals(Block other)
         {
@@ -62,22 +62,19 @@ namespace Welt.API.Forge
         {
             unchecked
             {
-                var hashCode = R.GetHashCode();
-                hashCode = (hashCode*397) ^ G.GetHashCode();
-                hashCode = (hashCode*397) ^ B.GetHashCode();
-                hashCode = (hashCode*397) ^ Sun.GetHashCode();
-                hashCode = (hashCode*397) ^ Id;
+                var hashCode = Id.GetHashCode();
                 hashCode = (hashCode*397) ^ Metadata;
                 return hashCode;
             }
         }
 
-        public static List<Type> RegisteredTypes = new List<Type>(); 
+        // NOTE: change this whole class to BlockAttribute and just have blocks made as
+        // [Block(2, 0x0, "stone", Hardness = 0.5f, Opaque = false, Light = new LightPact(0, 0, 0))]
+        // public static object StoneObject;
 
-        public byte R, G, B;
-        public byte Sun;
-        public ushort Id;
-        public byte Metadata;
+        public static List<Type> RegisteredTypes = new List<Type>();
+        public readonly ushort Id;
+        public readonly byte Metadata;
 
         public Block(ushort blockId) : this(blockId, 0x00)
         {

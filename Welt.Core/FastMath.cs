@@ -204,6 +204,12 @@ namespace Welt.Core
             if (value < min) value = min;
             if (value > max) value = max;
         }
+
+        public static void Adjust(byte min, byte max, ref byte value)
+        {
+            if (value < min) value = min;
+            if (value > max) value = max;
+        }
         
         public static float ToRadians(float degrees)
         {

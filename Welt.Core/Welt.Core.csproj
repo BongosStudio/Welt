@@ -56,6 +56,7 @@
     <Compile Include="Forge\Floor.cs" />
     <Compile Include="Forge\Generators\Decorations\TreeDecorator.cs" />
     <Compile Include="Forge\Generators\StandardGenerator.cs" />
+    <Compile Include="Forge\LightPalette.cs" />
     <Compile Include="Forge\Weather\WeatherEngine.cs" />
     <Compile Include="Forge\World.cs" />
     <Compile Include="Net\IMessage.cs" />
@@ -73,6 +74,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Casl\" />
     <Folder Include="Forge\Blocks\" />
     <Folder Include="Forge\Generators\Caves\" />
     <Folder Include="Net\Messages\Clientbound\" />
