@@ -1,21 +1,16 @@
 #To-Do List
 
-###Legend
-
-[ ] = not started  
-[-] = WIP (work in progress)  
-[x] = completed (for now)  
 
 ##API/Core 
 - [x] new working mesh builder
-- [-] world generator
+- [ ] world generator
 - [ ] entity models
 - [ ] physics engine that isn't hacked together
-- [-] netcode (will be using Bongou library)
+- [ ] netcode (will be using Bongou library)
 - [ ] Casl (external resource loader)
 
 ##Game 
-- [-] light engine 
+- [ ] light engine 
 - [ ] particle engine 
 - [ ] menus 
 - [x] texture and mesh builder 

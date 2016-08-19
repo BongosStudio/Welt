@@ -50,6 +50,7 @@
     <Compile Include="Forge\IBlockPalette.cs" />
     <Compile Include="Forge\IChunk.cs" />
     <Compile Include="Forge\Generators\IForgeGenerator.cs" />
+    <Compile Include="Forge\IDesigner.cs" />
     <Compile Include="Forge\IFloor.cs" />
     <Compile Include="Forge\IGalaxy.cs" />
     <Compile Include="Forge\IGalQuadrant.cs" />

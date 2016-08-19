@@ -44,6 +44,10 @@ namespace Welt.API.Forge
         public virtual bool Opaque => false;
         public virtual bool IsFlammable => false;
         public virtual bool IsReinforced => false;
+        public virtual bool HasCollision => true;
+        public virtual bool HasPhysics => false;
+        public virtual bool HasLifecycle => false;
+
 
         protected Block(ushort blockId, byte metadata)
         {
