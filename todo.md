@@ -38,4 +38,4 @@
     - asteriod belts/fields  
     
 ##Other 
-- [-] to-do list
+- [ ] to-do list
