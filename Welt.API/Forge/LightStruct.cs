@@ -69,5 +69,22 @@ namespace Welt.API.Forge
         {
             return new LightStruct(left.R - right, left.G - right, left.B - right);
         }
+
+        public static explicit operator LightStruct(ushort value)
+        {
+            var r = value & 0xF;
+            var g = value >> 4 & 0xF;
+            var b = value >> 8 & 0xF;
+            return new LightStruct(r, g, b);
+        }
+
+        public static explicit operator ushort(LightStruct value)
+        {
+            var lite = 0;
+            lite |= value.R;
+            lite |= (ushort)(value.G << 4);
+            lite |= (ushort)(value.B << 8);
+            return (ushort) lite;
+        }
     }
 }

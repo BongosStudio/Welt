@@ -4,27 +4,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 namespace Welt.API.Forge
 {
-    //public enum BlockType : ushort
-    //{
-    //    None = 0,
-    //    Dirt,
-    //    Grass,
-    //    Lava,
-    //    Leaves,
-    //    Rock,
-    //    Sand,
-    //    Tree,
-    //    Snow,
-    //    RedFlower,
-    //    LongGrass,
-
-    //    Water = 182,
-    //    Maximum
-    //}
-
+    // TODO: take these types out. THEY BELONG IN CORE.
     public class BlockType
     {
         public const ushort None = 0;
@@ -47,64 +31,62 @@ namespace Welt.API.Forge
 
     public abstract class Block
     {
-        public bool Equals(Block other)
-        {
-            return R == other.R && G == other.G && B == other.B && Sun == other.Sun && Id == other.Id;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is Block && Equals((Block) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Id.GetHashCode();
-                hashCode = (hashCode*397) ^ Metadata;
-                return hashCode;
-            }
-        }
-
-        // NOTE: change this whole class to BlockAttribute and just have blocks made as
-        // [Block(2, 0x0, "stone", Hardness = 0.5f, Opaque = false, Light = new LightPact(0, 0, 0))]
-        // public static object StoneObject;
-
         public static List<Type> RegisteredTypes = new List<Type>();
-        public readonly ushort Id;
-        public readonly byte Metadata;
 
-        public Block(ushort blockId) : this(blockId, 0x00)
-        {
+        public ushort Id { get; }
+        public byte Metadata { get; }
 
-        }
+        public virtual float Hardness => 0.5f;
+        public virtual float Width => 1;
+        public virtual float Depth => 1;
+        public virtual float Height => 1;
 
-        public Block(ushort blockId, byte metadata)
+        public virtual bool Opaque => false;
+        public virtual bool IsFlammable => false;
+        public virtual bool IsReinforced => false;
+
+        protected Block(ushort blockId, byte metadata)
         {
             Id = blockId;
-            Sun = 0;
-            R = 0;
-            G = 0;
-            B = 0;
             Metadata = metadata;
             if (!RegisteredTypes.Contains(GetType())) RegisteredTypes.Add(GetType());
         }
 
+        #region Overrides & Operators
+
         public static bool operator ==(Block left, Block right)
         {
             return left.Id == right.Id &&
-                   left.Metadata == right.Metadata &&
-                   left.R == right.R &&
-                   left.G == right.G &&
-                   left.B == right.B;
+                   left.Metadata == right.Metadata;
         }
 
         public static bool operator !=(Block left, Block right)
         {
             return !(left == right);
         }
+
+        protected bool Equals(Block other)
+        {
+            return Id == other.Id && Metadata == other.Metadata;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Block)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Id.GetHashCode() * 397) ^ Metadata.GetHashCode();
+            }
+        }
+
+        #endregion
     }
 
     #endregion

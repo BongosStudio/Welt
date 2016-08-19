@@ -82,39 +82,13 @@ namespace Welt.API.Forge
         /// <returns></returns>
         Block GetBlock(int x, int y, int z);
         /// <summary>
-        ///     Gets the block light value at the requested location.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
-        LightStruct GetLight(int x, int y, int z);
-        /// <summary>
-        ///     Gets the sun light value at the requested location.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
-        LightStruct GetSunLight(int x, int y, int z);
-
-        /// <summary>
-        ///     Sets the block at the vector.
+        ///     Sets the block at the requested location.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
         /// <param name="value"></param>
         void SetBlock(int x, int y, int z, Block value);
-        /// <summary>
-        ///     Sets the block light at the vector.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <param name="value"></param>
-        void SetLight(int x, int y, int z, LightStruct value);
-        
         // these are `int`s so that we can gauge whether or not it wants to tap a relative chunk
         /// <summary>
         ///     Initializes the chunk within the world and the chunk manager.

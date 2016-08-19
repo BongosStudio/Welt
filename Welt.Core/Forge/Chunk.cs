@@ -33,10 +33,16 @@ namespace Welt.Core.Forge
         public virtual IChunk Nw { get; protected set; }
         public virtual IChunk Se { get; protected set; }
         public virtual IChunk Sw { get; protected set; }
+        public ILightPalette LightPalette { get; }
         public byte[,] HeightMap { get; }
         public IFloor[] Floors { get; }
         public bool IsModified { get; set; }
         public bool IsGenerated { get; set; }
+
+        public void SetLight(int x, int y, int z, LightStruct value)
+        {
+            throw new NotImplementedException();
+        }
 
         public virtual void Initialize(IWorld world)
         {
@@ -77,6 +83,16 @@ namespace Welt.Core.Forge
             }
 
             return new Block();
+        }
+
+        public LightStruct GetLight(int x, int y, int z)
+        {
+            throw new NotImplementedException();
+        }
+
+        public LightStruct GetSunLight(int x, int y, int z)
+        {
+            throw new NotImplementedException();
         }
 
         public void SetBlock(int x, int y, int z, Block value)
