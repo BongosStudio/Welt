@@ -13,29 +13,53 @@ namespace Welt.API.Forge.Generators
     public interface IBiomeGenerator
     {
         /// <summary>
-        ///     The max elevation the generator will position a surface block.
+        ///     Gets the max elevation the generator will position a surface block.
         /// </summary>
         int MaxElevation { get; }
         /// <summary>
-        ///     The min elevation the generator will position a surface block.
+        ///     Gets the min elevation the generator will position a surface block.
         /// </summary>
         int MinElevation { get; }
         /// <summary>
-        ///     The <see cref="Welt.API.Forge.Weather.IWeatherEngine"/> the world will use per generator type.
+        ///     Gets the <see cref="IWeatherEngine"/> the world will use per generator type.
         /// </summary>
         IWeatherEngine Weather { get; }
         /// <summary>
-        ///     A collection <see cref="Welt.API.Forge.Generator"/>
+        ///     Gets a collection <see cref="IDecorationGenerator"/> that will be used in the biome.
         /// </summary>
         IDecorationGenerator[] Decorations { get; }
-        ushort Water { get; }
+        /// <summary>
+        ///     Gets the block used as water in the generator.
+        /// </summary>
+        Block Water { get; }
+        /// <summary>
+        ///     Gets whether or not the biome makes a pass to build water structures.
+        /// </summary>
         bool CanHaveWater { get; }
+        /// <summary>
+        ///     Gets the median waterline value. Any water above ground will have a 5+/- block tolerance.
+        /// </summary>
         int WaterLine { get; }
+        /// <summary>
+        ///     Gets the <see cref="ICaveGenerator"/>.
+        /// </summary>
         ICaveGenerator Caves { get; }
-        ushort Grass { get; }
-        bool CanHaveGrass { get; }
-        int GrassLine { get; }
+        /// <summary>
+        ///     Gets the blocks used for flora.
+        /// </summary>
+        Block[] Flora { get; }
+        /// <summary>
+        ///     Gets whether or not the biome can have flora.
+        /// </summary>
+        bool CanHaveFlora { get; }
 
+        /// <summary>
+        ///     Generates a randomized chunk of biome within the <see cref="IWorld"/>.
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="x"></param>
+        /// <param name="z"></param>
+        /// <returns></returns>
         IChunk GenerateChunk(IWorld world, uint x, uint z);
     }
 }
