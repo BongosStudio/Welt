@@ -17,13 +17,18 @@ namespace Welt.Core.Forge.Biomes
         {
             new TreeDecorator(TreeTypes.Oak, TreeTypes.Spruce), 
         };
-        public ushort Water => BlockType.Water;
+
+        public Block Water => Block.Get("water");
         public bool CanHaveWater => true;
         public int WaterLine => 130;
         public ICaveGenerator Caves { get; }
-        public ushort Grass => BlockType.Grass;
-        public bool CanHaveGrass => true;
-        public int GrassLine => 150;
+
+        public Block[] Flora => new[]
+        {
+            Block.Get("grass_plant"),
+            Block.Get("rode")
+        };
+        public bool CanHaveFlora => true;
 
         public IChunk GenerateChunk(IWorld world, uint x, uint z)
         {

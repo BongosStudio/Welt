@@ -1,0 +1,10 @@
+{
+    "frame_length": 2,
+    "frame_selection": "random",
+    "light": [
+        "10;6;6",
+        "11;6;6",
+        "9;7;7",
+        "11;7;7"
+    ]
+}

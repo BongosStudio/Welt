@@ -17,6 +17,8 @@ float4 NightColor;
 float4 MorningTint;		
 float4 EveningTint;	
 
+float3 SunPosition;
+
 Texture Texture1;
 sampler Texture1Sampler = sampler_state
 {

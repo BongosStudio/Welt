@@ -77,7 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Casl\" />
-    <Folder Include="Forge\Blocks\" />
     <Folder Include="Forge\Designers\" />
     <Folder Include="Forge\Generators\Caves\" />
     <Folder Include="Net\Messages\Clientbound\" />

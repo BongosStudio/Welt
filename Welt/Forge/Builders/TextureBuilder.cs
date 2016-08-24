@@ -33,35 +33,21 @@ namespace Welt.Forge.Builders
 
             #region Create BlockTextureModels
 
-            Create(1, 0, 0, 3, 0, 2); // grass block
-            Create(2, 0, 1); // stone
-            Create(3, 0, 16); // cobblestone
-            Create(4, 0, 4); // wood planks
-            Create(5, 0, 5, 5, 6); // stone slab
-            Create(6, 0, 7); // bricks
-            Create(7, 0, 8, 8, 9, 10); // tnt
-            Create(8, 0, 11); // spooder web
-            Create(9, 0, 12); // rose
-            Create(9, 1, 13); // dandelion
-            Create(14, 0, 14); // water
-            Create(18, 0, 18); // sand
-            Create(20, 0, 20, 20, 21); // wood log
+            /*foreach (var btm in BlockTextureModel.Created)
+            {
+                // whatever we have to do to stitch the textures into a map. Idk how we should do that yet.
+            }
 
-            Create(39, 0, 39); // grass 
-            Create(53, 0, 53); // leaves
-            Create(66, 0, 66); // snow
-            Create(80, 0, 80); // torch
+            foreach (var block in Block.RegisteredTypes)
+            {
+                // look for any files of any sides. ie: stone_top_left, stone, stone_bottom_top, stone_sides, etc.
+                // valid names are top, bottom, front, back, left, right, sides
+            }
+            */
 
             #endregion
 
-            /*
-            
-            foreach (var btm in BlockTextureModel.Created) 
-            {
-                // whatever we have to do to stitch the textures into a map. Idk how we should do that yet.
-            } 
-             
-             */
+
             _initialized = true;
         }
 
@@ -165,3 +151,4 @@ namespace Welt.Forge.Builders
         }
     }
 }
+ 

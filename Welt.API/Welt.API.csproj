@@ -50,7 +50,6 @@
     <Compile Include="Forge\IBlockPalette.cs" />
     <Compile Include="Forge\IChunk.cs" />
     <Compile Include="Forge\Generators\IForgeGenerator.cs" />
-    <Compile Include="Forge\IDesigner.cs" />
     <Compile Include="Forge\IFloor.cs" />
     <Compile Include="Forge\IGalaxy.cs" />
     <Compile Include="Forge\IGalQuadrant.cs" />
@@ -60,7 +59,6 @@
     <Compile Include="Forge\Weather\IWeatherEngine.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\LightStruct.cs" />
-    <Compile Include="NamespaceDocs.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

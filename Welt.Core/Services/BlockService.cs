@@ -6,12 +6,12 @@ namespace Welt.Core.Services
     {
         public void Load(Assembly assembly)
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Unload()
         {
-            throw new System.NotImplementedException();
+            
         }
     }
 }
