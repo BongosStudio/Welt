@@ -22,23 +22,39 @@ namespace Welt.API.Forge
         /// </summary>
         public static List<Block> RegisteredTypes => new List<Block>
         {
+            //Many of these blocks will need flammability and lifecycles added, such as uranium.
+
+            //Basic Natural blocks
+
             new Block("stone", 1, 0),
             new Block("limestone", 1, 0x01),
             new Block("grass", 2, 0),
             new Block("dirt", 3, 0),
             new Block("volcanic soil", 3, 0x01),
-            new Block("water", 11, 0, hardness: 0, height: 0.9f),
-            new Block("lava", 12, 0, hardness: 0, height: 0.9f),
-            new Block("rose", 20, 0, hardness: 0.1f, width: 0.2f, depth: 0.2f, height: 0.5f, flammable: true, hasPhysics: true),
-            new Block("wood", 30, 0, flammable: true),
-            new Block("leaves", 31, 0, hardness: 0.2f, flammable: true, hasLifecycle: true)
-            new Block("iron ore", 40, 0),
-            new Block("coal ore", 41, 0),
-            new Block("sulphur", 42, 0),
-            new Block("niter", 43, 0),
-            new Block("copper", 44, 0),
-            new Block("zinc", 45, 0),
-            new Block("clay", 50, 0),
+            new Block("clay", 4, 0),
+            new Block("water", 5, 0, hardness: 0, height: 0.9f),
+            new Block("lava", 6, 0, hardness: 0, height: 0.9f),
+            new Block("rose", 7, 0, hardness: 0.1f, width: 0.2f, depth: 0.2f, height: 0.5f, flammable: true, hasPhysics: true),
+            new Block("wood", 8, 0, flammable: true),
+            new Block("leaves", 9, 0, hardness: 0.2f, flammable: true, hasLifecycle: true),
+
+            //Minerals
+
+            new Block("iron ore", 100, 0),
+            new Block("coal ore", 101, 0),
+            new Block("sulphur deposit",102, 0, flammable: true),
+            new Block("niter deposit", 103, 0),
+            new Block("copper ore", 104, 0),
+            new Block("zinc ore", 105, 0),
+            new Block("titanium ore", 106, 0),
+            new Block("uranium ore", 107, 0),
+            new Block("aluminum", 108, 0),
+
+            //Decoration Blocks
+
+            new Block("glass", 200, 0),
+            new Block("plexiglass", 201, 0),
+
 
         };
 
