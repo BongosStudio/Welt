@@ -34,7 +34,6 @@ namespace Welt.API.Forge
             new Block("clay", 4, 0),
             new Block("water", 5, 0, hardness: 0, height: 0.9f),
             new Block("lava", 6, 0, hardness: 0, height: 0.9f),
-            new Block("rose", 7, 0, hardness: 0.1f, width: 0.2f, depth: 0.2f, height: 0.5f, flammable: true, hasPhysics: true),
             new Block("wood", 8, 0, flammable: true),
             new Block("leaves", 9, 0, hardness: 0.2f, flammable: true, hasLifecycle: true),
 
@@ -55,6 +54,13 @@ namespace Welt.API.Forge
             new Block("glass", 200, 0),
             new Block("plexiglass", 201, 0),
 
+            //Construction Blocks
+
+            new Block("flagstone", 300, 0),
+
+            //Misc Blocks
+
+            new Block("rose", 7, 0, hardness: 0.1f, width: 0.2f, depth: 0.2f, height: 0.5f, flammable: true, hasPhysics: true),
 
         };
 
