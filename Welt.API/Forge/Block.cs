@@ -23,13 +23,23 @@ namespace Welt.API.Forge
         public static List<Block> RegisteredTypes => new List<Block>
         {
             new Block("stone", 1, 0),
+            new Block("limestone", 1, 0x01),
             new Block("grass", 2, 0),
             new Block("dirt", 3, 0),
+            new Block("volcanic soil", 3, 0x01),
             new Block("water", 11, 0, hardness: 0, height: 0.9f),
             new Block("lava", 12, 0, hardness: 0, height: 0.9f),
             new Block("rose", 20, 0, hardness: 0.1f, width: 0.2f, depth: 0.2f, height: 0.5f, flammable: true, hasPhysics: true),
             new Block("wood", 30, 0, flammable: true),
             new Block("leaves", 31, 0, hardness: 0.2f, flammable: true, hasLifecycle: true)
+            new Block("iron ore", 40, 0),
+            new Block("coal ore", 41, 0),
+            new Block("sulphur", 42, 0),
+            new Block("niter", 43, 0),
+            new Block("copper", 44, 0),
+            new Block("zinc", 45, 0),
+            new Block("clay", 50, 0),
+
         };
 
         /// <summary>
