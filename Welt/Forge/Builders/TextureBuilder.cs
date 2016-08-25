@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
 using Welt.Blocks;
 using Welt.Types;
 using static Welt.Console.ThrowHelper;
-using static Welt.Forge.BlockTextureModel;
 
 
 namespace Welt.Forge.Builders
@@ -19,9 +23,13 @@ namespace Welt.Forge.Builders
     public static class TextureBuilder
     {
         private static bool _initialized;
-        private const int TEXTURE_ATLAS = 16;
-        // TODO: change this texture atlas size. Make it dynamic because this shit ain't gonna be static.
-        // perhaps do a Texture2D.Height/16 = Y and Texture2D.Width/16 = X?
+        private static Dictionary<string, Vector2> _textures;
+        private static int _textureAtlas;
+
+        private static readonly int[] _textureSizes =
+        {
+            16, 32, 64, 128, 256, 512, 1048, 2056
+        };
 
         /// <summary>
         ///     Initializes the builder and reads all textures used for the game. Should be called 
@@ -33,17 +41,9 @@ namespace Welt.Forge.Builders
 
             #region Create BlockTextureModels
 
-            /*foreach (var btm in BlockTextureModel.Created)
-            {
-                // whatever we have to do to stitch the textures into a map. Idk how we should do that yet.
-            }
-
-            foreach (var block in Block.RegisteredTypes)
-            {
-                // look for any files of any sides. ie: stone_top_left, stone, stone_bottom_top, stone_sides, etc.
-                // valid names are top, bottom, front, back, left, right, sides
-            }
-            */
+            // jesus fuck lets try this again. ALRIGHT.
+            // step 1: get all the images. 
+            
 
             #endregion
 
@@ -84,16 +84,12 @@ namespace Welt.Forge.Builders
             }
         }
 
-        private static IEnumerable<Vector2> GetUvMapping(int texture, BlockFaceDirection face)
+        private static IEnumerable<Vector2> GetUvMapping(Vector2 texture, BlockFaceDirection face)
         {
+            var ofs = 1f/_textureAtlas;
 
-            var y = texture/TEXTURE_ATLAS;
-            var x = texture%TEXTURE_ATLAS;
-
-            const float ofs = 0.0625F; // 1f/TEXTURE_ATLAS
-
-            var yOfs = y*ofs;
-            var xOfs = x*ofs;
+            var yOfs = texture.Y*ofs;
+            var xOfs = texture.X*ofs;
             var uvList = new Vector2[6];
 
             switch (face)

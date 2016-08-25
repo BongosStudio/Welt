@@ -1,6 +1,6 @@
 {
-    "frame_length": 2,
-    "frame_selection": "random",
+    "animation_length": 2,
+    "animation_call": "random",
     "light": [
         "10;6;6",
         "11;6;6",

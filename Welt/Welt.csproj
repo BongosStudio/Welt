@@ -78,6 +78,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Blocks\BlockMetaDescription.cs" />
     <Compile Include="Blocks\VertexPositionTextureLight.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\FirstPersonCamera.cs" />
@@ -95,7 +96,6 @@
     <Compile Include="Entities\EntityData\EntityDataType.cs" />
     <Compile Include="Entities\LivingEntity.cs" />
     <Compile Include="Entities\PlayerEntity.cs" />
-    <Compile Include="Forge\BlockTextureModel.cs" />
     <Compile Include="Forge\Builders\ChunkBuilder.cs" />
     <Compile Include="Forge\Builders\DefaultMeshBuilder.cs" />
     <Compile Include="Forge\Builders\IMeshBuilder.cs" />
