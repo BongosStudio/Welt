@@ -1,11 +1,12 @@
 ﻿#region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
+
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Welt.Blocks
+namespace Welt.Rendering
 {
     [Serializable]
     public struct VertexPositionTextureLight : IVertexType

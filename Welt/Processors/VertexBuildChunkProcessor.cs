@@ -7,11 +7,11 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
-using Welt.Blocks;
 using Welt.Core.Forge;
 using Welt.Forge;
 using Welt.Forge.Builders;
 using Welt.Logic.Forge;
+using Welt.Rendering;
 using Welt.Types;
 
 // ReSharper disable PossibleLossOfFraction

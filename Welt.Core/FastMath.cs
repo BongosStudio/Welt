@@ -135,26 +135,22 @@ namespace Welt.Core
 
         public static int Floor(float value)
         {
-            if (value > 0) return (int) value;
-            return (int) value - 1;
+            return (int) Math.Floor(value);
         }
 
         public static int Ceiling(float value)
         {
-            if (value > 0) return (int) value + 1;
-            return (int) value;
+            return (int) Math.Ceiling(value);
         }
 
         public static int Floor(double value)
         {
-            if (value > 0) return (int) value;
-            return (int) value - 1;
+            return (int) Math.Floor(value);
         }
 
         public static int Ceiling(double value)
         {
-            if (value > 0) return (int) value + 1;
-            return (int) value;
+            return (int) Math.Ceiling(value);
         }
 
         public static bool WithinBounds(int lower, int upper, int value)

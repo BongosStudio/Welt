@@ -78,8 +78,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Blocks\BlockMetaDescription.cs" />
-    <Compile Include="Blocks\VertexPositionTextureLight.cs" />
+    <Compile Include="Rendering\AnimationCall.cs" />
+    <Compile Include="Rendering\BlockMetaDescription.cs" />
+    <Compile Include="Rendering\Effects\BlendTextureEffect.cs" />
+    <Compile Include="Rendering\Effects\NoiseTextureEffect.cs" />
+    <Compile Include="Rendering\Effects\OpacityTextureEffect.cs" />
+    <Compile Include="Rendering\Effects\ParticlesTextureEffect.cs" />
+    <Compile Include="Rendering\ITextureEffect.cs" />
+    <Compile Include="Rendering\VertexPositionTextureLight.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\FirstPersonCamera.cs" />
     <Compile Include="Cameras\HudRenderer.cs" />
@@ -102,7 +108,7 @@
     <Compile Include="Forge\Builders\TextureBuilder.cs" />
     <Compile Include="Forge\Builders\WorldBuilder.cs" />
     <Compile Include="Forge\Cardinals.cs" />
-    <Compile Include="Forge\Mesh.cs" />
+    <Compile Include="Rendering\Mesh.cs" />
     <Compile Include="Forge\Processors\LightingProcessor.cs" />
     <Compile Include="Forge\Renderers\FogRenderer.cs" />
     <Compile Include="Forge\Renderers\IRenderer.cs" />
@@ -1515,6 +1521,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Blocks\" />
     <Folder Include="Forge\Providers\" />
     <Folder Include="Forge\Renderers\ParticleSystems\" />
   </ItemGroup>

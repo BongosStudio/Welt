@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
-using Welt.Blocks;
 
-namespace Welt.Forge
+namespace Welt.Rendering
 {
     public sealed class Mesh
     {
