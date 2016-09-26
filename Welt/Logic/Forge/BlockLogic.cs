@@ -4,35 +4,36 @@
 
 using Microsoft.Xna.Framework;
 using Welt.API.Forge;
+using Welt.Core.Forge;
+using Welt.Core.Services;
 using Welt.Forge;
+using Welt.Forge.Builders;
 using Welt.Models;
+using static Welt.Forge.Builders.TextureBuilder;
 
 namespace Welt.Logic.Forge
 {
 
-    // THIS IS ALL BEING MOVED. 
+    // THIS IS ALL BEING COMPLETELY REDONE. TRUST NONE OF IT.
 
     
     public class BlockLogic
     {
-        public static bool GetRightClick(WorldObject world, Vector3 position, Player player)
+        public static bool GetRightClick(World world, Types.Vector3I position, Player player)
         {
-            var block = world.GetBlock(position);
+            var block = world.GetBlock(position.X, position.Y, position.Z);
             
             switch (block.Id)
             {
-                case BlockType.RedFlower:
-                    world.SetBlock(position, new Block(BlockType.Lava));
-                    return true;
                 default:
                     return false;
             }
 
         }
 
-        public static Vector3 DetermineTarget(WorldObject world, Vector3 original, Vector3 adjacent)
+        public static Vector3 DetermineTarget(World world, Types.Vector3I original, Vector3 adjacent)
         {
-            var block = world.GetBlock(original).Id;
+            var block = world.GetBlock(original.X, original.Y, original.Z).Id;
             if (IsCapBlock(block) || IsGrassBlock(block) || IsPlantBlock(block)) return original;
             return adjacent;
             // TODO: figure a better way for this shit lol
@@ -44,31 +45,32 @@ namespace Welt.Logic.Forge
             return 64;
         }
 
-        public static void GetLightLevel(ushort id, out byte red, out byte green, out byte blue)
+        public static void GetLightLevel(ushort id, byte metadata, out byte red, out byte green, out byte blue)
         {
-            switch (id)
+            var name = BlockService.GetBlockName(id, metadata);
+            switch (name)
             {
-                case BlockType.Lava:
+                case "lava":
                     red = 14;
                     green = 4;
                     blue = 0;
                     return;
-                case BlockType.RedFlower:
+                case "rose":
                     red = 10;
                     green = 0;
                     blue = 0;
                     return;
-                case BlockType.Snow:
+                case "snow":
                     red = 1;
                     green = 1;
                     blue = 1;
                     return;
-                case BlockType.Water:
+                case "water":
                     red = 0;
                     green = 1;
                     blue = 3;
                     return;
-                case BlockType.Torch:
+                case "torch":
                     red = 10;
                     green = 0;
                     blue = 10;
@@ -81,25 +83,20 @@ namespace Welt.Logic.Forge
             }
         }
 
-        public static BoundingBox GetBoundingBox(ushort id, Vector3 position)
+        public static BoundingBox GetBoundingBox(ushort id, byte metadata, Vector3 position)
         {
-            switch (id)
-            {
-                case BlockType.Snow:
-                    return new BoundingBox(position, position + new Vector3(1, 0.1f, 1));
-                default:
-                    return new BoundingBox(position, position + new Vector3(1, 1, 1));
-            }
+            var block = BlockService.GetBlock(id, metadata);
+            return new BoundingBox(position, position + new Vector3(block.W, block.H, block.D));
         }
 
         public static BlockTexture GetTexture(ushort blockType)
         {
-            return GetTexture(blockType, BlockFaceDirection.None, BlockType.None);
+            return GetTexture(blockType, BlockFaceDirection.None);
         }
 
         public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir)
         {
-            return GetTexture(blockType, faceDir, BlockType.None);
+            return GetTexture(blockType, faceDir);
         }
 
         public static uint GetCost(ushort type)
@@ -109,8 +106,8 @@ namespace Welt.Logic.Forge
 
         public static bool IsCapBlock(ushort type)
         {
-            if (type == BlockType.Snow) return true;
-            return false;
+            var block = BlockService.GetBlock(type, 0);
+            return block.H <= 0.1f;
         }
 
         public static bool IsHalfBlock(ushort type)
@@ -120,28 +117,29 @@ namespace Welt.Logic.Forge
 
         public static bool IsSolidBlock(ushort type)
         {
-            return type != BlockType.Water && type != BlockType.None && type != BlockType.Snow && type != BlockType.RedFlower && type != BlockType.LongGrass;
+            return BlockService.GetBlock(type, 0).C;
         }
 
         public static bool IsPlantBlock(ushort type)
         {
-            return type == BlockType.RedFlower;
+            var b = BlockService.GetBlock(type, 0);
+            return b.Name == "rose"; // TODO: lol
         }
 
         public static bool IsGrassBlock(ushort type)
         {
-            return type == BlockType.LongGrass;
+            var b = BlockService.GetBlock(type, 0);
+            return b.Name == "grass"; // TODO: lol
         }
 
         public static bool IsTransparentBlock(ushort type)
         {
-            return type == BlockType.None || type == BlockType.Water || type == BlockType.Leaves || type == BlockType.Snow ||
-                   type == BlockType.RedFlower || type == BlockType.Rock || type == BlockType.LongGrass;
+            return BlockService.GetBlock(type, 0).O;
         }
 
         public static bool IsDiggable(ushort type)
         {
-            return type != BlockType.Water;
+            return BlockService.GetBlock(type, 0).Hrd > 0;
         }
 
         #region GetTexture
@@ -153,13 +151,18 @@ namespace Welt.Logic.Forge
         /// <param name="faceDir"></param>
         /// <param name="blockAbove">Reserved for blocks which behave differently if certain blocks are above them</param>
         /// <returns></returns>
-        public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir, ushort blockAbove)
+        public static BlockTexture GetTexture(ushort id, byte metadata, BlockFaceDirection faceDir, ushort blockAbove)
         {
-            switch (blockType)
+            // all of this is lol. 
+            // TODO:
+            // TODO:
+            // TO FUCKING DO:
+            var b = BlockService.GetBlock(id, metadata).Name;
+            switch (b)
             {
-                case BlockType.Dirt:
+                case "dirt":
                     return BlockTexture.Dirt;
-                case BlockType.Grass:
+                case "grass_block":
                     switch (faceDir)
                     {
                         case BlockFaceDirection.XIncreasing:
@@ -172,42 +175,42 @@ namespace Welt.Logic.Forge
                         case BlockFaceDirection.YDecreasing:
                             return BlockTexture.Dirt;
                         default:
-                            return BlockTexture.Rock;
+                            return BlockTexture.Stone;
                     }
-                case BlockType.Lava:
+                case "lava":
                     return BlockTexture.Lava;
-                case BlockType.Leaves:
+                case "leaves":
                     return BlockTexture.Leaves;
-                case BlockType.Rock:
-                    return BlockTexture.Rock;
-                case BlockType.Sand:
+                case "stone":
+                    return BlockTexture.Stone;
+                case "sand":
                     return BlockTexture.Sand;
-                case BlockType.Snow:
+                case "snow":
                     return BlockTexture.Snow;
-                case BlockType.Tree:
+                case "wood":
                     switch (faceDir)
                     {
                         case BlockFaceDirection.XIncreasing:
                         case BlockFaceDirection.XDecreasing:
                         case BlockFaceDirection.ZIncreasing:
                         case BlockFaceDirection.ZDecreasing:
-                            return BlockTexture.TreeHorizontal;
+                            return BlockTexture.Wood;
                         case BlockFaceDirection.YIncreasing:
                         case BlockFaceDirection.YDecreasing:
-                            return BlockTexture.TreeVertical;
+                            return BlockTexture.WoodTop;
                         default:
-                            return BlockTexture.Rock;
+                            return BlockTexture.Stone;
                     }
-                case BlockType.Water:
+                case "water":
                     return BlockTexture.Water;
-                case BlockType.RedFlower:
+                case "rose":
                     return BlockTexture.Rose;
-                case BlockType.LongGrass:
+                case "long_grass":
                     return BlockTexture.Grass;
-                case BlockType.Torch:
-                    return BlockTexture.Torch;
+                //case "torch":
+                //    return BlockTexture.Torch;
                 default:
-                    return BlockTexture.Rock;
+                    return BlockTexture.Stone;
             }
         }
         #endregion

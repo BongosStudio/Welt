@@ -30,7 +30,7 @@ namespace Welt.Scenes
         protected virtual Color BackColor { get; } = Color.CornflowerBlue;
         protected InputController InputController { get; } = InputController.CreateDefault();
 
-        protected Scene(Game game) : base(game)
+        protected Scene(WeltGame game) : base(game)
         {
             IsEnabled = true;
             Opacity = 1;

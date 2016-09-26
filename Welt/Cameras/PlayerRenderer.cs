@@ -40,8 +40,8 @@ namespace Welt.Cameras
         public void Initialize()
         {
             Camera.Initialize();
-            Camera.Position = new Vector3(WorldObject.Origin*ChunkObject.Size.X, ChunkObject.Size.Y, WorldObject.Origin*ChunkObject.Size.Z);
-            // TODO: change the Y of the spawn position so we don't fall please?
+            Camera.Position = new Vector3(0, 256, 0);
+            // TODO: change this to give us an actual fucking spawn
             Player.Position = Camera.Position;
             Camera.LookAt(Vector3.Forward);
             // TODO: load the previous data of position
@@ -216,8 +216,8 @@ namespace Welt.Cameras
             for (var x = 0.5f; x < 8f; x += 0.1f)
             {
                 var targetPoint = Camera.Position + (_mLookVector*x);
-                var block = Player.World.GetBlock(targetPoint);
-                if (block.Id != BlockType.None && (waterSelectable || block.Id != BlockType.Water))
+                var block = Player.World.GetBlock((uint) targetPoint.X, (uint) targetPoint.Y, (uint) targetPoint.Z);
+                if (block.Id != 0)
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);
                     
@@ -235,9 +235,10 @@ namespace Welt.Cameras
             for (var x = xStart; x > 0.7f; x -= 0.1f)
             {
                 var targetPoint = Camera.Position + (_mLookVector*x);
-                var block = Player.World.GetBlock(targetPoint);
-                
-                if (Player.World.GetBlock(targetPoint).Id != BlockType.None) continue;
+                var block = Player.World.GetBlock((uint) targetPoint.X, (uint) targetPoint.Y, (uint) targetPoint.Z);
+
+                if (block.Id != 0)
+                    continue;
                 Player.CurrentSelectedAdjacent = new PositionedBlock(targetPoint, block);
                 break;
             }

@@ -20,5 +20,8 @@ namespace Welt.Forge.Processors
         }
 
         public void ClearLighting()
+        {
+
+        }
     }
 }

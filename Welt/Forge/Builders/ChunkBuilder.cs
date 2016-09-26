@@ -29,9 +29,8 @@ namespace Welt.Forge.Builders
         public bool CanContinue { get; set; } = true;
 
         public BoundingBox BoundingBox
-            =>
-                new BoundingBox(new Vector3(Position.X, 0, Position.Y),
-                    new Vector3(Position.X + Chunk.Width, Chunk.Height, Position.Y + Chunk.Depth));
+            => new BoundingBox(new Vector3(Position.X, 0, Position.Y),
+                    new Vector3(Position.X + Chunk.Width, OwnedChunk.Height, Position.Y + Chunk.Depth));
         public VertexBuffer VertexBuffer;
         public VertexBuffer WaterVertexBuffer;
         public VertexBuffer GrassVertexBuffer;
@@ -55,7 +54,8 @@ namespace Welt.Forge.Builders
         public Vector3I HighestSolidBlock = new Vector3I(0, 0, 0);
         //highestNoneBlock starts at 0 so it will be adjusted. if you start at highest it will never be adjusted ! 
 
-        public Vector3I LowestNoneBlock = new Vector3I(0, Chunk.Height, 0);
+        public Vector3I LowestNoneBlock 
+            => new Vector3I(0, (uint) OwnedChunk.Height, 0);
         
         public void Clear()
         {

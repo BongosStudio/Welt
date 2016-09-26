@@ -2,6 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E26D7EC7-4BE3-46C1-8185-608F2E649A2B}</ProjectGuid>
@@ -9,8 +10,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Welt.API</RootNamespace>
     <AssemblyName>Welt.API</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile151</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,42 +34,34 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <Folder Include="Entities\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cardinal.cs" />
     <Compile Include="Forge\Biome.cs" />
-    <Compile Include="Forge\Block.cs" />
     <Compile Include="Forge\BlockFaceDirection.cs" />
     <Compile Include="Forge\Generators\IBiomeGenerator.cs" />
     <Compile Include="Forge\Generators\ICaveGenerator.cs" />
     <Compile Include="Forge\Generators\IDecorationGenerator.cs" />
-    <Compile Include="Forge\IBlockPalette.cs" />
-    <Compile Include="Forge\IChunk.cs" />
     <Compile Include="Forge\Generators\IForgeGenerator.cs" />
-    <Compile Include="Forge\IFloor.cs" />
+    <Compile Include="Forge\IChunk.cs" />
     <Compile Include="Forge\IGalaxy.cs" />
     <Compile Include="Forge\IGalQuadrant.cs" />
-    <Compile Include="Forge\ILightPalette.cs" />
     <Compile Include="Forge\IWorld.cs" />
     <Compile Include="Forge\IWorldSystem.cs" />
+    <Compile Include="Forge\LightStruct.cs" />
     <Compile Include="Forge\Weather\IWeatherEngine.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
-    <Compile Include="Forge\LightStruct.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Entities\" />
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\..\..\..\Repos\Source\Welt\lib\System.ValueTuple.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

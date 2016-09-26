@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Welt.API.Forge;
+using System;
 
 namespace Welt.Rendering
 {
@@ -10,21 +11,10 @@ namespace Welt.Rendering
         public static int VertexCount { get; private set; }
         public static int IndexCount { get; private set; }
 
-        public readonly Vector3[] Vertices;
-        public readonly byte[] Indices;
-        public readonly BlockFaceDirection Face;
-        public readonly string Texture;
-
-        public readonly List<Mesh> Submeshes;
-
-        /// <summary>
-        ///     Creates a parent mesh with empty vertices and indices.
-        /// </summary>
-        public Mesh() : this(new Vector3[0], new byte[0], BlockFaceDirection.None, string.Empty)
-        {
-            
-        }
-
+        public VertexPositionTextureLight[] Vertices { get; private set; }
+        public byte[] Indices { get; private set; }
+        public Vector2 TextureCoords { get; private set; }
+        
         /// <summary>
         ///     Creates a child mesh with assigned vertices and indices.
         /// </summary>
@@ -32,32 +22,21 @@ namespace Welt.Rendering
         /// <param name="face"></param>
         /// <param name="i"></param>
         /// <param name="texture"></param>
-        public Mesh(IEnumerable<Vector3> v, IEnumerable<byte> i, BlockFaceDirection face, string texture)
+        public Mesh(IEnumerable<VertexPositionTextureLight> v, IEnumerable<byte> i, Vector2 texCoords)
         {
             Vertices = v.ToArray();
             Indices = i.ToArray();
-            Face = face;
-            Texture = texture;
-            Submeshes = new List<Mesh>(16);
+            TextureCoords = texCoords;
             VertexCount += Vertices.Length;
             IndexCount += Indices.Length;
         }
-
-        public void AddSubmesh(Mesh mesh)
-        {
-            Submeshes.Add(mesh);
-        }
-
-        public bool IsParentMesh()
-        {
-            return Submeshes.Any();
-        }
-
+        
         ~Mesh()
         {
             VertexCount -= Vertices.Length;
             IndexCount -= Indices.Length;
-            Submeshes.Clear();
+            Vertices = null;
+            Indices = null;
         }
     }
 }

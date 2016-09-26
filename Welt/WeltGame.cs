@@ -24,7 +24,7 @@ using Welt.Scenes;
 
 namespace Welt
 {
-    public class WeltGame : Game
+    public class WeltGame : Microsoft.Xna.Framework.Game
     {
         #region Fields
 

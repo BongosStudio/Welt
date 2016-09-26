@@ -7,6 +7,7 @@ namespace Welt.Rendering
     public struct BlockMetaDescription
     {
         public Vector2[] Textures;
+        public BlockFaceDirection[] Faces;
         public LightStruct LightMeta;
         public int AnimationLengthMeta;
         public AnimationCall AnimationCallMeta;

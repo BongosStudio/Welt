@@ -3,6 +3,7 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using Welt.API.Forge;
 using static Welt.Core.FastMath;
 
@@ -10,18 +11,19 @@ namespace Welt.Core.Forge
 {
     public class Chunk : IChunk
     {
-        public const int Width = 16, Depth = 16, Height = 256;
+        public const int Width = 16, Depth = 16;
 
         public Chunk(IWorld world, uint x, uint z)
         {
-            HeightMap = new byte[Width, Depth];
-            Floors = new IFloor[16];
-            for (byte i = 0; i < Height/16; i++)
-                Floors[i] = new Floor(i);
+            //Height = world.Height;
+            Height = 256;
+            HeightMap = new int[Width*Depth];
             X = x;
             Z = z;
-            
+            Blocks = new BlockPalette(this);
         }
+
+        public int Height { get; }
 
         public uint X { get; set; }
         public uint Z { get; set; }
@@ -33,16 +35,13 @@ namespace Welt.Core.Forge
         public virtual IChunk Nw { get; protected set; }
         public virtual IChunk Se { get; protected set; }
         public virtual IChunk Sw { get; protected set; }
-        public ILightPalette LightPalette { get; }
-        public byte[,] HeightMap { get; }
-        public IFloor[] Floors { get; }
+        public int[] HeightMap { get; }
         public bool IsModified { get; set; }
         public bool IsGenerated { get; set; }
 
-        public void SetLight(int x, int y, int z, LightStruct value)
-        {
-            throw new NotImplementedException();
-        }
+        protected BlockPalette Blocks;
+
+        private int _lowestAirBlock;
 
         public virtual void Initialize(IWorld world)
         {
@@ -58,73 +57,101 @@ namespace Welt.Core.Forge
             IsModified = true;
         }
 
-        public Block GetBlock(int x, int y, int z)
+        public (ushort Id, byte Metadata) GetBlock(int x, int y, int z)
         {
-            if (!WithinBounds(0, Height, y)) return new Block();
+            if (!WithinBounds(0, Height, y))
+                return (0, 0);
 
             if (WithinBounds(0, Width, x) && WithinBounds(0, Depth, z))
-                return GetFloor(y).Blocks.GetBlock((uint) x, (uint) y, (uint) z);
+                return Blocks.GetBlock((uint) x, (uint) y, (uint) z);
+
+            //if (x < 0 && z >= 0)
+            //{
+            //    return W.GetBlock(Width + x, y, z);
+            //}
+            //if (x >= 0 && z < 0)
+            //{
+            //    return E.GetBlock(x, y, z + Depth);
+            //}
+            //if (x < 0 && z < 0)
+            //{
+            //    return S.GetBlock(Width + x, y, z + Depth);
+            //}
+            //if (x >= Width && z >= Depth)
+            //{
+            //    return N.GetBlock(x - Width, y, z - Depth);
+            //}
+
+            return (0, 0);
+        }
+
+        public void SetBlock(int x, int y, int z, ushort id, byte metadata)
+        {
+            //Blocks.SetBlock((uint) x, (uint) y, (uint) z, id, metadata);
+            if (!WithinBounds(0, Height, y))
+                return;
+            if (WithinBounds(0, Width, x) && WithinBounds(0, Depth, z))
+            {
+                Blocks.SetBlock((uint) x, (uint) y, (uint) z, id, metadata);
+                if (id == 0)
+                {
+                    if (_lowestAirBlock > y)
+                        _lowestAirBlock = y;
+                    BlockRemoved?.Invoke(this, new BlockChangedEventArgs((uint) x, (uint) y, (uint) z));
+                }
+                else
+                {
+                    BlockAdded?.Invoke(this, new BlockChangedEventArgs((uint) x, (uint) y, (uint) z));
+                }
+                SetHeight(x, z);
+                return;
+            }
 
             if (x < 0 && z >= 0)
             {
-                return W.GetBlock(Width + x, y, z);
+                W.SetBlock(Width + x, y, z, id, metadata);
+                return;
             }
             if (x >= 0 && z < 0)
             {
-                return E.GetBlock(x, y, z + Depth);
+                E.SetBlock(x, y, z + Depth, id, metadata);
+                return;
             }
             if (x < 0 && z < 0)
             {
-                return S.GetBlock(Width + x, y, z + Depth);
+                S.SetBlock(Width + x, y, z + Depth, id, metadata);
+                return;
             }
             if (x >= Width && z >= Depth)
             {
-                return N.GetBlock(x - Width, y, z - Depth);
+                N.SetBlock(x - Width, y, z - Depth, id, metadata);
+                return;
             }
 
-            return new Block();
         }
 
-        public LightStruct GetLight(int x, int y, int z)
+        public int GetHeight(int x, int z)
         {
-            throw new NotImplementedException();
+            return HeightMap[x*Width + z];
         }
 
-        public LightStruct GetSunLight(int x, int y, int z)
+        public int GetLowestNoneBlock()
         {
-            throw new NotImplementedException();
+            return _lowestAirBlock;
         }
 
-        public void SetBlock(int x, int y, int z, Block value)
+        private void SetHeight(int x, int z)
         {
-            if (!WithinBounds(0, Height, y)) return;
-            if (WithinBounds(0, Width, x) && WithinBounds(0, Depth, z))
-                GetFloor(y).Blocks.SetBlock((uint) x, (uint) y, (uint) z, value);
-
-            if (x < 0 && z >= 0)
+            //HeightMap[x*Width + z] = value;
+            for (var i = Height; i >= 0; --i)
             {
-                W.SetBlock(Width + x, y, z, value);
-            }
-            else if (x >= 0 && z < 0)
-            {
-                E.SetBlock(x, y, z + Depth, value);
-            }
-            else if (x < 0 && z < 0)
-            {
-                S.SetBlock(Width + x, y, z + Depth, value);
-            }
-            else if (x >= Width && z >= Depth)
-            {
-                N.SetBlock(x - Width, y, z - Depth, value);
+                if (GetBlock(x, i, z).Id == 0)
+                    continue;
+                HeightMap[x*Width + z] = i;
             }
         }
 
-        protected IFloor GetFloor(int y)
-        {
-            return y <= 0 ? Floors[0] : Floors[y/16];
-        }
-
-        public event EventHandler BlockAdded;
-        public event EventHandler BlockRemoved;
+        public event EventHandler<BlockChangedEventArgs> BlockAdded;
+        public event EventHandler<BlockChangedEventArgs> BlockRemoved;
     }
 }

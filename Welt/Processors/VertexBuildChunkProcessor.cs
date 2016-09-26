@@ -13,6 +13,9 @@ using Welt.Forge.Builders;
 using Welt.Logic.Forge;
 using Welt.Rendering;
 using Welt.Types;
+using Welt.Core.Services;
+using System.Linq;
+using Welt.Game.Builders.Forge.Blocks;
 
 // ReSharper disable PossibleLossOfFraction
 
@@ -24,6 +27,12 @@ namespace Welt.Processors
     {
         private readonly GraphicsDevice _mGraphicsDevice;
         private const int MAX_SUN_VALUE = 16;
+        private static readonly IBlockMesh[] _meshBuilderInstances =
+        {
+            new DefaultBlockMesh(),
+            new GrassBlockMesh(),
+            new CapBlockMesh(),
+        };
 
         public VertexBuildChunkProcessor(GraphicsDevice graphicsDevice)
         {
@@ -38,9 +47,9 @@ namespace Welt.Processors
             //and digging is handled correctly too 
             //TODO generalize highest/lowest None to non-solid
 
-            var yLow = (byte) (chunk.LowestNoneBlock.Y == 0 ? 0 : chunk.LowestNoneBlock.Y - 1);
+            var yLow = (int) (chunk.LowestNoneBlock.Y == 0 ? 0 : chunk.LowestNoneBlock.Y - 1);
             var yHigh =
-                (byte) (chunk.HighestSolidBlock.Y == Chunk.Height ? Chunk.Height : chunk.HighestSolidBlock.Y + 1);
+                (int) (chunk.HighestSolidBlock.Y == (uint) chunk.OwnedChunk.Height ? (uint) chunk.OwnedChunk.Height : chunk.HighestSolidBlock.Y + 1);
 
             for (byte x = 0; x < Chunk.Width; x++)
             {
@@ -57,48 +66,49 @@ namespace Welt.Processors
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.OwnedChunk.E.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.OwnedChunk.E.LowestNoneBlock.Y);
+                            
+                            yHigh = Math.Max(yHigh, chunk.OwnedChunk.E.HeightMap.Max());
+                            yLow = Math.Min(yLow, chunk.OwnedChunk.E.GetLowestNoneBlock());
                         }
                     }
                     else if (x == Chunk.Width - 1)
                     {
-                        if (chunk.W == null)
+                        if (chunk.OwnedChunk.W == null)
                         {
-                            yHigh = ChunkObject.Size.Y;
+                            yHigh = chunk.OwnedChunk.Height;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.W.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.W.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.OwnedChunk.W.HeightMap.Max());
+                            yLow = Math.Min(yLow, chunk.OwnedChunk.W.GetLowestNoneBlock());
                         }
                     }
 
                     if (z == 0)
                     {
-                        if (chunk.S == null)
+                        if (chunk.OwnedChunk.S == null)
                         {
-                            yHigh = ChunkObject.Size.Y;
+                            yHigh = chunk.OwnedChunk.Height;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.S.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.S.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.OwnedChunk.S.HeightMap.Max());
+                            yLow = Math.Min(yLow, chunk.OwnedChunk.S.GetLowestNoneBlock());
                         }
                     }
-                    else if (z == ChunkObject.Max.Z)
+                    else if (z == 16)
                     {
-                        if (chunk.N == null)
+                        if (chunk.OwnedChunk.N == null)
                         {
-                            yHigh = ChunkObject.Size.Y;
+                            yHigh = chunk.OwnedChunk.Height;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.N.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.N.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.OwnedChunk.N.HeightMap.Max());
+                            yLow = Math.Min(yLow, chunk.OwnedChunk.N.GetLowestNoneBlock());
                         }
                     }
 
@@ -107,19 +117,19 @@ namespace Welt.Processors
                     // TODO: change these to meshes instead of having to build each time there's a new one
                     for (var y = yLow; y < yHigh; y++)
                     {
-                        var b = chunk.GetBlock(x, y, z);
-                        if (b.Id == BlockType.None) continue;
+                        var b = chunk.OwnedChunk.GetBlock(x, y, z);
+                        if (b.Id == 0) continue;
                         if (BlockLogic.IsPlantBlock(b.Id))
                         {
-                            BuildPlantVertexList(b, chunk, new Vector3I(x, y, z));
+                            BuildPlantVertexList(b.Id, chunk, new Vector3I(x, (uint) y, z));
                         }
                         else if (BlockLogic.IsGrassBlock(b.Id))
                         {
-                            BuildGrassVertexList(b, chunk, new Vector3I(x, y, z));
+                            BuildGrassVertexList(b.Id, chunk, new Vector3I(x, (uint) y, z));
                         }
                         else
                         {
-                            BuildBlockVertexList(b, chunk, new Vector3I(x, y, z));
+                            BuildBlockVertexList(b.Id, chunk, new Vector3I(x, (uint) y, z));
                         }
                     }
                 }
@@ -154,55 +164,59 @@ namespace Welt.Processors
                 }
             }
 
-            chunk.IsModified = false;
+            chunk.OwnedChunk.IsModified = false;
         }
 
         #endregion
 
         #region BuildBlockVertexList
 
-        private void BuildBlockVertexList(Block block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
+        private void BuildBlockVertexList(ushort block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
         {
 
-            var blockPosition = chunk.Position + chunkRelativePosition;
+            var blockPosition = new Vector3I(
+                (uint) chunk.Position.X + chunkRelativePosition.X, 
+                chunkRelativePosition.Y, 
+                (uint) chunk.Position.Y + chunkRelativePosition.Z);
 
             //get signed bytes from these to be able to remove 1 without further casts
             var x = (sbyte) chunkRelativePosition.X;
             var y = (sbyte) chunkRelativePosition.Y;
             var z = (sbyte) chunkRelativePosition.Z;
 
+            // TODO: change these to a bitmap to determine if the blocks require full meshes.
+            // If they do require full meshes, the neighboring blocks won't need to build
+            // connected faces. If they don't (i.e.: opaque blocks, half blocks, or none complete),
+            // they connected block will need to render connected face.
+            var blockTopNw = chunk.OwnedChunk.GetBlock(x - 1, y + 1, z + 1);
+            var blockTopN = chunk.OwnedChunk.GetBlock(x, y + 1, z + 1);
+            var blockTopNe = chunk.OwnedChunk.GetBlock(x + 1, y + 1, z + 1);
+            var blockTopW = chunk.OwnedChunk.GetBlock(x - 1, y + 1, z);
+            var blockTopM = chunk.OwnedChunk.GetBlock(x, y + 1, z);
+            var blockTopE = chunk.OwnedChunk.GetBlock(x + 1, y + 1, z);
+            var blockTopSw = chunk.OwnedChunk.GetBlock(x - 1, y + 1, z - 1);
+            var blockTopS = chunk.OwnedChunk.GetBlock(x, y + 1, z - 1);
+            var blockTopSe = chunk.OwnedChunk.GetBlock(x + 1, y + 1, z - 1);
 
-            var solidBlock = new Block(BlockType.Rock);
+            var blockMidNw = chunk.OwnedChunk.GetBlock(x - 1, y, z + 1);
+            var blockMidN = chunk.OwnedChunk.GetBlock(x, y, z + 1);
+            var blockMidNe = chunk.OwnedChunk.GetBlock(x + 1, y, z + 1);
+            var blockMidW = chunk.OwnedChunk.GetBlock(x - 1, y, z);
+            var blockMidM = chunk.OwnedChunk.GetBlock(x, y, z);
+            var blockMidE = chunk.OwnedChunk.GetBlock(x + 1, y, z);
+            var blockMidSw = chunk.OwnedChunk.GetBlock(x - 1, y, z - 1);
+            var blockMidS = chunk.OwnedChunk.GetBlock(x, y, z - 1);
+            var blockMidSe = chunk.OwnedChunk.GetBlock(x + 1, y, z - 1);
 
-            var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
-            var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
-            var blockTopNe = chunk.GetBlock(x + 1, y + 1, z + 1);
-            var blockTopW = chunk.GetBlock(x - 1, y + 1, z);
-            var blockTopM = chunk.GetBlock(x, y + 1, z);
-            var blockTopE = chunk.GetBlock(x + 1, y + 1, z);
-            var blockTopSw = chunk.GetBlock(x - 1, y + 1, z - 1);
-            var blockTopS = chunk.GetBlock(x, y + 1, z - 1);
-            var blockTopSe = chunk.GetBlock(x + 1, y + 1, z - 1);
-
-            var blockMidNw = chunk.GetBlock(x - 1, y, z + 1);
-            var blockMidN = chunk.GetBlock(x, y, z + 1);
-            var blockMidNe = chunk.GetBlock(x + 1, y, z + 1);
-            var blockMidW = chunk.GetBlock(x - 1, y, z);
-            var blockMidM = chunk.GetBlock(x, y, z);
-            var blockMidE = chunk.GetBlock(x + 1, y, z);
-            var blockMidSw = chunk.GetBlock(x - 1, y, z - 1);
-            var blockMidS = chunk.GetBlock(x, y, z - 1);
-            var blockMidSe = chunk.GetBlock(x + 1, y, z - 1);
-
-            var blockBotNw = chunk.GetBlock(x - 1, y - 1, z + 1);
-            var blockBotN = chunk.GetBlock(x, y - 1, z + 1);
-            var blockBotNe = chunk.GetBlock(x + 1, y - 1, z + 1);
-            var blockBotW = chunk.GetBlock(x - 1, y - 1, z);
-            var blockBotM = chunk.GetBlock(x, y - 1, z);
-            var blockBotE = chunk.GetBlock(x + 1, y - 1, z);
-            var blockBotSw = chunk.GetBlock(x - 1, y - 1, z - 1);
-            var blockBotS = chunk.GetBlock(x, y - 1, z - 1);
-            var blockBotSe = chunk.GetBlock(x + 1, y - 1, z - 1);
+            var blockBotNw = chunk.OwnedChunk.GetBlock(x - 1, y - 1, z + 1);
+            var blockBotN = chunk.OwnedChunk.GetBlock(x, y - 1, z + 1);
+            var blockBotNe = chunk.OwnedChunk.GetBlock(x + 1, y - 1, z + 1);
+            var blockBotW = chunk.OwnedChunk.GetBlock(x - 1, y - 1, z);
+            var blockBotM = chunk.OwnedChunk.GetBlock(x, y - 1, z);
+            var blockBotE = chunk.OwnedChunk.GetBlock(x + 1, y - 1, z);
+            var blockBotSw = chunk.OwnedChunk.GetBlock(x - 1, y - 1, z - 1);
+            var blockBotS = chunk.OwnedChunk.GetBlock(x, y - 1, z - 1);
+            var blockBotSe = chunk.OwnedChunk.GetBlock(x + 1, y - 1, z - 1);
 
             float sunTr, sunTl, sunBr, sunBl;
             float redTr, redTl, redBr, redBl;
@@ -210,187 +224,201 @@ namespace Welt.Processors
             float bluTr, bluTl, bluBr, bluBl;
             Color localTr, localTl, localBr, localBl;
 
-
+            // TODO: create a light map to allow for fetching of light levels in a position. Should also
+            // contain a bitmap determining if that position has sun light and another to determine if it
+            // creates light. Bitmaps will be very useful in this process.
             // XDecreasing
-            if (BlockLogic.IsTransparentBlock(blockMidW.Id) && block.Id != blockMidW.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidW.Id) && block != blockMidW.Id)
             {
-                sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
-                sunTr = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
-                sunBl = (1f/MAX_SUN_VALUE)*((blockBotNw.Sun + blockBotW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
-                sunBr = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
+                //sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
+                //sunTr = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
+                //sunBl = (1f/MAX_SUN_VALUE)*((blockBotNw.Sun + blockBotW.Sun + blockMidNw.Sun + blockMidW.Sun)/4);
+                //sunBr = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotW.Sun + blockMidSw.Sun + blockMidW.Sun)/4);
 
-                redTl = (1f/MAX_SUN_VALUE)*((blockTopNw.R + blockTopW.R + blockMidNw.R + blockMidW.R)/4);
-                redTr = (1f/MAX_SUN_VALUE)*((blockTopSw.R + blockTopW.R + blockMidSw.R + blockMidW.R)/4);
-                redBl = (1f/MAX_SUN_VALUE)*((blockBotNw.R + blockBotW.R + blockMidNw.R + blockMidW.R)/4);
-                redBr = (1f/MAX_SUN_VALUE)*((blockBotSw.R + blockBotW.R + blockMidSw.R + blockMidW.R)/4);
+                //redTl = (1f/MAX_SUN_VALUE)*((blockTopNw.R + blockTopW.R + blockMidNw.R + blockMidW.R)/4);
+                //redTr = (1f/MAX_SUN_VALUE)*((blockTopSw.R + blockTopW.R + blockMidSw.R + blockMidW.R)/4);
+                //redBl = (1f/MAX_SUN_VALUE)*((blockBotNw.R + blockBotW.R + blockMidNw.R + blockMidW.R)/4);
+                //redBr = (1f/MAX_SUN_VALUE)*((blockBotSw.R + blockBotW.R + blockMidSw.R + blockMidW.R)/4);
 
-                grnTl = (1f/MAX_SUN_VALUE)*((blockTopNw.G + blockTopW.G + blockMidNw.G + blockMidW.G)/4);
-                grnTr = (1f/MAX_SUN_VALUE)*((blockTopSw.G + blockTopW.G + blockMidSw.G + blockMidW.G)/4);
-                grnBl = (1f/MAX_SUN_VALUE)*((blockBotNw.G + blockBotW.G + blockMidNw.G + blockMidW.G)/4);
-                grnBr = (1f/MAX_SUN_VALUE)*((blockBotSw.G + blockBotW.G + blockMidSw.G + blockMidW.G)/4);
+                //grnTl = (1f/MAX_SUN_VALUE)*((blockTopNw.G + blockTopW.G + blockMidNw.G + blockMidW.G)/4);
+                //grnTr = (1f/MAX_SUN_VALUE)*((blockTopSw.G + blockTopW.G + blockMidSw.G + blockMidW.G)/4);
+                //grnBl = (1f/MAX_SUN_VALUE)*((blockBotNw.G + blockBotW.G + blockMidNw.G + blockMidW.G)/4);
+                //grnBr = (1f/MAX_SUN_VALUE)*((blockBotSw.G + blockBotW.G + blockMidSw.G + blockMidW.G)/4);
 
-                bluTl = (1f/MAX_SUN_VALUE)*((blockTopNw.B + blockTopW.B + blockMidNw.B + blockMidW.B)/4);
-                bluTr = (1f/MAX_SUN_VALUE)*((blockTopSw.B + blockTopW.B + blockMidSw.B + blockMidW.B)/4);
-                bluBl = (1f/MAX_SUN_VALUE)*((blockBotNw.B + blockBotW.B + blockMidNw.B + blockMidW.B)/4);
-                bluBr = (1f/MAX_SUN_VALUE)*((blockBotSw.B + blockBotW.B + blockMidSw.B + blockMidW.B)/4);
+                //bluTl = (1f/MAX_SUN_VALUE)*((blockTopNw.B + blockTopW.B + blockMidNw.B + blockMidW.B)/4);
+                //bluTr = (1f/MAX_SUN_VALUE)*((blockTopSw.B + blockTopW.B + blockMidSw.B + blockMidW.B)/4);
+                //bluBl = (1f/MAX_SUN_VALUE)*((blockBotNw.B + blockBotW.B + blockMidNw.B + blockMidW.B)/4);
+                //bluBr = (1f/MAX_SUN_VALUE)*((blockBotSw.B + blockBotW.B + blockMidSw.B + blockMidW.B)/4);
 
-                localTl = new Color(redTl, grnTl, bluTl);
-                localTr = new Color(redTr, grnTr, bluTr);
-                localBl = new Color(redBl, grnBl, bluBl);
-                localBr = new Color(redBr, grnBr, bluBr);
+                //localTl = new Color(redTl, grnTl, bluTl);
+                //localTr = new Color(redTr, grnTr, bluTr);
+                //localBl = new Color(redBl, grnBl, bluBl);
+                //localBr = new Color(redBr, grnBr, bluBr);
 
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
-                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                //BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
+                //    block, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                var c = Color.White;
+                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block, 0, 0, 0, 0, c, c, c, c);
             }
-            if (BlockLogic.IsTransparentBlock(blockMidE.Id) && block.Id != blockMidE.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidE.Id) && block != blockMidE.Id)
             {
-                sunTl = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
-                sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
-                sunBl = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
-                sunBr = (1f/MAX_SUN_VALUE)*((blockBotNe.Sun + blockBotE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
+                //sunTl = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
+                //sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
+                //sunBl = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotE.Sun + blockMidSe.Sun + blockMidE.Sun)/4);
+                //sunBr = (1f/MAX_SUN_VALUE)*((blockBotNe.Sun + blockBotE.Sun + blockMidNe.Sun + blockMidE.Sun)/4);
 
-                redTl = (1f/MAX_SUN_VALUE)*((blockTopSe.R + blockTopE.R + blockMidSe.R + blockMidE.R)/4);
-                redTr = (1f/MAX_SUN_VALUE)*((blockTopNe.R + blockTopE.R + blockMidNe.R + blockMidE.R)/4);
-                redBl = (1f/MAX_SUN_VALUE)*((blockBotSe.R + blockBotE.R + blockMidSe.R + blockMidE.R)/4);
-                redBr = (1f/MAX_SUN_VALUE)*((blockBotNe.R + blockBotE.R + blockMidNe.R + blockMidE.R)/4);
+                //redTl = (1f/MAX_SUN_VALUE)*((blockTopSe.R + blockTopE.R + blockMidSe.R + blockMidE.R)/4);
+                //redTr = (1f/MAX_SUN_VALUE)*((blockTopNe.R + blockTopE.R + blockMidNe.R + blockMidE.R)/4);
+                //redBl = (1f/MAX_SUN_VALUE)*((blockBotSe.R + blockBotE.R + blockMidSe.R + blockMidE.R)/4);
+                //redBr = (1f/MAX_SUN_VALUE)*((blockBotNe.R + blockBotE.R + blockMidNe.R + blockMidE.R)/4);
 
-                grnTl = (1f/MAX_SUN_VALUE)*((blockTopSe.G + blockTopE.G + blockMidSe.G + blockMidE.G)/4);
-                grnTr = (1f/MAX_SUN_VALUE)*((blockTopNe.G + blockTopE.G + blockMidNe.G + blockMidE.G)/4);
-                grnBl = (1f/MAX_SUN_VALUE)*((blockBotSe.G + blockBotE.G + blockMidSe.G + blockMidE.G)/4);
-                grnBr = (1f/MAX_SUN_VALUE)*((blockBotNe.G + blockBotE.G + blockMidNe.G + blockMidE.G)/4);
+                //grnTl = (1f/MAX_SUN_VALUE)*((blockTopSe.G + blockTopE.G + blockMidSe.G + blockMidE.G)/4);
+                //grnTr = (1f/MAX_SUN_VALUE)*((blockTopNe.G + blockTopE.G + blockMidNe.G + blockMidE.G)/4);
+                //grnBl = (1f/MAX_SUN_VALUE)*((blockBotSe.G + blockBotE.G + blockMidSe.G + blockMidE.G)/4);
+                //grnBr = (1f/MAX_SUN_VALUE)*((blockBotNe.G + blockBotE.G + blockMidNe.G + blockMidE.G)/4);
 
-                bluTl = (1f/MAX_SUN_VALUE)*((blockTopSe.B + blockTopE.B + blockMidSe.B + blockMidE.B)/4);
-                bluTr = (1f/MAX_SUN_VALUE)*((blockTopNe.B + blockTopE.B + blockMidNe.B + blockMidE.B)/4);
-                bluBl = (1f/MAX_SUN_VALUE)*((blockBotSe.B + blockBotE.B + blockMidSe.B + blockMidE.B)/4);
-                bluBr = (1f/MAX_SUN_VALUE)*((blockBotNe.B + blockBotE.B + blockMidNe.B + blockMidE.B)/4);
+                //bluTl = (1f/MAX_SUN_VALUE)*((blockTopSe.B + blockTopE.B + blockMidSe.B + blockMidE.B)/4);
+                //bluTr = (1f/MAX_SUN_VALUE)*((blockTopNe.B + blockTopE.B + blockMidNe.B + blockMidE.B)/4);
+                //bluBl = (1f/MAX_SUN_VALUE)*((blockBotSe.B + blockBotE.B + blockMidSe.B + blockMidE.B)/4);
+                //bluBr = (1f/MAX_SUN_VALUE)*((blockBotNe.B + blockBotE.B + blockMidNe.B + blockMidE.B)/4);
 
-                localTl = new Color(redTl, grnTl, bluTl);
-                localTr = new Color(redTr, grnTr, bluTr);
-                localBl = new Color(redBl, grnBl, bluBl);
-                localBr = new Color(redBr, grnBr, bluBr);
+                //localTl = new Color(redTl, grnTl, bluTl);
+                //localTr = new Color(redTr, grnTr, bluTr);
+                //localBl = new Color(redBl, grnBl, bluBl);
+                //localBr = new Color(redBr, grnBr, bluBr);
 
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
-                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                //BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
+                //    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                var c = Color.White;
+                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing, block, 0, 0, 0, 0, c, c, c, c);
             }
-            if (BlockLogic.IsTransparentBlock(blockBotM.Id) && block.Id != blockBotM.Id)
+            if (BlockLogic.IsTransparentBlock(blockBotM.Id) && block != blockBotM.Id)
             {
-                sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun)/4);
-                sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun)/4);
-                sunTl = (1f/MAX_SUN_VALUE)*((blockBotNw.Sun + blockBotN.Sun + blockBotM.Sun + blockTopW.Sun)/4);
-                sunTr = (1f/MAX_SUN_VALUE)*((blockBotNe.Sun + blockBotN.Sun + blockBotM.Sun + blockTopE.Sun)/4);
+                //sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun)/4);
+                //sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun)/4);
+                //sunTl = (1f/MAX_SUN_VALUE)*((blockBotNw.Sun + blockBotN.Sun + blockBotM.Sun + blockTopW.Sun)/4);
+                //sunTr = (1f/MAX_SUN_VALUE)*((blockBotNe.Sun + blockBotN.Sun + blockBotM.Sun + blockTopE.Sun)/4);
 
-                redBl = (1f/MAX_SUN_VALUE)*((blockBotSw.R + blockBotS.R + blockBotM.R + blockTopW.R)/4);
-                redBr = (1f/MAX_SUN_VALUE)*((blockBotSe.R + blockBotS.R + blockBotM.R + blockTopE.R)/4);
-                redTl = (1f/MAX_SUN_VALUE)*((blockBotNw.R + blockBotN.R + blockBotM.R + blockTopW.R)/4);
-                redTr = (1f/MAX_SUN_VALUE)*((blockBotNe.R + blockBotN.R + blockBotM.R + blockTopE.R)/4);
+                //redBl = (1f/MAX_SUN_VALUE)*((blockBotSw.R + blockBotS.R + blockBotM.R + blockTopW.R)/4);
+                //redBr = (1f/MAX_SUN_VALUE)*((blockBotSe.R + blockBotS.R + blockBotM.R + blockTopE.R)/4);
+                //redTl = (1f/MAX_SUN_VALUE)*((blockBotNw.R + blockBotN.R + blockBotM.R + blockTopW.R)/4);
+                //redTr = (1f/MAX_SUN_VALUE)*((blockBotNe.R + blockBotN.R + blockBotM.R + blockTopE.R)/4);
 
-                grnBl = (1f/MAX_SUN_VALUE)*((blockBotSw.G + blockBotS.G + blockBotM.G + blockTopW.G)/4);
-                grnBr = (1f/MAX_SUN_VALUE)*((blockBotSe.G + blockBotS.G + blockBotM.G + blockTopE.G)/4);
-                grnTl = (1f/MAX_SUN_VALUE)*((blockBotNw.G + blockBotN.G + blockBotM.G + blockTopW.G)/4);
-                grnTr = (1f/MAX_SUN_VALUE)*((blockBotNe.G + blockBotN.G + blockBotM.G + blockTopE.G)/4);
+                //grnBl = (1f/MAX_SUN_VALUE)*((blockBotSw.G + blockBotS.G + blockBotM.G + blockTopW.G)/4);
+                //grnBr = (1f/MAX_SUN_VALUE)*((blockBotSe.G + blockBotS.G + blockBotM.G + blockTopE.G)/4);
+                //grnTl = (1f/MAX_SUN_VALUE)*((blockBotNw.G + blockBotN.G + blockBotM.G + blockTopW.G)/4);
+                //grnTr = (1f/MAX_SUN_VALUE)*((blockBotNe.G + blockBotN.G + blockBotM.G + blockTopE.G)/4);
 
-                bluBl = (1f/MAX_SUN_VALUE)*((blockBotSw.B + blockBotS.B + blockBotM.B + blockTopW.B)/4);
-                bluBr = (1f/MAX_SUN_VALUE)*((blockBotSe.B + blockBotS.B + blockBotM.B + blockTopE.B)/4);
-                bluTl = (1f/MAX_SUN_VALUE)*((blockBotNw.B + blockBotN.B + blockBotM.B + blockTopW.B)/4);
-                bluTr = (1f/MAX_SUN_VALUE)*((blockBotNe.B + blockBotN.B + blockBotM.B + blockTopE.B)/4);
+                //bluBl = (1f/MAX_SUN_VALUE)*((blockBotSw.B + blockBotS.B + blockBotM.B + blockTopW.B)/4);
+                //bluBr = (1f/MAX_SUN_VALUE)*((blockBotSe.B + blockBotS.B + blockBotM.B + blockTopE.B)/4);
+                //bluTl = (1f/MAX_SUN_VALUE)*((blockBotNw.B + blockBotN.B + blockBotM.B + blockTopW.B)/4);
+                //bluTr = (1f/MAX_SUN_VALUE)*((blockBotNe.B + blockBotN.B + blockBotM.B + blockTopE.B)/4);
 
-                localTl = new Color(redTl, grnTl, bluTl);
-                localTr = new Color(redTr, grnTr, bluTr);
-                localBl = new Color(redBl, grnBl, bluBl);
-                localBr = new Color(redBr, grnBr, bluBr);
+                //localTl = new Color(redTl, grnTl, bluTl);
+                //localTr = new Color(redTr, grnTr, bluTr);
+                //localBl = new Color(redBl, grnBl, bluBl);
+                //localBr = new Color(redBr, grnBr, bluBr);
 
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
-                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                //BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
+                //    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                var c = Color.White;
+                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing, block, 0, 0, 0, 0, c, c, c, c);
             }
-            if (BlockLogic.IsTransparentBlock(blockTopM.Id) && block.Id != blockTopM.Id)
+            if (BlockLogic.IsTransparentBlock(blockTopM.Id) && block != blockTopM.Id)
             {
-                sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun)/4);
-                sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun)/4);
-                sunBl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockTopW.Sun + blockTopM.Sun)/4);
-                sunBr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockTopE.Sun + blockTopM.Sun)/4);
+                //sunTl = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun)/4);
+                //sunTr = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun)/4);
+                //sunBl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockTopW.Sun + blockTopM.Sun)/4);
+                //sunBr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockTopE.Sun + blockTopM.Sun)/4);
 
-                redTl = (1f/MAX_SUN_VALUE)*((blockTopNw.R + blockTopN.R + blockTopW.R + blockTopM.R)/4);
-                redTr = (1f/MAX_SUN_VALUE)*((blockTopNe.R + blockTopN.R + blockTopE.R + blockTopM.R)/4);
-                redBl = (1f/MAX_SUN_VALUE)*((blockTopSw.R + blockTopS.R + blockTopW.R + blockTopM.R)/4);
-                redBr = (1f/MAX_SUN_VALUE)*((blockTopSe.R + blockTopS.R + blockTopE.R + blockTopM.R)/4);
+                //redTl = (1f/MAX_SUN_VALUE)*((blockTopNw.R + blockTopN.R + blockTopW.R + blockTopM.R)/4);
+                //redTr = (1f/MAX_SUN_VALUE)*((blockTopNe.R + blockTopN.R + blockTopE.R + blockTopM.R)/4);
+                //redBl = (1f/MAX_SUN_VALUE)*((blockTopSw.R + blockTopS.R + blockTopW.R + blockTopM.R)/4);
+                //redBr = (1f/MAX_SUN_VALUE)*((blockTopSe.R + blockTopS.R + blockTopE.R + blockTopM.R)/4);
 
-                grnTl = (1f/MAX_SUN_VALUE)*((blockTopNw.G + blockTopN.G + blockTopW.G + blockTopM.G)/4);
-                grnTr = (1f/MAX_SUN_VALUE)*((blockTopNe.G + blockTopN.G + blockTopE.G + blockTopM.G)/4);
-                grnBl = (1f/MAX_SUN_VALUE)*((blockTopSw.G + blockTopS.G + blockTopW.G + blockTopM.G)/4);
-                grnBr = (1f/MAX_SUN_VALUE)*((blockTopSe.G + blockTopS.G + blockTopE.G + blockTopM.G)/4);
+                //grnTl = (1f/MAX_SUN_VALUE)*((blockTopNw.G + blockTopN.G + blockTopW.G + blockTopM.G)/4);
+                //grnTr = (1f/MAX_SUN_VALUE)*((blockTopNe.G + blockTopN.G + blockTopE.G + blockTopM.G)/4);
+                //grnBl = (1f/MAX_SUN_VALUE)*((blockTopSw.G + blockTopS.G + blockTopW.G + blockTopM.G)/4);
+                //grnBr = (1f/MAX_SUN_VALUE)*((blockTopSe.G + blockTopS.G + blockTopE.G + blockTopM.G)/4);
 
-                bluTl = (1f/MAX_SUN_VALUE)*((blockTopNw.B + blockTopN.B + blockTopW.B + blockTopM.B)/4);
-                bluTr = (1f/MAX_SUN_VALUE)*((blockTopNe.B + blockTopN.B + blockTopE.B + blockTopM.B)/4);
-                bluBl = (1f/MAX_SUN_VALUE)*((blockTopSw.B + blockTopS.B + blockTopW.B + blockTopM.B)/4);
-                bluBr = (1f/MAX_SUN_VALUE)*((blockTopSe.B + blockTopS.B + blockTopE.B + blockTopM.B)/4);
+                //bluTl = (1f/MAX_SUN_VALUE)*((blockTopNw.B + blockTopN.B + blockTopW.B + blockTopM.B)/4);
+                //bluTr = (1f/MAX_SUN_VALUE)*((blockTopNe.B + blockTopN.B + blockTopE.B + blockTopM.B)/4);
+                //bluBl = (1f/MAX_SUN_VALUE)*((blockTopSw.B + blockTopS.B + blockTopW.B + blockTopM.B)/4);
+                //bluBr = (1f/MAX_SUN_VALUE)*((blockTopSe.B + blockTopS.B + blockTopE.B + blockTopM.B)/4);
 
-                localTl = new Color(redTl, grnTl, bluTl);
-                localTr = new Color(redTr, grnTr, bluTr);
-                localBl = new Color(redBl, grnBl, bluBl);
-                localBr = new Color(redBr, grnBr, bluBr);
+                //localTl = new Color(redTl, grnTl, bluTl);
+                //localTr = new Color(redTr, grnTr, bluTr);
+                //localBl = new Color(redBl, grnBl, bluBl);
+                //localBr = new Color(redBr, grnBr, bluBr);
 
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
-                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                //BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
+                //    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                var c = Color.White;
+                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing, block, 0, 0, 0, 0, c, c, c, c);
             }
-            if (BlockLogic.IsTransparentBlock(blockMidS.Id) && block.Id != blockMidS.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidS.Id) && block != blockMidS.Id)
             {
-                sunTl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
-                sunTr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
-                sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
-                sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
+                //sunTl = (1f/MAX_SUN_VALUE)*((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
+                //sunTr = (1f/MAX_SUN_VALUE)*((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
+                //sunBl = (1f/MAX_SUN_VALUE)*((blockBotSw.Sun + blockBotS.Sun + blockMidSw.Sun + blockMidS.Sun)/4);
+                //sunBr = (1f/MAX_SUN_VALUE)*((blockBotSe.Sun + blockBotS.Sun + blockMidSe.Sun + blockMidS.Sun)/4);
 
-                redTl = (1f/MAX_SUN_VALUE)*((blockTopSw.R + blockTopS.R + blockMidSw.R + blockMidS.R)/4);
-                redTr = (1f/MAX_SUN_VALUE)*((blockTopSe.R + blockTopS.R + blockMidSe.R + blockMidS.R)/4);
-                redBl = (1f/MAX_SUN_VALUE)*((blockBotSw.R + blockBotS.R + blockMidSw.R + blockMidS.R)/4);
-                redBr = (1f/MAX_SUN_VALUE)*((blockBotSe.R + blockBotS.R + blockMidSe.R + blockMidS.R)/4);
+                //redTl = (1f/MAX_SUN_VALUE)*((blockTopSw.R + blockTopS.R + blockMidSw.R + blockMidS.R)/4);
+                //redTr = (1f/MAX_SUN_VALUE)*((blockTopSe.R + blockTopS.R + blockMidSe.R + blockMidS.R)/4);
+                //redBl = (1f/MAX_SUN_VALUE)*((blockBotSw.R + blockBotS.R + blockMidSw.R + blockMidS.R)/4);
+                //redBr = (1f/MAX_SUN_VALUE)*((blockBotSe.R + blockBotS.R + blockMidSe.R + blockMidS.R)/4);
 
-                grnTl = (1f/MAX_SUN_VALUE)*((blockTopSw.G + blockTopS.G + blockMidSw.G + blockMidS.G)/4);
-                grnTr = (1f/MAX_SUN_VALUE)*((blockTopSe.G + blockTopS.G + blockMidSe.G + blockMidS.G)/4);
-                grnBl = (1f/MAX_SUN_VALUE)*((blockBotSw.G + blockBotS.G + blockMidSw.G + blockMidS.G)/4);
-                grnBr = (1f/MAX_SUN_VALUE)*((blockBotSe.G + blockBotS.G + blockMidSe.G + blockMidS.G)/4);
+                //grnTl = (1f/MAX_SUN_VALUE)*((blockTopSw.G + blockTopS.G + blockMidSw.G + blockMidS.G)/4);
+                //grnTr = (1f/MAX_SUN_VALUE)*((blockTopSe.G + blockTopS.G + blockMidSe.G + blockMidS.G)/4);
+                //grnBl = (1f/MAX_SUN_VALUE)*((blockBotSw.G + blockBotS.G + blockMidSw.G + blockMidS.G)/4);
+                //grnBr = (1f/MAX_SUN_VALUE)*((blockBotSe.G + blockBotS.G + blockMidSe.G + blockMidS.G)/4);
 
-                bluTl = (1f/MAX_SUN_VALUE)*((blockTopSw.B + blockTopS.B + blockMidSw.B + blockMidS.B)/4);
-                bluTr = (1f/MAX_SUN_VALUE)*((blockTopSe.B + blockTopS.B + blockMidSe.B + blockMidS.B)/4);
-                bluBl = (1f/MAX_SUN_VALUE)*((blockBotSw.B + blockBotS.B + blockMidSw.B + blockMidS.B)/4);
-                bluBr = (1f/MAX_SUN_VALUE)*((blockBotSe.B + blockBotS.B + blockMidSe.B + blockMidS.B)/4);
+                //bluTl = (1f/MAX_SUN_VALUE)*((blockTopSw.B + blockTopS.B + blockMidSw.B + blockMidS.B)/4);
+                //bluTr = (1f/MAX_SUN_VALUE)*((blockTopSe.B + blockTopS.B + blockMidSe.B + blockMidS.B)/4);
+                //bluBl = (1f/MAX_SUN_VALUE)*((blockBotSw.B + blockBotS.B + blockMidSw.B + blockMidS.B)/4);
+                //bluBr = (1f/MAX_SUN_VALUE)*((blockBotSe.B + blockBotS.B + blockMidSe.B + blockMidS.B)/4);
 
-                localTl = new Color(redTl, grnTl, bluTl);
-                localTr = new Color(redTr, grnTr, bluTr);
-                localBl = new Color(redBl, grnBl, bluBl);
-                localBr = new Color(redBr, grnBr, bluBr);
+                //localTl = new Color(redTl, grnTl, bluTl);
+                //localTr = new Color(redTr, grnTr, bluTr);
+                //localBl = new Color(redBl, grnBl, bluBl);
+                //localBr = new Color(redBr, grnBr, bluBr);
 
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
-                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                //BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
+                //    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                var c = Color.White;
+                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing, block, 0, 0, 0, 0, c, c, c, c);
             }
-            if (BlockLogic  .IsTransparentBlock(blockMidN.Id) && block.Id != blockMidN.Id)
+            if (BlockLogic.IsTransparentBlock(blockMidN.Id) && block != blockMidN.Id)
             {
-                sunTl = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
-                sunTr = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
-                sunBl = (1f/MAX_SUN_VALUE)*((blockBotNe.Sun + blockBotN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
-                sunBr = (1f/MAX_SUN_VALUE)*((blockBotNw.Sun + blockBotN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
+                //sunTl = (1f/MAX_SUN_VALUE)*((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
+                //sunTr = (1f/MAX_SUN_VALUE)*((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
+                //sunBl = (1f/MAX_SUN_VALUE)*((blockBotNe.Sun + blockBotN.Sun + blockMidNe.Sun + blockMidN.Sun)/4);
+                //sunBr = (1f/MAX_SUN_VALUE)*((blockBotNw.Sun + blockBotN.Sun + blockMidNw.Sun + blockMidN.Sun)/4);
 
-                redTl = (1f/MAX_SUN_VALUE)*((blockTopNe.R + blockTopN.R + blockMidNe.R + blockMidN.R)/4);
-                redTr = (1f/MAX_SUN_VALUE)*((blockTopNw.R + blockTopN.R + blockMidNw.R + blockMidN.R)/4);
-                redBl = (1f/MAX_SUN_VALUE)*((blockBotNe.R + blockBotN.R + blockMidNe.R + blockMidN.R)/4);
-                redBr = (1f/MAX_SUN_VALUE)*((blockBotNw.R + blockBotN.R + blockMidNw.R + blockMidN.R)/4);
+                //redTl = (1f/MAX_SUN_VALUE)*((blockTopNe.R + blockTopN.R + blockMidNe.R + blockMidN.R)/4);
+                //redTr = (1f/MAX_SUN_VALUE)*((blockTopNw.R + blockTopN.R + blockMidNw.R + blockMidN.R)/4);
+                //redBl = (1f/MAX_SUN_VALUE)*((blockBotNe.R + blockBotN.R + blockMidNe.R + blockMidN.R)/4);
+                //redBr = (1f/MAX_SUN_VALUE)*((blockBotNw.R + blockBotN.R + blockMidNw.R + blockMidN.R)/4);
 
-                grnTl = (1f/MAX_SUN_VALUE)*((blockTopNe.G + blockTopN.G + blockMidNe.G + blockMidN.G)/4);
-                grnTr = (1f/MAX_SUN_VALUE)*((blockTopNw.G + blockTopN.G + blockMidNw.G + blockMidN.G)/4);
-                grnBl = (1f/MAX_SUN_VALUE)*((blockBotNe.G + blockBotN.G + blockMidNe.G + blockMidN.G)/4);
-                grnBr = (1f/MAX_SUN_VALUE)*((blockBotNw.G + blockBotN.G + blockMidNw.G + blockMidN.G)/4);
+                //grnTl = (1f/MAX_SUN_VALUE)*((blockTopNe.G + blockTopN.G + blockMidNe.G + blockMidN.G)/4);
+                //grnTr = (1f/MAX_SUN_VALUE)*((blockTopNw.G + blockTopN.G + blockMidNw.G + blockMidN.G)/4);
+                //grnBl = (1f/MAX_SUN_VALUE)*((blockBotNe.G + blockBotN.G + blockMidNe.G + blockMidN.G)/4);
+                //grnBr = (1f/MAX_SUN_VALUE)*((blockBotNw.G + blockBotN.G + blockMidNw.G + blockMidN.G)/4);
 
-                bluTl = (1f/MAX_SUN_VALUE)*((blockTopNe.B + blockTopN.B + blockMidNe.B + blockMidN.B)/4);
-                bluTr = (1f/MAX_SUN_VALUE)*((blockTopNw.B + blockTopN.B + blockMidNw.B + blockMidN.B)/4);
-                bluBl = (1f/MAX_SUN_VALUE)*((blockBotNe.B + blockBotN.B + blockMidNe.B + blockMidN.B)/4);
-                bluBr = (1f/MAX_SUN_VALUE)*((blockBotNw.B + blockBotN.B + blockMidNw.B + blockMidN.B)/4);
+                //bluTl = (1f/MAX_SUN_VALUE)*((blockTopNe.B + blockTopN.B + blockMidNe.B + blockMidN.B)/4);
+                //bluTr = (1f/MAX_SUN_VALUE)*((blockTopNw.B + blockTopN.B + blockMidNw.B + blockMidN.B)/4);
+                //bluBl = (1f/MAX_SUN_VALUE)*((blockBotNe.B + blockBotN.B + blockMidNe.B + blockMidN.B)/4);
+                //bluBr = (1f/MAX_SUN_VALUE)*((blockBotNw.B + blockBotN.B + blockMidNw.B + blockMidN.B)/4);
 
-                localTl = new Color(redTl, grnTl, bluTl);
-                localTr = new Color(redTr, grnTr, bluTr);
-                localBl = new Color(redBl, grnBl, bluBl);
-                localBr = new Color(redBr, grnBr, bluBr);
+                //localTl = new Color(redTl, grnTl, bluTl);
+                //localTr = new Color(redTr, grnTr, bluTr);
+                //localBl = new Color(redBl, grnBl, bluBl);
+                //localBr = new Color(redBr, grnBr, bluBr);
 
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
-                    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                //BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
+                //    block.Id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                var c = Color.White;
+                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing, block, 0, 0, 0, 0, c, c, c, c);
             }
         }
 
@@ -398,10 +426,13 @@ namespace Welt.Processors
 
         #region BuildPlantVertexList
 
-        private void BuildPlantVertexList(Block block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
+        private void BuildPlantVertexList(ushort block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
         {
 
-            var blockPosition = chunk.Position + chunkRelativePosition;
+            var blockPosition = new Vector3I(
+                (uint) chunk.Position.X + chunkRelativePosition.X,
+                chunkRelativePosition.Y,
+                (uint) chunk.Position.Y + chunkRelativePosition.Z);
 
             //get signed bytes from these to be able to remove 1 without further casts
             var x = (sbyte) chunkRelativePosition.X;
@@ -480,17 +511,20 @@ namespace Welt.Processors
 
             //_blockRenderer.BuildFaceVertices(blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block.Id, sunTL, sunTR, sunBL, sunBR, localTL, localTR, localBL, localBR);
 
-            BuildPlantVertices(chunk, blockPosition, chunkRelativePosition, block.Id, 0.6f, Color.LightGray);
+            BuildPlantVertices(chunk, blockPosition, chunkRelativePosition, block, 0.6f, Color.LightGray);
         }
 
         #endregion
 
         #region BuildGrassVertexList
 
-        private void BuildGrassVertexList(Block block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
+        private void BuildGrassVertexList(ushort block, ChunkBuilder chunk, Vector3I chunkRelativePosition)
         {
 
-            var blockPosition = chunk.Position + chunkRelativePosition;
+            var blockPosition = new Vector3I(
+                (uint) chunk.Position.X + chunkRelativePosition.X,
+                chunkRelativePosition.Y,
+                (uint) chunk.Position.Y + chunkRelativePosition.Z);
 
             //get signed bytes from these to be able to remove 1 without further casts
             var x = (sbyte) chunkRelativePosition.X;
@@ -569,7 +603,7 @@ namespace Welt.Processors
 
             //_blockRenderer.BuildFaceVertices(blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing, block.Id, sunTL, sunTR, sunBL, sunBR, localTL, localTR, localBL, localBR);
 
-            BuildGrassVertices(chunk, blockPosition, chunkRelativePosition, block.Id, 0.6f, Color.LightGray);
+            BuildGrassVertices(chunk, blockPosition, chunkRelativePosition, block, 0.6f, Color.LightGray);
         }
 
         #endregion
@@ -579,7 +613,7 @@ namespace Welt.Processors
         {
             var texture = BlockLogic.GetTexture(blockType);
 
-            var uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
+            var uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.3f, 1, 1),
                 new Vector3(1, 0, 0), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.3f, 1, 0),
@@ -590,7 +624,7 @@ namespace Welt.Processors
                 new Vector3(1, 0, 0), uvList[5], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 2, 2, 1, 3);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XDecreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XDecreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.3f, 1, 0),
                 new Vector3(-1, 0, 0), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.3f, 1, 1),
@@ -601,7 +635,7 @@ namespace Welt.Processors
                 new Vector3(-1, 0, 0), uvList[2], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 3, 0, 3, 2);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.7f, 1, 1),
                 new Vector3(1, 0, 0), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.7f, 1, 0),
@@ -612,7 +646,7 @@ namespace Welt.Processors
                 new Vector3(1, 0, 0), uvList[5], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 2, 2, 1, 3);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XDecreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XDecreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.7f, 1, 0),
                 new Vector3(-1, 0, 0), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.7f, 1, 1),
@@ -623,7 +657,7 @@ namespace Welt.Processors
                 new Vector3(-1, 0, 0), uvList[2], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 3, 0, 3, 2);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZIncreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0, 1, 0.3f),
                 new Vector3(0, 0, 1), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(1, 1, 0.3f),
@@ -634,7 +668,7 @@ namespace Welt.Processors
                 new Vector3(0, 0, 1), uvList[2], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 3, 0, 3, 2);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZDecreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZDecreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(1, 1, 0.3f),
                 new Vector3(0, 0, -1), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0, 1, 0.3f),
@@ -645,7 +679,7 @@ namespace Welt.Processors
                 new Vector3(0, 0, -1), uvList[5], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 2, 2, 1, 3);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZIncreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0, 1, 0.7f),
                 new Vector3(0, 0, 1), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(1, 1, 0.7f),
@@ -656,7 +690,7 @@ namespace Welt.Processors
                 new Vector3(0, 0, 1), uvList[2], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 3, 0, 3, 2);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZDecreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZDecreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(1, 1, 0.7f),
                 new Vector3(0, 0, -1), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0, 1, 0.7f),
@@ -675,7 +709,7 @@ namespace Welt.Processors
         {
             var texture = BlockLogic.GetTexture(blockType);
 
-            var uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
+            var uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.5f, 1, 1),
                 new Vector3(1, 0, 0), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.5f, 1, 0),
@@ -686,7 +720,7 @@ namespace Welt.Processors
                 new Vector3(1, 0, 0), uvList[5], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 2, 2, 1, 3);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XDecreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.XDecreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.5f, 1, 0),
                 new Vector3(-1, 0, 0), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0.5f, 1, 1),
@@ -697,7 +731,7 @@ namespace Welt.Processors
                 new Vector3(-1, 0, 0), uvList[2], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 3, 0, 3, 2);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZIncreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZIncreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0, 1, 0.5f),
                 new Vector3(0, 0, 1), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(1, 1, 0.5f),
@@ -708,7 +742,7 @@ namespace Welt.Processors
                 new Vector3(0, 0, 1), uvList[2], sunLight, localLight);
             AddIndex(chunk, blockType, 0, 1, 3, 0, 3, 2);
 
-            uvList = TextureHelper.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZDecreasing];
+            uvList = TextureBuilder.UvMappings[(int) texture*6 + (int) BlockFaceDirection.ZDecreasing];
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(1, 1, 0.5f),
                 new Vector3(0, 0, -1), uvList[0], sunLight, localLight);
             AddVertex(chunk, blockType, blockPosition, chunkRelativePosition, new Vector3(0, 1, 0.5f),
@@ -732,7 +766,7 @@ namespace Welt.Processors
 
             var faceIndex = (int) faceDir;
 
-            var uvList = TextureHelper.UvMappings[(int) texture*6 + faceIndex];
+            var uvList = TextureBuilder.UvMappings[(int) texture*6 + faceIndex];
 
             float height = 1;
             if (BlockLogic.IsCapBlock(blockType)) height = 0.1f;
@@ -836,7 +870,7 @@ namespace Welt.Processors
         private void AddVertex(ChunkBuilder chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
             Vector3 vertexAdd, Vector3 normal, Vector2 uv1, float sunLight, Color localLight)
         {
-            if (blockType != BlockType.Water)
+            if (blockType != 5) // 5 is the ID for water. It shouldn't change, so we'll keep it const.
             {
                 chunk.VertexList.Add(new VertexPositionTextureLight((Vector3) blockPosition + vertexAdd, uv1, sunLight,
                     localLight.ToVector3()));
@@ -853,7 +887,7 @@ namespace Welt.Processors
         private void AddIndex(ChunkBuilder chunk, ushort blockType, short i1, short i2, short i3, short i4, short i5,
             short i6)
         {
-            if (blockType != BlockType.Water)
+            if (blockType != 5)
             {
                 chunk.IndexList.Add((short) (chunk.VertexCount + i1));
                 chunk.IndexList.Add((short) (chunk.VertexCount + i2));

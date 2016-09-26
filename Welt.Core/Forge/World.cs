@@ -3,7 +3,6 @@
 #endregion
 
 using System;
-using System.Runtime.CompilerServices;
 using Welt.API.Forge;
 using Welt.API.Forge.Generators;
 
@@ -14,18 +13,25 @@ namespace Welt.Core.Forge
         public string Name { get; }
         public long Seed { get; }
         public int Size { get; }
+        public int Height { get; }
         public IForgeGenerator Generator { get; }
         public IWorldSystem System { get; }
         public int SystemIndex { get; }
 
+        public long TimeOfDay { get; set; }
+
         protected readonly ChunkManager Manager;
+        protected int MaxX => Size*Chunk.Width;
+        protected int MaxZ => Size*Chunk.Depth;
 
         public World(string name, IForgeGenerator gen)
         {
             Name = name;
             var random = new FastMath.LongRandom();
             Seed = random.Next(int.MaxValue)*name.GetHashCode();
+            // TODO change Size and Height with IForgeGenerator
             Size = 32;
+            Height = 256;
             Generator = gen;
             Manager = new ChunkManager(this);
 
@@ -74,6 +80,13 @@ namespace Welt.Core.Forge
         public Chunk CreateChunkWithoutGeneration(uint x, uint z)
         {
             var chunk = new Chunk(this, x, z);
+            _SetChunk(x, z, chunk, ChunkChangedEventArgs.ChunkChangedAction.Created);
+            return chunk;
+        }
+
+        public Chunk CreateChunkInMemoryWithoutGeneration(uint x, uint z)
+        {
+            var chunk = new Chunk(this, x, z);
             return chunk;
         }
 
@@ -100,21 +113,27 @@ namespace Welt.Core.Forge
             ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Destroyed));
         }
 
-        public virtual Block GetBlock(uint x, uint y, uint z)
+        public virtual (ushort Id, byte Metadata) GetBlock(uint x, uint y, uint z)
         {
-            if (x >= Size*Chunk.Width || z >= Size*Chunk.Depth || y >= Chunk.Height)
-                throw new ArgumentOutOfRangeException();
-            var chunk = GetChunk(x/Chunk.Width, z/Chunk.Depth);
-            return chunk.GetBlock((int) (x%Chunk.Width), (int) y, (int) (z%Chunk.Depth));
+            if (y >= Height) return (0, 0);
+
+            var nx = (uint) (x%MaxX);
+            var nz = (uint) (z%MaxZ);
+
+            var chunk = GetChunk(nx/Chunk.Width, nz/Chunk.Depth);
+            return chunk.GetBlock((int) (nx%Chunk.Width), (int) y, (int) (nz%Chunk.Depth));
         }
 
-        public virtual void SetBlock(uint x, uint y, uint z, Block value)
+        public virtual void SetBlock(uint x, uint y, uint z, ushort id, byte metadata)
         {
-            if (x >= Size*Chunk.Width || z >= Size*Chunk.Depth || y >= Chunk.Height)
-                throw new ArgumentOutOfRangeException();
-            var chunk = GetChunk(x/Chunk.Width, z/Chunk.Depth);
-            chunk.SetBlock((int) (x%Chunk.Width), (int) y, (int) (z%Chunk.Depth), value);
-            BlockChanged?.Invoke(this, new BlockChangedEventArgs(x, y, z));
+            if (y >= Height) return;
+
+            var nx = (uint) (x%MaxX);
+            var nz = (uint) (z%MaxZ);
+
+            var chunk = GetChunk(nx/Chunk.Width, nz/Chunk.Depth);
+            chunk.SetBlock((int) (nx%Chunk.Width), (int) y, (int) (nz%Chunk.Depth), id, metadata);
+            BlockChanged?.Invoke(this, new BlockChangedEventArgs(nx, y, nz));
         }
 
         public event EventHandler<BlockChangedEventArgs> BlockChanged;

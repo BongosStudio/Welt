@@ -13,9 +13,9 @@ namespace Welt.Types
     public struct PositionedBlock
     {
         public readonly Vector3I Position;
-        public readonly Block Block;
+        public readonly (ushort Id, byte Metadata) Block;
 
-        public PositionedBlock(Vector3I position, Block block)
+        public PositionedBlock(Vector3I position, (ushort Id, byte Metadata) block)
         {
             this.Position = position;
             this.Block = block;

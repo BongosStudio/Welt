@@ -5,6 +5,7 @@
 
 using Microsoft.Xna.Framework;
 using Welt.API.Forge;
+using Welt.Core.Forge;
 using Welt.Entities;
 using Welt.Forge;
 using Welt.Logic.Forge;
@@ -18,7 +19,7 @@ namespace Welt.Models
     {
         public static Player Current;
         #region Fields
-        public WorldObject World;
+        public World World;
         public PlayerEntity Entity;
 
         public Vector3 Position;
@@ -56,7 +57,7 @@ namespace Welt.Models
             Current = player;
         }
        
-        public void AssignWorld(WorldObject world)
+        public void AssignWorld(World world)
         {
             World = world;
             Entity = new PlayerEntity();
@@ -65,7 +66,7 @@ namespace Welt.Models
         public bool LeftClick(GameTime time)
         {
             if (CurrentSelection == null) return false;
-            World.SetBlock(CurrentSelection.Value.Position, new Block());
+            World.SetBlock(CurrentSelection.Value.Position.X, CurrentSelection.Value.Position.Y, CurrentSelection.Value.Position.Z, 0, 0);
             return true;
         }
 

@@ -16,12 +16,13 @@ using Welt.Forge;
 using Welt.Forge.Renderers;
 using Welt.Models;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
+using Welt.Core.Forge;
 
 namespace Welt.Scenes
 {
     public class PlayScene : Scene
     {
-        private readonly WorldObject _mWorld;
+        private readonly World _mWorld;
         private readonly IRenderer _mRenderer;
         private HudRenderer _mHud;
         private readonly Player _mPlayer = Player.Current;
@@ -37,7 +38,7 @@ namespace Welt.Scenes
         internal override UIRoot UI => new Play();
         internal override ViewModelBase DataContext { get; set; }
 
-        public PlayScene(Game game, WorldObject worldToHandoff, IRenderer rendererToHandoff, SkyDomeRenderer skyToHandoff,
+        public PlayScene(WeltGame game, World worldToHandoff, IRenderer rendererToHandoff, SkyDomeRenderer skyToHandoff,
             PlayerRenderer playerToHandoff) : base(game)
         {
             _mWorld = worldToHandoff;
@@ -80,8 +81,9 @@ namespace Welt.Scenes
         /// </summary>
         public override void Initialize()
         {
+            // this needs to be redone
             _mHud = new HudRenderer(GraphicsDevice, _mWorld, _mPlayerRenderer);
-            _mWorldRenderer = new SimpleRenderer(GraphicsDevice, _mPlayerRenderer.Camera, _mWorld);
+            _mWorldRenderer = new SimpleRenderer(GraphicsDevice, _mPlayerRenderer.Camera, new Forge.Builders.WorldBuilder(GraphicsDevice, _mWorld, _mRenderer));
             
             base.Initialize();                  
             _mHud.Initialize();
@@ -140,161 +142,53 @@ namespace Welt.Scenes
         #endregion
 
         #region DebugKeys
-
-        private static void ShowDebugKeysHelp()
-        {
-            Console.WriteLine("Debug keys");
-            Console.WriteLine("F1  = toggle freelook(fly) / player physics");
-            Console.WriteLine("F3  = toggle vsync + fixedtimestep updates ");
-            Console.WriteLine("F4  = toggle 100*160 window size");
-            Console.WriteLine("F7  = toggle wireframe");
-            Console.WriteLine("F8  = toggle chunk diagnostics");
-            Console.WriteLine("F9  = toggle day cycle / day mode");
-            Console.WriteLine("F10 = toggle day cycle / night mode");
-            Console.WriteLine("F11 = toggle fullscreen");
-            Console.WriteLine("F   = release / regain focus");
-            Console.WriteLine("Esc = exit");
-        }
-
-        private void ProcessDebugKeys()
-        {
-            var keyState = Keyboard.GetState();
-
-            //toggle fullscreen
-            if (_mOldKeyboardState.IsKeyUp(Keys.F11) && keyState.IsKeyDown(Keys.F11))
-            {
-                SceneController.GraphicsManager.ToggleFullScreen();
-            }
-
-            //freelook mode
-            if (_mOldKeyboardState.IsKeyUp(Keys.F1) && keyState.IsKeyDown(Keys.F1))
-            {
-                _mPlayerRenderer.FreeCam = !_mPlayerRenderer.FreeCam;
-            }
-
-            //minimap mode
-            if (_mOldKeyboardState.IsKeyUp(Keys.M) && keyState.IsKeyDown(Keys.M))
-            {
-                _mHud.ShowMinimap = !_mHud.ShowMinimap;
-            }
-
-            //wireframe mode
-            if (_mOldKeyboardState.IsKeyUp(Keys.F7) && keyState.IsKeyDown(Keys.F7))
-            {
-                _mWorld.ToggleRasterMode();
-            }
-
-            //diagnose mode
-            if (_mOldKeyboardState.IsKeyUp(Keys.F8) && keyState.IsKeyDown(Keys.F8))
-            {
-                _mDiagnosticMode = !_mDiagnosticMode;
-            }
-
-            //day cycle/dayMode
-            if (_mOldKeyboardState.IsKeyUp(Keys.F9) && keyState.IsKeyDown(Keys.F9))
-            {
-                _mWorld.DayMode = !_mWorld.DayMode;
-                //Debug.WriteLine("Day Mode is " + WorldObject.dayMode);
-            }
-
-            //day cycle/nightMode
-            if (_mOldKeyboardState.IsKeyUp(Keys.F10) && keyState.IsKeyDown(Keys.F10))
-            {
-                _mWorld.NightMode = !_mWorld.NightMode;
-                //Debug.WriteLine("Day/Night Mode is " + WorldObject.nightMode);
-            }
-
-            // Allows the game to exit
-            if (keyState.IsKeyDown(Keys.Escape) && keyState.IsKeyDown(Keys.LeftShift))
-            {
-                Game.Exit();
-                return;
-            }
-
-            // Release the mouse pointer
-            if (_mOldKeyboardState.IsKeyUp(Keys.Escape) && keyState.IsKeyDown(Keys.Escape))
-            {
-                _mReleaseMouse = !_mReleaseMouse;
-                Game.IsMouseVisible = !Game.IsMouseVisible;
-                _mPlayer.IsPaused = !_mPlayer.IsPaused;
-            }
-
-            // fixed time step
-            if (_mOldKeyboardState.IsKeyUp(Keys.F3) && keyState.IsKeyDown(Keys.F3))
-            {
-                SceneController.GraphicsManager.SynchronizeWithVerticalRetrace = !SceneController.GraphicsManager.SynchronizeWithVerticalRetrace;
-                Game.IsFixedTimeStep = !Game.IsFixedTimeStep;
-                Debug.WriteLine("FixedTimeStep and vsync are " + Game.IsFixedTimeStep);
-                SceneController.GraphicsManager.ApplyChanges();
-            }
-
-            // stealth mode / keep screen space for profilers
-            if (_mOldKeyboardState.IsKeyUp(Keys.F4) && keyState.IsKeyDown(Keys.F4))
-            {
-                if (SceneController.GraphicsManager.PreferredBackBufferHeight == 750)
-                {
-                    SceneController.GraphicsManager.PreferredBackBufferHeight = 100;
-                    SceneController.GraphicsManager.PreferredBackBufferWidth = 160;
-                }
-                else
-                {
-                    SceneController.GraphicsManager.PreferredBackBufferHeight = 750;
-                    SceneController.GraphicsManager.PreferredBackBufferWidth = 1000;
-                }
-                SceneController.GraphicsManager.ApplyChanges();
-            }
-
-            _mOldKeyboardState = keyState;
-        }
-
+        
         #endregion
 
-        #region UpdateTOD
+        #region UpdateTimeOfDay
 
-        public virtual Vector3 UpdateTod(GameTime gameTime)
+        public virtual Vector3 UpdateTimeOfDay(GameTime gameTime)
         {
-            const long div = 20000;
+            // TODO
+            //const long div = 20000;
 
-            if (!_mWorld.RealTime)
-                _mWorld.Tod += ((float)gameTime.ElapsedGameTime.Milliseconds / div);
-            else
-                _mWorld.Tod = (DateTime.Now.Hour) + ((float)DateTime.Now.Minute) / 60 +
-                              (((float)DateTime.Now.Second) / 60) / 60;
+            //_mWorld.TimeOfDay += gameTime.ElapsedGameTime.Milliseconds/div;
 
-            if (_mWorld.Tod >= 24)
-                _mWorld.Tod = 0;
+            //if (_mWorld.TimeOfDay >= 24)
+            //    _mWorld.TimeOfDay = 0;
 
-            if (_mWorld.DayMode)
-            {
-                _mWorld.Tod = 12;
-                _mWorld.NightMode = false;
-            }
-            else if (_mWorld.NightMode)
-            {
-                _mWorld.Tod = 0;
-                _mWorld.DayMode = false;
-            }
+            //if (_mWorld.DayMode)
+            //{
+            //    _mWorld.TimeOfDay = 12;
+            //    _mWorld.NightMode = false;
+            //}
+            //else if (_mWorld.NightMode)
+            //{
+            //    _mWorld.TimeOfDay = 0;
+            //    _mWorld.DayMode = false;
+            //}
 
-            // Calculate the position of the sun based on the time of day.
-            float x;
-            float y;
+            //// Calculate the position of the sun based on the time of day.
+            //float x;
+            //float y;
 
-            if (_mWorld.Tod <= 12)
-            {
-                y = _mWorld.Tod / 12;
-                x = 12 - _mWorld.Tod;
-            }
-            else
-            {
-                y = (24 - _mWorld.Tod) / 12;
-                x = 12 - _mWorld.Tod;
-            }
+            //if (_mWorld.TimeOfDay <= 12)
+            //{
+            //    y = _mWorld.TimeOfDay / 12;
+            //    x = 12 - _mWorld.TimeOfDay;
+            //}
+            //else
+            //{
+            //    y = (24 - _mWorld.TimeOfDay) / 12;
+            //    x = 12 - _mWorld.TimeOfDay;
+            //}
 
-            x /= 10;
+            //x /= 10;
 
-            _mWorld.SunPos = new Vector3(-x, y, 0);
+            //_mWorld.SunPos = new Vector3(-x, y, 0);
 
-            return _mWorld.SunPos;
+            //return _mWorld.SunPos;
+            return Vector3.Zero;
         }
 
         #endregion
@@ -320,7 +214,7 @@ namespace Welt.Scenes
                 base.Update(gameTime);
             }
             WeltGame.Instance.IsMouseVisible = _mPlayer.IsPaused;
-            UpdateTod(gameTime);
+            UpdateTimeOfDay(gameTime);
         }
 
         #endregion

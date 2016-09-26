@@ -3,158 +3,84 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Welt.API.Forge;
 
 namespace Welt.Core.Forge
 {
-    public class BlockPalette : IBlockPalette
+    /// <summary>
+    ///     Contains all block information within the assigned chunk.
+    /// </summary>
+    public class BlockPalette
     {
-        private readonly Block[] _palette;
-        private readonly byte[] _indexed;
+        public const int FlattenOffset = Chunk.Depth*Chunk.Width;
 
-        public const int FlattenOffset = Chunk.Depth*16;
+        private (ushort Id, byte Metadata)[] _palette;
+        private byte[] _indices;
+        private object _syncLock = new object(); // idk if this is even needed for locking but lets implement it for now.
 
-        public BlockPalette()
+        public BlockPalette(Chunk chunk)
         {
-            _palette = new Block[byte.MaxValue]; // TODO: maybe we should change the size? With light
-                                                 // being custom, this may be a problem in the future
-            _indexed = new byte[Chunk.Width*Chunk.Depth*16];
+            _palette = new (ushort, byte)[256];
+            _indices = new byte[Chunk.Width*Chunk.Depth*chunk.Height]; 
         }
 
-        public Block GetBlock(uint x, uint y, uint z)
+        public (ushort Id, byte Metadata) GetBlock(uint x, uint y, uint z)
         {
-            return _palette[_indexed[FlattenIndex(x, y%16, z)]];
+            var index = FlattenIndex(x, y, z);
+            if (_indices[index] == 0)
+                return (0, 0);
+            return _palette[_indices[index]];
         }
 
-        public void SetBlock(uint x, uint y, uint z, Block value)
+        public bool SetBlock(uint x, uint y, uint z, ushort id, byte metadata)
         {
-            byte index;
-            if (TryGetIndex(value, out index))
+            //if (_palette.Length >= 256) return false; // TODO: do something better than this...?
+            var pi = AssureIndexed(id, metadata);
+            _indices[FlattenIndex(x, y, z)] = (byte) pi;
+
+            var index = FlattenIndex(x, y, z);
+            return true;
+        }
+
+        private int AssureIndexed(ushort id, byte metadata)
+        {
+            if (GetIndexOf(id, metadata, out var index))
+                return index;
+            var i = GetNextAvailableIndex();
+            _palette[i] = (id, metadata);
+            return i;
+        }
+
+        private bool GetIndexOf(ushort id, byte metadata, out int index)
+        {
+            for (var i = 0; i < _palette.Length; ++i)
             {
-                _indexed[FlattenIndex(x, y%16, z)] = index;
-            }
-            else
-            {
-                var slot = GetNextOpenSlot();
-                _palette[slot] = value;
-                _indexed[FlattenIndex(x, y%16, z)] = slot;
-            }
-        }
-
-        public ushort GetId(uint x, uint y, uint z)
-        {
-            return GetBlock(x, y, z).Id;
-        }
-
-        public void SetId(uint x, uint y, uint z, ushort value)
-        {
-            var block = GetBlock(x, y, z);
-            block.Id = value;
-            SetBlock(x, y, z, block);
-        }
-
-        public byte GetMetadata(uint x, uint y, uint z)
-        {
-            return GetBlock(x, y, z).Metadata;
-        }
-
-        public void SetMetadata(uint x, uint y, uint z, byte value)
-        {
-            var block = GetBlock(x, y, z);
-            block.Metadata = value;
-            SetBlock(x, y, z, block);
-        }
-
-        public byte GetRLight(uint x, uint y, uint z)
-        {
-            return GetBlock(x, y, z).R;
-        }
-
-        public void SetRLight(uint x, uint y, uint z, byte value)
-        {
-            var block = GetBlock(x, y, z);
-            block.R = value;
-            SetBlock(x, y, z, block);
-        }
-
-        public byte GetGLight(uint x, uint y, uint z)
-        {
-            return GetBlock(x, y, z).G;
-        }
-
-        public void SetGLight(uint x, uint y, uint z, byte value)
-        {
-            var block = GetBlock(x, y, z);
-            block.G = value;
-            SetBlock(x, y, z, block);
-        }
-
-        public byte GetBLight(uint x, uint y, uint z)
-        {
-            return GetBlock(x, y, z).B;
-        }
-
-        public void SetBLight(uint x, uint y, uint z, byte value)
-        {
-            var block = GetBlock(x, y, z);
-            block.B = value;
-            SetBlock(x, y, z, block);
-        }
-
-        public byte[] ToBinary()
-        {
-            // the layout for the binary data of a palette will fall into such:
-            // BYTE : count of blocks
-            // BYTE[] _
-            //         |    USHORT : block id
-            //         |    BYTE : block metadata
-            //         |
-            //         |
-            throw new NotImplementedException();
-        }
-
-        public bool IsEmpty()
-        {
-            return _palette.All(b => b == default(Block)); 
-            // we're choosing to look at `_palette` because it only has 256 objects
-            // which means we can iterate through it faster. We know that if there's
-            // no blocks in it, that all of `_indexed` references a default block.
-        }
-
-        private static uint FlattenIndex(uint x, uint y, uint z)
-        {
-            return x*FlattenOffset + z*16 + y;
-        }
-
-        private bool TryGetIndex(Block block, out byte index)
-        {
-            for (byte i = 1;; i++)
-            {
-                if (_palette[i] == default(Block))
-                {
-                    index = 0;
-                    return false;
-                }
-                if (_palette[i] == block)
+                if (_palette[i].Id == id && _palette[i].Metadata == metadata)
                 {
                     index = i;
                     return true;
                 }
             }
+            index = 0;
+            return false;
         }
 
-        private byte GetNextOpenSlot()
+        private int GetNextAvailableIndex()
         {
-            for (byte i = 1;; i++)
+            // we start at 1 because 0 is guaranteed as air block
+            for (var i = 1; i < _palette.Length; ++i)
             {
-                var b = _palette[i];
-                // first check if any index this block. We need to clear as many unused slots as
-                // we can
-                if (_indexed.Contains(i)) continue;
-                // clearly the table does, so lets see if it's now a default block 
-                if (b == default(Block)) return i;
+                if (_palette[i].Id == 0)
+                    return i;
             }
+            throw new Exception(); // TODO: better handling
+        }
+
+        private static uint FlattenIndex(uint x, uint y, uint z)
+        {
+            return x*FlattenOffset + z*Chunk.Depth + y;
         }
     }
 }

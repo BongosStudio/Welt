@@ -10,13 +10,10 @@ namespace Welt.Processors
         // this class exists only to run parallel tasks of building the meshes, light, vertices,
         // and generation. Reflection has yet to be implemented.
         public readonly IChunkProcessor[] ChunkProcessors;
-        public readonly IMeshBuilder[] MeshBuilders;
 
         public WorldRenderingProcessor(params IChunkProcessor[] processors)
         {
             ChunkProcessors = processors;
-            MeshBuilders = new IMeshBuilder[128];
-            MeshBuilders[0] = new DefaultMeshBuilder();
         }
 
         public void Process(ChunkBuilder builder)

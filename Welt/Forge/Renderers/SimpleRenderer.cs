@@ -81,7 +81,7 @@ namespace Welt.Forge.Renderers
         
         public void DoLightFor(ChunkBuilder chunk)
         {
-            _lightingChunkProcessor.ProcessChunk(chunk);
+            _world.ProcessChunk(chunk);
         }
 
         #region DrawSolid
@@ -116,7 +116,7 @@ namespace Welt.Forge.Renderers
             {
                 pass.Apply();
 
-                foreach (var chunk in _world.Chunks.Where(c => !c.IsGenerated))
+                foreach (var chunk in _world.Where(c => !c.IsGenerated))
                 {
                     if (chunk.State != ChunkState.Ready) RebuildChunk(chunk);
                     if (!chunk.BoundingBox.Intersects(viewFrustum) || chunk.IndexBuffer == null) continue;

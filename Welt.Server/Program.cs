@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lidgren.Network;
-using Welt.Core.Server;
+using Welt;
 
 namespace Welt.Server
 {
@@ -12,7 +12,7 @@ namespace Welt.Server
     {
         static void Main(string[] args)
         {
-            var server = new GameServer(new GameServerConfig());
+            //var server = new GameServer(new GameServerConfig());
             
         }
     }

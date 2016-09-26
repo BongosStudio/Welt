@@ -14,7 +14,7 @@ using Welt.Core;
 using Welt.Rendering;
 using Welt.Types;
 using static Welt.Console.ThrowHelper;
-
+using Welt.Core.Services;
 
 namespace Welt.Forge.Builders
 {
@@ -24,6 +24,36 @@ namespace Welt.Forge.Builders
     /// </summary>
     public static class TextureBuilder
     {
+        public enum BlockTexture
+        {
+            None,
+            Stone,
+            Dirt,
+            IronBlock,
+            GrassSide,
+            GrassTop,
+            DiamondBlock,
+            Lava,
+            Leaves,
+            Gravel,
+            Clay,
+            Sand,
+            Snow,
+            WoodTop,
+            Wood,
+            Water,
+            Grass,
+            Unknown0,
+            Rose,
+            StoneBrick,
+            Brick,
+            Torch,
+
+            Max
+        }
+
+        public static Dictionary<int, Vector2[]> UvMappings = new Dictionary<int, Vector2[]>();
+
         private static Dictionary<string, Vector2> _textures; // TODO: replace Vector2 with BlockMetaDescription
         private static int _textureAtlas;
         private static Image _thaMapOfAllDemTexturez;
@@ -41,105 +71,85 @@ namespace Welt.Forge.Builders
         {
             ClearTextureMap();
 
+            for (var i = 0; i < (int) BlockTexture.Max; ++i)
+            {
+                // TODO: have this automatically created because doing this by hand is tedious
+                UvMappings.Add(i*6 + 0, GetTexture(i, BlockFaceDirection.XIncreasing));
+                UvMappings.Add(i*6 + 1, GetTexture(i, BlockFaceDirection.XDecreasing));
+                UvMappings.Add(i*6 + 2, GetTexture(i, BlockFaceDirection.YIncreasing));
+                UvMappings.Add(i*6 + 3, GetTexture(i, BlockFaceDirection.YDecreasing));
+                UvMappings.Add(i*6 + 4, GetTexture(i, BlockFaceDirection.ZIncreasing));
+                UvMappings.Add(i*6 + 5, GetTexture(i, BlockFaceDirection.ZDecreasing));
+            }
+            
+            // this is all commented out for future implementation. For now, we stick to what worked before so
+            // we can actually get shit tested.
             #region Create BlockTextureModels
 
             // jesus fuck lets try this again. ALRIGHT.
             // step 1: get all the images. 
-            var images =
-                Directory.GetFiles("Content/Textures/Blocks", "*.png", SearchOption.TopDirectoryOnly).ToArray();
+            //var images =
+            //    Directory.GetFiles("Content/Textures/Blocks", "*.png", SearchOption.TopDirectoryOnly).ToArray();
 
-            // step 2: get the dominant image size
-            var chosenImages = new[]
-            {
-                images[FastMath.NextRandom(images.Length)],
-                images[FastMath.NextRandom(images.Length)],
-                images[FastMath.NextRandom(images.Length)]
-            };
+            //// step 2: get the dominant image size
+            //var chosenImages = new[]
+            //{
+            //    images[FastMath.NextRandom(images.Length)],
+            //    images[FastMath.NextRandom(images.Length)],
+            //    images[FastMath.NextRandom(images.Length)]
+            //};
 
-            _textureAtlas = _textureSizes.Single(d => chosenImages.All(i => Image.FromFile(i).Width == d));
+            //_textureAtlas = _textureSizes.Single(d => chosenImages.All(i => Image.FromFile(i).Width == d));
 
-            // step 3: get all the metas
-            var metas = Directory.GetFiles("Content/Textures/Metas", "*.wmeta", SearchOption.TopDirectoryOnly); 
+            //// step 3: get all the metas
+            //var metas = Directory.GetFiles("Content/Textures/Metas", "*.wmeta", SearchOption.TopDirectoryOnly); 
 
-            // step 3: now that we have the images and the metas, we start piecing together _thaMapOfAllDemTexturez
-            // To figure out how many rows and collumns (as they must be the same because OCD is a bitch, we take the square root of
-            // how many images there are. 
-            // TODO: split an animated image into multiple images. This means we can't have animated images yet. Sorry.
-            var mapSize = FastMath.Ceiling(Math.Sqrt(images.Length));
-            var map = new Bitmap(mapSize*_textureAtlas, mapSize*_textureAtlas);
+            //// step 3: now that we have the images and the metas, we start piecing together _thaMapOfAllDemTexturez
+            //// To figure out how many rows and collumns (as they must be the same because OCD is a bitch, we take the square root of
+            //// how many images there are. 
+            //// TODO: split an animated image into multiple images. This means we can't have animated images yet. Sorry.
+            //var mapSize = FastMath.Ceiling(Math.Sqrt(images.Length));
+            //var map = new Bitmap(mapSize*_textureAtlas, mapSize*_textureAtlas);
 
-            // the row
-            for (var x = 0; x < mapSize; x++)
-            {
-                // the column
-                for (var y = 0; y < mapSize; y++)
-                {
-                    var vector = new Vector2(x*_textureAtlas, y*_textureAtlas);
-                    var file = images[x*mapSize + y];
+            //// the row
+            //for (var x = 0; x < mapSize; x++)
+            //{
+            //    // the column
+            //    for (var y = 0; y < mapSize; y++)
+            //    {
+            //        var vector = new Vector2(x*_textureAtlas, y*_textureAtlas);
+            //        var file = images[x*mapSize + y];
 
-                    string name;
-                    var faces = ParseOwnedFaceTexture(file, out name);
+            //        string name;
+            //        var faces = ParseOwnedFaceTexture(file, out name); // the faces that have this texture
 
-                    _textures.Add(file.Split('.')[0], vector); // BUG: k not really but idk if this shit works
+            //        _textures.Add(file.Split('.')[0], vector); // BUG: k not really but idk if this shit works
 
-                    using (var image = (Bitmap) Image.FromFile(file))
-                    {
-                        // the pixels in the image
-                        for (var ix = 0; ix < _textureAtlas; ix++)
-                        {
-                            for (var iy = 0; iy < _textureAtlas; iy++)
-                            {
-                                map.SetPixel(x + ix, y + iy, image.GetPixel(ix, iy));
-                            }
-                        }
-                    }             
-                }
-            }
+            //        using (var image = (Bitmap) Image.FromFile(file))
+            //        {
+            //            // the pixels in the image
+            //            for (var ix = 0; ix < _textureAtlas; ix++)
+            //            {
+            //                for (var iy = 0; iy < _textureAtlas; iy++)
+            //                {
+            //                    map.SetPixel(x + ix, y + iy, image.GetPixel(ix, iy));
+            //                }
+            //            }
+            //        }             
+            //    }
+            //}
 
-            _thaMapOfAllDemTexturez = map;
+            //_thaMapOfAllDemTexturez = map;
 
             #endregion
         }
 
-        public static IEnumerable<Vector2> CreateTexture(ushort id, byte md, Mesh mesh)
-        {
-            var btm = Find(id, md);
-            var v = new List<Vector2>();
-
-            if (mesh.IsParentMesh())
-            {
-                foreach (var submesh in mesh.Submeshes)
-                {
-                    v.AddRange(CreateTexture(id, md, submesh));
-                }
-                return v;
-            }
-
-            switch (mesh.Face)
-            {
-                case BlockFaceDirection.XIncreasing:
-                    return GetUvMapping(btm.XIncreasingTexture, BlockFaceDirection.XIncreasing);
-                case BlockFaceDirection.XDecreasing:
-                    return GetUvMapping(btm.XDecreasingTexture, BlockFaceDirection.XDecreasing);
-                case BlockFaceDirection.ZIncreasing:
-                    return GetUvMapping(btm.ZIncreasingTexture, BlockFaceDirection.ZIncreasing);
-                case BlockFaceDirection.ZDecreasing:
-                    return GetUvMapping(btm.ZDecreasingTexture, BlockFaceDirection.ZDecreasing);
-                case BlockFaceDirection.YIncreasing:
-                    return GetUvMapping(btm.YIncreasingTexture, BlockFaceDirection.YIncreasing);
-                case BlockFaceDirection.YDecreasing:
-                    return GetUvMapping(btm.YDecreasingTexture, BlockFaceDirection.YDecreasing);
-                default:
-                    throw new ArgumentException("Invalid face supplied for " + nameof(mesh));
-            }
-        }
-
-        private static IEnumerable<Vector2> GetUvMapping(Vector2 texture, BlockFaceDirection face)
+        public static Vector2[] GetTexture(int texture, BlockFaceDirection face)
         {
             var ofs = 1f/_textureAtlas;
 
-            var yOfs = texture.Y*ofs;
-            var xOfs = texture.X*ofs;
+            var yOfs = texture*ofs;
+            var xOfs = texture*ofs;
             var uvList = new Vector2[6];
 
             switch (face)
@@ -195,7 +205,7 @@ namespace Welt.Forge.Builders
             }
             return uvList;
         }
-
+        
         private static void ClearTextureMap()
         {
             _textures = new Dictionary<string, Vector2>();
@@ -244,6 +254,19 @@ namespace Welt.Forge.Builders
                         if (!hasFoundFaceDeclarations) builder.Append($"_{area}");
                         break;
                 }
+            }
+
+            if (faces.Count == 0)
+            {
+                faces = new HashSet<BlockFaceDirection>
+                {
+                    BlockFaceDirection.XDecreasing,
+                    BlockFaceDirection.XIncreasing,
+                    BlockFaceDirection.ZDecreasing,
+                    BlockFaceDirection.ZIncreasing,
+                    BlockFaceDirection.YDecreasing,
+                    BlockFaceDirection.YIncreasing
+                };
             }
 
             blockName = builder.ToString();

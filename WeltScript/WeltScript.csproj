@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F2534D94-E314-4EAE-8D11-8ECB1D58B271}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WeltScript</RootNamespace>
+    <AssemblyName>WeltScript</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Compiler\ModifierTypes.cs" />
+    <Compile Include="Compiler\Script.cs" />
+    <Compile Include="Compiler\ScriptSystem.cs" />
+    <Compile Include="Compiler\StatementCollection.cs" />
+    <Compile Include="Compiler\WsGC.cs" />
+    <Compile Include="Objects\BaseObject.cs" />
+    <Compile Include="Objects\WsArray.cs" />
+    <Compile Include="Objects\WsBool.cs" />
+    <Compile Include="Objects\WsChar.cs" />
+    <Compile Include="Objects\WsDouble.cs" />
+    <Compile Include="Objects\WsFunc.cs" />
+    <Compile Include="Objects\WsInt.cs" />
+    <Compile Include="Objects\WsObject.cs" />
+    <Compile Include="Objects\WsString.cs" />
+    <Compile Include="Operators\AdditionOperator.cs" />
+    <Compile Include="Operators\EqualOperator.cs" />
+    <Compile Include="Operators\IOperator.cs" />
+    <Compile Include="Operators\NotOperator.cs" />
+    <Compile Include="Operators\SubtractionOperator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Statements\AssignmentStatement.cs" />
+    <Compile Include="Statements\BreakStatement.cs" />
+    <Compile Include="Statements\CompareStatement.cs" />
+    <Compile Include="Statements\ContinueStatement.cs" />
+    <Compile Include="Statements\DecrementStatement.cs" />
+    <Compile Include="Statements\ForStatement.cs" />
+    <Compile Include="Statements\IfElseStatement.cs" />
+    <Compile Include="Statements\IfStatement.cs" />
+    <Compile Include="Statements\ImportStatement.cs" />
+    <Compile Include="Statements\IncrementStatement.cs" />
+    <Compile Include="Statements\IScriptStatement.cs" />
+    <Compile Include="Statements\NewStatement.cs" />
+    <Compile Include="Statements\ReturnStatement.cs" />
+    <Compile Include="Statements\SleepStatement.cs" />
+    <Compile Include="Statements\TryCatchStatement.cs" />
+    <Compile Include="Statements\WhileStatement.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\lib\System.ValueTuple.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Examples\Door.ws" />
+    <None Include="Examples\HelloWorld.ws" />
+    <None Include="Examples\Math.ws" />
+    <None Include="WsCore\README.md" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

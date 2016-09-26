@@ -58,6 +58,10 @@
       <Project>{813DF234-8FFD-4C3A-8231-D6296C221DF1}</Project>
       <Name>Welt.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Welt\Welt.csproj">
+      <Project>{1A87ADF4-725C-4BC0-A437-4A5E234767B1}</Project>
+      <Name>Welt</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

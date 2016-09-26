@@ -15,15 +15,19 @@ namespace Welt.API.Forge
         string Name { get; }
         long Seed { get; }
         int Size { get; }
+        int Height { get; }
+        
         IForgeGenerator Generator { get; }
         IWorldSystem System { get; }
         int SystemIndex { get; }
+
+        long TimeOfDay { get; set; }
 
         IChunk GetChunk(uint x, uint z);
         void SetChunk(uint x, uint z, IChunk value);
         void RemoveChunk(uint x, uint z);
 
-        Block GetBlock(uint x, uint y, uint z);
-        void SetBlock(uint x, uint y, uint z, Block value);
+        (ushort Id, byte Metadata) GetBlock(uint x, uint y, uint z);
+        void SetBlock(uint x, uint y, uint z, ushort id, byte metadata);
     }
 }
