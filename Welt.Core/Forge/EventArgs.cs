@@ -4,9 +4,9 @@ namespace Welt.Core.Forge
 {
     public class BlockChangedEventArgs : EventArgs
     {
-        public readonly uint X, Y, Z;
+        public readonly int X, Y, Z;
 
-        public BlockChangedEventArgs(uint x, uint y, uint z)
+        public BlockChangedEventArgs(int x, int y, int z)
         {
             X = x;
             Y = y;

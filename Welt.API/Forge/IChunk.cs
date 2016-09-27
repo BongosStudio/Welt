@@ -5,8 +5,7 @@
 namespace Welt.API.Forge
 {
     /// <summary>
-    ///     Interface for Chunk objects. IChunk objects contain IFloors and are
-    ///     contained within IWorlds.
+    ///     Interface for Chunk objects.
     /// </summary>
     public interface IChunk
     {

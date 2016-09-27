@@ -21,11 +21,11 @@ namespace Welt.Game.Builders.Forge.Blocks
         // TODO: maybe have normals? It's pretty easy to determine that .Top() normals are 0;1;0 and Left() are 1;0;0. 
         // Instead of having the data passed per the mesh, we could just calculate it on the fly?
 
-        (Vector3[] Vertices, byte[] Indices) Top();
-        (Vector3[] Vertices, byte[] Indices) Bottom();
-        (Vector3[] Vertices, byte[] Indices) Right();
-        (Vector3[] Vertices, byte[] Indices) Left();
-        (Vector3[] Vertices, byte[] Indices) Front();
-        (Vector3[] Vertices, byte[] Indices) Back();
+        (Vector3[] Vertices, byte[] Indices, byte[] Uvs) Top();
+        (Vector3[] Vertices, byte[] Indices, byte[] Uvs) Bottom();
+        (Vector3[] Vertices, byte[] Indices, byte[] Uvs) Right();
+        (Vector3[] Vertices, byte[] Indices, byte[] Uvs) Left();
+        (Vector3[] Vertices, byte[] Indices, byte[] Uvs) Front();
+        (Vector3[] Vertices, byte[] Indices, byte[] Uvs) Back();
     }
 }

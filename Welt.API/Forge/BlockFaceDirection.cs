@@ -12,9 +12,9 @@ namespace Welt.API.Forge
         None,
         XIncreasing = 1 << 0,
         XDecreasing = 1 << 1,
-        ZIncreasing = 1 << 2,
-        ZDecreasing = 1 << 3,
-        YIncreasing = 1 << 4,
-        YDecreasing = 1 << 5
+        YIncreasing = 1 << 2,
+        YDecreasing = 1 << 3,
+        ZIncreasing = 1 << 4,
+        ZDecreasing = 1 << 5
     }
 }

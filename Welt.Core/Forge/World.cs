@@ -110,7 +110,7 @@ namespace Welt.Core.Forge
         public virtual void RemoveChunk(uint x, uint z)
         {
             Manager.RemoveChunk(x, z);
-            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Destroyed));
+            OnChunkChanged(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Destroyed));
         }
 
         public virtual (ushort Id, byte Metadata) GetBlock(uint x, uint y, uint z)
@@ -133,10 +133,20 @@ namespace Welt.Core.Forge
 
             var chunk = GetChunk(nx/Chunk.Width, nz/Chunk.Depth);
             chunk.SetBlock((int) (nx%Chunk.Width), (int) y, (int) (nz%Chunk.Depth), id, metadata);
-            BlockChanged?.Invoke(this, new BlockChangedEventArgs(nx, y, nz));
+            OnBlockChanged(this, new BlockChangedEventArgs(nx, y, nz));
         }
 
         public event EventHandler<BlockChangedEventArgs> BlockChanged;
         public event EventHandler<ChunkChangedEventArgs> ChunkChanged;
+
+        public void OnBlockChanged(object sender, BlockChangedEventArgs args)
+        {
+            BlockChanged?.Invoke(sender, args);
+        }
+
+        public void OnChunkChanged(object sender, ChunkChangedEventArgs args)
+        {
+            ChunkChanged?.Invoke(sender, args);
+        }
     }
 }

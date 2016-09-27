@@ -78,11 +78,16 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Controllers\WorldController.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
+    <Compile Include="Extensions\ForgeExtensions.cs" />
     <Compile Include="Forge\Meshes\CapBlockMesh.cs" />
     <Compile Include="Forge\Meshes\DefaultBlockMesh.cs" />
-    <Compile Include="Forge\Meshes\FacelessBlockMesh.cs" />
     <Compile Include="Forge\Meshes\GrassBlockMesh.cs" />
     <Compile Include="Forge\Meshes\IBlockMesh.cs" />
+    <Compile Include="Forge\Processors\IChunkProcessor.cs" />
+    <Compile Include="Forge\Processors\ProcessorStatus.cs" />
+    <Compile Include="Forge\Processors\VertexProcessor.cs" />
     <Compile Include="Rendering\AnimationCall.cs" />
     <Compile Include="Rendering\BlockMetaDescription.cs" />
     <Compile Include="Rendering\Effects\BlendTextureEffect.cs" />

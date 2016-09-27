@@ -23,6 +23,7 @@ using Welt.Game.Builders.Forge.Blocks;
 
 namespace Welt.Processors
 {
+    [Obsolete("Moved to Welt.Forge.Processors.VertexProcessor.")]
     public class VertexBuildChunkProcessor : IChunkProcessor
     {
         private readonly GraphicsDevice _mGraphicsDevice;

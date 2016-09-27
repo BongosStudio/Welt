@@ -30,6 +30,7 @@ namespace Welt.Forge.Renderers
         private readonly FirstPersonCamera _mCamera;
         private readonly GraphicsDevice _graphicsDevice;
         private readonly WorldBuilder _world;
+        private readonly VertexBuildChunkProcessor _mVertexProcessor;
         protected Effect SolidBlockEffect;
         protected Texture2D TextureAtlas;
         private float _mTod;
@@ -149,9 +150,9 @@ namespace Welt.Forge.Renderers
             return DoBuild(chunk);
         }
 
-        private ChunkBuilder DoBuild(Chunk chunk)
+        private ChunkBuilder DoBuild(ChunkBuilder chunk)
         {
-            _mVertexBuildChunkProcessor.ProcessChunk(chunk);
+            _mVertexProcessor.ProcessChunk(chunk);
             return chunk;
         }
 

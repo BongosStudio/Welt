@@ -63,6 +63,11 @@ namespace Welt.Forge.Builders
             16, 32, 64, 128, 256, 512, 1048, 2056
         };
 
+        static TextureBuilder()
+        {
+            Initialize();
+        }
+
         /// <summary>
         ///     Initializes the builder and reads all textures used for the game. Should be called 
         ///     during Game.LoadContent.
