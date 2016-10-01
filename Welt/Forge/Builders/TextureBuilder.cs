@@ -1,20 +1,9 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Welt.API.Forge;
-using Welt.Core;
-using Welt.Rendering;
-using Welt.Types;
-using static Welt.Console.ThrowHelper;
-using Welt.Core.Services;
 
 namespace Welt.Forge.Builders
 {
@@ -69,7 +58,7 @@ namespace Welt.Forge.Builders
         }
 
         /// <summary>
-        ///     Initializes the builder and reads all textures used for the game. Should be called 
+        ///     Initializes the builder and reads all textures used for the game. Should be called
         ///     during Game.LoadContent.
         /// </summary>
         public static void Initialize()
@@ -86,13 +75,14 @@ namespace Welt.Forge.Builders
                 UvMappings.Add(i*6 + 4, GetTexture(i, BlockFaceDirection.ZIncreasing));
                 UvMappings.Add(i*6 + 5, GetTexture(i, BlockFaceDirection.ZDecreasing));
             }
-            
+
             // this is all commented out for future implementation. For now, we stick to what worked before so
             // we can actually get shit tested.
+
             #region Create BlockTextureModels
 
             // jesus fuck lets try this again. ALRIGHT.
-            // step 1: get all the images. 
+            // step 1: get all the images.
             //var images =
             //    Directory.GetFiles("Content/Textures/Blocks", "*.png", SearchOption.TopDirectoryOnly).ToArray();
 
@@ -107,11 +97,11 @@ namespace Welt.Forge.Builders
             //_textureAtlas = _textureSizes.Single(d => chosenImages.All(i => Image.FromFile(i).Width == d));
 
             //// step 3: get all the metas
-            //var metas = Directory.GetFiles("Content/Textures/Metas", "*.wmeta", SearchOption.TopDirectoryOnly); 
+            //var metas = Directory.GetFiles("Content/Textures/Metas", "*.wmeta", SearchOption.TopDirectoryOnly);
 
             //// step 3: now that we have the images and the metas, we start piecing together _thaMapOfAllDemTexturez
             //// To figure out how many rows and collumns (as they must be the same because OCD is a bitch, we take the square root of
-            //// how many images there are. 
+            //// how many images there are.
             //// TODO: split an animated image into multiple images. This means we can't have animated images yet. Sorry.
             //var mapSize = FastMath.Ceiling(Math.Sqrt(images.Length));
             //var map = new Bitmap(mapSize*_textureAtlas, mapSize*_textureAtlas);
@@ -140,13 +130,13 @@ namespace Welt.Forge.Builders
             //                    map.SetPixel(x + ix, y + iy, image.GetPixel(ix, iy));
             //                }
             //            }
-            //        }             
+            //        }
             //    }
             //}
 
             //_thaMapOfAllDemTexturez = map;
 
-            #endregion
+            #endregion Create BlockTextureModels
         }
 
         public static Vector2[] GetTexture(int texture, BlockFaceDirection face)
@@ -167,6 +157,7 @@ namespace Welt.Forge.Builders
                     uvList[4] = new Vector2(xOfs + ofs, yOfs); // 1,0
                     uvList[5] = new Vector2(xOfs + ofs, yOfs + ofs); // 1,1
                     break;
+
                 case BlockFaceDirection.XDecreasing:
                     uvList[0] = new Vector2(xOfs, yOfs); // 0,0
                     uvList[1] = new Vector2(xOfs + ofs, yOfs); // 1,0
@@ -175,6 +166,7 @@ namespace Welt.Forge.Builders
                     uvList[4] = new Vector2(xOfs + ofs, yOfs + ofs); // 1,1
                     uvList[5] = new Vector2(xOfs, yOfs + ofs); // 0,1
                     break;
+
                 case BlockFaceDirection.YIncreasing:
                     uvList[0] = new Vector2(xOfs, yOfs + ofs); // 0,1
                     uvList[1] = new Vector2(xOfs, yOfs); // 0,0
@@ -183,6 +175,7 @@ namespace Welt.Forge.Builders
                     uvList[4] = new Vector2(xOfs + ofs, yOfs); // 1,0
                     uvList[5] = new Vector2(xOfs + ofs, yOfs + ofs); // 1,1
                     break;
+
                 case BlockFaceDirection.YDecreasing:
                     uvList[0] = new Vector2(xOfs, yOfs); // 0,0
                     uvList[1] = new Vector2(xOfs + ofs, yOfs); // 1,0
@@ -191,6 +184,7 @@ namespace Welt.Forge.Builders
                     uvList[4] = new Vector2(xOfs + ofs, yOfs); // 1,0
                     uvList[5] = new Vector2(xOfs + ofs, yOfs + ofs); // 1,1
                     break;
+
                 case BlockFaceDirection.ZIncreasing:
                     uvList[0] = new Vector2(xOfs, yOfs); // 0,0
                     uvList[1] = new Vector2(xOfs + ofs, yOfs); // 1,0
@@ -199,6 +193,7 @@ namespace Welt.Forge.Builders
                     uvList[4] = new Vector2(xOfs + ofs, yOfs + ofs); // 1,1
                     uvList[5] = new Vector2(xOfs, yOfs + ofs); // 0,1
                     break;
+
                 case BlockFaceDirection.ZDecreasing:
                     uvList[0] = new Vector2(xOfs, yOfs); // 0,0
                     uvList[1] = new Vector2(xOfs + ofs, yOfs); // 1,0
@@ -210,7 +205,7 @@ namespace Welt.Forge.Builders
             }
             return uvList;
         }
-        
+
         private static void ClearTextureMap()
         {
             _textures = new Dictionary<string, Vector2>();
@@ -229,34 +224,42 @@ namespace Welt.Forge.Builders
                         faces.Add(BlockFaceDirection.ZIncreasing);
                         hasFoundFaceDeclarations = true;
                         break;
+
                     case "back":
                         faces.Add(BlockFaceDirection.ZDecreasing);
                         hasFoundFaceDeclarations = true;
                         break;
+
                     case "left":
                         faces.Add(BlockFaceDirection.XDecreasing);
                         hasFoundFaceDeclarations = true;
                         break;
+
                     case "right":
                         faces.Add(BlockFaceDirection.ZIncreasing);
                         hasFoundFaceDeclarations = true;
                         break;
+
                     case "top":
                         faces.Add(BlockFaceDirection.YIncreasing);
                         hasFoundFaceDeclarations = true;
                         break;
+
                     case "bottom":
                         faces.Add(BlockFaceDirection.YDecreasing);
                         hasFoundFaceDeclarations = true;
                         break;
+
                     case "sides":
                         faces.Add(BlockFaceDirection.XIncreasing);
                         faces.Add(BlockFaceDirection.XDecreasing);
                         faces.Add(BlockFaceDirection.ZIncreasing);
                         faces.Add(BlockFaceDirection.ZDecreasing);
                         break;
+
                     default:
-                        if (!hasFoundFaceDeclarations) builder.Append($"_{area}");
+                        if (!hasFoundFaceDeclarations)
+                            builder.Append($"_{area}");
                         break;
                 }
             }
@@ -279,4 +282,3 @@ namespace Welt.Forge.Builders
         }
     }
 }
- 

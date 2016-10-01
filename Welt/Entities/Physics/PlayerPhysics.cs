@@ -1,22 +1,26 @@
 ﻿#region Copyright
+
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
-#endregion
+
+#endregion Copyright
+
 #region Using Statements
 
-using System;
-using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using Welt.API.Forge;
+using System;
+using System.ComponentModel;
 using Welt.Cameras;
-using Welt.Forge;
+using Welt.Controllers;
+using Welt.Core.Services;
+using Welt.Game.Extensions;
 using Welt.Logic.Forge;
 using Welt.Models;
 using static Welt.Core.FastMath;
 
-#endregion
+#endregion Using Statements
 
-namespace Welt.Physics
+namespace Welt.Entities.Physics
 {
     public class PlayerPhysics
     {
@@ -30,10 +34,11 @@ namespace Welt.Physics
         private const float MAX_VELOCITY = 20f;
         private const float MAX_VELOCITY_WATER = 4f;
         private const float VELOCITY_DAMAGE_CAP = 5f; // each 0.5f would take 0.5f HP. 20f is instant death.
+
         // TODO: player stamina catcher & updater
         private TimeSpan _staminaReset = TimeSpan.Zero;
 
-        #endregion
+        #endregion Fields
 
         public PlayerPhysics(PlayerRenderer playerRenderer)
         {
@@ -48,7 +53,8 @@ namespace Welt.Physics
             UpdatePosition(gameTime);
 
             var headbobOffset = (float) Math.Sin(_mPlayer.HeadBob)*GetPlayerHeadBob() + 0.15f;
-            if (_mPlayer.Entity.IsInWater) headbobOffset = 0;
+            if (_mPlayer.Entity.IsInWater)
+                headbobOffset = 0;
             _mCamera.Position = _mPlayer.Position + new Vector3(0, headbobOffset, 0);
         }
 
@@ -65,6 +71,7 @@ namespace Welt.Physics
                         _mPlayer.Entity.Stamina -= 0.005f;
                     }
                     break;
+
                 case "stamina":
                     if (_mPlayer.Entity.Stamina == 0)
                     {
@@ -75,8 +82,10 @@ namespace Welt.Physics
                         _mPlayer.Entity.Stamina = 1;
                     }
                     break;
+
                 case "isinwater":
                     break;
+
                 case "iscrouching":
                     // TODO: change model height and view height
                     break;
@@ -88,7 +97,8 @@ namespace Welt.Physics
             var kstate = Keyboard.GetState();
             _mPlayer.Entity.IsRunning = kstate[Keys.LeftShift] == KeyState.Down && _mPlayer.Entity.Stamina > 0;
             _mPlayer.Entity.IsCrouching = kstate[Keys.LeftControl] == KeyState.Down;
-            if (_staminaReset > TimeSpan.Zero) _staminaReset -= time.ElapsedGameTime;
+            if (_staminaReset > TimeSpan.Zero)
+                _staminaReset -= time.ElapsedGameTime;
             if (_staminaReset <= TimeSpan.Zero)
             {
                 if (_mPlayer.Entity.Stamina < 0.25f)
@@ -105,16 +115,21 @@ namespace Welt.Physics
 
         private float GetPlayerSpeed()
         {
-            if (_mPlayer.Entity.IsInWater) return 1.7f;
-            if (_mPlayer.Entity.IsRunning) return 5.0f;
-            if (_mPlayer.Entity.IsCrouching) return 1.7f;
+            if (_mPlayer.Entity.IsInWater)
+                return 1.7f;
+            if (_mPlayer.Entity.IsRunning)
+                return 5.0f;
+            if (_mPlayer.Entity.IsCrouching)
+                return 1.7f;
             return 3.5f;
         }
 
         private float GetPlayerHeadBob()
         {
-            if (_mPlayer.Entity.IsCrouching) return 0.01f;
-            if (_mPlayer.Entity.IsRunning) return 0.15f;
+            if (_mPlayer.Entity.IsCrouching)
+                return 0.01f;
+            if (_mPlayer.Entity.IsRunning)
+                return 0.15f;
             return 0.1f;
         }
 
@@ -128,7 +143,7 @@ namespace Welt.Physics
             var footPosition = _mPlayer.Position + new Vector3(0f, -1.5f, 0f);
             var headPosition = _mPlayer.Position + new Vector3(0f, 0.1f, 0f);
             // adjust to if in water
-            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == BlockType.Water;
+            _mPlayer.Entity.IsInWater = _mPlayer.World.GetBlock(footPosition).Id == 5;
 
             var velocity = GetPlayerGravity()*(float) gameTime.ElapsedGameTime.TotalSeconds;
             var min = _mPlayer.Entity.IsInWater ? -MAX_VELOCITY_WATER : -MAX_VELOCITY;
@@ -138,24 +153,26 @@ namespace Welt.Physics
 
             //TODO _isAboveSnowline = headPosition.Y > WorldSettings.SNOWLINE;
 
-            if (BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) ||
-                BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
+            var fpb = BlockService.GetBlock(_mPlayer.World.GetBlock(footPosition));
+            var hpb = BlockService.GetBlock(_mPlayer.World.GetBlock(headPosition));
+
+            if (fpb.C || hpb.C)
             {
-                var standingOnBlock = _mPlayer.World.GetBlock(footPosition).Id;
-                var hittingHeadOnBlock = _mPlayer.World.GetBlock(headPosition).Id;
+                var standingOnBlock = fpb.Id;
+                var hittingHeadOnBlock = hpb.Id;
 
                 // TODO: fall damage
 
                 // If the player has their head stuck in a block, push them down.
-                if (BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(headPosition).Id))
+                if (hpb.C)
                 {
-                    var blockIn = (int) (headPosition.Y);
+                    var blockIn = (int) headPosition.Y;
                     _mPlayer.Position.Y = blockIn - 0.15f;
                 }
 
                 // If the player is stuck in the ground, bring them out.
                 // This happens because we're standing on a block at -1.5, but stuck in it at -1.4, so -1.45 is the sweet spot.
-                if (BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id))
+                if (fpb.C)
                 {
                     var blockOn = (int) (footPosition.Y);
                     _mPlayer.Position.Y = (float) (blockOn + 1 + 1.45);
@@ -163,31 +180,11 @@ namespace Welt.Physics
 
                 _mPlayer.Velocity.Y = 0;
 
-                // Logic for standing on a block.
-                switch (standingOnBlock)
-                {
-                    case BlockType.Water:
-                        // play swimming sound
-                        break;
-                    case BlockType.Dirt:
-                        // play dirt sound
-                        break;
-                    case BlockType.Grass:
-                    case BlockType.LongGrass:
-                    case BlockType.Leaves:
-                        // play rustling mix with grass movement
-                        // maybe make an easter egg where it plays the pokemon thing with "A WILD BLAHBLAHBLAH APPEARED"?
-                        // Idk, I like that idea so I may do it.
-                        break;
-                }
-
-                //Logic for bumping your head on a block.
-                switch (hittingHeadOnBlock)
-                {
-                    case BlockType.Lava:
-                        // set the player on fire
-                        break;
-                }
+                SoundController.Instance.PlayWalk(fpb.Id);
+                // create contact with block underneath
+                PhysicsController.CreateContactWith(_mPlayer.Entity, fpb.Id, 0);
+                // create contact with block at head position
+                PhysicsController.CreateContactWith(_mPlayer.Entity, hpb.Id, 0);
             }
 
             // Death by falling off the map.
@@ -210,7 +207,6 @@ namespace Welt.Physics
                 {
                     _mPlayer.Position.Y += 0.05f;
                 }
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 else if ((BlockLogic.IsSolidBlock(_mPlayer.World.GetBlock(footPosition).Id) && _mPlayer.Velocity.Y == 0))
                 {
                     _mPlayer.Velocity.Y = PLAYERJUMPVELOCITY;
@@ -251,10 +247,10 @@ namespace Welt.Physics
             }
             else if (!TryToMoveTo(new Vector3(rotatedMoveVector.X, 0, 0), gameTime))
             {
-            }           
+            }
         }
 
-        #endregion
+        #endregion UpdatePosition
 
         #region TryToMoveTo
 
@@ -308,6 +304,6 @@ namespace Welt.Physics
             return false;
         }
 
-        #endregion
+        #endregion TryToMoveTo
     }
 }

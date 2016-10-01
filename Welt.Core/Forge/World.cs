@@ -1,6 +1,8 @@
 ﻿#region Copyright
+
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
-#endregion
+
+#endregion Copyright
 
 using System;
 using Welt.API.Forge;
@@ -115,7 +117,8 @@ namespace Welt.Core.Forge
 
         public virtual (ushort Id, byte Metadata) GetBlock(uint x, uint y, uint z)
         {
-            if (y >= Height) return (0, 0);
+            if (y >= Height)
+                return (0, 0);
 
             var nx = (uint) (x%MaxX);
             var nz = (uint) (z%MaxZ);
@@ -126,7 +129,8 @@ namespace Welt.Core.Forge
 
         public virtual void SetBlock(uint x, uint y, uint z, ushort id, byte metadata)
         {
-            if (y >= Height) return;
+            if (y >= Height)
+                return;
 
             var nx = (uint) (x%MaxX);
             var nz = (uint) (z%MaxZ);
@@ -137,6 +141,7 @@ namespace Welt.Core.Forge
         }
 
         public event EventHandler<BlockChangedEventArgs> BlockChanged;
+
         public event EventHandler<ChunkChangedEventArgs> ChunkChanged;
 
         public void OnBlockChanged(object sender, BlockChangedEventArgs args)

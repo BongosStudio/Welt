@@ -12,6 +12,13 @@ namespace Welt.Core.Forge
             Y = y;
             Z = z;
         }
+
+        public BlockChangedEventArgs(uint x, uint y, uint z)
+        {
+            X = (int) x;
+            Y = (int) y;
+            Z = (int) z;
+        }
     }
 
     public class ChunkChangedEventArgs : EventArgs

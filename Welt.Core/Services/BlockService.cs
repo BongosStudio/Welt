@@ -88,6 +88,14 @@ namespace Welt.Core.Services
             return _blocks.Single(b => b.Id == id && b.Metadata == md);
         }
 
+        public static (
+            ushort Id, byte Md, string Name, float Hrd, float W, float H,
+            float D, bool O, bool F, bool R, bool C, bool P, bool L)
+            GetBlock((ushort id, byte md) block)
+        {
+            return _blocks.Single(b => b.Id == block.id && b.Metadata == block.md);
+        }
+
         public static (ushort Id, byte Metadata) GetBlockFromName(string name)
         {
             var b = _blocks.Single(block => block.Name == name);

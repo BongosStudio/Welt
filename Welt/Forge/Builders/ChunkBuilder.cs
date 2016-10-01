@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections;
+using System.Collections.Generic;
 using Welt.API.Forge;
 using Welt.Core.Forge;
+using Welt.Game.Extensions;
+using Welt.Logic.Forge;
 using Welt.Models;
 using Welt.Rendering;
-using Welt.Types;
-using System.Collections;
-using Welt.Core.Services;
-using Welt.Logic.Forge;
-using Welt.Game.Extensions;
 
 namespace Welt.Forge.Builders
 {
@@ -39,6 +37,7 @@ namespace Welt.Forge.Builders
         public BoundingBox BoundingBox
             => new BoundingBox(new Vector3(Position.X, 0, Position.Y),
                     new Vector3(Position.X + Chunk.Width, OwnedChunk.Height, Position.Y + Chunk.Depth));
+
         public VertexBuffer VertexBuffer;
         public VertexBuffer WaterVertexBuffer;
         public VertexBuffer GrassVertexBuffer;
@@ -60,7 +59,8 @@ namespace Welt.Forge.Builders
         public short GrassVertexCount;
 
         public BitArray SolidBlockMap;
-        
+        public LightTable LightTable;
+
         private void HandleBlockAdjusted(object sender, BlockChangedEventArgs args)
         {
             var block = OwnedChunk.GetBlock(args.X, args.Y, args.Z);
@@ -83,7 +83,7 @@ namespace Welt.Forge.Builders
                 }
             }
         }
-        
+
         public void Clear()
         {
             VertexBuffer?.Dispose();

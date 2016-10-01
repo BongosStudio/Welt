@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Welt.API.Forge;
 using Welt.Core.Forge;
@@ -21,6 +18,7 @@ namespace Welt.Forge.Processors
         public ProcessorStatus Status { get; private set; }
 
         private GraphicsDevice _graphicsDevice;
+
         private static IBlockMesh[] _meshInstances =
         {
             new DefaultBlockMesh(),
@@ -40,7 +38,7 @@ namespace Welt.Forge.Processors
             await BuildVertices(builder);
             return builder;
         }
-        
+
         private Task<ChunkBuilder> CreateChunkBuilder(Chunk chunk)
         {
             return Task.Run(() =>
@@ -103,15 +101,14 @@ namespace Welt.Forge.Processors
                     builder, mesh.Back().Vertices, mesh.Back().Indices, mesh.Back().Uvs, id, x, y, z, BlockFaceDirection.ZDecreasing);
 
             var position = new Vector3(builder.OwnedChunk.X + x, y, builder.OwnedChunk.Z + z);
-            
         }
 
         private void CreateTextureAndAdjustBuffers(
-            ChunkBuilder builder, 
-            Vector3[] vertices, 
-            byte[] indices, 
+            ChunkBuilder builder,
+            Vector3[] vertices,
+            byte[] indices,
             byte[] uvi,
-            ushort id, 
+            ushort id,
             int x, int y, int z,
             // TODO: vector shifting within the block (for things like torches or flowers. All we have to do is add another Vector3 then
             // add that to the x;y;z parameters.

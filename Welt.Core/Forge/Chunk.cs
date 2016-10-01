@@ -1,9 +1,10 @@
 ﻿#region Copyright
+
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
-#endregion
+
+#endregion Copyright
 
 using System;
-using System.Diagnostics;
 using Welt.API.Forge;
 using static Welt.Core.FastMath;
 
@@ -97,11 +98,11 @@ namespace Welt.Core.Forge
                 {
                     if (_lowestAirBlock > y)
                         _lowestAirBlock = y;
-                    BlockRemoved?.Invoke(this, new BlockChangedEventArgs((uint) x, (uint) y, (uint) z));
+                    BlockRemoved?.Invoke(this, new BlockChangedEventArgs(x, y, z));
                 }
                 else
                 {
-                    BlockAdded?.Invoke(this, new BlockChangedEventArgs((uint) x, (uint) y, (uint) z));
+                    BlockAdded?.Invoke(this, new BlockChangedEventArgs(x, y, z));
                 }
                 SetHeight(x, z);
                 return;
@@ -127,7 +128,6 @@ namespace Welt.Core.Forge
                 N.SetBlock(x - Width, y, z - Depth, id, metadata);
                 return;
             }
-
         }
 
         public int GetHeight(int x, int z)
@@ -152,6 +152,7 @@ namespace Welt.Core.Forge
         }
 
         public event EventHandler<BlockChangedEventArgs> BlockAdded;
+
         public event EventHandler<BlockChangedEventArgs> BlockRemoved;
     }
 }

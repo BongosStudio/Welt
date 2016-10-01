@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Welt.Core.Forge;
 using Welt.Forge.Processors;
 
 namespace Welt.Controllers
@@ -11,6 +7,8 @@ namespace Welt.Controllers
     public class WorldController
     {
         public VertexProcessor VertexProcessor;
-        public LightingProcessor  LightingProcessor;
+        public LightingProcessor LightingProcessor;
+        public World World;
+
     }
 }

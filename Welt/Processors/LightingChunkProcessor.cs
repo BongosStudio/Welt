@@ -1,20 +1,15 @@
 ﻿#region Copyright
+
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
-#endregion
+
+#endregion Copyright
+
 #region Using Statements
 
 using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Welt.Annotations;
-using Welt.API.Forge;
-using Welt.Core.Forge;
-using Welt.Forge;
 using Welt.Forge.Builders;
-using Welt.Logic.Forge;
-using Welt.Models;
 
-#endregion
+#endregion Using Statements
 
 namespace Welt.Processors
 {
@@ -26,7 +21,6 @@ namespace Welt.Processors
 
         public void ProcessChunk(ChunkBuilder chunk)
         {
-            
             //ClearLighting(chunk);
             //FillLighting(chunk);
         }
@@ -52,10 +46,10 @@ namespace Welt.Processors
         //                    block = chunk.GetBlock(x, y, z);
         //                    if (block.Id != BlockType.None) inShade = true;
         //                    block.Sun = (byte) (!inShade ? sunValue : 0);
-                            
-        //                    BlockLogic.GetLightLevel(block.Id, 
+
+        //                    BlockLogic.GetLightLevel(block.Id,
         //                        out block.R,
-        //                        out block.G, 
+        //                        out block.G,
         //                        out block.B);
         //                    chunk.SetBlockUnsafe(x, y, z, block);
 
@@ -218,9 +212,11 @@ namespace Welt.Processors
         //        Debug.WriteLine("PropogateLightB Exception");
         //    }
         //}
-        #endregion
+
+        #endregion ClearLighting
 
         #region FillLighting
+
         //private void FillLighting(Chunk chunk)
         //{
         //    FillLightingSun(chunk);
@@ -231,7 +227,6 @@ namespace Welt.Processors
 
         //private void FillLightingSun(Chunk chunk)
         //{
-
         //    for (byte x = 0; x < ChunkBuilder.Size.X; x++)
         //    {
         //        for (byte z = 0; z < ChunkBuilder.Size.Z; z++)
@@ -276,7 +271,7 @@ namespace Welt.Processors
         //                for (var y = chunk.LowestNoneBlock.Y; y < ChunkBuilder.Size.Y; y++)
         //                {
         //                    BlockLogic.GetLightLevel(chunk.GetBlock(x, y, z).Id, out _r, out _g, out _b);
-              
+
         //                    // Local light R
         //                    if (_r > 1)
         //                    {
@@ -315,7 +310,6 @@ namespace Welt.Processors
         //            {
         //                for (var y = chunk.LowestNoneBlock.Y; y < ChunkBuilder.Size.Y; y++)
         //                {
-
         //                    BlockLogic.GetLightLevel(chunk.GetBlock(x, y, z).Id, out _r, out _g, out _b);
 
         //                    // Local light G
@@ -355,7 +349,6 @@ namespace Welt.Processors
         //            {
         //                for (var y = chunk.LowestNoneBlock.Y; y < ChunkBuilder.Size.Y; y++)
         //                {
-
         //                    BlockLogic.GetLightLevel(chunk.GetBlock(x, y, z).Id, out _r, out _g, out _b);
 
         //                    // Local light B
@@ -384,7 +377,7 @@ namespace Welt.Processors
         //        //Debug.WriteLine("FillLightingB Exception");
         //    }
         //}
-        #endregion
 
+        #endregion FillLighting
     }
 }

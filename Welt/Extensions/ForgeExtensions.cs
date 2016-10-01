@@ -88,5 +88,10 @@ namespace Welt.Game.Extensions
         {
             return ((byte) direction & (1 << (byte) BlockFaceDirection.ZDecreasing)) != 0;
         }
+
+        public static (ushort Id, byte Metadata) GetBlock(this IWorld world, Vector3 position)
+        {
+            return world.GetBlock((uint) position.X, (uint) position.Y, (uint) position.Z);
+        }
     }
 }

@@ -78,9 +78,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Audio\BlockAudio.cs" />
+    <Compile Include="Controllers\PhysicsController.cs" />
+    <Compile Include="Controllers\SoundController.cs" />
     <Compile Include="Controllers\WorldController.cs" />
+    <Compile Include="Entities\Physics\Rules\BasicPhysicsRule.cs" />
+    <Compile Include="Entities\Physics\Rules\IPhysicsRule.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="Extensions\ForgeExtensions.cs" />
+    <Compile Include="Forge\LightTable.cs" />
     <Compile Include="Forge\Meshes\CapBlockMesh.cs" />
     <Compile Include="Forge\Meshes\DefaultBlockMesh.cs" />
     <Compile Include="Forge\Meshes\GrassBlockMesh.cs" />
@@ -140,13 +146,12 @@
     <Compile Include="Models\Player.cs" />
     <Compile Include="Persistence\ChunkPersistence.cs" />
     <Compile Include="Persistence\IChunkPersistence.cs" />
-    <Compile Include="Physics\PlayerPhysics.cs" />
+    <Compile Include="Entities\Physics\PlayerPhysics.cs" />
     <Compile Include="Processors\DataProcessor.cs" />
     <Compile Include="Processors\IChunkProcessor.cs" />
     <Compile Include="Processors\ImmersionProcessor.cs" />
     <Compile Include="Processors\LightingChunkProcessor.cs" />
     <Compile Include="Processors\ReflectionProcessor.cs" />
-    <Compile Include="Processors\VertexBuildChunkProcessor.cs" />
     <Compile Include="Processors\WorldRenderingProcessor.cs" />
     <Compile Include="Profiling\FrameRateCounter.cs" />
     <Compile Include="Profiling\Utility.cs" />
