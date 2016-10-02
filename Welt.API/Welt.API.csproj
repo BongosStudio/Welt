@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="Cardinal.cs" />
     <Compile Include="Forge\Biome.cs" />
+    <Compile Include="Forge\Block.cs" />
     <Compile Include="Forge\BlockFaceDirection.cs" />
     <Compile Include="Forge\Generators\IBiomeGenerator.cs" />
     <Compile Include="Forge\Generators\ICaveGenerator.cs" />

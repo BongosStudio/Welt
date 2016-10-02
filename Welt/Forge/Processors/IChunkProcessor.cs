@@ -20,10 +20,10 @@ namespace Welt.Forge.Processors
 
         // TODO: perhaps have it grab a pre-existing ChunkBuilder object and adjust those buffers?
         /// <summary>
-        ///     Creates a <see cref="Task{ChunkBuilder}"/> object from the given <paramref name="chunk"/>.
+        ///     Modifies the <para name="chunk"/> returning a <see cref="Task{ChunkBuilder}"/>
         /// </summary>
         /// <param name="chunk"></param>
         /// <returns></returns>
-        Task<ChunkBuilder> ProcessChunk(Chunk chunk);
+        Task<ChunkBuilder> ProcessChunk(ChunkBuilder chunk);
     }
 }

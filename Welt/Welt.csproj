@@ -79,6 +79,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Audio\BlockAudio.cs" />
+    <Compile Include="Controllers\LightController.cs" />
     <Compile Include="Controllers\PhysicsController.cs" />
     <Compile Include="Controllers\SoundController.cs" />
     <Compile Include="Controllers\WorldController.cs" />

@@ -25,14 +25,31 @@ namespace Welt.Forge.Processors
 
         public ProcessorStatus Status { get; }
 
-        public void ClearLighting()
+        public void ClearLighting(ChunkBuilder builder)
         {
-
+            builder.LightTable.ClearTable();
         }
 
-        public async Task<ChunkBuilder> ProcessChunk(Chunk chunk)
+        public async Task<ChunkBuilder> ProcessChunk(ChunkBuilder chunk)
         {
             throw new NotImplementedException();
+        }
+
+        private Task CreateLightBlocks(ChunkBuilder builder)
+        {
+            return new Task(() =>
+            {
+                for (var x = 0; x < Chunk.Width; ++x)
+                {
+                    for (var z = 0; z < Chunk.Depth; ++z)
+                    {
+                        for (var y = 0; y < builder.OwnedChunk.Height; ++y)
+                        {
+                            builder.LightTable[x, y, z] = 
+                        }
+                    }
+                }
+            });
         }
     }
 }

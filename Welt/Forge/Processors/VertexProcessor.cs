@@ -31,7 +31,7 @@ namespace Welt.Forge.Processors
             _graphicsDevice = device;
         }
 
-        public async Task<ChunkBuilder> ProcessChunk(Chunk chunk)
+        public async Task<ChunkBuilder> ProcessChunk(ChunkBuilder chunk)
         {
             Status = ProcessorStatus.Processing;
             var builder = await CreateChunkBuilder(chunk);
@@ -39,13 +39,12 @@ namespace Welt.Forge.Processors
             return builder;
         }
 
-        private Task<ChunkBuilder> CreateChunkBuilder(Chunk chunk)
+        private Task<ChunkBuilder> CreateChunkBuilder(ChunkBuilder chunk)
         {
             return Task.Run(() =>
             {
-                var builder = new ChunkBuilder(chunk);
-                builder.CreateBlockMap();
-                return builder;
+                chunk.CreateBlockMap();
+                return chunk;
             });
         }
 

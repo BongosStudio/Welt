@@ -37,6 +37,7 @@
     <Compile Include="FastMath.cs" />
     <Compile Include="Forge\Biomes\ForestBiomeGenerator.cs" />
     <Compile Include="Forge\BlockPalette.cs" />
+    <Compile Include="Forge\Blocks.cs" />
     <Compile Include="Forge\Botany\TreeTypes.cs" />
     <Compile Include="Forge\Chunk.cs" />
     <Compile Include="Forge\ChunkManager.cs" />
