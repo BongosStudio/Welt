@@ -1,0 +1,9 @@
+﻿// sample_data.gtd (game texture designer)
+
+// valid faces are:
+// x, y, z, posx, negx, posy, negy, posz, negz, xy, xz, yz
+faces.x=mytexture.png
+faces.posy=mytexture_top.png
+
+// animation speed. units are are milliseconds
+anim.speed=500

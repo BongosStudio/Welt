@@ -1,0 +1,64 @@
+﻿<ek:UIRoot x:Class="UserInterface.SettingsMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:UserInterface"
+      xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
+      xmlns:c="clr-namespace:EmptyKeys.UserInterface.Designer.Charts;assembly=EmptyKeys.UserInterface.Designer"
+      xmlns:cv="clr-namespace:UserInterface.Converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="500" d:DesignWidth="500" Style="{DynamicResource UiStyle}">
+    <ek:UIRoot.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UserInterface;component/Dictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ek:UIRoot.Resources>
+    <Grid>
+        <TabControl>
+            <TabItem Header="General">
+                <StackPanel Margin="20,0,20,0">
+                    <TextBlock>Horizontal Sensitivity</TextBlock>
+                    <Grid Margin="0,0,-0.4,0">
+                        <Slider Margin="0,0,135,0" Value="{Binding HorizontalSens}" Maximum="1" SmallChange="0.1" LargeChange="1" AutoToolTipPlacement="TopLeft"/>
+                        <TextBlock  Margin="0,0,100,0" Text="{Binding HorizontalSens}" HorizontalAlignment="Right" Width="35"/>
+                    </Grid>
+                    <TextBlock>Vertical Sensitivity</TextBlock>
+                    <Grid>
+                        <Slider Margin="0,0,135,0" Value="{Binding VerticalSens}" Maximum="1" SmallChange="0.1" LargeChange="1" />
+                        <TextBlock  Margin="0,0,99.6,0" Text="{Binding VerticalSens}" HorizontalAlignment="Right" Width="35"/>
+                    </Grid>
+
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Audio">
+                <StackPanel Margin="20,0,20,0">
+                    <TextBlock>Master Volume</TextBlock>
+                    <Grid>
+                        <Slider Margin="0,0,65,0" Value="{Binding MasterVolume}" Maximum="100" SmallChange="1" LargeChange="10" AutoToolTipPlacement="TopLeft"/>
+                        <TextBlock  Margin="0,0,0,0" Text="{Binding MasterVolume}" HorizontalAlignment="Right" Width="45"/>
+                    </Grid>
+                    <TextBlock>Music Volume</TextBlock>
+                    <Grid>
+                        <Slider Margin="0,0,65,0" Value="{Binding MusicVolume}" Maximum="100"/>
+                        <TextBlock  Margin="0,0,0,0" Text="{Binding MusicVolume}" HorizontalAlignment="Right" Width="45"/>
+                    </Grid>
+                    <TextBlock>Effect Volume</TextBlock>
+                    <Grid>
+                        <Slider Margin="0,0,65,0" Value="{Binding EffectVolume}" Maximum="100"/>
+                        <TextBlock  Margin="0,0,0,0" Text="{Binding EffectVolume}" HorizontalAlignment="Right" Width="45"/>
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Visual">
+                <StackPanel>
+                    <CheckBox>Is fullscreen</CheckBox>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        <Button Style="{DynamicResource ButtonStyle}" Content="x" HorizontalAlignment="Right" VerticalAlignment="Top" Width="28" Height="28" Command="{Binding ExitCommand}"/>
+    </Grid>
+</ek:UIRoot>

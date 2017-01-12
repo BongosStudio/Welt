@@ -1,0 +1,36 @@
+﻿<ek:UIRoot x:Class="UserInterface.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:UserInterface"
+             xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
+             xmlns:c="clr-namespace:EmptyKeys.UserInterface.Designer.Charts;assembly=EmptyKeys.UserInterface.Designer"
+             xmlns:cv="clr-namespace:UserInterface.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800"
+             Style="{DynamicResource UiStyle}">
+    <ek:UIRoot.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UserInterface;component/Dictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ek:UIRoot.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="67*"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="MainButtons" Grid.RowSpan="2">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
+                <Button Content="Singleplayer" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SingleplayerButtonCommand}"/>
+                <Button Content="Multiplayer" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding MultiplayerButtonCommand}" IsEnabled="False"/>
+                <Button Content="Settings" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SettingsButtonCommand}"/>
+                <Button Content="Exit" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding ExitButtonCommand}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</ek:UIRoot>

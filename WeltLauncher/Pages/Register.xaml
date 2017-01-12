@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="WeltLauncher.Pages.Register"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Style="{StaticResource ContentRoot}">
+        <ScrollViewer>
+            <StackPanel MinWidth="200">
+                <TextBlock Text="Register" Style="{StaticResource Heading2}" />
+                <TextBlock x:Name="ResponseTxt" Foreground="{StaticResource Accent}"/>
+                <TextBlock Text="Username"/>
+                <TextBox x:Name="UsernameTxt" HorizontalAlignment="Left" Width="200"/>
+                <TextBlock>Password (minimum 6 characters)</TextBlock>
+                <PasswordBox x:Name="PasswordTxt" HorizontalAlignment="Left" Width="200"/>
+                <TextBlock>Confirm password</TextBlock>
+                <PasswordBox x:Name="ConfirmPasswordTxt" HorizontalAlignment="Left" Width="200"/>
+                <Button HorizontalAlignment="Left" Width="150" Margin="0, 20, 0, 20" Click="RegisterAccount">Register</Button>
+                <TextBlock Height="100" Width="300" HorizontalAlignment="Left" TextWrapping="Wrap">By clicking "register", you hereby agree to Welt's <TextBlock Foreground="{StaticResource Accent}" Cursor="Hand">Term's and Conditions</TextBlock></TextBlock>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

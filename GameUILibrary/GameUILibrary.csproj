@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{86C41467-C0A3-4079-A285-CF0EC80FEF6F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GameUILibrary</RootNamespace>
+    <AssemblyName>GameUILibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EmptyKeys.UserInterface, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI_MonoGame.2.5.0.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Common\AnyCPU\EmptyKeys.UserInterface.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.Core, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI_MonoGame.2.5.0.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Common\AnyCPU\EmptyKeys.UserInterface.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.Debug, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI_MonoGame.2.5.0.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Common\AnyCPU\EmptyKeys.UserInterface.Debug.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.MonoGame, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI_MonoGame.2.5.0.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\MonoGame\AnyCPU\EmptyKeys.UserInterface.MonoGame.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Converters\VisibilityConverter.cs" />
+    <Compile Include="GeneratedUI\Dictionary.xaml.cs" />
+    <Compile Include="GeneratedUI\Dictionary.xaml_bindings.cs" />
+    <Compile Include="GeneratedUI\Loading.xaml.cs" />
+    <Compile Include="GeneratedUI\Loading.xaml_bindings.cs" />
+    <Compile Include="GeneratedUI\MainMenu.xaml.cs" />
+    <Compile Include="GeneratedUI\MainMenu.xaml_bindings.cs" />
+    <Compile Include="GeneratedUI\Play.xaml.cs" />
+    <Compile Include="GeneratedUI\Play.xaml_bindings.cs" />
+    <Compile Include="GeneratedUI\SettingsMenu.xaml.cs" />
+    <Compile Include="GeneratedUI\SettingsMenu.xaml_bindings.cs" />
+    <Compile Include="GeneratedUI\SinglePlayerMenu.xaml.cs" />
+    <Compile Include="GeneratedUI\SinglePlayerMenu.xaml_bindings.cs" />
+    <Compile Include="GeneratedUI\Splash.xaml.cs" />
+    <Compile Include="GeneratedUI\Splash.xaml_bindings.cs" />
+    <Compile Include="Models\LoadingViewModel.cs" />
+    <Compile Include="Models\MainMenuViewModel.cs" />
+    <Compile Include="Models\PlayViewModel.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
+    <Compile Include="Models\SingleplayerViewModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="shaders\DirectionalBlurShader.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BehaviorsLicense.txt" />
+    <Content Include="license.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

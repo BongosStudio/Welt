@@ -1,0 +1,323 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
+                    xmlns:local="clr-namespace:UserInterface">
+    <SolidColorBrush x:Key="ButtonTextColor" Color="White" />
+    <SolidColorBrush x:Key="ButtonTextPressedColor" Color="White" />
+    <SolidColorBrush x:Key="ButtonTextHoverColor" Color="Gray" />
+    <SolidColorBrush x:Key="ButtonTextFocusedColor" Color="Gray" />
+    <SolidColorBrush x:Key="ForegroundColor" Color="WhiteSmoke"/>
+    <SolidColorBrush x:Key="BackgroundColor" Color="#2a2d34"/>
+    <SolidColorBrush x:Key="AccentColor" Color="#36558f"/>
+    <SolidColorBrush x:Key="HighlightColor" Color="#801a86"/>
+    <SolidColorBrush x:Key="LowlightColor" Color="#717478"/>
+    <SolidColorBrush x:Key="ActiveColor" Color="#645986"/>
+    <SolidColorBrush x:Key="SuccessColor" Color="#8fe388"/>
+    <SolidColorBrush x:Key="DisabledBackground" Color="#3d4046"/>
+    <SolidColorBrush x:Key="DisabledForeground" Color="Gray"/>
+
+    <Style TargetType="TabItem">
+        <Setter Property="Background" Value="{DynamicResource BackgroundColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True" Padding="5">
+                        <ContentPresenter Content="{TemplateBinding Header}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,2,10,2" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource AccentColor}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="MaxDropDownHeight" Value="150" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="32"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Image Name="PART_ComboBoxLeft" Source="{DynamicResource BackgroundColor}" SnapsToDevicePixels="True" />
+                        <Image Name="PART_ComboBoxCenter" Source="{DynamicResource BackgroundColor}" Grid.Column="1" Stretch="Fill" SnapsToDevicePixels="True" />
+                        <Image Name="PART_ComboBoxRight" Source="{DynamicResource BackgroundColor}" Grid.Column="2" SnapsToDevicePixels="True"/>
+
+                        <ToggleButton Name="PART_Button" ClickMode="Press" Grid.ColumnSpan="3" IsTabStop="False" Focusable="False" IsChecked="{TemplateBinding IsDropDownOpen}">
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <ContentPresenter Content="{TemplateBinding Content}" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+
+                        <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" Grid.Column="1" IsHitTestVisible="False" />
+
+                        <Popup Name="PART_Popup" MaxHeight="{TemplateBinding MaxDropDownHeight}" IsOpen="{TemplateBinding IsDropDownOpen}" Grid.ColumnSpan="3">
+                            <ScrollViewer>
+                                <StackPanel IsItemsHost="True" Margin="16,0,0,0"/>
+                            </ScrollViewer>
+                        </Popup>
+
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Source" Value="{DynamicResource ActiveColor}" TargetName="PART_ComboBoxLeft" />
+                            <Setter Property="Source" Value="{DynamicResource ActiveColor}" TargetName="PART_ComboBoxCenter" />
+                            <Setter Property="Source" Value="{DynamicResource ActiveColor}" TargetName="PART_ComboBoxRight" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SliderButtonStyle" TargetType="{x:Type RepeatButton}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent">
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="SliderThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border Name="PART_SliderThumb" Background="{DynamicResource ActiveColor}" SnapsToDevicePixels="True" Width="20" Height="20">
+                        
+                    </Border>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource AccentColor}" TargetName="PART_SliderThumb" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <ControlTemplate x:Key="HorizontalSlider" TargetType="{x:Type Slider}">
+        <Grid Height="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="12"/>
+            </Grid.ColumnDefinitions>
+            <Border Name="PART_SliderRailLeft" Background="{DynamicResource LowlightColor}" IsHitTestVisible="False" Height="10"/>
+            <Border Name="PART_SliderRailCenter" Grid.Column="1" Background="{DynamicResource LowlightColor}" IsHitTestVisible="False" Height="10"/>
+            <Border Name="PART_SliderRailRight" Grid.Column="2" Background="{DynamicResource LowlightColor}" IsHitTestVisible="False" Height="10"/>
+            <Track Name="PART_Track" Grid.ColumnSpan="3" Margin="6,0,6,0">
+                <Track.DecreaseRepeatButton>
+                    <RepeatButton Style="{DynamicResource SliderButtonStyle}" ClickMode="Press"/>
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb>
+                    <Thumb Style="{DynamicResource SliderThumbStyle}" />
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                    <RepeatButton Style="{DynamicResource SliderButtonStyle}" ClickMode="Press"/>
+                </Track.IncreaseRepeatButton>
+            </Track>
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type Slider}">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="Template" Value="{DynamicResource HorizontalSlider}" />
+    </Style>
+
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <ContentPresenter Content="{TemplateBinding Content}" />
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True" >
+                            <Setter Property="Foreground">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Gray" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True" >
+                            <Setter Property="Foreground">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Gray" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TextBoxScrollViewer" TargetType="ScrollViewer">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollViewer">
+                    <ScrollContentPresenter Name="PART_ScrollContentPresenter" SnapsToDevicePixels="True" 
+                        Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="UiStyle" TargetType="ek:UIRoot">
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+        <Setter Property="FontFamily" Value="Code 7x5"/>
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+    <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource BackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CaretBrush" Value="White" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="4"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition MinHeight="36" />
+                        </Grid.RowDefinitions>
+
+                        <Border Name="PART_TextBoxLeft" Background="{DynamicResource BackgroundColor}" IsHitTestVisible="False"/>
+                        <Border Name="PART_TextBoxCenter" Grid.Column="1" Background="{DynamicResource BackgroundColor}" IsHitTestVisible="False"/>
+                        <Border Name="PART_TextBoxRight" Grid.Column="2" Background="{DynamicResource BackgroundColor}" IsHitTestVisible="False"/>
+
+                        <ScrollViewer Name="PART_ScrollViewer" Margin="0,4,0,4" Grid.Column="1" Style="{DynamicResource TextBoxScrollViewer}" 
+                                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                            <TextBlock Text="{TemplateBinding Text}" TextAlignment="{TemplateBinding TextAlignment}" VerticalAlignment="Center"
+                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" />
+                        </ScrollViewer>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Background" Value="{DynamicResource DisabledBackground}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledForeground}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="true">
+                            <Setter Property="IsHitTestVisible" Value="True"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style BasedOn="{StaticResource {x:Type CheckBox}}" TargetType="CheckBox">
+        <Setter Property="Background" Value="{DynamicResource BackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+        
+        <Setter Property="Template">
+            <Setter.Value> 
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid Margin="0,0,10,0">
+                            <Border Name="PART_NotChecked" Background="{DynamicResource BackgroundColor}" Width="20" Height="20" />
+                            <Border Name="PART_CheckMark" Background="{DynamicResource AccentColor}" Width="20" Height="20" Visibility="Collapsed" BorderBrush="{DynamicResource BackgroundColor}" BorderThickness="4"/>
+                        </Grid>
+                        <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Visibility" Value="Visible" TargetName="PART_CheckMark" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" TargetName="PART_CheckMark" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" TargetName="PART_NotChecked" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="ButtonStyle" BasedOn="{StaticResource {x:Type Button}}" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource BackgroundColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True" Padding="5">
+                        <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource AccentColor}" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Background" Value="{DynamicResource DisabledBackground}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledForeground}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="true">
+                            <Setter Property="IsHitTestVisible" Value="True"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
