@@ -47,15 +47,15 @@ namespace Welt
         public void BeginWatch()
         {
             m_IsRunning = true;
-            new Thread(() =>
-            {
-                while (m_IsRunning)
-                {
-                    Update();
-                    Thread.Sleep(500);
-                }
-            })
-            { IsBackground = true }.Start();
+            //new Thread(() =>
+            //{
+            //    while (m_IsRunning)
+            //    {
+            //        Update();
+            //        Thread.Sleep(500);
+            //    }
+            //})
+            //{ IsBackground = true }.Start();
         }
 
         public void Destroy()

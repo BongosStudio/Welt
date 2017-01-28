@@ -20,7 +20,7 @@ namespace Welt.Cameras
 
         public Matrix View { get; protected set; }
         public Matrix Projection { get; protected set; }
-        public Matrix InverseViewProjection { get; protected set; }
+        public Matrix ReflectionViewMatrix { get; protected set; }
 
         public Vector3 Position
         {

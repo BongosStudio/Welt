@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GameUILibrary.Models
 {
-    public class SettingsModel : PlayViewModel
+    public class SettingsModel : PauseViewModel
     {
         private int m_MasterVol = 100;
         private int m_MusicVol = 100;

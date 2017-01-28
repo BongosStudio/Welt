@@ -68,7 +68,7 @@ namespace Welt.Forge.Generators
                             blockType = BlockType.DIRT;
                             if (octave1 < 0.2f)
                             {
-                                blockType = BlockType.ROCK;
+                                blockType = BlockType.STONE;
                             }
                         }
                     }

@@ -14,8 +14,11 @@ namespace Welt.Cameras
 {
     public class FirstPersonCamera : Camera
     {
+        public static FirstPersonCamera Instance;
+
         public FirstPersonCamera(Viewport viewport) : base(viewport)
         {
+            Instance = this;
         }
 
         public Vector3 Target { get; private set; }
@@ -67,7 +70,11 @@ namespace Welt.Cameras
 
             var cameraRotatedUpVector = Vector3.Transform(Vector3.Up, rotationMatrix);
             View = Matrix.CreateLookAt(Position, Target, cameraRotatedUpVector);
-            InverseViewProjection = Matrix.Invert(View * Projection);
+
+            var invertPos = Position;
+            invertPos.Y = -Position.Y + (-Position.Y * 20f); // TODO: add height*2f
+            var lookAt = invertPos + Vector3.Transform(Vector3.Forward, rotationMatrix);
+            ReflectionViewMatrix = Matrix.CreateLookAt(invertPos, lookAt, cameraRotatedUpVector);
             base.CalculateView();
         }
 

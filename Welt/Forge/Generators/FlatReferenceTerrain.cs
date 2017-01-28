@@ -28,7 +28,7 @@ namespace Welt.Forge.Generators
                          * block.Id = Id.empty;
                          */
                         else if (y < sizeY/2)
-                            block.Id = BlockType.ROCK;
+                            block.Id = BlockType.STONE;
                         else if (y == sizeY/2)
                         {
                             var i = chunk.Index.X%2 == 0

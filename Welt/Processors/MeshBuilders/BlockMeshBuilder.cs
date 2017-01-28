@@ -1,7 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Welt.Blocks;
 using Welt.Forge;
 using Welt.Types;
+using Welt.Models;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Welt.Processors.MeshBuilders
 {
@@ -16,18 +20,24 @@ namespace Welt.Processors.MeshBuilders
             {
                 case BlockType.TORCH:
                     return TorchBuilder.BuildPostVertexList;
-                case BlockType.RED_FLOWER:
+                case BlockType.FLOWER_ROSE:
                     return PlantBuilder.BuildPlantVertexList;
                 case BlockType.LONG_GRASS:
                     return GrassBuilder.BuildGrassVertexList;
+                case BlockType.SNOW:
+                    return SnowCapBuilder.BuildBlockVertexList;
+                case BlockType.LADDER:
+                    return LadderBuilder.BuildLadderVertexList;
                 default:
                     return UniformCubeBuilder.BuildBlockVertexList;
             }
         }
 
-        protected static void AddVertex(Chunk chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelativePosition,
-            Vector3 vertexAdd, Vector3 normal, Vector2 uv1, float sunLight, Color localLight)
+        protected static void AddPlane(Chunk chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelPos, 
+            BlockFaceDirection face, float[] sun, Color[] local, Vector3[] vadds, Vector2[] uvs, short[] ins)
         {
+            if (vadds.Length != uvs.Length) throw new ArgumentException("vadds and uvs must be same size");
+
             var effect = BlockEffect.None;
 
             switch (blockType)
@@ -35,50 +45,46 @@ namespace Welt.Processors.MeshBuilders
                 case BlockType.WATER:
                     effect = BlockEffect.LightLiquidEffect;
                     break;
-                case BlockType.RED_FLOWER:
+                case BlockType.FLOWER_ROSE:
                 case BlockType.LONG_GRASS:
                 case BlockType.LEAVES:
                     effect = BlockEffect.VegetationWindEffect;
                     break;
             }
-
-            if (!Block.IsTransparentBlock(blockType))
-                chunk.PrimaryVertexList.Add(new VertexPositionTextureLightEffect(
-                    (Vector3)blockPosition + vertexAdd, uv1, sunLight,
-                    localLight.ToVector3(), effect));
-            else
-                chunk.SecondaryVertexList.Add(new VertexPositionTextureLightEffect(
-                    (Vector3)blockPosition + vertexAdd, uv1, sunLight,
-                    localLight.ToVector3(), effect));
-        }
-
-        #region AddIndex
-
-        protected static void AddIndex(Chunk chunk, ushort blockType, short i1, short i2, short i3, short i4, short i5,
-            short i6)
-        {
-            if (!Block.IsTransparentBlock(blockType))
+            var overlay = BlockProvider.GetProvider(blockType).GetOverlay(face);
+            var vertices = new VertexPositionTextureLightEffect[vadds.Length];
+            for (var i = 0; i < vertices.Length; i++)
             {
-                chunk.PrimaryIndexList.Add((short)(chunk.PrimaryVertexCount + i1));
-                chunk.PrimaryIndexList.Add((short)(chunk.PrimaryVertexCount + i2));
-                chunk.PrimaryIndexList.Add((short)(chunk.PrimaryVertexCount + i3));
-                chunk.PrimaryIndexList.Add((short)(chunk.PrimaryVertexCount + i4));
-                chunk.PrimaryIndexList.Add((short)(chunk.PrimaryVertexCount + i5));
-                chunk.PrimaryIndexList.Add((short)(chunk.PrimaryVertexCount + i6));
-                chunk.PrimaryVertexCount += 4;
+                vertices[i] = new VertexPositionTextureLightEffect(
+                    vadds[i] + (Vector3)blockPosition,
+                    uvs[i], overlay, sun[i], local[i].ToVector3(), effect);
+            }
+            if (!Block.IsOpaqueBlock(blockType))
+            {
+                lock (chunk)
+                {
+                    chunk.PrimaryVertexList.AddRange(vertices);
+                    chunk.PrimaryIndexList.AddRange(ins.Select(ii => (short)(ii + chunk.PrimaryVertexCount)));
+                    
+                    //chunk.PrimaryPlaneIndex.Add(
+                    //    FastMath.Get4DHash((int)chunkRelPos.X, (int)chunkRelPos.Y, (int)chunkRelPos.Z, (int)face),
+                    //    (chunk.PrimaryVertexCount, vertices.Length));
+                    chunk.PrimaryVertexCount += vertices.Length;
+                }
             }
             else
             {
-                chunk.SecondaryIndexList.Add((short)(chunk.SecondaryVertexCount + i1));
-                chunk.SecondaryIndexList.Add((short)(chunk.SecondaryVertexCount + i2));
-                chunk.SecondaryIndexList.Add((short)(chunk.SecondaryVertexCount + i3));
-                chunk.SecondaryIndexList.Add((short)(chunk.SecondaryVertexCount + i4));
-                chunk.SecondaryIndexList.Add((short)(chunk.SecondaryVertexCount + i5));
-                chunk.SecondaryIndexList.Add((short)(chunk.SecondaryVertexCount + i6));
-                chunk.SecondaryVertexCount += 4;
+                lock (chunk)
+                {
+                    chunk.SecondaryVertexList.AddRange(vertices);
+                    chunk.SecondaryIndexList.AddRange(ins.Select(ii => (short)(ii + chunk.SecondaryVertexCount)));
+                    //chunk.SecondaryPlaneIndex.Add(
+                    //    FastMath.Get4DHash((int)chunkRelPos.X, (int)chunkRelPos.Y, (int)chunkRelPos.Z, (int)face),
+                    //    (chunk.SecondaryVertexCount, vertices.Length));
+                    chunk.SecondaryVertexCount += vertices.Length;
+                }
             }
+            
         }
-
-        #endregion
     }
 }

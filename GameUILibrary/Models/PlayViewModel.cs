@@ -1,30 +1,63 @@
-﻿#region Copyright
-
-// COPYRIGHT 2016 JUSTIN COX (CONJI)
-
-#endregion Copyright
-
-using EmptyKeys.UserInterface;
-using EmptyKeys.UserInterface.Input;
-using EmptyKeys.UserInterface.Mvvm;
+﻿using EmptyKeys.UserInterface.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GameUILibrary.Models
 {
     public class PlayViewModel : ViewModelBase
     {
-        public RelayCommand OptionsButtonCommand { get; set; }
-        private Visibility m_PmVis = Visibility.Collapsed;
-        public Visibility PauseMenuVisibility
+        private string m_SelectedItemName;
+        public string SelectedItemName
         {
-            get { return m_PmVis; }
+            get { return m_SelectedItemName; }
             set
             {
-                if (m_PmVis == value) return;
-                m_PmVis = value;
+                if (value == "Air") m_SelectedItemName = "";
+                else m_SelectedItemName = value;
                 RaisePropertyChanged();
             }
         }
-        public RelayCommand QuitButtonCommand { get; set; }
-        public RelayCommand ResumeButtonCommand { get; set; }
+
+        private string m_ChatBoxText;
+
+        public string ChatBoxText
+        {
+            get { return m_ChatBoxText; }
+            set
+            {
+                m_ChatBoxText = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string m_ChatBoxInput;
+        public string ChatBoxInput
+        {
+            get { return m_ChatBoxInput; }
+            set
+            {
+                m_ChatBoxInput = ChatBoxInput;
+                RaisePropertyChanged();
+            }
+        }
+
+        private bool m_ChatBoxInputSelected;
+        public bool IsChatBoxSelected
+        {
+            get { return m_ChatBoxInputSelected; }
+            set
+            {
+                m_ChatBoxInputSelected = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public void AddMessage(string message)
+        {
+            ChatBoxText += Environment.NewLine + message;
+        }
     }
 }

@@ -7,20 +7,32 @@ namespace Welt.Forge
 {
     public class BlockPalette
     {
+        private struct BlockDataWrapper
+        {
+            public ushort Id;
+            public byte Metadata;
+
+            public BlockDataWrapper(ushort id, byte metadata)
+            {
+                Id = id;
+                Metadata = metadata;
+            }
+        }
+
         private byte m_NextAvailableSlot = 1;
-        private (ushort Id, byte Metadata)[] m_BlockInstances = new (ushort, byte)[64];
+        private BlockDataWrapper[] m_BlockInstances = new BlockDataWrapper[64];
         private LightMap m_LightMap;
-        private NibbleArray m_Indices;
-        private NibbleArray m_R, m_G, m_B, m_S;
+        private byte[] m_Indices;
+        private byte[] m_R, m_G, m_B, m_S;
 
         public BlockPalette(int size)
         {
-            m_Indices = new NibbleArray(size);
-            m_BlockInstances[0] = (0, 0);
-            m_R = new NibbleArray(size);
-            m_G = new NibbleArray(size);
-            m_B = new NibbleArray(size);
-            m_S = new NibbleArray(size);
+            m_Indices = new byte[size];
+            m_BlockInstances[0] = new BlockDataWrapper(0, 0);
+            m_R = new byte[size];
+            m_G = new byte[size];
+            m_B = new byte[size];
+            m_S = new byte[size];
         }
 
         public Block this[long index]
@@ -107,13 +119,13 @@ namespace Welt.Forge
             m_B[index] = value;
         }
 
-        private bool TryGetIndex((ushort Id, byte Meta) block, out byte index)
+        private bool TryGetIndex(BlockDataWrapper block, out byte index)
         {
             for (byte i = 0; i < m_NextAvailableSlot; ++i)
             {
                 var c = m_BlockInstances[i];
                 //Debug.WriteLine($"Comparing {block.Id};{block.Meta} to {c.Id};{c.Metadata}");
-                if (m_BlockInstances[i].Id == block.Id && m_BlockInstances[i].Metadata == block.Meta)
+                if (m_BlockInstances[i].Id == block.Id && m_BlockInstances[i].Metadata == block.Metadata)
                 {
                     //Debug.WriteLine($"Match found at {i}");
                     index = i;
@@ -137,15 +149,21 @@ namespace Welt.Forge
             return true;
         }
 
+        private int GetIndex(int index)
+        {
+            return m_Indices[index];
+        }
+
         private Block GetBlockData(int index)
         {
-            var data = m_BlockInstances[m_Indices[index]];
-            return new Block(data.Id, data.Metadata, m_R[index], m_G[index], m_B[index], m_S[index]);
+            var data = m_BlockInstances[GetIndex(index)];
+            var result = new Block(data.Id, data.Metadata, m_R[index], m_G[index], m_B[index], m_S[index]);
+            return result;
         }
 
         private void SetBlockData(int index, Block value)
         {
-            if (TryGetIndex((value.Id, value.Metadata), out var i))
+            if (TryGetIndex(new BlockDataWrapper(value.Id, value.Metadata), out var i))
             {
                 // i is the index within the indices where we have our USHORT/BYTE instance.
                 // first we set the index data

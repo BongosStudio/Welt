@@ -15,45 +15,36 @@ namespace Welt.Graphics
 {
     public class TextureMap
     {
-        public static Texture2D Texture { get; private set; }
         private static Dictionary<string, Vector2[][]> m_UvMappings = new Dictionary<string, Vector2[][]>();
-        private const int TEXTURE_ATLAS = 64;
+        private const int TEXTURE_ATLAS = 16;
 
-        public static void LoadTextures(GraphicsDevice graphics, string directory)
+        public Texture2D LoadBlockTextures(GraphicsDevice graphics, string directory)
         {
+            #region Block Textures
             var i = new Vector2(0);
-            var data = new List<byte>();
             var files = Directory.EnumerateFiles(directory, "*.png");
-            var d = (int)Math.Ceiling(Math.Sqrt(files.Count()));
-            var texture = new Bitmap(d * TEXTURE_ATLAS, d * TEXTURE_ATLAS);
-            var count = 0;
+            var d = (float)Math.Ceiling(Math.Sqrt(files.Count()));
+            var texture = new Bitmap((int)d * TEXTURE_ATLAS + TEXTURE_ATLAS, (int)d * TEXTURE_ATLAS + TEXTURE_ATLAS);
+            var final = System.Drawing.Graphics.FromImage(texture);
             foreach (var file in files)
             {
-                //images.Add(file.Replace(".png", ""), (Bitmap)Image.FromFile(file));
-                var name = file.Replace(".png", "");
-                var ofs = 1f / TEXTURE_ATLAS;
-
-                var yOfs = (int) (i.Y * ofs);
-                var xOfs = (int) (i.X * ofs);
+                var name = file.Replace(".png", "").Split('\\').Last();
+                
                 using (var image = (Bitmap)Image.FromFile(file))
                 {
-                    for (var x = 0; x < TEXTURE_ATLAS; ++x)
-                    {
-                        for (var y = 0; y < TEXTURE_ATLAS; ++y)
-                        {
-                            // This does not assign correct X and Y coords to texture.
-                            // work on tomorrow .3.
-                            //data.Add(image.Value.GetPixel(x, y));
-                            texture.SetPixel(xOfs + x, yOfs + y, image.GetPixel(x, y));
-                        }
-                    }
+                    final.DrawImage(image, i.X*TEXTURE_ATLAS, i.Y*TEXTURE_ATLAS, TEXTURE_ATLAS, TEXTURE_ATLAS);
                 }
 
-                    #region UV Mappings
+                #region UV Mappings
 
-                    var uvList = new[]
-                    {
-                        new Vector2[]
+                var ofs = TEXTURE_ATLAS / final.VisibleClipBounds.Width;
+
+                var yOfs = i.Y * ofs;
+                var xOfs = i.X * ofs;
+
+                var uvList = new[]
+                {
+                    new Vector2[]
                         {
                             new Vector2(xOfs, yOfs),
                             new Vector2(xOfs + ofs, yOfs),
@@ -110,8 +101,9 @@ namespace Welt.Graphics
                     };
 
                 #endregion
+
                 m_UvMappings.Add(name, uvList);
-                Debug.WriteLine($"Assigning {name} to {i}");
+                Debug.WriteLine($"Generated texture {name}:{i}");
                 if (i.X < d)
                     i.X++;
                 else
@@ -119,97 +111,32 @@ namespace Welt.Graphics
                     i.Y++;
                     i.X = 0;
                 }
-                count++;
             }
-
-            // enumerate the images, stitch, and add the UVs to local data
-            //var data = new List<System.Drawing.Color>();
-            //foreach (var image in images)
-            //{
-            //    var ofs = 1f / TEXTURE_ATLAS;
-
-            //    var yOfs = i.Y * ofs;
-            //    var xOfs = i.X * ofs;
-
-            //    for (var x = 0; x < TEXTURE_ATLAS; ++x)
-            //    {
-            //        for (var y = 0; y < TEXTURE_ATLAS; ++y)
-            //        {
-            //            data.Add(image.Value.GetPixel(x, y));
-            //            //texture.SetPixel((int) i.X + x, (int) i.Y + y, image.Value.GetPixel(x, y));
-            //        }
-            //    }
-
-            //    #region UV Mappings
-
-            //    var uvList = new[]
-            //    {
-            //        new Vector2[]
-            //        {
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs)
-            //        },
-            //        new Vector2[]
-            //        {
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs + ofs)
-            //        },
-            //        new Vector2[]
-            //        {
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs)
-            //        },
-            //        new Vector2[]
-            //        {
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs)
-            //        },
-            //        new Vector2[]
-            //        {
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs + ofs)
-            //        },
-            //        new Vector2[]
-            //        {
-            //            new Vector2(xOfs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs, yOfs + ofs),
-            //            new Vector2(xOfs + ofs, yOfs),
-            //            new Vector2(xOfs + ofs, yOfs + ofs)
-            //        }
-            //    };
-
-            //    #endregion
-
-            //    m_UvMappings.Add(image.Key, uvList);
-            //}
-            //Texture.SetData(data.ToArray());
-            using (var stream = new FileStream("test.png", FileMode.Create))
+            final.Save();
+            texture.Save("test.png");
+            using (var stream = new MemoryStream())
             {
                 texture.Save(stream, ImageFormat.Png);
-                //Texture.SaveAsPng(stream, d * TEXTURE_ATLAS, d * TEXTURE_ATLAS);
+                stream.Seek(0, SeekOrigin.Begin);
+                return Texture2D.FromStream(graphics, stream);
             }
+
+            #endregion
+            
+        }
+
+        public Texture2D LoadTexture(GraphicsDevice graphics, string name)
+        {
+            using (var stream = new FileStream(name, FileMode.Open))
+            {
+                return Texture2D.FromStream(graphics, stream);
+            }
+        }
+
+        public static Vector2[] GetTexture(string name, BlockFaceDirection face)
+        {
+            var uvs = m_UvMappings[name][(int)face];
+            return uvs;
         }
     }
 }

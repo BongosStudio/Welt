@@ -39,7 +39,13 @@ namespace Welt.Types
         /// </summary>
         public byte this[int index]
         {
-            get { return (byte)(Data[index / 2] >> ((index) % 2 * 4) & 0xF); }
+            get
+            {
+                //var data = Data[index / 2];
+                //var shift = ((index) % 2 * 4) & 0xF;
+                //return (byte)(data >> shift);
+                return (byte)(Data[index / 2] >> ((index) % 2 * 4) & 0xF);
+            }
             set
             {
                 value &= 0xF;

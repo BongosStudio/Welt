@@ -74,8 +74,9 @@ namespace Welt.Processors
         private void PropogateLightSun(Chunk chunk, uint x, uint y, uint z, byte light)
         {
             var offset = (int) (x*Chunk.FlattenOffset + z*Chunk.Size.Y + y);
-            if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
-            if (chunk.Blocks[offset].Sun >= light) return;
+            var block = chunk.Blocks[offset];
+            if (block.Id != BlockType.NONE && block.Id != BlockType.WATER) return;
+            if (block.Sun >= light) return;
             chunk.Blocks.SetBlockSun(offset, light);
 
             if (light <= 1) return;
@@ -105,8 +106,9 @@ namespace Welt.Processors
             try
             {
                 var offset = (int)(x * Chunk.FlattenOffset + z * Chunk.Size.Y + y);
-                if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
-                if (chunk.Blocks[offset].R >= lightR) return;
+                var block = chunk.Blocks[offset];
+                if (!Block.IsOpaqueBlock(block.Id)) return;
+                if (block.R >= lightR) return;
                 chunk.Blocks.SetRLight(offset, lightR);
                 if (chunk.State > ChunkState.Lighting) chunk.State = ChunkState.AwaitingBuild;
                 if (lightR <= 1) return;
@@ -135,8 +137,9 @@ namespace Welt.Processors
             try
             {
                 var offset = (int)(x * Chunk.FlattenOffset + z * Chunk.Size.Y + y);
-                if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
-                if (chunk.Blocks[offset].G >= lightG) return;
+                var block = chunk.Blocks[offset];
+                if (!Block.IsOpaqueBlock(block.Id)) return;
+                if (block.G >= lightG) return;
                 chunk.Blocks.SetGLight(offset, lightG);
 
                 if (lightG <= 1) return;
@@ -164,8 +167,9 @@ namespace Welt.Processors
             try
             {
                 var offset = (int)(x * Chunk.FlattenOffset + z * Chunk.Size.Y + y);
-                if (chunk.Blocks[offset].Id != BlockType.NONE && chunk.Blocks[offset].Id != BlockType.WATER) return;
-                if (chunk.Blocks[offset].B >= lightB) return;
+                var block = chunk.Blocks[offset];
+                if (!Block.IsOpaqueBlock(block.Id)) return;
+                if (block.B >= lightB) return;
                 chunk.Blocks.SetBLight(offset, lightB);
 
                 if (lightB <= 1) return;
@@ -197,6 +201,7 @@ namespace Welt.Processors
             FillLightingR(chunk);
             FillLightingG(chunk);
             FillLightingB(chunk);
+            chunk.State = ChunkState.AwaitingRebuild;
         }
 
         private void FillLightingSun(Chunk chunk)

@@ -10,6 +10,9 @@ using Welt.Blocks;
 using Welt.Forge;
 using Welt.Types;
 using Welt.Processors.MeshBuilders;
+using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 // ReSharper disable PossibleLossOfFraction
 
@@ -116,12 +119,14 @@ namespace Welt.Processors
                 }
             }
 
-            lock (chunk)
+            var start = DateTime.Now;
+
+            var pvwr = new WeakReference<VertexPositionTextureLightEffect[]>(chunk.PrimaryVertexList.ToArray());
+            var pi = chunk.PrimaryIndexList.ToArray();
+            var svwr = new WeakReference<VertexPositionTextureLightEffect[]>(chunk.SecondaryVertexList.ToArray());
+            var si = chunk.SecondaryIndexList.ToArray();
+            if (pvwr.TryGetTarget(out var pv))
             {
-                var pv = chunk.PrimaryVertexList.ToArray();
-                var pi = chunk.PrimaryIndexList.ToArray();
-                var sv = chunk.SecondaryVertexList.ToArray();
-                var si = chunk.SecondaryIndexList.ToArray();
                 if (pv.Length > 0)
                 {
                     chunk.PrimaryVertexBuffer = new VertexBuffer(m_GraphicsDevice, typeof(VertexPositionTextureLightEffect), pv.Length,
@@ -131,32 +136,40 @@ namespace Welt.Processors
                         BufferUsage.WriteOnly);
                     chunk.PrimaryIndexBuffer.SetData(pi);
                 }
+            }
+            if (svwr.TryGetTarget(out var sv))
+            {
                 if (sv.Length > 0)
                 {
                     chunk.SecondaryVertexBuffer = new VertexBuffer(m_GraphicsDevice, typeof(VertexPositionTextureLightEffect), sv.Length,
                         BufferUsage.WriteOnly);
+
                     chunk.SecondaryVertexBuffer.SetData(sv);
                     chunk.SecondaryIndexBuffer = new IndexBuffer(m_GraphicsDevice, IndexElementSize.SixteenBits, si.Length,
                         BufferUsage.WriteOnly);
                     chunk.SecondaryIndexBuffer.SetData(si);
                 }
             }
-
-            chunk.Dirty = false;
+            chunk.PrimaryVertexList.Clear();
+            chunk.SecondaryVertexList.Clear();
+            chunk.PrimaryIndexList.Clear();
+            chunk.SecondaryIndexList.Clear();
+            //GC.Collect();
         }
 
         #endregion
 
+        
         public void ProcessChunk(Chunk chunk)
         {
             if (chunk == null) return;
-            chunk.Clear();
+            
+            lock (chunk)
+            {
+                chunk.Clear();
+            }
             BuildVertexList(chunk);
-        }
-
-        public void ProcessChunk(Chunk chunk, Vector3I position)
-        {
-
+            chunk.State = Models.ChunkState.Ready;
         }
     }
 }

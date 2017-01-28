@@ -18,6 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Welt.Components;
 using Welt.Controllers;
+using Welt.Forge;
 using Welt.Graphics;
 using Welt.Scenes;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
@@ -38,6 +39,7 @@ namespace Welt
         public GameSettings GameSettings { get; private set; }
         public AudioFactory Audio { get; private set; }
         public TaskManagerComponent TaskManager { get; private set; }
+        public GraphicsManager GraphicsManager { get; private set; }
         
         private readonly GraphicsDeviceManager m_Graphics;
         private MonoGameEngine m_UiEngine;
@@ -52,6 +54,7 @@ namespace Welt
             Content.RootDirectory = "Content";
             Audio = new AudioFactory(this);
             TaskManager = new TaskManagerComponent(this);
+            GraphicsManager = new GraphicsManager(this);
             Components.Add(TaskManager);
             // initialize the player
         }
@@ -77,10 +80,12 @@ namespace Welt
             var fullscreen = GameSettings.DisplayMode == WindowDisplayMode.TrueFullScreen;
             int height;
             int width;
+            var allowResize = false;
             if (GameSettings.DisplayMode == WindowDisplayMode.Windowed)
             {
                 height = 600;
                 width = 800;
+                allowResize = true;
             }
             else
             {
@@ -91,8 +96,8 @@ namespace Welt
             {
                 Window.Position = new Point(0);
                 Window.IsBorderless = true;
-                Window.AllowUserResizing = false;
             }
+            Window.AllowUserResizing = allowResize;
             var graphics = new GraphicsDeviceManager(this)
             {
                 IsFullScreen = fullscreen,
@@ -108,13 +113,13 @@ namespace Welt
         private void Graphics_DeviceCreated(object sender, EventArgs e)
         {
             CreateUiEngine();
-            
         }
 
         private void Graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
         {
             Width = m_Graphics.PreferredBackBufferWidth;
             Height = m_Graphics.PreferredBackBufferHeight;
+            e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
         }
 
         private void CreateUiEngine()
@@ -138,7 +143,6 @@ namespace Welt
                 ThrowHelper.Throw<Exception>(args.ExceptionObject,
                     args.IsTerminating ? ThrowType.Severe : ThrowType.Error);
             };
-            //TextureMap.LoadTextures(GraphicsDevice, "textures");
             IsMouseVisible = true;
             Window.ClientSizeChanged += (sender, args) =>
             {
@@ -147,7 +151,6 @@ namespace Welt
                 GraphicsDevice.PresentationParameters.BackBufferWidth = Width;
                 GraphicsDevice.PresentationParameters.BackBufferHeight = Height;
                 GraphicsDevice.Viewport = new Viewport(0, 0, Width, Height, 0, 1);
-                //CreateUiEngine();
             };
             base.Initialize();
             Height = Window.ClientBounds.Height;
@@ -155,8 +158,9 @@ namespace Welt
             SetCursor(Cursors.Default);
             SceneController.Initialize(m_Graphics, new MainMenuScene(this));
             // TODO: load audio 
-            //TextureMap.LoadTextures(GraphicsDevice, "textures");
-            IsMouseVisible = true;
+            // TODO: move these to a splash screen
+            GraphicsManager.Initialize();
+            BlockProvider.CreateProviders();
         }
 
         #endregion Initialize
@@ -177,9 +181,6 @@ namespace Welt
         protected override void Draw(GameTime gameTime)
         {
             SceneController.Draw(gameTime);
-            // Idk if we'll need to switch ui draw and base draw. UI should always be on top but
-            // again, idk if there is anything base is drawing.
-            //m_UiRoot?.Draw(gameTime);
             base.Draw(gameTime);
         }
 

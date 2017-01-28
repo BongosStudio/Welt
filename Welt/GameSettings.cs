@@ -48,6 +48,7 @@ namespace Welt
 #else
             = WindowDisplayMode.FakeFullScreen;
 #endif
-
+        public int RenderDistance { get; set; } = 14;
+        public int CacheDistance { get; set; } = 16;
     }
 }

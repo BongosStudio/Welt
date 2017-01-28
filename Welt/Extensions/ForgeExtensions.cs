@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -95,6 +97,24 @@ namespace Welt.Extensions
                 }
             }
             return blocks.ToArray();
+        }
+
+        public static void DrawPrimaryBuffer(this Chunk chunk, GraphicsDevice graphics)
+        {
+            if (chunk.PrimaryVertexCount == 0 || chunk.PrimaryVertexBuffer == null || chunk.PrimaryIndexBuffer == null)
+                return;
+            graphics.SetVertexBuffer(chunk.PrimaryVertexBuffer);
+            graphics.Indices = chunk.PrimaryIndexBuffer;
+            graphics?.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.PrimaryVertexCount);
+        }
+
+        public static void DrawSecondaryBuffer(this Chunk chunk, GraphicsDevice graphics)
+        {
+            if (chunk.SecondaryVertexCount == 0 || chunk.SecondaryVertexBuffer == null || chunk.SecondaryIndexBuffer == null)
+                return;
+            graphics.SetVertexBuffer(chunk.SecondaryVertexBuffer);
+            graphics.Indices = chunk.SecondaryIndexBuffer;
+            graphics?.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.SecondaryVertexCount);
         }
     }
 }

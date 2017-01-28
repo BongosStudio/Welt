@@ -81,7 +81,7 @@
     <Compile Include="Blocks\BlockFaceDirection.cs" />
     <Compile Include="Blocks\BlockTexture.cs" />
     <Compile Include="Blocks\VertexPositionDualTexture.cs" />
-    <Compile Include="Blocks\VertexPositionTextureLight.cs" />
+    <Compile Include="Blocks\VertexPositionTextureLightEffect.cs" />
     <Compile Include="Blocks\VertexPositionTextureShade.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\FirstPersonCamera.cs" />
@@ -111,7 +111,19 @@
     <Compile Include="Forge\Block.cs" />
     <Compile Include="Forge\BlockPalette.cs" />
     <Compile Include="Forge\BlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\DefaultBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\DirtBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\GrassBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\LadderBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\LavaBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\LeavesBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\RoseBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\SandBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\SnowBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\StoneBlockProvider.cs" />
     <Compile Include="Forge\BlockProviders\TorchBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\WaterBlockProvider.cs" />
+    <Compile Include="Forge\BlockProviders\WoodBlockProvider.cs" />
     <Compile Include="Forge\LightMap.cs" />
     <Compile Include="Forge\MetadataConverters\TorchMetadataConverter.cs" />
     <Compile Include="Forge\Chunk.cs" />
@@ -135,6 +147,7 @@
     <Compile Include="Forge\WorldHelpers.cs" />
     <Compile Include="Forge\WorldType.cs" />
     <Compile Include="GameSettings.cs" />
+    <Compile Include="Graphics\GraphicsManager.cs" />
     <Compile Include="Graphics\TextureCell.cs" />
     <Compile Include="Graphics\TextureDataAttribute.cs" />
     <Compile Include="Graphics\TextureMap.cs" />
@@ -151,6 +164,7 @@
     <Compile Include="Models\ChunkState.cs" />
     <Compile Include="Models\InventoryContainer.cs" />
     <Compile Include="Models\Maybe.cs" />
+    <Compile Include="Models\Plane.cs" />
     <Compile Include="Models\Player.cs" />
     <Compile Include="Particles\ParticleEmitter.cs" />
     <Compile Include="Particles\ParticleSettings.cs" />
@@ -166,7 +180,9 @@
     <Compile Include="Processors\LightingChunkProcessor.cs" />
     <Compile Include="Processors\MeshBuilders\BlockMeshBuilder.cs" />
     <Compile Include="Processors\MeshBuilders\GrassBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\LadderBuilder.cs" />
     <Compile Include="Processors\MeshBuilders\PlantBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\SnowCapBuilder.cs" />
     <Compile Include="Processors\MeshBuilders\TorchBuilder.cs" />
     <Compile Include="Processors\MeshBuilders\UniformCubeBuilder.cs" />
     <Compile Include="Processors\VertexBuildChunkProcessor.cs" />
@@ -285,6 +301,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Content\Effects\PointLight.fx" />
     <None Include="Content\Fonts\Arial_13.5_Regular.spritefont" />
     <None Include="Content\Fonts\Code_7x5_13.5_Regular.spritefont" />
     <None Include="Content\Fonts\console.spritefont" />

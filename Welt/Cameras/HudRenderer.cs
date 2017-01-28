@@ -62,7 +62,7 @@ namespace Welt.Cameras
             var cx = x/Chunk.Size.X;
             var cz = z/Chunk.Size.Z;
 
-            var chunk = World.Chunks.GetChunk(cx, 0, cz);
+            var chunk = World.ChunkManager.GetChunk(cx, 0, cz);
 
             for (var xx = 0; xx < Chunk.Size.X; xx++)
             {

@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Xna.Framework;
 using System;
 using Welt.Blocks;
 using Welt.Types;
@@ -17,24 +18,14 @@ namespace Welt.Forge.BlockProviders
         };
 
         public override ushort BlockId => BlockType.TORCH;
-        public override string BlockName => "torch";
-        public override string BlockTitle
-        {
-            get
-            {
-                return m_BlockTitle;
-            }
+        public override string BlockName => "torch_on";
+        public override string BlockTitle { get; set; } = "Torch";
+        public override bool IsOpaque { get; set; } = true;
+        public override bool HasCollision { get; set; } = false;
 
-            set
-            {
-                m_BlockTitle = value;
-            }
-        }
-        private string m_BlockTitle = "Torch";
-
-        public static Vector3B GetLightLevel(byte meta)
+        public override Vector3B GetLightLevel(byte metadata)
         {
-            return m_LightColor[NibbleArray.GetData(meta).Item1];
+            return m_LightColor[NibbleArray.GetData(metadata).Item1];
         }
 
         public static BlockFaceDirection GetPost(byte meta)
@@ -42,9 +33,9 @@ namespace Welt.Forge.BlockProviders
             return (BlockFaceDirection)NibbleArray.GetData(meta).Item2;
         }
 
-        public override BlockTexture GetTexture(BlockFaceDirection faceDir, ushort blockAbove = 0)
+        public override BoundingBox GetBoundingBox(byte metadata)
         {
-            throw new NotImplementedException();
+            return new BoundingBox(new Vector3(0.4f, 0, 0.4f), new Vector3(0.6f));
         }
     }
 }

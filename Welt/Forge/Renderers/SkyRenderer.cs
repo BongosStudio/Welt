@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Cameras;
+using Welt.Graphics;
 
 #endregion
 
@@ -33,8 +34,8 @@ namespace Welt.Forge.Renderers
             // SkyDome
             SkyDome = content.Load<Model>("Models\\dome");
             SkyDome.Meshes[0].MeshParts[0].Effect = content.Load<Effect>("Effects\\SkyDome");
-            CloudMap = content.Load<Texture2D>("Textures\\cloudMap");
-            StarMap = content.Load<Texture2D>("Textures\\newStars2");
+            CloudMap = WeltGame.Instance.GraphicsManager.CloudTexture;
+            StarMap = WeltGame.Instance.GraphicsManager.StarTexture;
 
             ProjectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                 _mGraphicsDevice.Viewport.AspectRatio, 0.3f, 1000.0f);

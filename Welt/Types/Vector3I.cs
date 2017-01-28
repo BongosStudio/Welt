@@ -84,6 +84,11 @@ namespace Welt.Types
             return new Vector3I(v.X % by, v.Y % by, v.Z % by);
         }
 
+        public static Vector3I operator %(Vector3I v, int by)
+        {
+            return new Vector3I((uint)(v.X % by), (uint)(v.Y % by), (uint)(v.Z % by));
+        }
+
         public static uint DistanceSquared(Vector3I value1, Vector3I value2)
         {
             var x = value1.X - value2.X;
@@ -96,7 +101,7 @@ namespace Welt.Types
         public override int GetHashCode()
         {
             //TODO check this hashcode impl           
-            return (int)(X ^ Y ^ Z);
+            return (((int) X * 251) + (int) Y) * 251 + (int) Z;
         }
 
         public override string ToString()

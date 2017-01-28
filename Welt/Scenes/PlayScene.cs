@@ -12,39 +12,43 @@ using Welt.Forge.Renderers;
 using Welt.Models;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using EmptyKeys.UserInterface.Controls;
-using EmptyKeys.UserInterface.Generated;
-using EmptyKeys.UserInterface.Mvvm;
-using EmptyKeys.UserInterface;
-using GameUILibrary.Models;
-using Welt.Extensions;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using Welt.Particles;
+using EmptyKeys.UserInterface.Generated;
+using GameUILibrary.Models;
+using Welt.Extensions;
+using System.Windows.Forms;
 
 namespace Welt.Scenes
 {
     public class PlayScene : Scene
     {
-        private Play PlUi => new Play
+        private PlayUI m_PlayUi => new PlayUI
         {
-            DataContext = PlVm
+            DataContext = m_PlayViewModel
         };
-        private PlayViewModel PlVm => new PlayViewModel
+        private Pause m_PauseUi => new Pause
         {
-            QuitButtonCommand = new Action(() => Next(new MainMenuScene(Game))).CreateButtonCommand(),
-            OptionsButtonCommand = new Action(SwitchToSettings).CreateButtonCommand(),
-            ResumeButtonCommand = new Action(() => m_Player.IsPaused = false).CreateButtonCommand()
+            DataContext = new PauseViewModel
+            {
+                ResumeButtonCommand = 
+                new Action(SwitchToPlayUi).CreateButtonCommand(),
+                OptionsButtonCommand = 
+                new Action(SwitchToSettingsUi).CreateButtonCommand(),
+                QuitButtonCommand = 
+                new Action(() => Next(new MainMenuScene(Game))).CreateButtonCommand()
+            }
+        };
+        private SettingsMenu m_SettingsUi => new SettingsMenu
+        {
+            DataContext = new SettingsModel
+            {
+                ExitCommand =
+                new Action(SwitchToPauseUi).CreateButtonCommand()
+            }
         };
 
-        private SettingsMenu SeUi => new SettingsMenu
-        {
-            DataContext = SeVm
-        };
-        private SettingsModel SeVm => new SettingsModel
-        {
-            ExitCommand =
-                new Action(SwitchToPause).CreateButtonCommand()
-        };
+        private PlayViewModel m_PlayViewModel = new PlayViewModel();
 
         private World m_World;
         private IRenderer m_Renderer;
@@ -56,8 +60,7 @@ namespace Welt.Scenes
         private FramesPerSecondCounterComponent m_Fps;
         
         internal override Color BackColor => Color.GhostWhite;
-        internal override UIRoot UI { get; set; } = new Play();
-        internal override ViewModelBase DataContext { get; set; }
+        internal override UIRoot UI { get; set; }
 
         public PlayScene(WeltGame game, World worldToHandoff, IRenderer rendererToHandoff, SkyRenderer skyToHandoff,
             PlayerRenderer playerToHandoff) : base(game)
@@ -75,49 +78,70 @@ namespace Welt.Scenes
             Input.Assign(() =>
             {
                 m_Player.IsPaused = !m_Player.IsPaused;
-                PlVm.PauseMenuVisibility = m_Player.IsPaused ?
-                        Visibility.Visible : Visibility.Collapsed;
+                if (m_Player.IsPaused)
+                    UI = m_PauseUi;
+                else
+                    UI = m_PlayUi;
             }, Keys.Escape);
             Input.Assign(() =>
             {
+                m_Player.IsMouseLocked = !m_Player.IsMouseLocked;
+                if (m_Player.IsMouseLocked)
+                    Cursor.Show();
+                else
+                    Cursor.Hide();
+            }, Keys.RightAlt);
+            Input.Assign(() =>
+            {
                 m_Player.HotbarIndex = 0;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[0].Block.Id).BlockTitle;
             }, Keys.D1);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 1;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[1].Block.Id).BlockTitle;
             }, Keys.D2);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 2;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[2].Block.Id).BlockTitle;
             }, Keys.D3);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 3;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[3].Block.Id).BlockTitle;
             }, Keys.D4);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 4;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[4].Block.Id).BlockTitle;
             }, Keys.D5);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 5;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[5].Block.Id).BlockTitle;
             }, Keys.D6);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 6;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[6].Block.Id).BlockTitle;
             }, Keys.D7);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 7;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[7].Block.Id).BlockTitle;
             }, Keys.D8);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 8;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[8].Block.Id).BlockTitle;
             }, Keys.D9);
             Input.Assign(() =>
             {
                 m_Player.HotbarIndex = 9;
+                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[9].Block.Id).BlockTitle;
             }, Keys.D0);
+            UI = m_PlayUi;
         }
 
         #region Initialize
@@ -131,7 +155,6 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             // all world/sky renderers will be initialized before this in the loading scene
-            
             m_Hud.Initialize();
             m_Fps.Initialize();
         }
@@ -186,16 +209,6 @@ namespace Welt.Scenes
             if (m_World.Tod >= 24)
                 m_World.Tod = 0;
 
-            if (m_World.DayMode)
-            {
-                m_World.Tod = 12;
-                m_World.NightMode = false;
-            }
-            else if (m_World.NightMode)
-            {
-                m_World.Tod = 0;
-                m_World.DayMode = false;
-            }
 
             // Calculate the position of the sun based on the time of day.
             float x;
@@ -275,15 +288,21 @@ namespace Welt.Scenes
         }
 
         #region Private methods
-
-        private void SwitchToSettings()
+       
+        private void SwitchToPlayUi()
         {
-            UI = SeUi;
+            UI = m_PlayUi;
+            m_Player.IsPaused = false;
         }
 
-        private void SwitchToPause()
+        private void SwitchToPauseUi()
         {
-            UI = PlUi;
+            UI = m_PauseUi;
+        }
+
+        private void SwitchToSettingsUi()
+        {
+            UI = m_SettingsUi;
         }
 
         #endregion

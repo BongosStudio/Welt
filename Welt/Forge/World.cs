@@ -38,10 +38,10 @@ namespace Welt.Forge
         public World(string name)
         {
             //Chunks = new Dictionary2<Chunk>();//
-            Chunks = new ChunkManager(new ChunkPersistence(), this);
+            ChunkManager = new ChunkManager(new ChunkPersistence(), this);
             Name = name;
             Seed = 54321;
-            Origin = new Vector2(FastMath.NextRandom((int) Size), FastMath.NextRandom((int) Size));
+            Origin = new Vector2(FastMath.NextRandom(Size), FastMath.NextRandom(Size));
         }
 
         public World(string name, int seed) : this(name)
@@ -88,7 +88,7 @@ namespace Welt.Forge
 
         public bool InView(uint x, uint y, uint z)
         {
-            if (Chunks.GetChunk(x/Chunk.Size.X, 0, z/Chunk.Size.Z, false) == null)
+            if (ChunkManager.GetChunk(x/Chunk.Size.X, 0, z/Chunk.Size.Z, false) == null)
                 return false;
 
             var lx = x%Chunk.Size.X;
@@ -102,7 +102,7 @@ namespace Welt.Forge
 
         #region Fields
 
-        public ChunkManager Chunks;
+        public ChunkManager ChunkManager;
         
         /// <summary>
         ///     The name of the world.
@@ -119,7 +119,7 @@ namespace Welt.Forge
         ///     The size is a single uint value which represents both width and depth. This
         ///     means that a world may only be said amount of chunks wide and deep.
         /// </remarks>
-        public uint Size { get; set; } = 256;
+        public int Size { get; set; } = 256;
         /// <summary>
         ///     The <see cref="WorldType"/> of the world. Generators are bound by this value on
         ///     what may render and what sizes to adhere to.
@@ -151,7 +151,7 @@ namespace Welt.Forge
 
         // Day/Night
         public float Tod = 12; // Midday
-        public Vector3 SunPos = new Vector3(0, 1, 0); // Directly overhead
+        public Vector3 SunPos = new Vector3(0, 1000, 0); // Directly overhead
         public bool RealTime = false;
         public bool DayMode = false;
         public bool NightMode = false;
@@ -160,9 +160,9 @@ namespace Welt.Forge
         #region Atmospheric settings
 
         public Vector4 DeepWaterColor = Color.Black.ToVector4();
-        public Vector4 Nightcolor = Color.Red.ToVector4();
-        public Vector4 Suncolor = Color.White.ToVector4();
-        public Vector4 Horizoncolor = Color.White.ToVector4();
+        public Vector4 NightColor = Color.Red.ToVector4();
+        public Vector4 SunColor = Color.White.ToVector4();
+        public Vector4 HorizonColor = Color.White.ToVector4();
 
         public Vector4 Eveningtint = Color.Red.ToVector4();
         public Vector4 Morningtint = Color.Gold.ToVector4();
@@ -202,7 +202,7 @@ namespace Welt.Forge
             var cx = x/Chunk.Size.X;
             var cz = z/Chunk.Size.Z;
 
-            var at = Chunks.GetChunk(cx, 0, cz);
+            var at = ChunkManager.GetChunk(cx, 0, cz);
 
             return at;
         }
@@ -212,7 +212,7 @@ namespace Welt.Forge
             if (!InView(x, y, z))
                 return new Block(BlockType.NONE);
             //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
-            var chunk = Chunks.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
+            var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
             return chunk.Blocks[x%Chunk.Size.X*Chunk.FlattenOffset + z%Chunk.Size.Z*Chunk.Size.Y + y%Chunk.Size.Y];
             //Debug.WriteLine("no block at  ({0},{1},{2}) ", x, y, z);
         }
@@ -226,7 +226,7 @@ namespace Welt.Forge
             var x = pos.X;
             var y = pos.Y;
             var z = pos.Z;
-            var chunk = Chunks.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
+            var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
 
             var localX = (byte)(x % Chunk.Size.X);
             var localY = (byte)(y % Chunk.Size.Y);
@@ -237,34 +237,34 @@ namespace Welt.Forge
             chunk.SetBlock(localX, localY, localZ, newType);
 
             //Chunk should be responsible for maintaining this
-            chunk.State = ChunkState.AwaitingRelighting;
+            //chunk.State = ChunkState.AwaitingRelighting;
             //var affected = new List<Cardinal>();
 
             // use Chunk accessors
-            if (localX == 0)
-            {
-                if (chunk.E != null) chunk.E.State = ChunkState.AwaitingRelighting;
-                //affected.Add(Cardinal.E);
-            }
-            if (localX == Chunk.Max.X)
-            {
-                //viewableChunks[(x / Chunk.SIZE.X) + 1, z / Chunk.SIZE.Z].dirty = true;
-                if (chunk.W != null) chunk.W.State = ChunkState.AwaitingRelighting;
-                //affected.Add(Cardinal.W);
-            }
-            if (localZ == 0)
-            {
-                //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) - 1].dirty = true;
-                if (chunk.S != null) chunk.S.State = ChunkState.AwaitingRelighting;
-                //affected.Add(Cardinal.S);
-            }
-            if (localZ == Chunk.Max.Z)
-            {
-                //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) + 1].dirty = true;
-                if (chunk.N != null) chunk.N.State = ChunkState.AwaitingRelighting;
-                //affected.Add(Cardinal.N);
-            }
-            //OnBlockChanged(this, new BlockChangedEventArgs(newType.Id, new Vector3I(localX, y, localZ), chunk));
+            //if (localX == 0)
+            //{
+            //    if (chunk.E != null) chunk.E.State = ChunkState.AwaitingRelighting;
+            //    //affected.Add(Cardinal.E);
+            //}
+            //if (localX == Chunk.Max.X)
+            //{
+            //    //viewableChunks[(x / Chunk.SIZE.X) + 1, z / Chunk.SIZE.Z].dirty = true;
+            //    if (chunk.W != null) chunk.W.State = ChunkState.AwaitingRelighting;
+            //    //affected.Add(Cardinal.W);
+            //}
+            //if (localZ == 0)
+            //{
+            //    //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) - 1].dirty = true;
+            //    if (chunk.S != null) chunk.S.State = ChunkState.AwaitingRelighting;
+            //    //affected.Add(Cardinal.S);
+            //}
+            //if (localZ == Chunk.Max.Z)
+            //{
+            //    //viewableChunks[x / Chunk.SIZE.X, (z / Chunk.SIZE.Z) + 1].dirty = true;
+            //    if (chunk.N != null) chunk.N.State = ChunkState.AwaitingRelighting;
+            //    //affected.Add(Cardinal.N);
+            //}
+            OnBlockChanged(this, new BlockChangedEventArgs(newType.Id, new Vector3I(localX, y, localZ), chunk));
             return old;
         }
 
@@ -275,7 +275,7 @@ namespace Welt.Forge
                     new AccessViolationException("Cannot access block at this distance."));
             return Maybe<Block, Exception>.Check(() =>
             {
-                var chunk = Chunks.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
+                var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
 
                 var localX = (byte)(x % Chunk.Size.X);
                 var localY = (byte)(y % Chunk.Size.Y);

@@ -18,13 +18,14 @@ namespace Welt.Forge
         public const ushort GRASS = 2;
         public const ushort LAVA = 3;
         public const ushort LEAVES = 4;
-        public const ushort ROCK = 5;
+        public const ushort STONE = 5;
         public const ushort SAND = 6;
         public const ushort LOG = 7;
         public const ushort SNOW = 8;
-        public const ushort RED_FLOWER = 9;
+        public const ushort FLOWER_ROSE = 9;
         public const ushort LONG_GRASS = 10;
         public const ushort TORCH = 90;
+        public const ushort LADDER = 91;
         public const ushort WATER = 182;
         public const ushort MAXIMUM = ushort.MaxValue;
     }
@@ -99,15 +100,7 @@ namespace Welt.Forge
 
         public static Vector3B GetLightLevel(ushort id, byte metadata)
         {
-            switch (id)
-            {
-                case BlockType.LAVA:
-                    return new Vector3B(14, 0, 0);
-                case BlockType.TORCH:
-                    return TorchBlockProvider.GetLightLevel(metadata);
-                default:
-                    return new Vector3B();
-            }
+            return BlockProvider.GetProvider(id).GetLightLevel(metadata);
         }
 
         public static Vector3B GetLightLevel(BlockStack blocks)
@@ -115,26 +108,18 @@ namespace Welt.Forge
             return GetLightLevel(blocks.Block.Id, blocks.Block.Metadata);
         }
 
-        public static BoundingBox GetBoundingBox(ushort id, Vector3 position)
+        public static BoundingBox GetBoundingBox(ushort id, byte meta, Vector3 position)
         {
-            switch (id)
-            {
-                case BlockType.SNOW:
-                    return new BoundingBox(position, position + new Vector3(1, 0.1f, 1));
-                case BlockType.TORCH:
-                case BlockType.RED_FLOWER:
-                    return new BoundingBox(position + new Vector3(0.4f, 0, 0.4f), position + new Vector3(0.6f));
-                default:
-                    return new BoundingBox(position, position + new Vector3(1, 1, 1));
-            }
+            var b = BlockProvider.GetProvider(id);
+            return new BoundingBox(position + b.GetBoundingBox(meta).Min, position + b.GetBoundingBox(meta).Max);
         }
 
-        public static BlockTexture GetTexture(ushort blockType)
+        public static Vector2[] GetTexture(ushort blockType)
         {
             return GetTexture(blockType, BlockFaceDirection.Maximum, BlockType.NONE);
         }
 
-        public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir)
+        public static Vector2[] GetTexture(ushort blockType, BlockFaceDirection faceDir)
         {
             return GetTexture(blockType, faceDir, BlockType.NONE);
         }
@@ -144,36 +129,31 @@ namespace Welt.Forge
             return 1;
         }
 
-        public static bool IsCapBlock(ushort type)
+        public static bool IsCapBlock(ushort type, byte meta)
         {
-            if (type == BlockType.SNOW) return true;
-            return false;
+            return BlockProvider.GetProvider(type).GetBoundingBox(meta).Contains(
+                new BoundingBox(new Vector3(0, 0.21f, 0), new Vector3(1, 1, 1))) == ContainmentType.Contains;
         }
 
-        public static bool IsHalfBlock(ushort type)
+        public static bool IsHalfBlock(ushort type, byte meta)
         {
-            return false;
+            return BlockProvider.GetProvider(type).GetBoundingBox(meta).Contains(
+                new BoundingBox(new Vector3(0, 0.51f, 0), new Vector3(1, 1, 1))) == ContainmentType.Contains;
+        }
+
+        public static bool HasCollision(ushort type)
+        {
+            return BlockProvider.GetProvider(type).HasCollision;
         }
 
         public static bool IsSolidBlock(ushort type)
         {
-            switch (type)
-            {
-                case BlockType.NONE:
-                case BlockType.WATER:
-                case BlockType.SNOW:
-                case BlockType.RED_FLOWER:
-                case BlockType.LONG_GRASS:
-                case BlockType.TORCH:
-                    return false;
-                default:
-                    return true;
-            }
+            return BlockProvider.GetProvider(type).IsSolid;
         }
 
         public static bool IsPlantBlock(ushort type)
         {
-            return type == BlockType.RED_FLOWER;
+            return BlockProvider.GetProvider(type).IsPlantBlock;
         }
 
         public static bool IsGrassBlock(ushort type)
@@ -181,21 +161,9 @@ namespace Welt.Forge
             return type == BlockType.LONG_GRASS;
         }
 
-        public static bool IsTransparentBlock(ushort type)
+        public static bool IsOpaqueBlock(ushort type)
         {
-            switch (type)
-            {
-                case BlockType.NONE:
-                case BlockType.WATER:
-                case BlockType.LEAVES:
-                case BlockType.SNOW:
-                case BlockType.RED_FLOWER:
-                case BlockType.LONG_GRASS:
-                case BlockType.TORCH:
-                    return true;
-                default:
-                    return false;
-            }
+            return BlockProvider.GetProvider(type).IsOpaque;
         }
 
         public static bool WillForceRenderSide(ushort type, BlockFaceDirection face, ushort blockAtFace)
@@ -207,25 +175,12 @@ namespace Welt.Forge
                 case BlockType.WATER:
                     return face == BlockFaceDirection.YIncreasing && blockAtFace != BlockType.WATER;
                 case BlockType.LOG:
-                    return IsTransparentBlock(blockAtFace);
+                    return IsOpaqueBlock(blockAtFace);
                 default:
-                    return false;
+                    return !IsSolidBlock(blockAtFace);
             }
         }
-
-        public static bool CanPlaceAt(ushort type, ushort below, ushort occupant)
-        {
-            switch (type)
-            {
-                case BlockType.RED_FLOWER:
-                case BlockType.LONG_GRASS:
-                    if (occupant == BlockType.WATER) return false;
-                    return IsSolidBlock(below);
-                default:
-                    return !IsSolidBlock(occupant);
-            }
-        }
-
+        
         public static bool IsDiggable(ushort type)
         {
             return type != BlockType.WATER;
@@ -240,62 +195,9 @@ namespace Welt.Forge
         /// <param name="faceDir"></param>
         /// <param name="blockAbove">Reserved for blocks which behave differently if certain blocks are above them</param>
         /// <returns></returns>
-        public static BlockTexture GetTexture(ushort blockType, BlockFaceDirection faceDir, ushort blockAbove)
+        public static Vector2[] GetTexture(ushort blockType, BlockFaceDirection faceDir, ushort blockAbove)
         {
-            switch (blockType)
-            {
-                case BlockType.DIRT:
-                    return BlockTexture.Dirt;
-                case BlockType.GRASS:
-                    switch (faceDir)
-                    {
-                        case BlockFaceDirection.XIncreasing:
-                        case BlockFaceDirection.XDecreasing:
-                        case BlockFaceDirection.ZIncreasing:
-                        case BlockFaceDirection.ZDecreasing:
-                            return BlockTexture.GrassSide;
-                        case BlockFaceDirection.YIncreasing:
-                            return BlockTexture.GrassTop;
-                        case BlockFaceDirection.YDecreasing:
-                            return BlockTexture.Dirt;
-                        default:
-                            return BlockTexture.Rock;
-                    }
-                case BlockType.LAVA:
-                    return BlockTexture.Lava;
-                case BlockType.LEAVES:
-                    return BlockTexture.Leaves;
-                case BlockType.ROCK:
-                    return BlockTexture.Rock;
-                case BlockType.SAND:
-                    return BlockTexture.Sand;
-                case BlockType.SNOW:
-                    return BlockTexture.Snow;
-                case BlockType.LOG:
-                    switch (faceDir)
-                    {
-                        case BlockFaceDirection.XIncreasing:
-                        case BlockFaceDirection.XDecreasing:
-                        case BlockFaceDirection.ZIncreasing:
-                        case BlockFaceDirection.ZDecreasing:
-                            return BlockTexture.TreeHorizontal;
-                        case BlockFaceDirection.YIncreasing:
-                        case BlockFaceDirection.YDecreasing:
-                            return BlockTexture.TreeVertical;
-                        default:
-                            return BlockTexture.Rock;
-                    }
-                case BlockType.WATER:
-                    return BlockTexture.Water;
-                case BlockType.RED_FLOWER:
-                    return BlockTexture.Rose;
-                case BlockType.LONG_GRASS:
-                    return BlockTexture.Grass;
-                case BlockType.TORCH:
-                    return BlockTexture.Torch;
-                default:
-                    return BlockTexture.Rock;
-            }
+            return BlockProvider.GetProvider(blockType).GetTexture(faceDir, blockAbove);
         }
 
         #endregion

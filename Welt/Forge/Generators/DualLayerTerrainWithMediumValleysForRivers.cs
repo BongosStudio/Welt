@@ -101,7 +101,6 @@ namespace Welt.Forge.Generators
         {
             //BlockType blockType;
             //bool sunlit = true;
-
             for (byte x = 0; x < Chunk.Size.X; x++)
             {
                 for (byte z = 0; z < Chunk.Size.Z; z++)
@@ -165,7 +164,7 @@ namespace Welt.Forge.Generators
                             else if (R.Next(50) == 1)
                             {
                                 y++;
-                                chunk.SetBlock(x, (byte) y, z, new Block(BlockType.RED_FLOWER));
+                                chunk.SetBlock(x, (byte) y, z, new Block(BlockType.FLOWER_ROSE));
                             }
                             //else if (R.Next(5) == 1)
                             //{

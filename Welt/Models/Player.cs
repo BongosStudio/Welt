@@ -4,6 +4,7 @@
 #region Using Statements
 
 using Microsoft.Xna.Framework;
+using System;
 using Welt.Entities;
 using Welt.Events.Forge;
 using Welt.Forge;
@@ -19,6 +20,20 @@ namespace Welt.Models
         public static Player Current;
         #region Fields
         public World World;
+        public Chunk Chunk
+        {
+            get
+            {
+                // we only want this to update every time the chunk is grabbed
+                var chunk = World.ChunkAt(Position);
+                if (chunk.Index != m_PreviousChunkIndex)
+                {
+                    m_PreviousChunkIndex = chunk.Index;
+                    OnEnteredNewChunk(this, null);
+                }
+                return chunk;
+            }
+        }
         public PlayerEntity Entity;
 
         public Vector3 Position;
@@ -37,8 +52,11 @@ namespace Welt.Models
         public Vector3 TargetPoint;
 
         public bool IsPaused;
+        public bool IsMouseLocked;
         public string Username;
         public string AuthToken;
+
+        private Vector3I m_PreviousChunkIndex;
         
         #endregion
 
@@ -52,18 +70,16 @@ namespace Welt.Models
                 {
                     Stamina = 1,
                     Health = 1
-                }
+                },
+                IsMouseLocked = true
             };
             player.Inventory[0] = new BlockStack(new Block(BlockType.DIRT));
-            player.Inventory[1] = new BlockStack(new Block(BlockType.ROCK));
+            player.Inventory[1] = new BlockStack(new Block(BlockType.STONE));
             player.Inventory[2] = new BlockStack(new Block(BlockType.LOG));
             player.Inventory[3] = new BlockStack(new Block(BlockType.LEAVES));
-            player.Inventory[4] = new BlockStack(new Block(BlockType.RED_FLOWER));
+            player.Inventory[4] = new BlockStack(new Block(BlockType.FLOWER_ROSE));
             player.Inventory[5] = new BlockStack(new Block(BlockType.TORCH));
-            player.Inventory[6] = new BlockStack(new Block(BlockType.TORCH, 1));
-            player.Inventory[7] = new BlockStack(new Block(BlockType.TORCH, 2));
-            player.Inventory[8] = new BlockStack(new Block(BlockType.TORCH, 3));
-            player.Inventory[9] = new BlockStack(new Block(BlockType.TORCH, 4));
+            player.Inventory[6] = new BlockStack(new Block(BlockType.LADDER, 0));
             Current = player;
             
         }
@@ -76,6 +92,7 @@ namespace Welt.Models
 
         public bool LeftClick(GameTime time)
         {
+            if (!IsMouseLocked) return false;
             if (CurrentSelection == null) return false;
             ForgeEventHandlers.SetBlockHandler(World, CurrentSelection.Value.Position, new Block());
             //World.SetBlock(CurrentSelection.Value.Position, new Block(0, 0));
@@ -84,20 +101,11 @@ namespace Welt.Models
 
         public bool RightClick(GameTime time)
         {
+            if (!IsMouseLocked) return false;
             if (Inventory[HotbarIndex].Block.Id == 0) return false;
-            if (CurrentSelectedAdjacent != null &&
-                !BlockLogic.GetRightClick(World, CurrentSelectedAdjacent.Value.Position, this) && 
-                Block.CanPlaceAt(
-                    Inventory[HotbarIndex].Block.Id, 
-                    World.GetBlock((Vector3) CurrentSelectedAdjacent.Value.Position + new Vector3(0, -1, 0)).Id, 
-                    CurrentSelectedAdjacent.Value.Block.Id))
-            {
-
-                World.SetBlock(
-                    BlockLogic.DetermineTarget(World, CurrentSelection.Value.Position,
-                    CurrentSelectedAdjacent.Value.Position), 
-                    Inventory[HotbarIndex].Block);
-            }
+            var provider = BlockProvider.GetProvider(Inventory[HotbarIndex].Block.Id);
+            if (!CurrentSelection.HasValue || !CurrentSelectedAdjacent.HasValue) return false;
+            provider.PlaceBlock(World, CurrentSelection.Value.Position, CurrentSelectedAdjacent.Value.Position, Inventory[HotbarIndex].Block);
             return true;
         }
 
@@ -105,6 +113,12 @@ namespace Welt.Models
         {
             Entity = new PlayerEntity();
         }
-        
+
+        public event EventHandler EnteredNewChunk;
+
+        public void OnEnteredNewChunk(object sender, EventArgs args)
+        {
+            EnteredNewChunk?.Invoke(sender, args);
+        }
     }
 }

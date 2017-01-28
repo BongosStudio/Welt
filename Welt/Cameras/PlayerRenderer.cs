@@ -71,7 +71,7 @@ namespace Welt.Cameras
         {
             var previousView = Camera.View;
 
-            if (Player.IsPaused) return; // this is here so we can still process the game while paused.
+            if (Player.IsPaused || !Player.IsMouseLocked) return; // this is here so we can still process the game while paused.
             if (!FreeCam)
                 m_Physics.Move(gameTime);
             else
@@ -223,7 +223,7 @@ namespace Welt.Cameras
                 var targetPoint = Camera.Position + (_mLookVector*x);
                 var block = Player.World.GetBlock(targetPoint);
                 if ((block.Id != BlockType.NONE && (waterSelectable || block.Id != BlockType.WATER)) && 
-                    Block.GetBoundingBox(block.Id, targetPoint.Floor()).Contains(targetPoint) == ContainmentType.Contains)
+                    Block.GetBoundingBox(block.Id, block.Metadata, targetPoint.Floor()).Contains(targetPoint) == ContainmentType.Contains)
                 {
                     Player.CurrentSelection = new PositionedBlock(targetPoint, block);
                     

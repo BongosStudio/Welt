@@ -1,7 +1,7 @@
 float4x4 World;
 float4x4 View;
 float4x4 Projection;
-float4x4 InverseWorld;
+float4x4 ReflectionMatrix;
 
 float3 CameraPosition;
 
@@ -22,7 +22,7 @@ float4 EveningTint;
 float3 HeldItemLight;
 bool HasFlicker;
 
-float3 SunPosition; // this needs to be changed to SkyLightPosition for both moon and sun.
+float3 SkyLightPosition; 
 
 bool IsUnderWater;
 float RippleTime;
@@ -49,8 +49,16 @@ float	g_fPIx2 = 6.28318530f;
 float4	g_vLightingWaveScale = float4(0.35f, 0.10f, 0.10f, 0.03f);
 float4	g_vLightingScaleBias = float4(0.6f, 0.7f, 0.2f, 0.0f);
 
-
-
+Texture ReflectionTexture;
+sampler ReflectionTextureSampler = sampler_state
+{
+	texture = <ReflectionTexture>;
+	magfilter = POINT;
+	minfilter = POINT;
+	mipfilter = POINT;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
 Texture Texture1;
 sampler Texture1Sampler = sampler_state
 {
@@ -71,8 +79,9 @@ struct VertexShaderInput
 {
 	float4 Position : POSITION0;
 	float2 TexCoords1 : TEXCOORD0;
-	float SunLight : COLOR0;
-	float3 LocalLight : COLOR1;
+	float4 Overlay : COLOR0;
+	float SunLight : COLOR1;
+	float3 LocalLight : COLOR2;
 	float Effect : BLENDWEIGHT1;
 };
 
@@ -83,6 +92,8 @@ struct VertexShaderOutput
 	float3 CameraView : TEXCOORD1;
 	float Distance : TEXCOORD2;
 	float4 Color : COLOR0;
+	float4 Overlay : COLOR1;
+	float4 ReflectionPosition : TEXCOORD3;
 	float Effect : BLENDWEIGHT1;
 };
 
@@ -118,18 +129,22 @@ float noise3f(float3 p)
 	return 1.0 - res*(1.0 / 1073741824.0);
 }
 
-
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
+	input.Position.w = 1.0f;
+
 	VertexShaderOutput output;
+	matrix reflectProjectWorld;
 
 	float4 worldPosition = mul(input.Position, World);
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
+	reflectProjectWorld = mul(ReflectionMatrix, Projection);
+	reflectProjectWorld = mul(World, reflectProjectWorld);
 
 	output.CameraView = normalize(CameraPosition - worldPosition);
 	output.Distance = length(CameraPosition - worldPosition);
-	
+	output.ReflectionPosition = mul(input.Position, reflectProjectWorld); // maybe change to worldPosition?
 	output.TexCoords1 = input.TexCoords1;
 
 	float4 sColor = SunColor;
@@ -146,7 +161,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	switch (input.Effect)
 	{
 	case 1: // LightLiquidEffect
-		output.Position.y += (0.2f * sin(RippleTime + input.Position.x + (input.Position.z * 2))) - 0.2f;
+		output.Position.y += (0.1f * sin(RippleTime + input.Position.x + (input.Position.z * 2))) - 0.2f;
 		output.Color.rgb = (sColor * input.SunLight) + (input.LocalLight.rgb * 1.5);
 		output.Color.a = 1;
 		// TODO: display reflection
@@ -156,26 +171,27 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 		output.Position.x += (0.05f * sin((RippleTime/2)*n*2 + input.Position.x + (input.Position.z * 2)));
 		if (HasFlicker)
 		{
-			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SunPosition - input.Position)))) + (input.LocalLight.rgb * 1.5) + (((HeldItemLight * 0.75 * (1 + sin(RippleTime)*(Random*0.1))) / output.Distance) * 0.25);
+			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SkyLightPosition - input.Position)) + (input.Overlay.rgb * input.Overlay.a))) + (input.LocalLight.rgb * 1.5) + (((HeldItemLight * 0.75 * (1 + sin(RippleTime)*(Random*0.1))) / output.Distance) * 0.25);
 		}
 		else
 		{
-			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SunPosition - input.Position)))) + (input.LocalLight.rgb * 1.5);
+			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SkyLightPosition - input.Position)) + (input.Overlay.rgb * input.Overlay.a))) + (input.LocalLight.rgb * 1.5);
 		}
 		output.Color.a = 0.3;
 		break;
 	default:
 		if (HasFlicker)
 		{
-			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SunPosition - input.Position)))) + (input.LocalLight.rgb * 1.5) + (((HeldItemLight * 0.75 * (1 + sin(RippleTime)*(Random*0.1))) / output.Distance) * 0.25);
+			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SkyLightPosition - input.Position)) + (input.Overlay.rgb * input.Overlay.a))) + (input.LocalLight.rgb * 1.5) + (((HeldItemLight * 0.75 * (1 + sin(RippleTime)*(Random*0.1))) / output.Distance) * 0.25);
 		}
 		else
 		{
-			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SunPosition - input.Position)))) + (input.LocalLight.rgb * 1.5);
+			output.Color.rgb = (sColor * (input.SunLight * saturate(length(SkyLightPosition - input.Position)) + (input.Overlay.rgb * input.Overlay.a))) + (input.LocalLight.rgb * 1.5);
 		}
 		output.Color.a = 1;
 		break;
 	}
+	//output.Color.xyz += (input.Overlay.rgb * input.Overlay.a) * input.SunLight;
 
 	if (IsUnderWater)
 	{
@@ -186,13 +202,15 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	// gives a rounded shape to the landscape, making it seem like an actual planet.
 	// this value needs to be dependant on world size so smaller planets have a larger bend.
 	output.Position.y -= output.Distance * output.Distance *0.0025f;
-
+	output.Overlay = input.Overlay;
 	output.Effect = input.Effect;
 	return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
+	float2 reflectTexCoord;
+	float4 reflectionColor;
 	float4 texColor1 = tex2D(Texture1Sampler, input.TexCoords1);
 	float fog = saturate((input.Distance - FogNear) / (FogNear - FogFar));
 	float4 topColor = SunColor;
@@ -200,7 +218,9 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 nColor = NightColor;
 	float4 color;
 	float4 outputFogColor;
-
+	reflectTexCoord.x = input.ReflectionPosition.x / input.ReflectionPosition.w / 2.0f + 0.5f;
+	reflectTexCoord.y = -input.ReflectionPosition.y / input.ReflectionPosition.w / 2.0f + 0.5f;
+	reflectionColor = tex2D(ReflectionTextureSampler, reflectTexCoord);
 	color.rgb = texColor1.rgb * input.Color.rgb;
 	if (IsUnderWater)
 	{
@@ -215,7 +235,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	{
 	case 1:
 		//color.a = 0.3;
-		
+		//color = lerp(texColor1, reflectionColor, 0.15f);
 		break;
 	default:
 		if (color.a == 0)

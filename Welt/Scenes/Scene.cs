@@ -33,6 +33,7 @@ namespace Welt.Scenes
             IsEnabled = true;
             Opacity = 1;
             Input = InputController.CreateDefault();
+            
         }
 
         ~Scene()
@@ -46,7 +47,10 @@ namespace Welt.Scenes
         public bool IsEnabled { get; set; }
         internal virtual ViewModelBase DataContext
         {
-            get { return UI.DataContext as ViewModelBase; }
+            get
+            {
+                return UI.DataContext as ViewModelBase;
+            }
             set
             {
                 UI.DataContext = value;
@@ -75,6 +79,10 @@ namespace Welt.Scenes
             if (UI != null)
                 UI.DataContext = DataContext;
             m_Cookies.Clear();
+            Game.Window.ClientSizeChanged += (sender, args) =>
+            {
+                UI.Resize(WeltGame.Width, WeltGame.Height);
+            };
             Initialize();
         }
 
@@ -133,7 +141,6 @@ namespace Welt.Scenes
 
         internal void I_Draw(GameTime time)
         {
-            GraphicsDevice.Clear(BackColor);
             Draw(time);
             UI.Draw(time);
         }

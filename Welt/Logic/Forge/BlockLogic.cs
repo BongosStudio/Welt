@@ -16,7 +16,7 @@ namespace Welt.Logic.Forge
             
             switch (block.Id)
             {
-                case BlockType.RED_FLOWER:
+                case BlockType.FLOWER_ROSE:
                     
                     return true;
                 default:
@@ -27,8 +27,8 @@ namespace Welt.Logic.Forge
 
         public static Vector3 DetermineTarget(World world, Vector3 original, Vector3 adjacent)
         {
-            var block = world.GetBlock(original).Id;
-            if (Block.IsCapBlock(block) || Block.IsGrassBlock(block) || Block.IsPlantBlock(block)) return original;
+            var block = world.GetBlock(original);
+            if (Block.IsCapBlock(block.Id, block.Metadata) || Block.IsGrassBlock(block.Id) || Block.IsPlantBlock(block.Id)) return original;
             return adjacent;
             // TODO: figure a better way for this shit lol
         }

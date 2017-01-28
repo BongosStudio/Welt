@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Welt</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" media="screen"/>
+    <script src="javascripts/index.js"></script>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+    
+</head>
+<body>
+    <div id="player" style="position: fixed; z-index: -99; width: 105%; height: 107%; margin-left: -30px; pointer-events: none;">
+    </div>
+    
+<p>
+</p>
+    <h1 id="welcome-header">Hello Universe</h1>
+    <div style="text-align:center;">
+      <a id="discord-button" href="https://discord.gg/DhJu8pR">Register for Alpha on Discord&trade;</a>
+    </div>
+    
+    <footer>
+        <a href="#">Check out the GitHub!</a>
+        |
+        <a href="https://www.youtube.com/watch?v=yrgaD9I_CtI">Background video</a>
+    </footer>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                videoId: 'yrgaD9I_CtI',
+                playerVars: {
+                    autohide: true,
+                    autoplay: true,
+                    showinfo: false,
+                },
+                
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            player.mute();
+        }
+    </script>
+</body>
+</html>

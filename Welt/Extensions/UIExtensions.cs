@@ -28,7 +28,7 @@ namespace Welt.Extensions
         {
             return new RelayCommand((o) => 
             {
-                //WeltGame.Instance.AudioFactory.PlayButtonSound();
+                WeltGame.Instance.Audio.ButtonSound.Play();
                 action.Invoke();
             });
         }

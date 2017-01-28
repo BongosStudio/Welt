@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Welt.Blocks;
 using Welt.Models;
 using Welt.Types;
+using System.Collections;
 
 #endregion
 
@@ -22,7 +23,7 @@ namespace Welt.Forge
 
         public Chunk(World world, Vector3I index)
         {
-            this.World = world;
+            World = world;
             Blocks = new BlockPalette(Size.X * Size.Z * Size.Y);
             HeightMap = new byte[16*16];
             PrimaryVertexList = new List<VertexPositionTextureLightEffect>();
@@ -45,7 +46,7 @@ namespace Welt.Forge
         public void Assign(Vector3I index)
         {
             //ensure world is set directly in here to have access to N S E W as soon as possible
-            World.Chunks.SetChunk(index, this);
+            World.ChunkManager.SetChunk(index, this);
 
             Dirty = true;
             //Array.Clear(Blocks, 0, Blocks.Length);
@@ -63,12 +64,21 @@ namespace Welt.Forge
         {
             PrimaryVertexList.Clear();
             PrimaryIndexList.Clear();
+            //PrimaryVertexBuffer?.Dispose();
+            //PrimaryIndexBuffer?.Dispose();
 
             SecondaryVertexList.Clear();
             SecondaryIndexList.Clear();
+            //SecondaryVertexBuffer?.Dispose();
+            //SecondaryIndexBuffer?.Dispose();
 
             PrimaryVertexCount = 0;
             SecondaryVertexCount = 0;
+        }
+
+        public static int GetIndex(int x, int y, int z)
+        {
+            return x * FlattenOffset + z * Size.Y + y;
         }
 
         #region SetBlock
@@ -182,6 +192,11 @@ namespace Welt.Forge
             return light;
         }
 
+        public Block GetBlock(uint relx, uint rely, uint relz)
+        {
+            return GetBlock((int)relx, (int)rely, (int)relz);
+        }
+
         public Block GetBlock(int relx, int rely, int relz)
         {
             if (rely < 0 || rely > Max.Y)
@@ -264,8 +279,8 @@ namespace Welt.Forge
         public List<VertexPositionTextureLightEffect> PrimaryVertexList;
         public List<VertexPositionTextureLightEffect> SecondaryVertexList;
 
-        public short PrimaryVertexCount;
-        public short SecondaryVertexCount;
+        public int PrimaryVertexCount;
+        public int SecondaryVertexCount;
 
         /// <summary>
         /// Contains blocks as a flattened array.
@@ -305,7 +320,7 @@ namespace Welt.Forge
 
         public bool Broken;
 
-        public readonly World World;
+        public World World;
 
         public Vector3B HighestSolidBlock = new Vector3B(0, 0, 0);
         //highestNoneBlock starts at 0 so it will be adjusted. if you start at highest it will never be adjusted ! 
@@ -322,7 +337,7 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mN == null) _mN = World.Chunks.GetChunk(Index + Vector3I.OneZ, false);
+                if (_mN == null) _mN = World.ChunkManager.GetChunk(Index + Vector3I.OneZ, false);
                 if (_mN != null) _mN._mS = this;
                 return _mN;
             }
@@ -332,7 +347,7 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mS == null) _mS = World.Chunks.GetChunk(Index - Vector3I.OneZ, false);
+                if (_mS == null) _mS = World.ChunkManager.GetChunk(Index - Vector3I.OneZ, false);
                 if (_mS != null) _mS._mN = this;
                 return _mS;
             }
@@ -342,7 +357,7 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mE == null) _mE = World.Chunks.GetChunk(Index - Vector3I.OneX, false);
+                if (_mE == null) _mE = World.ChunkManager.GetChunk(Index - Vector3I.OneX, false);
                 if (_mE != null) _mE._mW = this;
                 return _mE;
             }
@@ -352,19 +367,19 @@ namespace Welt.Forge
         {
             get
             {
-                if (_mW == null) _mW = World.Chunks.GetChunk(Index + Vector3I.OneX, false);
+                if (_mW == null) _mW = World.ChunkManager.GetChunk(Index + Vector3I.OneX, false);
                 if (_mW != null) _mW._mE = this;
                 return _mW;
             }
         }
 
-        public Chunk Nw => _mNw ?? (_mNw = World.Chunks.GetChunk(Index.X + 1, Index.Y, Index.Z + 1, false));
+        public Chunk Nw => _mNw ?? (_mNw = World.ChunkManager.GetChunk(Index.X + 1, Index.Y, Index.Z + 1, false));
 
-        public Chunk Ne => _mNe ?? (_mNe = World.Chunks.GetChunk(Index.X - 1, Index.Y, Index.Z + 1, false));
+        public Chunk Ne => _mNe ?? (_mNe = World.ChunkManager.GetChunk(Index.X - 1, Index.Y, Index.Z + 1, false));
 
-        public Chunk Sw => _mSw ?? (_mSw = World.Chunks.GetChunk(Index.X + 1, Index.Y, Index.Z - 1, false));
+        public Chunk Sw => _mSw ?? (_mSw = World.ChunkManager.GetChunk(Index.X + 1, Index.Y, Index.Z - 1, false));
 
-        public Chunk Se => _mSe ?? (_mSe = World.Chunks.GetChunk(Index.X - 1, Index.Y, Index.Z - 1, false));
+        public Chunk Se => _mSe ?? (_mSe = World.ChunkManager.GetChunk(Index.X - 1, Index.Y, Index.Z - 1, false));
 
         public Chunk GetNeighbour(Cardinal c)
         {
@@ -396,5 +411,6 @@ namespace Welt.Forge
         {
             State = state;
         }
+        
     }
 }

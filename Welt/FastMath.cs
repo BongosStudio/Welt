@@ -29,6 +29,18 @@ namespace Welt
 
         #region Static Methods
 
+        public static int Get4DHash(int x, int y, int z, int w)
+        {
+            unchecked
+            {
+                var hash = x.GetHashCode();
+                hash = (hash * 397) ^ y.GetHashCode();
+                hash = (hash * 397) ^ z.GetHashCode();
+                hash = (hash * 397) ^ w.GetHashCode();
+                return hash;
+            }
+        }
+
         public static void Flip(ref int value)
         {
             value = -value;
