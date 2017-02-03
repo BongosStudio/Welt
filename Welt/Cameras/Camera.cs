@@ -52,6 +52,13 @@ namespace Welt.Cameras
         {
         }
 
+        public void LookAt(Vector3 target)
+        {
+            // Doesn't take into account the rotated UP vector
+            // Should calculate rotations here!
+            View = Matrix.CreateLookAt(Position, target, Vector3.Up);
+        }
+
         #region Fields
 
         protected Vector3 _position = Vector3.Zero;

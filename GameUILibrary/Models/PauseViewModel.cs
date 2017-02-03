@@ -4,10 +4,8 @@
 
 #endregion Copyright
 
-using EmptyKeys.UserInterface;
 using EmptyKeys.UserInterface.Input;
 using EmptyKeys.UserInterface.Mvvm;
-using System.Diagnostics;
 
 namespace GameUILibrary.Models
 {

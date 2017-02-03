@@ -1,25 +1,30 @@
-﻿#region Copyright
-// COPYRIGHT 2016 JUSTIN COX (CONJI)
-#endregion
-
-using Lidgren.Network;
+﻿using System;
+using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
 {
-    public class HandshakePacket : Packet
+    /// <summary>
+    /// Sent from clients to begin a new connection.
+    /// </summary>
+    public struct HandshakePacket : IPacket
     {
-        public string Username;
+        public byte Id { get { return 0x02; } }
 
-        public override byte Id => 0x00;
-
-        public override void ReadData(ref NetIncomingMessage message)
+        public HandshakePacket(string username)
         {
-            if (!message.ReadString(out Username)) throw new NetException();
+            Username = username;
         }
 
-        public override void WriteData(ref NetOutgoingMessage message)
+        public string Username;
+
+        public void ReadPacket(IWeltStream stream)
         {
-            message.Write(Username);
+            Username = stream.ReadString();
+        }
+
+        public void WritePacket(IWeltStream stream)
+        {
+            stream.WriteString(Username);
         }
     }
 }

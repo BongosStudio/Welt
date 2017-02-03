@@ -3,155 +3,334 @@
 #endregion
 
 using System;
-using System.Diagnostics;
+using Microsoft.Xna.Framework;
+using Welt.API;
 using Welt.API.Forge;
-using static Welt.Core.FastMath;
+using System.Linq;
 
 namespace Welt.Core.Forge
 {
     public class Chunk : IChunk
     {
-        public const int Width = 16, Depth = 16;
-
-        public Chunk(IWorld world, uint x, uint z)
+        /* 
+        For accessing array for x,z,y coordianate use the pattern: Blocks[x * Chunk.FlattenOffset + z * Chunk.SIZE.Y + y]
+        For allowing sequental access on blocks using iterations, the blocks are stored as [x,z,y]. So basically iterate x first, z then and y last.
+        Consider the following pattern;
+        for (int x = 0; x < Chunk.WidthInBlocks; x++)
         {
-            //Height = world.Height;
-            Height = 256;
-            HeightMap = new int[Width*Depth];
-            X = x;
-            Z = z;
-            Blocks = new BlockPalette(this);
+            for (int z = 0; z < Chunk.LenghtInBlocks; z++)
+            {
+                int offset = x * Chunk.FlattenOffset + z * Chunk.HeightInBlocks; // we don't want this x-z value to be calculated each in in y-loop!
+                for (int y = 0; y < Chunk.HeightInBlocks; y++)
+                {
+                    var block=Blocks[offset + y].Id 
+        */
+
+        public const int Width = 16, Depth = 16, Height = 128;
+        public static int FlattenOffset = Size.Z * Size.Y;
+        public static Vector3B Size = new Vector3B(16, 128, 16);
+        public static Vector3B Max = new Vector3B(15, 127, 15);
+
+        public Chunk(World world, Vector3I index)
+        {
+            World = world;
+            Blocks = new BlockPalette(Width * Depth * Size.Y);
+            HeightMap = new byte[Width * Depth];
+
+            index %= World.Size;
+            //ensure world is set directly in here to have access to N S E W as soon as possible
+            World.ChunkManager.SetChunk(index, this);
+            
+            //Array.Clear(Blocks, 0, Blocks.Length);
+            Index = index;
+            Position = new Vector3I(index.X * Size.X, index.Y * Size.Y, index.Z * Size.Z);
+            BoundingBox = new BoundingBox(new Vector3(Position.X, Position.Y, Position.Z),
+                new Vector3(Position.X + Size.X, Position.Y + Size.Y, Position.Z + Size.Z));
         }
-
-        public int Height { get; }
-
-        public uint X { get; set; }
-        public uint Z { get; set; }
-        public virtual IChunk N { get; protected set; }
-        public virtual IChunk E { get; protected set; }
-        public virtual IChunk S { get; protected set; }
-        public virtual IChunk W { get; protected set; }
-        public virtual IChunk Ne { get; protected set; }
-        public virtual IChunk Nw { get; protected set; }
-        public virtual IChunk Se { get; protected set; }
-        public virtual IChunk Sw { get; protected set; }
-        public int[] HeightMap { get; }
+        
+        public byte[] HeightMap { get; }
         public bool IsModified { get; set; }
-        public bool IsGenerated { get; set; }
+        public bool IsTerrainPopulated { get; set; }
+        public bool IsLit { get; set; }
+        public byte MaxHeight => HeightMap.Max();
 
-        protected BlockPalette Blocks;
+        public World World { get; protected set; }
 
-        private int _lowestAirBlock;
+        public BoundingBox BoundingBox { get; protected set; }
 
-        public virtual void Initialize(IWorld world)
+        public Vector3I Index { get; protected set; }
+
+        public Vector3I Position { get; protected set; }
+
+        public Vector3B HighestSolidBlock = new Vector3B(0, 0, 0);
+        //highestNoneBlock starts at 0 so it will be adjusted. if you start at highest it will never be adjusted ! 
+
+        public Vector3B LowestNoneBlock = new Vector3B(0, Size.Y, 0);
+
+
+        public BlockPalette Blocks;
+
+        public static int GetIndex(int x, int y, int z)
         {
-            world.SetChunk(X, Z, this);
-            N = world.GetChunk(X + 1, Z);
-            E = world.GetChunk(X, Z + 1);
-            S = world.GetChunk(X - 1, Z);
-            W = world.GetChunk(X, Z - 1);
-            Ne = world.GetChunk(X + 1, Z + 1);
-            Nw = world.GetChunk(X + 1, Z - 1);
-            Se = world.GetChunk(X - 1, Z + 1);
-            Sw = world.GetChunk(X - 1, Z - 1);
-            IsModified = true;
+            return x * FlattenOffset + z * Size.Y + y;
         }
 
-        public (ushort Id, byte Metadata) GetBlock(int x, int y, int z)
+        #region SetBlock
+
+        public void SetBlockId(byte x, byte y, byte z, ushort id)
         {
-            if (!WithinBounds(0, Height, y))
-                return (0, 0);
-
-            if (WithinBounds(0, Width, x) && WithinBounds(0, Depth, z))
-                return Blocks.GetBlock((uint) x, (uint) y, (uint) z);
-
-            //if (x < 0 && z >= 0)
-            //{
-            //    return W.GetBlock(Width + x, y, z);
-            //}
-            //if (x >= 0 && z < 0)
-            //{
-            //    return E.GetBlock(x, y, z + Depth);
-            //}
-            //if (x < 0 && z < 0)
-            //{
-            //    return S.GetBlock(Width + x, y, z + Depth);
-            //}
-            //if (x >= Width && z >= Depth)
-            //{
-            //    return N.GetBlock(x - Width, y, z - Depth);
-            //}
-
-            return (0, 0);
+            SetBlock(x, y, z, new Block(id));
         }
 
-        public void SetBlock(int x, int y, int z, ushort id, byte metadata)
+        public void SetBlock(byte x, byte y, byte z, Block b)
         {
-            //Blocks.SetBlock((uint) x, (uint) y, (uint) z, id, metadata);
-            if (!WithinBounds(0, Height, y))
-                return;
-            if (WithinBounds(0, Width, x) && WithinBounds(0, Depth, z))
+            if (b.Id == BlockType.WATER)
             {
-                Blocks.SetBlock((uint) x, (uint) y, (uint) z, id, metadata);
-                if (id == 0)
+                if (LowestNoneBlock.Y > y)
                 {
-                    if (_lowestAirBlock > y)
-                        _lowestAirBlock = y;
-                    BlockRemoved?.Invoke(this, new BlockChangedEventArgs((uint) x, (uint) y, (uint) z));
+                    LowestNoneBlock = new Vector3B(x, y, z);
                 }
+            }
+
+            if (b.Id == BlockType.NONE)
+            {
+                if (LowestNoneBlock.Y > y)
+                {
+                    LowestNoneBlock = new Vector3B(x, y, z);
+                }
+            }
+            else if (HighestSolidBlock.Y < y)
+            {
+                HighestSolidBlock = new Vector3B(x, y, z);
+            }
+
+            if (HeightMap[x * Size.X + z] < y)
+                HeightMap[x * Size.X + z] = y;
+
+            Blocks[x * FlattenOffset + z * Size.Y + y] = b;
+        }
+
+        #endregion
+
+        public static bool OutOfBounds(byte x, byte y, byte z)
+        {
+            return x >= Size.X || y >= Size.Y || z >= Size.Z;
+        }
+
+        #region GetBlock
+
+        public byte GetHeight(byte x, byte z)
+        {
+            return HeightMap[x * Size.X + z];
+        }
+
+        public Vector3B GetBlockLight(int relx, int rely, int relz)
+        {
+            if (rely < 0 || rely > Max.Y)
+            {
+                //infinite Y : y bounds currently set as rock for never rendering those y bounds
+                return new Vector3B();
+            }
+
+            //handle the normal simple case
+            if (relx >= 0 && relz >= 0 && relx < Size.X && relz < Size.Z)
+            {
+                var b = Blocks.GetBlockLight(relx * FlattenOffset + relz * Size.Y + rely);
+                return b;
+            }
+
+            //handle all special cases
+
+            int x = relx, z = relz;
+            Chunk nChunk = null;
+
+            //TODO chunk relative GetBlock could even handle more tha just -1 but -2 -3 ... -15 
+
+            if (relx < 0) x = Max.X;
+            if (relz < 0) z = Max.Z;
+            if (relx > 15) x = 0;
+            if (relz > 15) z = 0;
+
+
+            if (x != relx && x == 0)
+                if (z != relz && z == 0)
+                    nChunk = Nw;
+                else if (z != relz && z == 15)
+                    nChunk = Sw;
                 else
-                {
-                    BlockAdded?.Invoke(this, new BlockChangedEventArgs((uint) x, (uint) y, (uint) z));
-                }
-                SetHeight(x, z);
-                return;
-            }
+                    nChunk = W;
+            else if (x != relx && x == 15)
+                if (z != relz && z == 0)
+                    nChunk = Ne;
+                else if (z != relz && z == 15)
+                    nChunk = Se;
+                else
+                    nChunk = E;
+            else if (z != relz && z == 0)
+                nChunk = N;
+            else if (z != relz && z == 15)
+                nChunk = S;
 
-            if (x < 0 && z >= 0)
+            if (nChunk == null)
             {
-                W.SetBlock(Width + x, y, z, id, metadata);
-                return;
+                //happens at current world bounds
+                return new Vector3B();
             }
-            if (x >= 0 && z < 0)
-            {
-                E.SetBlock(x, y, z + Depth, id, metadata);
-                return;
-            }
-            if (x < 0 && z < 0)
-            {
-                S.SetBlock(Width + x, y, z + Depth, id, metadata);
-                return;
-            }
-            if (x >= Width && z >= Depth)
-            {
-                N.SetBlock(x - Width, y, z - Depth, id, metadata);
-                return;
-            }
-
+            var light = nChunk.Blocks.GetBlockLight(x * FlattenOffset + z * Size.Y + rely);
+            return light;
         }
 
-        public int GetHeight(int x, int z)
+
+        public void SetId(byte x, byte y, byte z, ushort id)
         {
-            return HeightMap[x*Width + z];
+            SetBlock(x, y, z, new Block(id));
         }
 
-        public int GetLowestNoneBlock()
+        public Block GetBlock(byte x, byte y, byte z)
         {
-            return _lowestAirBlock;
+            return GetBlock(relx: x, rely: y, relz: z);
         }
 
-        private void SetHeight(int x, int z)
+
+        public Block GetBlock(uint relx, uint rely, uint relz)
         {
-            //HeightMap[x*Width + z] = value;
-            for (var i = Height; i >= 0; --i)
+            return GetBlock((int)relx, (int)rely, (int)relz);
+        }
+
+        public Block GetBlock(int relx, int rely, int relz)
+        {
+            if (rely < 0 || rely > Max.Y)
             {
-                if (GetBlock(x, i, z).Id == 0)
-                    continue;
-                HeightMap[x*Width + z] = i;
+                //infinite Y : y bounds currently set as rock for never rendering those y bounds
+                return new Block(BlockType.NONE);
+            }
+
+            //handle the normal simple case
+            if (relx >= 0 && relz >= 0 && relx < Size.X && relz < Size.Z)
+            {
+                var b = Blocks[relx * FlattenOffset + relz * Size.Y + rely];
+                return b;
+            }
+
+            //handle all special cases
+
+            int x = relx, z = relz;
+            Chunk nChunk = null;
+
+            //TODO chunk relative GetBlock could even handle more tha just -1 but -2 -3 ... -15 
+
+            if (relx < 0) x = Max.X;
+            if (relz < 0) z = Max.Z;
+            if (relx > 15) x = 0;
+            if (relz > 15) z = 0;
+
+
+            if (x != relx && x == 0)
+                if (z != relz && z == 0)
+                    nChunk = Nw;
+                else if (z != relz && z == 15)
+                    nChunk = Sw;
+                else
+                    nChunk = W;
+            else if (x != relx && x == 15)
+                if (z != relz && z == 0)
+                    nChunk = Ne;
+                else if (z != relz && z == 15)
+                    nChunk = Se;
+                else
+                    nChunk = E;
+            else if (z != relz && z == 0)
+                nChunk = N;
+            else if (z != relz && z == 15)
+                nChunk = S;
+
+            if (nChunk == null)
+            {
+                //happens at current world bounds
+                return new Block(BlockType.NONE);
+            }
+            var block = nChunk.Blocks[x * FlattenOffset + z * Size.Y + rely];
+            return block;
+        }
+
+        #endregion
+
+        private Chunk _mN, _mS, _mE, _mW, _mNe, _mNw, _mSe, _mSw;
+
+        public Chunk N
+        {
+            get
+            {
+                if (_mN == null) _mN = World.ChunkManager.GetChunk(Index + Vector3I.OneZ, false);
+                if (_mN != null) _mN._mS = this;
+                return _mN;
             }
         }
 
-        public event EventHandler<BlockChangedEventArgs> BlockAdded;
-        public event EventHandler<BlockChangedEventArgs> BlockRemoved;
+        public Chunk S
+        {
+            get
+            {
+                if (_mS == null) _mS = World.ChunkManager.GetChunk(Index - Vector3I.OneZ, false);
+                if (_mS != null) _mS._mN = this;
+                return _mS;
+            }
+        }
+
+        public Chunk E
+        {
+            get
+            {
+                if (_mE == null) _mE = World.ChunkManager.GetChunk(Index - Vector3I.OneX, false);
+                if (_mE != null) _mE._mW = this;
+                return _mE;
+            }
+        }
+
+        public Chunk W
+        {
+            get
+            {
+                if (_mW == null) _mW = World.ChunkManager.GetChunk(Index + Vector3I.OneX, false);
+                if (_mW != null) _mW._mE = this;
+                return _mW;
+            }
+        }
+
+        public Chunk Nw => _mNw ?? (_mNw = World.ChunkManager.GetChunk(Index.X + 1, Index.Y, Index.Z + 1, false));
+
+        public Chunk Ne => _mNe ?? (_mNe = World.ChunkManager.GetChunk(Index.X - 1, Index.Y, Index.Z + 1, false));
+
+        public Chunk Sw => _mSw ?? (_mSw = World.ChunkManager.GetChunk(Index.X + 1, Index.Y, Index.Z - 1, false));
+
+        public Chunk Se => _mSe ?? (_mSe = World.ChunkManager.GetChunk(Index.X - 1, Index.Y, Index.Z - 1, false));
+
+        public Chunk GetNeighbour(Cardinal c)
+        {
+            switch (c)
+            {
+                case Cardinal.N:
+                    return N;
+                case Cardinal.S:
+                    return S;
+                case Cardinal.E:
+                    return E;
+                case Cardinal.W:
+                    return W;
+                case Cardinal.Se:
+                    return Se;
+                case Cardinal.Sw:
+                    return Sw;
+                case Cardinal.Ne:
+                    return Ne;
+                case Cardinal.Nw:
+                    return Nw;
+            }
+            throw new NotImplementedException();
+        }
+
+
+        public event EventHandler<BlockChangeEventArgs> BlockAdded;
+        public event EventHandler<BlockChangeEventArgs> BlockRemoved;
     }
 }

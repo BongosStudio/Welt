@@ -5,7 +5,6 @@
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Media;
 using System;
 
 namespace Welt.Extensions

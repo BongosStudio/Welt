@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Welt.Core.Forge;
 using Welt.Forge;
 
 namespace Welt.Extensions
@@ -99,7 +95,7 @@ namespace Welt.Extensions
             return blocks.ToArray();
         }
 
-        public static void DrawPrimaryBuffer(this Chunk chunk, GraphicsDevice graphics)
+        public static void DrawPrimaryBuffer(this ReadOnlyChunk chunk, GraphicsDevice graphics)
         {
             if (chunk.PrimaryVertexCount == 0 || chunk.PrimaryVertexBuffer == null || chunk.PrimaryIndexBuffer == null)
                 return;
@@ -108,7 +104,7 @@ namespace Welt.Extensions
             graphics?.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, chunk.PrimaryVertexCount);
         }
 
-        public static void DrawSecondaryBuffer(this Chunk chunk, GraphicsDevice graphics)
+        public static void DrawSecondaryBuffer(this ReadOnlyChunk chunk, GraphicsDevice graphics)
         {
             if (chunk.SecondaryVertexCount == 0 || chunk.SecondaryVertexBuffer == null || chunk.SecondaryIndexBuffer == null)
                 return;

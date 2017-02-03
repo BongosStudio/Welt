@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Welt.Graphics
 {
@@ -30,7 +25,7 @@ namespace Welt.Graphics
             BlockTexture = m_TextureMap.LoadBlockTextures(Game.GraphicsDevice, "textures\\blocks");
             CloudTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "textures\\environment\\clouds.png");
             StarTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "textures\\environment\\stars.jpg");
-            
+            SunTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "textures\\environment\\sun.png");
         }
     }
 }

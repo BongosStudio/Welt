@@ -5,20 +5,15 @@
 #endregion Copyright
 
 using EmptyKeys.UserInterface;
-using EmptyKeys.UserInterface.Controls;
-using EmptyKeys.UserInterface.Media;
-using EmptyKeys.UserInterface.Mvvm;
-using EmptyKeys.UserInterface.Renderers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Sec;
+using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Concurrent;
-using System.Threading;
+using System.IO;
 using System.Windows.Forms;
 using Welt.Components;
 using Welt.Controllers;
-using Welt.Forge;
+using Welt.Core.Forge;
 using Welt.Graphics;
 using Welt.Scenes;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
@@ -40,9 +35,12 @@ namespace Welt
         public AudioFactory Audio { get; private set; }
         public TaskManagerComponent TaskManager { get; private set; }
         public GraphicsManager GraphicsManager { get; private set; }
+        public bool IsRunning { get; private set; }
         
         private readonly GraphicsDeviceManager m_Graphics;
         private MonoGameEngine m_UiEngine;
+        private RenderTarget2D m_RenderTarget;
+        private SpriteBatch m_SpriteBatch;
 
         #endregion Fields
 
@@ -56,7 +54,10 @@ namespace Welt
             TaskManager = new TaskManagerComponent(this);
             GraphicsManager = new GraphicsManager(this);
             Components.Add(TaskManager);
-            // initialize the player
+            Exiting += (sender, args) =>
+            {
+                IsRunning = false;
+            };
         }
 
         public static void SetCursor(Cursor cursor)
@@ -71,7 +72,14 @@ namespace Welt
                 Engine.Instance.Renderer.CreateFont(Content.Load<SpriteFont>("Fonts/Code_7x5_13.5_Regular"));
 
             ImageManager.Instance.LoadImages(Content, "Images/");
-            
+            m_RenderTarget = new RenderTarget2D(
+                GraphicsDevice,
+                GraphicsDevice.PresentationParameters.BackBufferWidth,
+                GraphicsDevice.PresentationParameters.BackBufferHeight,
+                false,
+                GraphicsDevice.PresentationParameters.BackBufferFormat,
+                GraphicsDevice.PresentationParameters.DepthStencilFormat);
+            m_SpriteBatch = new SpriteBatch(GraphicsDevice);
             base.LoadContent();
         }
 
@@ -169,6 +177,8 @@ namespace Welt
 
         protected override void Update(GameTime gameTime)
         {
+            var kstate = Keyboard.GetState();
+            if (kstate.IsKeyDown(Keys.F6)) TakeScreenshot();
             SceneController.Update(gameTime);
             //m_UiRoot?.Update(gameTime);
             base.Update(gameTime);
@@ -180,10 +190,33 @@ namespace Welt
 
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.SetRenderTarget(m_RenderTarget);
+            GraphicsDevice.Clear(Color.Black);
             SceneController.Draw(gameTime);
             base.Draw(gameTime);
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black);
+
+            m_SpriteBatch.Begin();
+            m_SpriteBatch.Draw(m_RenderTarget, Vector2.Zero, Color.White);
+            m_SpriteBatch.End();
         }
 
         #endregion Draw
+
+        public void ResetRenderTarget()
+        {
+            GraphicsDevice.SetRenderTarget(m_RenderTarget);
+            GraphicsDevice.Clear(Color.Black);
+        }
+
+        public void TakeScreenshot()
+        {
+            var title = $"screenshot-{DateTime.Now.Month}_{DateTime.Now.Day}_{DateTime.Now.Year}-{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}";
+            using (var stream = File.Create(title + ".png"))
+            {
+                m_RenderTarget.SaveAsPng(stream, Width, Height);
+            }
+        }
     }
 }

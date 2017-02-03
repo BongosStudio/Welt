@@ -1,9 +1,10 @@
 #region Copyright
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
-
+using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
+using Welt.API;
 
 namespace Welt.Core
 {
@@ -23,12 +24,85 @@ namespace Welt.Core
 
         #region Private Properties
 
-        private static readonly Random Random = new Random();
-        private static readonly object RLock = new object();
+        private static readonly Random m_Random = new Random();
+        private static readonly object m_Rlock = new object();
 
         #endregion
 
         #region Static Methods
+
+        /// <summary>
+        /// Maps a float from 0...360 to 0...255
+        /// </summary>
+        /// <param name="value"></param>
+        public static sbyte CreateRotationByte(float value)
+        {
+            return (sbyte)(((value % 360) / 360) * 256);
+        }
+
+        public static float UnpackRotationByte(sbyte value)
+        {
+            return (value / 256f) * 360f;
+        }
+
+        public static int CreateAbsoluteInt(double value)
+        {
+            return (int)(value * 32);
+        }
+
+        public static double ToRadians(double degrees)
+        {
+            return degrees * 0.017453292519943295769236907684886;
+        }
+
+        public static Vector3 RotateX(Vector3 vector, double rotation)
+        {
+            rotation = -rotation;
+            return new Vector3(
+                vector.X,
+                vector.Y * (float)Math.Cos(rotation) - vector.Z * (float)Math.Sin(rotation),
+                vector.Y * (float)Math.Sin(rotation) + vector.Z * (float)Math.Cos(rotation));
+        }
+
+        public static Vector3 RotateY(Vector3 vector, double rotation)
+        {
+            rotation = -rotation;
+            return new Vector3(
+                vector.Z * (float)Math.Sin(rotation) + vector.X * (float)Math.Cos(rotation),
+                vector.Y,
+                vector.Z * (float)Math.Cos(rotation) - vector.X * (float)Math.Sin(rotation));
+        }
+
+        public static Vector3 RotateZ(Vector3 vector, double rotation)
+        {
+            rotation = -rotation; 
+            return new Vector3(
+                vector.X * (float)Math.Cos(rotation) - vector.Y * (float)Math.Sin(rotation),
+                vector.X * (float)Math.Sin(rotation) + vector.Y * (float)Math.Cos(rotation),
+                vector.Z);
+        }
+
+        public static double DegreesToRadians(double degrees)
+        {
+            return degrees * (Math.PI / 180);
+        }
+
+        public static double RadiansToDegrees(double radians)
+        {
+            return radians * (180 / Math.PI);
+        }
+
+        public static int Get4DHash(int x, int y, int z, int w)
+        {
+            unchecked
+            {
+                var hash = x.GetHashCode();
+                hash = (hash * 397) ^ y.GetHashCode();
+                hash = (hash * 397) ^ z.GetHashCode();
+                hash = (hash * 397) ^ w.GetHashCode();
+                return hash;
+            }
+        }
 
         public static void Flip(ref int value)
         {
@@ -86,33 +160,49 @@ namespace Welt.Core
 
         public static int NextRandom(int max)
         {
-            lock (RLock)
+            lock (m_Rlock)
             {
-                return Random.Next(max);
+                return m_Random.Next(max);
+            }
+        }
+
+        public static uint NextRandom(uint max)
+        {
+            lock (m_Rlock)
+            {
+                return (uint) m_Random.Next((int) max);
             }
         }
 
         public static int NextRandom(int min, int max)
         {
-            lock (RLock)
+            lock (m_Rlock)
             {
-                return Random.Next(min, max);
+                return m_Random.Next(min, max);
+            }
+        }
+
+        public static uint NextRandom(uint min, uint max)
+        {
+            lock (m_Rlock)
+            {
+                return (uint)m_Random.Next((int) min, (int)max);
             }
         }
 
         public static double NextRandomDouble()
         {
-            lock (RLock)
+            lock (m_Rlock)
             {
-                return Random.NextDouble();
+                return m_Random.NextDouble();
             }
         }
 
         public static bool NextRandomBoolean()
         {
-            lock (RLock)
+            lock (m_Rlock)
             {
-                return Random.Next(2) == 1;
+                return m_Random.Next(2) == 1;
             }
         }
 
@@ -135,22 +225,26 @@ namespace Welt.Core
 
         public static int Floor(float value)
         {
-            return (int) Math.Floor(value);
+            if (value > 0) return (int) value;
+            return (int) value - 1;
         }
 
         public static int Ceiling(float value)
         {
-            return (int) Math.Ceiling(value);
+            if (value > 0) return (int) value + 1;
+            return (int) value;
         }
 
         public static int Floor(double value)
         {
-            return (int) Math.Floor(value);
+            if (value > 0) return (int) value;
+            return (int) value - 1;
         }
 
         public static int Ceiling(double value)
         {
-            return (int) Math.Ceiling(value);
+            if (value > 0) return (int) value + 1;
+            return (int) value;
         }
 
         public static bool WithinBounds(int lower, int upper, int value)
@@ -201,22 +295,6 @@ namespace Welt.Core
             if (value > max) value = max;
         }
 
-        public static void Adjust(byte min, byte max, ref byte value)
-        {
-            if (value < min) value = min;
-            if (value > max) value = max;
-        }
-        
-        public static float ToRadians(float degrees)
-        {
-            return degrees*0.01745329f;
-        }
-
-        public static float ToDegrees(float radians)
-        {
-            return radians*57.29578f;
-        }
-
         public static int BytesToInt(byte[] bytes, int offset)
         {
             var ret = 0;
@@ -230,52 +308,67 @@ namespace Welt.Core
             return ret;
         }
 
-        #endregion
-
-        #region LongRandom
-
-        public sealed class LongRandom
+        public static Vector3I BlockFaceToCoordinates(BlockFaceDirection face)
         {
-            public LongRandom()
+            switch (face)
             {
-                _seed = NextRandom(int.MaxValue) & ((1L << 48) - 1);
+                case BlockFaceDirection.YDecreasing:
+                    return Vector3I.Down;
+                case BlockFaceDirection.YIncreasing:
+                    return Vector3I.Up;
+                case BlockFaceDirection.ZDecreasing:
+                    return Vector3I.Backward;
+                case BlockFaceDirection.ZIncreasing:
+                    return Vector3I.Forward;
+                case BlockFaceDirection.XDecreasing:
+                    return Vector3I.Left;
+                default:
+                    return Vector3I.Right;
             }
-
-            public LongRandom(long seed)
-            {
-                _seed = (seed ^ LARGE_PRIME) & ((1L << 48) - 1);
-            }
-
-            public int Next(int n)
-            {
-                if (n <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(n), n, "n must be positive");
-
-                if ((n & -n) == n) // i.e., n is a power of 2
-                    return (int) ((n*(long) __next(31)) >> 31);
-
-                int bits, val;
-
-                do
-                {
-                    bits = __next(31);
-                    val = bits%n;
-                } while (bits - val + (n - 1) < 0);
-                return val;
-            }
-
-            private int __next(int bits)
-            {
-                _seed = (_seed*LARGE_PRIME + SMALL_PRIME) & ((1L << 48) - 1);
-                return (int) ((uint) _seed >> (48 - bits));
-            }
-
-            private long _seed;
-
-            private const long LARGE_PRIME = 0x5DEECE66DL;
-            private const long SMALL_PRIME = 0xBL;
-            
         }
+
+        public static BlockFaceDirection CoordinatesToBlockFace(Vector3I face)
+        {
+            if (face == Vector3I.Down)
+                return BlockFaceDirection.YDecreasing;
+            else if (face == Vector3I.Up)
+                return BlockFaceDirection.YIncreasing;
+            else if (face == Vector3I.Backward)
+                return BlockFaceDirection.ZDecreasing;
+            else if (face == Vector3I.Forward)
+                return BlockFaceDirection.ZIncreasing;
+            else if (face == Vector3I.Left)
+                return BlockFaceDirection.XDecreasing;
+            else
+                return BlockFaceDirection.XIncreasing;
+        }
+
+        public static double Distance2D(double a1, double a2, double b1, double b2)
+        {
+            return Math.Sqrt(Math.Pow(b1 - a1, 2) + Math.Pow(b2 - a2, 2));
+        }
+
+        //public static Direction DirectionByRotationFlat(float yaw, bool invert = false)
+        //{
+        //    byte direction = (byte)((int)Math.Floor((yaw * 4F) / 360F + 0.5D) & 3);
+        //    if (invert)
+        //        switch (direction)
+        //        {
+        //            case 0: return Direction.North;
+        //            case 1: return Direction.East;
+        //            case 2: return Direction.South;
+        //            case 3: return Direction.West;
+        //        }
+        //    else
+        //        switch (direction)
+        //        {
+        //            case 0: return Direction.South;
+        //            case 1: return Direction.West;
+        //            case 2: return Direction.North;
+        //            case 3: return Direction.East;
+        //        }
+        //    return 0;
+        //}
 
         #endregion
     }

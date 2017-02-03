@@ -201,7 +201,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	// gives a rounded shape to the landscape, making it seem like an actual planet.
 	// this value needs to be dependant on world size so smaller planets have a larger bend.
-	output.Position.y -= output.Distance * output.Distance *0.0025f;
+	output.Position.y -= output.Distance * output.Distance *0.001f;
 	output.Overlay = input.Overlay;
 	output.Effect = input.Effect;
 	return output;
@@ -236,6 +236,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	case 1:
 		//color.a = 0.3;
 		//color = lerp(texColor1, reflectionColor, 0.15f);
+		input.Position.x += (0.1f * sin(RippleTime + input.Position.x + (input.Position.z * 2))) - 0.2f;
 		break;
 	default:
 		if (color.a == 0)

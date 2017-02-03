@@ -143,17 +143,6 @@
 /processorParam:TextureFormat=Color
 /build:Textures/SelectionBlock.png
 
-#begin Textures/snow.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:TextureFormat=Color
-/build:Textures/snow.png
-
 #begin Textures/terrain.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -285,4 +274,21 @@
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
 /build:Effects/ParticleEffect.fx
+
+#begin Textures/snow.DDS
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:TextureFormat=Color
+/build:Textures/snow.DDS
+
+#begin Effects/ShadowMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/ShadowMap.fx
 

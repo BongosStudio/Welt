@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
+using Welt.API;
+using Welt.Core.Forge;
+using Welt.Core.Blocks;
 
 namespace Welt.Processors.MeshBuilders
 {
@@ -14,7 +10,7 @@ namespace Welt.Processors.MeshBuilders
     {
         public const int VertexCount = 16;
 
-        public static void BuildPlantVertexList(ushort id, Chunk chunk, Vector3I chunkRelativePosition)
+        public static void BuildPlantVertexList(ushort id, ReadOnlyChunk chunk, Vector3I chunkRelativePosition)
         {
 
             var blockPosition = chunk.Position + chunkRelativePosition;
@@ -62,7 +58,7 @@ namespace Welt.Processors.MeshBuilders
             BuildPlantVertices(chunk, blockPosition, chunkRelativePosition, id, 0.6f, (new Color(0.5f + local.X/255, 0.5f + local.Y/255, 0.5f + local.Z/255)));
         }
 
-        protected static void BuildPlantVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        protected static void BuildPlantVertices(ReadOnlyChunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             ushort blockType, float sunLight, Color localLight)
         {
             var provider = BlockProvider.GetProvider(blockType);

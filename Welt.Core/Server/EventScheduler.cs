@@ -1,0 +1,97 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using Welt.API;
+
+namespace Welt.Core.Server
+{
+    public class EventScheduler : IEventScheduler
+    {
+        private IList<ScheduledEvent> Events { get; set; } // Sorted
+        private readonly object EventLock = new object();
+        private IMultiplayerServer Server { get; set; }
+        private HashSet<IEventSubject> Subjects { get; set; }
+        private Stopwatch Stopwatch { get; set; }
+
+        public EventScheduler(IMultiplayerServer server)
+        {
+            Events = new List<ScheduledEvent>();
+            Server = server;
+            Subjects = new HashSet<IEventSubject>();
+            Stopwatch = new Stopwatch();
+            Stopwatch.Start();
+        }
+
+        public void ScheduleEvent(string name, IEventSubject subject, TimeSpan when, Action<IMultiplayerServer> action)
+        {
+            lock (EventLock)
+            {
+                long _when = Stopwatch.ElapsedTicks + when.Ticks;
+                if (!Subjects.Contains(subject))
+                {
+                    Subjects.Add(subject);
+                    subject.Disposed += Subject_Disposed;
+                }
+                int i;
+                for (i = 0; i < Events.Count; i++)
+                {
+                    if (Events[i].When > _when)
+                        break;
+                }
+                Events.Insert(i, new ScheduledEvent
+                {
+                    Name = name,
+                    Subject = subject,
+                    When = _when,
+                    Action = action
+                });
+            }
+        }
+
+        void Subject_Disposed(object sender, EventArgs e)
+        {
+            // Cancel all events with this subject
+            lock (EventLock)
+            {
+                for (int i = 0; i < Events.Count; i++)
+                {
+                    if (Events[i].Subject == sender)
+                    {
+                        Events.RemoveAt(i);
+                        i--;
+                    }
+                }
+                Subjects.Remove((IEventSubject)sender);
+            }
+        }
+
+        public void Update()
+        {
+            lock (EventLock)
+            {
+                var start = Stopwatch.ElapsedTicks;
+                for (int i = 0; i < Events.Count; i++)
+                {
+                    var e = Events[i];
+                    if (e.When <= start)
+                    {
+                        e.Action(Server);
+                        Events.RemoveAt(i);
+                        i--;
+                    }
+                    if (e.When > start)
+                        break; // List is sorted, we can exit early
+                }
+            }
+        }
+
+        private struct ScheduledEvent
+        {
+            public long When;
+            public Action<IMultiplayerServer> Action;
+            public IEventSubject Subject;
+            public string Name;
+        }
+    }
+}

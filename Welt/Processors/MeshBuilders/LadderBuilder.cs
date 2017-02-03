@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
+using Welt.API;
+using Welt.Core.Blocks;
+using Welt.Core.Forge;
 
 namespace Welt.Processors.MeshBuilders
 {
@@ -25,7 +20,7 @@ namespace Welt.Processors.MeshBuilders
             new Vector3(1, 1, 1), //7
         };
 
-        public static void BuildLadderVertexList(ushort id, Chunk chunk, Vector3I chunkRelativePosition)
+        public static void BuildLadderVertexList(ushort id, ReadOnlyChunk chunk, Vector3I chunkRelativePosition)
         {
             var blockPosition = chunk.Position + chunkRelativePosition;
 
@@ -33,9 +28,6 @@ namespace Welt.Processors.MeshBuilders
             var x = (sbyte)chunkRelativePosition.X;
             var y = (sbyte)chunkRelativePosition.Y;
             var z = (sbyte)chunkRelativePosition.Z;
-
-
-            var solidBlock = new Block(BlockType.STONE);
 
             var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
             var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
@@ -199,7 +191,7 @@ namespace Welt.Processors.MeshBuilders
             }
         }
 
-        protected static void BuildFaceVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        protected static void BuildFaceVertices(ReadOnlyChunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             BlockFaceDirection faceDir, ushort blockType, float sunLightTl, float sunLightTr, float sunLightBl,
             float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr)
         {

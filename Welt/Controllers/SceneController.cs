@@ -4,10 +4,8 @@
 
 #endregion Copyright
 
-using EmptyKeys.UserInterface.Controls;
 using Microsoft.Xna.Framework;
 using System;
-using Welt.Extensions;
 using Welt.Scenes;
 
 namespace Welt.Controllers
@@ -24,6 +22,7 @@ namespace Welt.Controllers
             Game = game;
             GraphicsManager = gdm;
             Scene.Controller = this;
+            Game.Exiting += HandleExiting;
         }
 
         public static void Draw(GameTime gameTime)
@@ -60,7 +59,7 @@ namespace Welt.Controllers
             //_ui.Update(gameTime);
         }
 
-        public void HandleExiting(object sender, EventArgs args)
+        public static void HandleExiting(object sender, EventArgs args)
         {
             m_Current.OnExiting(sender, args);
         }

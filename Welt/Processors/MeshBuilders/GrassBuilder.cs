@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
-using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
+using Welt.API;
+using Welt.Core.Blocks;
 
 namespace Welt.Processors.MeshBuilders
 {
     public class GrassBuilder : BlockMeshBuilder
     {
-        public static void BuildGrassVertexList(ushort id, Chunk chunk, Vector3I chunkRelativePosition)
+        public static void BuildGrassVertexList(ushort id, ReadOnlyChunk chunk, Vector3I chunkRelativePosition)
         {
 
             var blockPosition = chunk.Position + chunkRelativePosition;
@@ -20,10 +20,10 @@ namespace Welt.Processors.MeshBuilders
             BuildGrassVertices(chunk, blockPosition, chunkRelativePosition, id, 0.6f, Color.LightGray);
         }
 
-        protected static void BuildGrassVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        protected static void BuildGrassVertices(ReadOnlyChunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             ushort blockType, float sunLight, Color localLight)
         {
-            var uvList = Block.GetTexture(blockType, BlockFaceDirection.XIncreasing);
+            var uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.XIncreasing);
             
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
@@ -32,7 +32,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
                 new short[] { 0, 1, 2, 2, 1, 3 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.XDecreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.XDecreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },
@@ -40,7 +40,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
                 new short[] { 0, 1, 3, 0, 3, 2 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.XIncreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.XIncreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },
@@ -48,7 +48,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
                 new short[] { 0, 1, 2, 2, 1, 3 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.XDecreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.XDecreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },
@@ -56,7 +56,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
                 new short[] { 0, 1, 3, 0, 3, 2 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.ZIncreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.ZIncreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },
@@ -64,7 +64,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
                 new short[] { 0, 1, 3, 0, 3, 2 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.ZDecreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.ZDecreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },
@@ -72,7 +72,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
                 new short[] { 0, 1, 2, 2, 1, 3 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.ZIncreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.ZIncreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },
@@ -80,7 +80,7 @@ namespace Welt.Processors.MeshBuilders
                 new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
                 new short[] { 0, 1, 3, 0, 3, 2 });
 
-            uvList = Block.GetTexture(blockType, BlockFaceDirection.ZDecreasing);
+            uvList = BlockLogic.GetTexture(blockType, BlockFaceDirection.ZDecreasing);
             AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
                 new float[] { sunLight, sunLight, sunLight, sunLight },
                 new Color[] { localLight, localLight, localLight, localLight },

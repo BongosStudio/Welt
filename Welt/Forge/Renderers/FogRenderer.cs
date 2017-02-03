@@ -2,7 +2,6 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Welt.Forge.Renderers

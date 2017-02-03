@@ -3,13 +3,11 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Media;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using Welt.Extensions;
-using Welt.Forge;
-using Welt.Models;
-using Welt.Scenes;
+using Welt.API;
+using Welt.API.Forge;
+using Welt.Core;
 
 namespace Welt
 {
@@ -25,8 +23,8 @@ namespace Welt
         public SoundEffectInstance StepSnow;
         public SoundEffectInstance Splash;
 
-        public Song SongFeather;
-        public Song SongSnowfall;
+        public Song[] Songs;
+        private bool m_IsSongPlaying;
 
         public readonly WeltGame Game;
         
@@ -47,15 +45,24 @@ namespace Welt
         public void BeginWatch()
         {
             m_IsRunning = true;
-            //new Thread(() =>
-            //{
-            //    while (m_IsRunning)
-            //    {
-            //        Update();
-            //        Thread.Sleep(500);
-            //    }
-            //})
-            //{ IsBackground = true }.Start();
+            new Thread(() =>
+            {
+                while (Game.IsRunning)
+                {
+                    if (MediaPlayer.State != MediaState.Playing)
+                    {
+                        var willPlay = FastMath.NextRandom(1000) < 1;
+                        if (willPlay)
+                        {
+                            var song = Songs[FastMath.NextRandom(Songs.Length)];
+                            MediaPlayer.Play(song);
+                        }
+                    }
+                    Update();
+                    Thread.Sleep(500);
+                }
+            })
+            { IsBackground = true }.Start();
         }
 
         public void Destroy()
@@ -67,8 +74,11 @@ namespace Welt
         {
             ButtonSound = content.Load<SoundEffect>("Sounds\\menu-button").CreateInstance();
             WaterWaves = content.Load<SoundEffect>("Sounds\\waves").CreateInstance();
-            SongFeather = content.Load<Song>("Music\\Feather");
-            SongSnowfall = content.Load<Song>("Music\\snowfall");
+            Songs = new Song[]
+            {
+                content.Load<Song>("Music\\Feather"),
+                content.Load<Song>("Music\\snowfall")
+            };
             Splash = content.Load<SoundEffect>("Sounds\\splash").CreateInstance();
         }
 
@@ -105,7 +115,14 @@ namespace Welt
             }
             else
             {
-                WaterWaves.Stop();
+                try
+                {
+                    WaterWaves.Stop();
+                }
+                catch (Exception)
+                {
+
+                }
             }
         }
     }

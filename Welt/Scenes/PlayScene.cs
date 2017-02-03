@@ -2,22 +2,20 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Welt.Cameras;
 using Welt.Controllers;
-using Welt.Forge;
 using Welt.Forge.Renderers;
-using Welt.Models;
+using Welt.API;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using EmptyKeys.UserInterface.Controls;
 using MonoGame.Extended;
-using Welt.Particles;
 using EmptyKeys.UserInterface.Generated;
 using GameUILibrary.Models;
 using Welt.Extensions;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework.Graphics;
+using Welt.Core.Forge;
 
 namespace Welt.Scenes
 {
@@ -53,13 +51,16 @@ namespace Welt.Scenes
         private World m_World;
         private IRenderer m_Renderer;
         private HudRenderer m_Hud;
-        private Player m_Player;
+        private MultiplayerClient m_Player;
         private PlayerRenderer m_PlayerRenderer;
         private SkyRenderer m_SkyRenderer;
         private Vector2 m_PreviousMousePosition;
         private FramesPerSecondCounterComponent m_Fps;
-        
-        internal override Color BackColor => Color.GhostWhite;
+
+        private RenderTarget2D m_RenderTarget;
+        private SpriteBatch m_SpriteBatch;
+
+        internal override Color BackColor => Color.Black;
         internal override UIRoot UI { get; set; }
 
         public PlayScene(WeltGame game, World worldToHandoff, IRenderer rendererToHandoff, SkyRenderer skyToHandoff,
@@ -75,72 +76,7 @@ namespace Welt.Scenes
                 FirstPersonCameraController.DefaultMouseState.Y);
             m_Hud = new HudRenderer(GraphicsDevice, m_World, m_PlayerRenderer);
             
-            Input.Assign(() =>
-            {
-                m_Player.IsPaused = !m_Player.IsPaused;
-                if (m_Player.IsPaused)
-                    UI = m_PauseUi;
-                else
-                    UI = m_PlayUi;
-            }, Keys.Escape);
-            Input.Assign(() =>
-            {
-                m_Player.IsMouseLocked = !m_Player.IsMouseLocked;
-                if (m_Player.IsMouseLocked)
-                    Cursor.Show();
-                else
-                    Cursor.Hide();
-            }, Keys.RightAlt);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 0;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[0].Block.Id).BlockTitle;
-            }, Keys.D1);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 1;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[1].Block.Id).BlockTitle;
-            }, Keys.D2);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 2;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[2].Block.Id).BlockTitle;
-            }, Keys.D3);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 3;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[3].Block.Id).BlockTitle;
-            }, Keys.D4);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 4;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[4].Block.Id).BlockTitle;
-            }, Keys.D5);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 5;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[5].Block.Id).BlockTitle;
-            }, Keys.D6);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 6;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[6].Block.Id).BlockTitle;
-            }, Keys.D7);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 7;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[7].Block.Id).BlockTitle;
-            }, Keys.D8);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 8;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[8].Block.Id).BlockTitle;
-            }, Keys.D9);
-            Input.Assign(() =>
-            {
-                m_Player.HotbarIndex = 9;
-                m_PlayViewModel.SelectedItemName = BlockProvider.GetProvider(m_Player.Inventory[9].Block.Id).BlockTitle;
-            }, Keys.D0);
+            
             UI = m_PlayUi;
         }
 
@@ -177,6 +113,14 @@ namespace Welt.Scenes
         {
             m_Renderer.LoadContent(Game.Content);
             m_Hud.LoadContent(Game.Content);
+            m_RenderTarget = new RenderTarget2D(
+                GraphicsDevice, 
+                GraphicsDevice.PresentationParameters.BackBufferWidth, 
+                GraphicsDevice.PresentationParameters.BackBufferHeight, 
+                false, 
+                GraphicsDevice.PresentationParameters.BackBufferFormat, 
+                GraphicsDevice.PresentationParameters.DepthStencilFormat);
+            m_SpriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         #endregion
@@ -198,31 +142,19 @@ namespace Welt.Scenes
 
         public virtual Vector3 UpdateTod(GameTime gameTime)
         {
-            const long div = 20000;
-
-            if (!m_World.RealTime)
-                m_World.Tod += ((float)gameTime.ElapsedGameTime.Milliseconds / div);
-            else
-                m_World.Tod = (DateTime.Now.Hour) + ((float)DateTime.Now.Minute) / 60 +
-                              (((float)DateTime.Now.Second) / 60) / 60;
-
-            if (m_World.Tod >= 24)
-                m_World.Tod = 0;
-
-
             // Calculate the position of the sun based on the time of day.
             float x;
             float y;
 
-            if (m_World.Tod <= 12)
+            if (m_World.TimeOfDay <= 12)
             {
-                y = m_World.Tod / 12;
-                x = 12 - m_World.Tod;
+                y = m_World.TimeOfDay / 12;
+                x = 12 - m_World.TimeOfDay;
             }
             else
             {
-                y = (24 - m_World.Tod) / 12;
-                x = 12 - m_World.Tod;
+                y = (24 - m_World.TimeOfDay) / 12;
+                x = 12 - m_World.TimeOfDay;
             }
 
             x /= 10;

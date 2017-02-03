@@ -7,6 +7,6 @@ namespace Welt.Processors
 {
     public interface IChunkProcessor
     {
-        void ProcessChunk(Chunk chunk);
+        void ProcessChunk(ReadOnlyChunk chunk);
     }
 }

@@ -4,15 +4,13 @@
 #region Using Statements
 
 using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
+using Welt.API;
 using Welt.Processors.MeshBuilders;
-using System.Linq;
-using System.Collections.Generic;
-using System.Diagnostics;
+using Welt.API.Forge;
+using Welt.Core.Forge;
 
 // ReSharper disable PossibleLossOfFraction
 
@@ -20,7 +18,7 @@ using System.Diagnostics;
 
 namespace Welt.Processors
 {
-    public delegate void VertexBuilder(ushort id, Chunk chunk, Vector3I relativePosition);
+    public delegate void VertexBuilder(ushort id, ReadOnlyChunk chunk, Vector3I relativePosition);
 
     public class VertexBuildChunkProcessor : IChunkProcessor
     {
@@ -34,15 +32,15 @@ namespace Welt.Processors
 
         #region BuildVertexList
 
-        private void BuildVertexList(Chunk chunk)
+        private void BuildVertexList(ReadOnlyChunk chunk)
         {
             //lowestNoneBlock and highestNoneBlock come from the terrain gen (Eventually, if the terraingen did not set them you gain nothing)
             //and digging is handled correctly too 
             //TODO generalize highest/lowest None to non-solid
 
-            var yLow = (chunk.LowestNoneBlock.Y == 0 ? 0 : chunk.LowestNoneBlock.Y - 1);
+            var yLow = (chunk.Chunk.LowestNoneBlock.Y == 0 ? 0 : chunk.Chunk.LowestNoneBlock.Y - 1);
             var yHigh =
-                (chunk.HighestSolidBlock.Y == Chunk.Size.Y ? Chunk.Size.Y : chunk.HighestSolidBlock.Y + 1);
+                (chunk.Chunk.HighestSolidBlock.Y == Chunk.Size.Y ? Chunk.Size.Y : chunk.Chunk.HighestSolidBlock.Y + 1);
 
             for (byte x = 0; x < Chunk.Size.X; x++)
             {
@@ -55,55 +53,55 @@ namespace Welt.Processors
 
                     if (x == 0)
                     {
-                        if (chunk.E == null)
+                        if (chunk.Chunk.E == null)
                         {
                             yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.E.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.E.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.Chunk.E.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.Chunk.E.LowestNoneBlock.Y);
                         }
                     }
                     else if (x == Chunk.Max.X)
                     {
-                        if (chunk.W == null)
+                        if (chunk.Chunk.W == null)
                         {
                             yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.W.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.W.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.Chunk.W.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.Chunk.W.LowestNoneBlock.Y);
                         }
                     }
 
                     if (z == 0)
                     {
-                        if (chunk.S == null)
+                        if (chunk.Chunk.S == null)
                         {
                             yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.S.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.S.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.Chunk.S.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.Chunk.S.LowestNoneBlock.Y);
                         }
                     }
                     else if (z == Chunk.Max.Z)
                     {
-                        if (chunk.N == null)
+                        if (chunk.Chunk.N == null)
                         {
                             yHigh = Chunk.Size.Y;
                             yLow = 0;
                         }
                         else
                         {
-                            yHigh = Math.Max(yHigh, chunk.N.HighestSolidBlock.Y);
-                            yLow = Math.Min(yLow, chunk.N.LowestNoneBlock.Y);
+                            yHigh = Math.Max(yHigh, chunk.Chunk.N.HighestSolidBlock.Y);
+                            yLow = Math.Min(yLow, chunk.Chunk.N.LowestNoneBlock.Y);
                         }
                     }
 
@@ -111,16 +109,14 @@ namespace Welt.Processors
 
                     for (byte y = (byte) yLow; y < yHigh; y++)
                     {
-                        var id = chunk.Blocks[offset + y].Id;
+                        var id = chunk.Chunk.Blocks[offset + y].Id;
                         if (id == BlockType.NONE) continue;
                         var builder = BlockMeshBuilder.GetVertexBuilder(id);
                         builder(id, chunk, new Vector3I(x, y, z));
                     }
                 }
             }
-
-            var start = DateTime.Now;
-
+            
             var pvwr = new WeakReference<VertexPositionTextureLightEffect[]>(chunk.PrimaryVertexList.ToArray());
             var pi = chunk.PrimaryIndexList.ToArray();
             var svwr = new WeakReference<VertexPositionTextureLightEffect[]>(chunk.SecondaryVertexList.ToArray());
@@ -154,13 +150,13 @@ namespace Welt.Processors
             chunk.SecondaryVertexList.Clear();
             chunk.PrimaryIndexList.Clear();
             chunk.SecondaryIndexList.Clear();
-            //GC.Collect();
+            GC.Collect();
         }
 
         #endregion
 
         
-        public void ProcessChunk(Chunk chunk)
+        public void ProcessChunk(ReadOnlyChunk chunk)
         {
             if (chunk == null) return;
             
@@ -169,7 +165,7 @@ namespace Welt.Processors
                 chunk.Clear();
             }
             BuildVertexList(chunk);
-            chunk.State = Models.ChunkState.Ready;
+            chunk.Chunk.IsModified = false;
         }
     }
 }

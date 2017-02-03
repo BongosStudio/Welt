@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Welt.Forge;
-using Welt.Models;
-using Welt.Types;
+using Welt.API;
 
 namespace Welt.Events.Forge
 {
@@ -11,9 +8,9 @@ namespace Welt.Events.Forge
     {
         public ushort Id { get; }
         public Vector3I Position { get; }
-        public Chunk Chunk { get; }
+        public ReadOnlyChunk Chunk { get; }
         
-        public BlockChangedEventArgs(ushort id, Vector3I position, Chunk chunk)
+        public BlockChangedEventArgs(ushort id, Vector3I position, ReadOnlyChunk chunk)
         {
             Id = id;
             Position = position;

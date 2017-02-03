@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
+using Welt.API;
+using Welt.Core.Blocks;
+using Welt.Core.Forge;
 
 namespace Welt.Processors.MeshBuilders
 {
@@ -24,7 +20,7 @@ namespace Welt.Processors.MeshBuilders
             new Vector3(1, 0.1f, 1)
         };
 
-        public static void BuildBlockVertexList(ushort id, Chunk chunk, Vector3I chunkRelativePosition)
+        public static void BuildBlockVertexList(ushort id, ReadOnlyChunk chunk, Vector3I chunkRelativePosition)
         {
 
             var blockPosition = chunk.Position + chunkRelativePosition;
@@ -33,9 +29,6 @@ namespace Welt.Processors.MeshBuilders
             var x = (sbyte)chunkRelativePosition.X;
             var y = (sbyte)chunkRelativePosition.Y;
             var z = (sbyte)chunkRelativePosition.Z;
-
-
-            var solidBlock = new Block(BlockType.STONE);
 
             var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
             var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
@@ -75,8 +68,8 @@ namespace Welt.Processors.MeshBuilders
 
 
             // XDecreasing
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.XDecreasing, blockMidW.Id) ||
-                (Block.IsOpaqueBlock(blockMidW.Id) && id != blockMidW.Id))
+            if (BlockLogic.WillForceRenderSide(id, BlockFaceDirection.XDecreasing, blockMidW.Id) ||
+                (BlockLogic.IsOpaqueBlock(blockMidW.Id) && id != blockMidW.Id))
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun) / 4);
@@ -106,8 +99,8 @@ namespace Welt.Processors.MeshBuilders
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
                     id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.XIncreasing, blockMidE.Id) ||
-                (Block.IsOpaqueBlock(blockMidE.Id) && id != blockMidE.Id))
+            if (BlockLogic.WillForceRenderSide(id, BlockFaceDirection.XIncreasing, blockMidE.Id) ||
+                (BlockLogic.IsOpaqueBlock(blockMidE.Id) && id != blockMidE.Id))
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun) / 4);
@@ -137,8 +130,8 @@ namespace Welt.Processors.MeshBuilders
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
                     id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.YDecreasing, blockBotM.Id) ||
-                (Block.IsOpaqueBlock(blockBotM.Id) && id != blockBotM.Id))
+            if (BlockLogic.WillForceRenderSide(id, BlockFaceDirection.YDecreasing, blockBotM.Id) ||
+                (BlockLogic.IsOpaqueBlock(blockBotM.Id) && id != blockBotM.Id))
             {
                 sunBl = (1f / MAX_SUN_VALUE) * ((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun) / 4);
                 sunBr = (1f / MAX_SUN_VALUE) * ((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun) / 4);
@@ -168,8 +161,8 @@ namespace Welt.Processors.MeshBuilders
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
                     id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.YIncreasing, blockTopM.Id) ||
-                (Block.IsOpaqueBlock(blockTopM.Id) && id != blockTopM.Id))
+            if (BlockLogic.WillForceRenderSide(id, BlockFaceDirection.YIncreasing, blockTopM.Id) ||
+                (BlockLogic.IsOpaqueBlock(blockTopM.Id) && id != blockTopM.Id))
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun) / 4);
@@ -199,8 +192,8 @@ namespace Welt.Processors.MeshBuilders
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
                     id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.ZDecreasing, blockMidS.Id) ||
-                (Block.IsOpaqueBlock(blockMidS.Id) && id != blockMidS.Id))
+            if (BlockLogic.WillForceRenderSide(id, BlockFaceDirection.ZDecreasing, blockMidS.Id) ||
+                (BlockLogic.IsOpaqueBlock(blockMidS.Id) && id != blockMidS.Id))
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun) / 4);
@@ -230,8 +223,8 @@ namespace Welt.Processors.MeshBuilders
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
                     id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.ZIncreasing, blockMidN.Id) ||
-                (Block.IsOpaqueBlock(blockMidN.Id) && id != blockMidN.Id))
+            if (BlockLogic.WillForceRenderSide(id, BlockFaceDirection.ZIncreasing, blockMidN.Id) ||
+                (BlockLogic.IsOpaqueBlock(blockMidN.Id) && id != blockMidN.Id))
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun) / 4);
@@ -263,7 +256,7 @@ namespace Welt.Processors.MeshBuilders
             }
         }
 
-        public static void BuildFaceVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+        public static void BuildFaceVertices(ReadOnlyChunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
             BlockFaceDirection faceDir, ushort blockType, float sunLightTl, float sunLightTr, float sunLightBl,
             float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr)
         {

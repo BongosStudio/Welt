@@ -2,54 +2,64 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
-using System;
-using Welt.API.Persistence;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using Welt.API;
+using Welt.API.IO;
 
 namespace Welt.Core.Forge
 {
     public class ChunkManager
     {
-        private readonly IChunkPersistence _persistence;
-        private readonly Chunk[] _chunks;
-        private readonly World _world;
+        public World World { get; }
+        public IChunkPersistence Persistence { get; }
+        public IEnumerable<Chunk> Chunks => m_LoadedChunks.Values;
 
-        public ChunkManager(World world)
+        private ConcurrentDictionary<Vector3I, Chunk> m_LoadedChunks;
+        private object m_ChunkLock = new object();
+
+        public ChunkManager(IChunkPersistence persistence, World world)
         {
-            _chunks = new Chunk[world.Size*world.Size];
-            _world = world;
+            World = world;
+            Persistence = persistence;
+            m_LoadedChunks = new ConcurrentDictionary<Vector3I, Chunk>();
         }
 
-        public Chunk GetChunk(uint x, uint z, bool genIfNotFound = true)
+        public Chunk GetChunk(uint x, uint y, uint z, bool generate = true)
         {
-            if (x >= _world.Size || z >= _world.Size) return null;
-            if (_chunks.Length <= x || _chunks.Length <= z) throw new IndexOutOfRangeException();
+            return GetChunk(new Vector3I(x, y, z), generate);
+        }
 
-            if (_chunks[x*_world.Size + z]?.X == x && _chunks[x*_world.Size + z]?.Z == z)
-                return _chunks[x*_world.Size + z];
-
-            var chunk = new Chunk(_world, x, z);
-            if (genIfNotFound) _world.Generator.GenerateChunk(_world, chunk);
-            _chunks[x*_world.Size + z] = chunk;
+        public Chunk GetChunk(Vector3I index, bool generate = true)
+        {
+            if (m_LoadedChunks.ContainsKey(index)) return m_LoadedChunks[index];
+            if (TryLoad(index, out var chunk)) return chunk;
+            if (!generate) return null;
+            chunk = new Chunk(World, index);
+            World.Generator.Generate(World, chunk);
             return chunk;
         }
 
-        public Chunk[] GetChunks()
+        public void SetChunk(Vector3I index, Chunk chunk)
         {
-            return _chunks;
+            // tbh idk when this'll be used but fuck it, might as well have it.
+            if (m_LoadedChunks.ContainsKey(index))
+                m_LoadedChunks[index] = chunk;
+            else
+                m_LoadedChunks.TryAdd(index, chunk);
         }
 
-        public void SetChunk(uint x, uint z, Chunk chunk)
+        public void RemoveChunk(Chunk chunk)
         {
-            if (x >= _world.Size || z >= _world.Size) return;
-            if (_chunks.Length <= x || _chunks.Length <= z) throw new IndexOutOfRangeException();
-            _chunks[x* _world.Size + z] = chunk;
-            // TODO: hook into persistence to check if chunk is dirty
+            var index = chunk.Index % World.Size;
+            if (!m_LoadedChunks.ContainsKey(index)) return;
+            m_LoadedChunks.TryRemove(index, out chunk);
         }
 
-        public void RemoveChunk(uint x, uint z)
+        private bool TryLoad(Vector3I index, out Chunk chunk)
         {
-            if (_chunks.Length <= z || _chunks.Length <= z) throw new IndexOutOfRangeException();
-            _chunks[x*_world.Size + z] = null;
+            chunk = null;
+            return false;
         }
     }
 }

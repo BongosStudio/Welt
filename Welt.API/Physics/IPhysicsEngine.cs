@@ -1,0 +1,13 @@
+﻿using System;
+using Welt.API.Forge;
+
+namespace Welt.API.Physics
+{
+    public interface IPhysicsEngine
+    {
+        IWorld World { get; set; }
+        void AddEntity(IPhysicsEntity entity);
+        void RemoveEntity(IPhysicsEntity entity);
+        void Update(TimeSpan time);
+    }
+}

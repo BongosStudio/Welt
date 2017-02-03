@@ -2,11 +2,8 @@
 // COPYRIGHT 2015 JUSTIN COX (CONJI)
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using Welt.Forge;
 
 namespace Welt.IO
@@ -19,7 +16,7 @@ namespace Welt.IO
 
         public IEnumerable<ushort> Blocks;
 
-        public WireChunk(Chunk chunk)
+        public WireChunk(ReadOnlyChunk chunk)
         {
             Blocks = null;
         }

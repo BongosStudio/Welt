@@ -1,0 +1,9 @@
+﻿(server)
+address = 127.0.0.1
+port = 3456
+loadplugins = false
+maxplayers = 1024
+motd = Welcome to Welt!
+name = Welt's Dev Server
+query = true
+queryport = 224

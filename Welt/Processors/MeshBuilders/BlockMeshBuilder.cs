@@ -2,19 +2,25 @@
 using Microsoft.Xna.Framework;
 using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
-using Welt.Models;
-using System.Diagnostics;
+using Welt.Graphics;
+using Welt.API;
 using System.Linq;
+using Welt.Core.Forge;
+using Welt.API.Forge;
+using System.Collections.Generic;
+using Welt.Forge.Renderers;
 
 namespace Welt.Processors.MeshBuilders
 {
-    public delegate void BlockVertexBuilder(ushort id, Chunk chunk, Vector3I chunkRelativePosition);
+    public delegate void BlockVertexBuilder(
+        IBlockProvider provider, ReadOnlyChunk chunk, Vector3I chunkRelativePosition, 
+        ChunkRenderer.VisibleFaces faces, int vertexCount, 
+        ref List<VertexPositionTextureLightEffect> vertices, ref List<short> indices);
     public class BlockMeshBuilder
     {
         protected const byte MAX_SUN_VALUE = 15;
         private static object m_Lock = new object();
-        public static BlockVertexBuilder GetVertexBuilder(ushort id)
+        protected static BlockVertexBuilder GetVertexBuilder(ushort id)
         {
             switch (id)
             {
@@ -33,58 +39,26 @@ namespace Welt.Processors.MeshBuilders
             }
         }
 
-        protected static void AddPlane(Chunk chunk, ushort blockType, Vector3I blockPosition, Vector3I chunkRelPos, 
-            BlockFaceDirection face, float[] sun, Color[] local, Vector3[] vadds, Vector2[] uvs, short[] ins)
+        public static void Render(IBlockProvider provider, ReadOnlyChunk chunk, Vector3I position, ChunkRenderer.VisibleFaces faces, int vertexCount, out VertexPositionTextureLightEffect[] vertices, out short[] indices)
         {
-            if (vadds.Length != uvs.Length) throw new ArgumentException("vadds and uvs must be same size");
+            var v = new List<VertexPositionTextureLightEffect>();
+            var i = new List<short>();
+            GetVertexBuilder(provider.Id)(provider, chunk, position, faces, vertexCount, ref v, ref i);
+            vertices = v.ToArray();
+            indices = i.ToArray();
+        }
 
-            var effect = BlockEffect.None;
-
-            switch (blockType)
+        protected static void RenderMesh(IBlockProvider provider, Vector3I blockPosition,
+            float[] sun, Color[] local, Vector3[] vadds, Vector2[] uvs, short[] ins, int currentVertexCount, 
+            ref List<VertexPositionTextureLightEffect> vertices, ref List<short> indices)
+        {
+            for (var i = 0; i < vadds.Length; i++)
             {
-                case BlockType.WATER:
-                    effect = BlockEffect.LightLiquidEffect;
-                    break;
-                case BlockType.FLOWER_ROSE:
-                case BlockType.LONG_GRASS:
-                case BlockType.LEAVES:
-                    effect = BlockEffect.VegetationWindEffect;
-                    break;
-            }
-            var overlay = BlockProvider.GetProvider(blockType).GetOverlay(face);
-            var vertices = new VertexPositionTextureLightEffect[vadds.Length];
-            for (var i = 0; i < vertices.Length; i++)
-            {
-                vertices[i] = new VertexPositionTextureLightEffect(
+                vertices.Add(new VertexPositionTextureLightEffect(
                     vadds[i] + (Vector3)blockPosition,
-                    uvs[i], overlay, sun[i], local[i].ToVector3(), effect);
+                    uvs[i], new Vector4(), sun[i], local[i].ToVector3(), provider.DisplayEffect));
             }
-            if (!Block.IsOpaqueBlock(blockType))
-            {
-                lock (chunk)
-                {
-                    chunk.PrimaryVertexList.AddRange(vertices);
-                    chunk.PrimaryIndexList.AddRange(ins.Select(ii => (short)(ii + chunk.PrimaryVertexCount)));
-                    
-                    //chunk.PrimaryPlaneIndex.Add(
-                    //    FastMath.Get4DHash((int)chunkRelPos.X, (int)chunkRelPos.Y, (int)chunkRelPos.Z, (int)face),
-                    //    (chunk.PrimaryVertexCount, vertices.Length));
-                    chunk.PrimaryVertexCount += vertices.Length;
-                }
-            }
-            else
-            {
-                lock (chunk)
-                {
-                    chunk.SecondaryVertexList.AddRange(vertices);
-                    chunk.SecondaryIndexList.AddRange(ins.Select(ii => (short)(ii + chunk.SecondaryVertexCount)));
-                    //chunk.SecondaryPlaneIndex.Add(
-                    //    FastMath.Get4DHash((int)chunkRelPos.X, (int)chunkRelPos.Y, (int)chunkRelPos.Z, (int)face),
-                    //    (chunk.SecondaryVertexCount, vertices.Length));
-                    chunk.SecondaryVertexCount += vertices.Length;
-                }
-            }
-            
+            indices.AddRange(ins.Select(i => (short)(i + currentVertexCount)));
         }
     }
 }

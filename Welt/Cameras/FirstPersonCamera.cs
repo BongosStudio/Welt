@@ -6,7 +6,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Welt.Models;
+using Welt.API;
 
 #endregion
 
@@ -71,21 +71,15 @@ namespace Welt.Cameras
             var cameraRotatedUpVector = Vector3.Transform(Vector3.Up, rotationMatrix);
             View = Matrix.CreateLookAt(Position, Target, cameraRotatedUpVector);
 
-            var invertPos = Position;
-            invertPos.Y = -Position.Y + (-Position.Y * 20f); // TODO: add height*2f
-            var lookAt = invertPos + Vector3.Transform(Vector3.Forward, rotationMatrix);
-            ReflectionViewMatrix = Matrix.CreateLookAt(invertPos, lookAt, cameraRotatedUpVector);
+            var reflectionPosition = Target;
+            var reflUp = Vector3.Transform(Vector3.Up, Matrix.Identity);
+            ReflectionViewMatrix = Matrix.CreateLookAt(reflectionPosition, Vector3.Reflect(LookVector, new Vector3(0, -1, 0)), reflUp);
             base.CalculateView();
         }
 
         #endregion
 
-        public void LookAt(Vector3 target)
-        {
-            // Doesn't take into account the rotated UP vector
-            // Should calculate rotations here!
-            View = Matrix.CreateLookAt(Position, target, Vector3.Up);
-        }
+        
 
         #region Update
 

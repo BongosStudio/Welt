@@ -2,141 +2,257 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using Welt.API;
 using Welt.API.Forge;
-using Welt.API.Forge.Generators;
+using Welt.Core.Forge.Generators;
+using Welt.Core.Persistence;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Welt.Core.Forge
 {
     public class World : IWorld
     {
-        public string Name { get; }
-        public long Seed { get; }
-        public int Size { get; }
-        public int Height { get; }
-        public IForgeGenerator Generator { get; }
-        public IWorldSystem System { get; }
-        public int SystemIndex { get; }
+        #region choose terrain generation
 
-        public long TimeOfDay { get; set; }
+        //public IChunkGenerator Generator = new SimpleTerrain();
+        //public IChunkGenerator Generator = new FlatReferenceTerrain();
+        //public IChunkGenerator Generator = new TerrainWithCaves();
+        public IChunkGenerator Generator = new DualLayerTerrainWithMediumValleysForRivers();
 
-        protected readonly ChunkManager Manager;
-        protected int MaxX => Size*Chunk.Width;
-        protected int MaxZ => Size*Chunk.Depth;
+        // Biomes
+        //public IChunkGenerator Generator = new Tundra_Alpine();
+        //public IChunkGenerator Generator = new Desert_Subtropical();
+        //public IChunkGenerator Generator = new Grassland_Temperate();
 
-        public World(string name, IForgeGenerator gen)
+        #endregion
+
+        public World(string name)
         {
+            //Chunks = new Dictionary2<Chunk>();//
+            ChunkManager = new ChunkManager(new ChunkPersistence(), this);
             Name = name;
-            var random = new FastMath.LongRandom();
-            Seed = random.Next(int.MaxValue)*name.GetHashCode();
-            // TODO change Size and Height with IForgeGenerator
-            Size = 32;
-            Height = 256;
-            Generator = gen;
-            Manager = new ChunkManager(this);
-
-            System = null;
-            SystemIndex = 0;
+            Seed = 54321;
+            SpawnPoint = new Vector3I(FastMath.NextRandom(Size), 128, FastMath.NextRandom(Size));
         }
 
-        public World(string name, long seed, IForgeGenerator gen)
+        public World(string name, int seed) : this(name)
         {
-            Name = name;
             Seed = seed;
-            Size = 32;
-            Generator = gen;
-            Manager = new ChunkManager(this);
-
-            System = null;
-            SystemIndex = 0;
         }
+        
+        #region InView
+
+        public bool InView(uint x, uint y, uint z)
+        {
+            if (ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z, false) == null)
+                return false;
+
+            var lx = x % Chunk.Size.X;
+            var ly = y % Chunk.Size.Y;
+            var lz = z % Chunk.Size.Z;
+
+            return lx < Chunk.Size.X && ly < Chunk.Size.Y && lz < Chunk.Size.Z;
+        }
+
+        #endregion
+
+        #region Fields
+
+        public ChunkManager ChunkManager;
 
         /// <summary>
-        ///     Creates the chunk and adds it to the chunk manager.
+        ///     The name of the world.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
-        public Chunk CreateChunk(uint x, uint z)
-        {
-            var chunk = new Chunk(this, x, z);
-            Generator.GenerateChunk(this, chunk);
-            _SetChunk(x, z, chunk, ChunkChangedEventArgs.ChunkChangedAction.Created);
-            return chunk;
-        }
+        public string Name { get; }
+        /// <summary>
+        ///     The seed used for generation.
+        /// </summary>
+        public int Seed { get; }
+        /// <summary>
+        ///     The size of the world in Chunks.
+        /// </summary>
+        /// <remarks>
+        ///     The size is a single uint value which represents both width and depth. This
+        ///     means that a world may only be said amount of chunks wide and deep.
+        /// </remarks>
+        public int Size { get; set; } = 256;
+        /// <summary>
+        ///     The <see cref="WorldType"/> of the world. Generators are bound by this value on
+        ///     what may render and what sizes to adhere to.
+        /// </summary>
+        public WorldType WorldType { get; set; } = WorldType.BioInhabital;
+        /// <summary>
+        ///     The parent world of the world. The only time this value will not be null is if
+        ///     the world is a moon or spacestation.
+        /// </summary>
+        public World ParentWorld { get; set; }
+
+        public Action<object, ChunkLoadedEventArgs> ChunkGenerated { get; set; }
+
+        public Action<object, ChunkLoadedEventArgs> ChunkLoaded { get; set; }
+
+        public Action<object, BlockChangeEventArgs> BlockChanged { get; set; }
 
         /// <summary>
-        ///     Creates the chunk without adding it, keeping it solely on the stack.
+        ///     The spawn chunk of the world. 
         /// </summary>
-        /// <returns></returns>
-        public Chunk CreateChunkInMemory(uint x, uint z)
+        public Vector3I SpawnPoint { get; set; }
+
+        public readonly RasterizerState WireframedRaster = new RasterizerState
         {
-            var chunk = new Chunk(this, x, z);
-            Generator.GenerateChunk(this, chunk);
-            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Created));
-            return chunk;
+            CullMode = CullMode.None,
+            FillMode = FillMode.WireFrame
+        };
+
+        public readonly RasterizerState NormalRaster = new RasterizerState
+        {
+            CullMode = CullMode.CullCounterClockwiseFace,
+            FillMode = FillMode.Solid
+        };
+
+        public bool Wireframed;
+
+        // Day/Night
+        public int TimeOfDay { get; set; } = 1200;
+        public Vector3 SunPos = new Vector3(0, 1000, 0); // Directly overhead
+        public bool RealTime = false;
+        public bool DayMode = false;
+        public bool NightMode = false;
+
+        #region Atmospheric settings
+
+        public Vector4 DeepWaterColor = Color.Black.ToVector4();
+        public Vector4 NightColor = Color.Red.ToVector4();
+        public Vector4 SunColor = Color.White.ToVector4();
+        public Vector4 HorizonColor = Color.White.ToVector4();
+
+        public Vector4 Eveningtint = Color.Red.ToVector4();
+        public Vector4 Morningtint = Color.Gold.ToVector4();
+
+        //private float _tod;
+        //public bool dayMode = false;
+        //public bool nightMode = false;
+        public float Fognear = 14 * 16; //(BUILD_RANGE - 1) * 16;
+        public float Fogfar = 16 * 16; //(BUILD_RANGE + 1) * 16;
+
+        #endregion
+
+        #region Events
+        
+        public void OnBlockChanged(object sender, BlockChangeEventArgs args)
+        {
+            BlockChanged?.Invoke(sender, args);
         }
 
-        public Chunk CreateChunkWithoutGeneration(uint x, uint z)
+        #endregion
+
+        public Vector3I FindBlockPosition(Vector3I worldCoords, out IChunk chunk, bool generate = true)
         {
-            var chunk = new Chunk(this, x, z);
-            _SetChunk(x, z, chunk, ChunkChangedEventArgs.ChunkChangedAction.Created);
-            return chunk;
+            var x = worldCoords.X;
+            var z = worldCoords.Z;
+
+            var cx = x / Chunk.Size.X;
+            var cz = z / Chunk.Size.Z;
+
+            var at = ChunkManager.GetChunk(cx, 0, cz, generate);
+
+            chunk = at;
+            return new Vector3I(cx, worldCoords.Y, cz);
         }
 
-        public Chunk CreateChunkInMemoryWithoutGeneration(uint x, uint z)
+        #endregion
+
+        public IChunk GetChunk(Vector3I position)
         {
-            var chunk = new Chunk(this, x, z);
-            return chunk;
+            return ChunkManager.GetChunk(position);
         }
 
-        public virtual IChunk GetChunk(uint x, uint z)
+        public void SetChunk(Vector3I position, IChunk value)
         {
-            var chunk = Manager.GetChunk(x, z) ?? CreateChunk(x, z);
-            return chunk;
+            ChunkManager.SetChunk(position, value as Chunk);
         }
 
-        public virtual void SetChunk(uint x, uint z, IChunk value)
+        #region GetBlock
+
+        public BlockDescriptor GetBlockData(Vector3I position)
         {
-            _SetChunk(x, z, value, ChunkChangedEventArgs.ChunkChangedAction.Adjusted);
+            var d = BlockDescriptor.FromBlock(GetBlock(position));
+            d.Position = position;
+            d.Chunk = ChunkAt(position);
+            return d;
         }
 
-        private void _SetChunk(uint x, uint z, IChunk value, ChunkChangedEventArgs.ChunkChangedAction action)
+        public Block GetBlock(Vector3I position)
         {
-            Manager.SetChunk(x, z, (Chunk) value);
-            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, action));
+            return GetBlock(position.X, position.Y, position.Z);
         }
 
-        public virtual void RemoveChunk(uint x, uint z)
+        public IChunk ChunkAt(Vector3I position, bool generate = false)
         {
-            Manager.RemoveChunk(x, z);
-            ChunkChanged?.Invoke(this, new ChunkChangedEventArgs(x, z, ChunkChangedEventArgs.ChunkChangedAction.Destroyed));
+            var x = position.X;
+            var z = position.Z;
+
+            var cx = x / Chunk.Size.X;
+            var cz = z / Chunk.Size.Z;
+
+            var at = ChunkManager.GetChunk(cx, 0, cz, generate);
+
+            return at;
         }
 
-        public virtual (ushort Id, byte Metadata) GetBlock(uint x, uint y, uint z)
+        public Block GetBlock(uint x, uint y, uint z)
         {
-            if (y >= Height) return (0, 0);
-
-            var nx = (uint) (x%MaxX);
-            var nz = (uint) (z%MaxZ);
-
-            var chunk = GetChunk(nx/Chunk.Width, nz/Chunk.Depth);
-            return chunk.GetBlock((int) (nx%Chunk.Width), (int) y, (int) (nz%Chunk.Depth));
+            if (!InView(x, y, z))
+                return new Block(BlockType.NONE);
+            //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
+            var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
+            return chunk.Blocks[x % Chunk.Size.X * Chunk.FlattenOffset + z % Chunk.Size.Z * Chunk.Size.Y + y % Chunk.Size.Y];
+            //Debug.WriteLine("no block at  ({0},{1},{2}) ", x, y, z);
         }
 
-        public virtual void SetBlock(uint x, uint y, uint z, ushort id, byte metadata)
+        #endregion
+
+        #region SetBlock
+
+        public Block SetBlock(Vector3I pos, Block newType)
         {
-            if (y >= Height) return;
+            var x = pos.X;
+            var y = pos.Y;
+            var z = pos.Z;
+            var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
 
-            var nx = (uint) (x%MaxX);
-            var nz = (uint) (z%MaxZ);
+            var localX = (byte)(x % Chunk.Size.X);
+            var localY = (byte)(y % Chunk.Size.Y);
+            var localZ = (byte)(z % Chunk.Size.Z);
+            var old = chunk.Blocks[localX * Chunk.FlattenOffset + localZ * Chunk.Size.Y + localY];
+            var oldD = GetBlockData(pos);
+            //chunk.SetBlock is also called by terrain generators for Y loops min max optimisation
+            chunk.SetBlock(localX, localY, localZ, newType);
 
-            var chunk = GetChunk(nx/Chunk.Width, nz/Chunk.Depth);
-            chunk.SetBlock((int) (nx%Chunk.Width), (int) y, (int) (nz%Chunk.Depth), id, metadata);
-            BlockChanged?.Invoke(this, new BlockChangedEventArgs(nx, y, nz));
+            var newD = GetBlockData(pos);
+            OnBlockChanged(this, new BlockChangeEventArgs(pos, oldD, newD));
+            return old;
         }
 
-        public event EventHandler<BlockChangedEventArgs> BlockChanged;
-        public event EventHandler<ChunkChangedEventArgs> ChunkChanged;
+        public IEnumerator<IChunk> GetEnumerator()
+        {
+            return ChunkManager.Chunks.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
+
+        public bool IsValidPosition(Vector3I position)
+        {
+            return position.Y <= Chunk.Max.Y;
+        }
     }
 }

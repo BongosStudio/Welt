@@ -3,20 +3,15 @@
 #endregion
 
 using System.Threading;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Welt.Cameras;
 using Welt.Controllers;
-using Welt.Forge;
 using Welt.Forge.Renderers;
-using Welt.Models;
+using Welt.API;
 using EmptyKeys.UserInterface.Mvvm;
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Generated;
-using System.Collections.Generic;
-using Welt.Types;
+using Welt.Core.Forge;
 
 namespace Welt.Scenes
 {

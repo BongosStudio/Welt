@@ -1,7 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
-using Welt.Blocks;
 using Welt.Forge;
-using Welt.Types;
+using Welt.API;
+using Welt.Core.Forge;
+using System.Collections.Generic;
+using Welt.Graphics;
+using Welt.API.Forge;
+using Welt.Forge.Renderers;
 
 namespace Welt.Processors.MeshBuilders
 {
@@ -19,18 +23,17 @@ namespace Welt.Processors.MeshBuilders
             new Vector3(1, 1, 1), //7
         };
 
-        public static void BuildBlockVertexList(ushort id, Chunk chunk, Vector3I chunkRelativePosition)
+        public static void BuildBlockVertexList(IBlockProvider provider, ReadOnlyChunk chunk, 
+            Vector3I chunkRelativePosition, ChunkRenderer.VisibleFaces faces, int vertexCount, 
+            ref List<VertexPositionTextureLightEffect> vertices, ref List<short> indices)
         {
-            if (id == 0) return;
-            var blockPosition = chunk.Position + chunkRelativePosition;
+            if (provider.Id == 0) return;
+            var blockPosition = chunk.GetPosition() + chunkRelativePosition;
 
             //get signed bytes from these to be able to remove 1 without further casts
             var x = (sbyte)chunkRelativePosition.X;
             var y = (sbyte)chunkRelativePosition.Y;
             var z = (sbyte)chunkRelativePosition.Z;
-
-
-            var solidBlock = new Block(BlockType.STONE);
 
             var blockTopNw = chunk.GetBlock(x - 1, y + 1, z + 1);
             var blockTopN = chunk.GetBlock(x, y + 1, z + 1);
@@ -70,8 +73,7 @@ namespace Welt.Processors.MeshBuilders
 
 
             // XDecreasing
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.XDecreasing, blockMidW.Id) ||
-                (Block.IsOpaqueBlock(blockMidW.Id) && id != blockMidW.Id))
+            if ((faces & ChunkRenderer.VisibleFaces.West) != 0)
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopNw.Sun + blockTopW.Sun + blockMidNw.Sun + blockMidW.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopSw.Sun + blockTopW.Sun + blockMidSw.Sun + blockMidW.Sun) / 4);
@@ -99,10 +101,10 @@ namespace Welt.Processors.MeshBuilders
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
-                    id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    provider, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr, vertexCount,
+                    ref vertices, ref indices);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.XIncreasing, blockMidE.Id) ||
-                (Block.IsOpaqueBlock(blockMidE.Id) && id != blockMidE.Id))
+            if ((faces & ChunkRenderer.VisibleFaces.East) != 0)
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopSe.Sun + blockTopE.Sun + blockMidSe.Sun + blockMidE.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopNe.Sun + blockTopE.Sun + blockMidNe.Sun + blockMidE.Sun) / 4);
@@ -130,10 +132,10 @@ namespace Welt.Processors.MeshBuilders
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
-                    id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    provider, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr, vertexCount,
+                    ref vertices, ref indices);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.YDecreasing, blockBotM.Id) ||
-                (Block.IsOpaqueBlock(blockBotM.Id) && id != blockBotM.Id))
+            if ((faces & ChunkRenderer.VisibleFaces.Bottom) != 0)
             {
                 sunBl = (1f / MAX_SUN_VALUE) * ((blockBotSw.Sun + blockBotS.Sun + blockBotM.Sun + blockTopW.Sun) / 4);
                 sunBr = (1f / MAX_SUN_VALUE) * ((blockBotSe.Sun + blockBotS.Sun + blockBotM.Sun + blockTopE.Sun) / 4);
@@ -161,10 +163,10 @@ namespace Welt.Processors.MeshBuilders
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
-                    id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    provider, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr, vertexCount,
+                    ref vertices, ref indices);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.YIncreasing, blockTopM.Id) ||
-                (Block.IsOpaqueBlock(blockTopM.Id) && id != blockTopM.Id))
+            if ((faces & ChunkRenderer.VisibleFaces.Top) != 0)
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopNw.Sun + blockTopN.Sun + blockTopW.Sun + blockTopM.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopNe.Sun + blockTopN.Sun + blockTopE.Sun + blockTopM.Sun) / 4);
@@ -192,10 +194,10 @@ namespace Welt.Processors.MeshBuilders
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
-                    id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    provider, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr, vertexCount,
+                    ref vertices, ref indices);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.ZDecreasing, blockMidS.Id) ||
-                (Block.IsOpaqueBlock(blockMidS.Id) && id != blockMidS.Id))
+            if ((faces & ChunkRenderer.VisibleFaces.South) != 0)
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopSw.Sun + blockTopS.Sun + blockMidSw.Sun + blockMidS.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopSe.Sun + blockTopS.Sun + blockMidSe.Sun + blockMidS.Sun) / 4);
@@ -223,10 +225,10 @@ namespace Welt.Processors.MeshBuilders
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
-                    id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    provider, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr, vertexCount,
+                    ref vertices, ref indices);
             }
-            if (Block.WillForceRenderSide(id, BlockFaceDirection.ZIncreasing, blockMidN.Id) ||
-                (Block.IsOpaqueBlock(blockMidN.Id) && id != blockMidN.Id))
+            if ((faces & ChunkRenderer.VisibleFaces.North) != 0)
             {
                 sunTl = (1f / MAX_SUN_VALUE) * ((blockTopNe.Sun + blockTopN.Sun + blockMidNe.Sun + blockMidN.Sun) / 4);
                 sunTr = (1f / MAX_SUN_VALUE) * ((blockTopNw.Sun + blockTopN.Sun + blockMidNw.Sun + blockMidN.Sun) / 4);
@@ -254,66 +256,56 @@ namespace Welt.Processors.MeshBuilders
                 localBr = new Color(redBr, grnBr, bluBr);
 
                 BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
-                    id, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr);
+                    provider, sunTl, sunTr, sunBl, sunBr, localTl, localTr, localBl, localBr, vertexCount,
+                    ref vertices, ref indices);
             }
         }
 
-        protected static void BuildFaceVertices(Chunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
-            BlockFaceDirection faceDir, ushort blockType, float sunLightTl, float sunLightTr, float sunLightBl,
-            float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr)
+        protected static void BuildFaceVertices(ReadOnlyChunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,
+            BlockFaceDirection faceDir, IBlockProvider provider, float sunLightTl, float sunLightTr, float sunLightBl,
+            float sunLightBr, Color localLightTl, Color localLightTr, Color localLightBl, Color localLightBr, int vertexCount,
+            ref List<VertexPositionTextureLightEffect> vertices, ref List<short> indices)
         {
-            var uvList = BlockProvider.GetProvider(blockType).GetTexture(faceDir,
-                chunk.GetBlock(chunkRelativePosition.X, chunkRelativePosition.Y + 1, chunkRelativePosition.Z).Id);
-            
+            var uvList = provider.GetTexture(faceDir);
+            var suns = new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl };
+            var locals = new Color[] { localLightTr, localLightTl, localLightBr, localLightBl };
             switch (faceDir)
             {
                 case BlockFaceDirection.XIncreasing:
-                    AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, faceDir,
-                            new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl },
-                            new Color[] { localLightTr, localLightTl, localLightBr, localLightBl },
-                            new Vector3[] { m_AddVectors[7], m_AddVectors[6], m_AddVectors[5], m_AddVectors[3] },
-                            new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
-                            new short[] { 0, 1, 2, 2, 1, 3 });
+                    RenderMesh(provider, blockPosition, suns, locals,
+                        new Vector3[] { m_AddVectors[7], m_AddVectors[6], m_AddVectors[5], m_AddVectors[3] },
+                        new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
+                        new short[] { 0, 1, 2, 2, 1, 3 }, vertexCount, ref vertices, ref indices);
                     break;
                 case BlockFaceDirection.XDecreasing:
-                    AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, faceDir,
-                            new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl },
-                            new Color[] { localLightTr, localLightTl, localLightBr, localLightBl },
-                            new Vector3[] { m_AddVectors[2], m_AddVectors[4], m_AddVectors[0], m_AddVectors[1] },
-                            new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
-                            new short[] { 0, 1, 3, 0, 3, 2 });
+                    RenderMesh(provider, blockPosition, suns, locals,
+                        new Vector3[] { m_AddVectors[2], m_AddVectors[4], m_AddVectors[0], m_AddVectors[1] },
+                        new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
+                        new short[] { 0, 1, 3, 0, 3, 2 }, vertexCount, ref vertices, ref indices);
                     break;
                 case BlockFaceDirection.YIncreasing:
-                    AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, faceDir,
-                            new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl },
-                            new Color[] { localLightTr, localLightTl, localLightBr, localLightBl },
-                            new Vector3[] { m_AddVectors[7], m_AddVectors[4], m_AddVectors[6], m_AddVectors[2] },
-                            new Vector2[] { uvList[4], uvList[5], uvList[1], uvList[3] },
-                            new short[] { 3, 2, 0, 3, 0, 1 });
+                    RenderMesh(provider, blockPosition, suns, locals,
+                        new Vector3[] { m_AddVectors[7], m_AddVectors[4], m_AddVectors[6], m_AddVectors[2] },
+                        new Vector2[] { uvList[4], uvList[5], uvList[1], uvList[3] },
+                        new short[] { 3, 2, 0, 3, 0, 1 }, vertexCount, ref vertices, ref indices);
                     break;
                 case BlockFaceDirection.YDecreasing:
-                    AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, faceDir,
-                            new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl },
-                            new Color[] { localLightTr, localLightTl, localLightBr, localLightBl },
-                            new Vector3[] { m_AddVectors[5], m_AddVectors[1], m_AddVectors[3], m_AddVectors[0] },
-                            new Vector2[] { uvList[0], uvList[2], uvList[4], uvList[5] },
-                            new short[] { 0, 2, 1, 1, 2, 3 });
+                    RenderMesh(provider, blockPosition, suns, locals,
+                        new Vector3[] { m_AddVectors[5], m_AddVectors[1], m_AddVectors[3], m_AddVectors[0] },
+                        new Vector2[] { uvList[0], uvList[2], uvList[4], uvList[5] },
+                        new short[] { 0, 2, 1, 1, 2, 3 }, vertexCount, ref vertices, ref indices);
                     break;
                 case BlockFaceDirection.ZIncreasing:
-                    AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, faceDir,
-                            new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl },
-                            new Color[] { localLightTr, localLightTl, localLightBr, localLightBl },
-                            new Vector3[] { m_AddVectors[4], m_AddVectors[7], m_AddVectors[1], m_AddVectors[5] },
-                            new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
-                            new short[] { 0, 1, 3, 0, 3, 2 });
+                    RenderMesh(provider, blockPosition, suns, locals,
+                        new Vector3[] { m_AddVectors[4], m_AddVectors[7], m_AddVectors[1], m_AddVectors[5] },
+                        new Vector2[] { uvList[0], uvList[1], uvList[5], uvList[2] },
+                        new short[] { 0, 1, 3, 0, 3, 2 }, vertexCount, ref vertices, ref indices);
                     break;
                 case BlockFaceDirection.ZDecreasing:
-                    AddPlane(chunk, blockType, blockPosition, chunkRelativePosition, faceDir,
-                            new float[] { sunLightTr, sunLightTl, sunLightBr, sunLightBl },
-                            new Color[] { localLightTr, localLightTl, localLightBr, localLightBl },
-                            new Vector3[] { m_AddVectors[6], m_AddVectors[2], m_AddVectors[3], m_AddVectors[0] },
-                            new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
-                            new short[] { 0, 1, 2, 2, 1, 3 });
+                    RenderMesh(provider, blockPosition, suns, locals,
+                        new Vector3[] { m_AddVectors[6], m_AddVectors[2], m_AddVectors[3], m_AddVectors[0] },
+                        new Vector2[] { uvList[0], uvList[1], uvList[2], uvList[5] },
+                        new short[] { 0, 1, 2, 2, 1, 3 }, vertexCount, ref vertices, ref indices);
                     break;
             }
         }

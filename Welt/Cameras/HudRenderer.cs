@@ -3,13 +3,12 @@
 #endregion
 #region Using Statements
 
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Welt.Controllers;
 using Welt.Forge;
-using Welt.Models;
+using Welt.Core.Forge;
+using Welt.API.Forge;
 
 #endregion
 
@@ -59,18 +58,18 @@ namespace Welt.Cameras
             var x = (uint) PlayerRenderer.Camera.Position.X;
             var z = (uint) PlayerRenderer.Camera.Position.Z;
 
-            var cx = x/Chunk.Size.X;
-            var cz = z/Chunk.Size.Z;
+            var cx = x/ReadOnlyChunk.Size.X;
+            var cz = z/ReadOnlyChunk.Size.Z;
 
             var chunk = World.ChunkManager.GetChunk(cx, 0, cz);
 
-            for (var xx = 0; xx < Chunk.Size.X; xx++)
+            for (var xx = 0; xx < ReadOnlyChunk.Size.X; xx++)
             {
-                for (var zz = 0; z < Chunk.Size.Z; z++)
+                for (var zz = 0; z < ReadOnlyChunk.Size.Z; z++)
                 {
-                    var y = chunk.HeightMap[xx * Chunk.Size.X + zz];
-                    var blockcheck = chunk.Blocks[xx*Chunk.FlattenOffset + zz*Chunk.Size.Y + y].Id;
-                    var index = xx * Chunk.Size.X + zz;
+                    var y = chunk.HeightMap[xx * ReadOnlyChunk.Size.X + zz];
+                    var blockcheck = chunk.Blocks[xx*ReadOnlyChunk.FlattenOffset + zz*ReadOnlyChunk.Size.Y + y].Id;
+                    var index = xx * ReadOnlyChunk.Size.X + zz;
                     switch (blockcheck)
                     {
                         case BlockType.GRASS:
@@ -164,7 +163,7 @@ namespace Welt.Cameras
                 {
                     _mBlockPos.X = i*8 + 650;
                     _mBlockPos.Y = j*8 + 20;
-                    _mSpriteBatchmap.Draw(_mMinimapTex, _mBlockPos, _mMaptexture[i*Chunk.Size.X + j]);
+                    _mSpriteBatchmap.Draw(_mMinimapTex, _mBlockPos, _mMaptexture[i*ReadOnlyChunk.Size.X + j]);
                 }
             }
             _mSpriteBatchmap.End();
@@ -182,7 +181,7 @@ namespace Welt.Cameras
         private SpriteBatch _mSpriteBatchmap;
         private Texture2D _mMinimapTex;
         private Color _mMinimapBgCol = new Color(150, 150, 150, 150);
-        private readonly Color[] _mMaptexture = new Color[Chunk.Size.X*Chunk.Size.Z];
+        private readonly Color[] _mMaptexture = new Color[ReadOnlyChunk.Size.X*ReadOnlyChunk.Size.Z];
         private Rectangle _mMinimapBgRect = new Rectangle(650, 20, 64, 64);
         private Rectangle _mBlockPos = new Rectangle(0, 0, 8, 8);
 

@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Forms;
 using Welt.Controllers;
 using Welt.Extensions;
@@ -125,6 +124,7 @@ namespace Welt.Scenes
 
         protected void Next(Scene scene)
         {
+            scene.OnExiting(this, null);
             SceneController.Load(scene);
         }
 
