@@ -10,7 +10,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct RespawnPacket : IPacket
     {
-        public byte Id { get { return 0x09; } }
+        public byte Id => 0x09;
         
         public void ReadPacket(IWeltStream stream)
         {

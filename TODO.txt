@@ -1,0 +1,48 @@
+TODOS:
+- change the lighting engine to use deferred shading. This is gonna be a pain, but it'll help MAJORLY with more detailed 
+shadows and lighting. Basically, the goal for this is to have a shader that solely gets all of the influential lights in an
+area and passes them to light up the area.
+- figure out why the damn BlockEffect parameters are invalid casts. Nothing changed with them, so it has to be from the latest
+MonoGame update. (FIXED)
+- ensure chunks are sent as cleanly as possible. We need to figure out the fine line between efficiency, resources, and speed.
+
+LOGS:
+- March 6, 2017
+	- ChunkMesh bounding boxes do not update when being processed to draw, so they all have a min of 0 and a max of 0. 
+	We need to figure out what's going on with these. This MAY be the reason as to why chunks aren't being drawn.
+	- SkyComponent is acting like a bitch and not rendering correctly. Possibly think of a way to redo it or how to fix it.
+	- InputController doesn't work anymore for some reason. Lets think about moving it to a ILogicComponent and have it work
+	in the scene rather than the other components.
+	- Temporarily changed BlockEffect.fx to return colors instead of PixelShaderOutput so we can test visuals. This means the
+	deferred engine will not work until we re-enable that and re-enable DEF in the ChunkComponent.
+	- Combine LightingEngine and WorldLighting so that there's only one component doing the work.
+	- Have LightEngine implement the same pattern as Renderer with multiple threads then implement Light.Update for visual 
+	changes.
+
+- March 12, 2017
+	- It's now been almost 2 weeks and I can't figure why the FUCK the renderers aren't working. I'm almost tempted to scrap
+	the current project and restart it as far as renderers go because this is getting ridiculous. Nothing seems out of place
+	but it's just not working. I tested the other version to see if perhaps it's my laptop, but that version is working fine.
+
+- March 14, 2017
+	- So it turns out the world renderers aren't returning any vertices and indices for some reason to the ChunkMesh. Gotta 
+	figure out what's going on there. (FIXED)
+	- Redoing the sky renderer so that we can create a more dynamic sky. For now it's planes but it may move to domes. Not
+	sure yet.
+
+- March 27, 2017
+	- Not sure what's going on but worlds don't have chunks assigned to the correct indexes. It's not ChunkHandler, so it's 
+	gotta be ReadOnlyWorld or ChunkComponent (FIXED)
+
+- March 30, 2017
+	- Not all chunks get sent to the client. There's either a bottleneck somewhere or something is causing the connection to
+	drop. Needs more testing.
+
+- March 31, 2017
+	- As it turns out, the socket event args passed to MultiplayerClient.ProcessNetwork has an invalid BytesTransferred value.
+	The bytes length sent from the server match what's recieved up until a certain point (have yet to see a pattern) and then
+	the passed SocketAsyncEventArgs return a BytesTransferred value of ushort.MaxValue. I thought this meant the 
+	BytesTransferred value hit its cap but the property is an int, so it's getting that number from somewhere. After toying 
+	with the SocketArgsPool a little, that doesn't effect it seeing as how the incorrect value would still be returned. 
+	I'm going to attempt some stress testing with no chunk data sent and see how well it handles that. That will be for 
+	tonight though.

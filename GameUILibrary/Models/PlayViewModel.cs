@@ -12,7 +12,7 @@ namespace GameUILibrary.Models
             set
             {
                 if (value == "Air") m_SelectedItemName = "";
-                else m_SelectedItemName = value;
+                else m_SelectedItemName = value ?? "";
                 RaisePropertyChanged();
             }
         }
@@ -24,7 +24,7 @@ namespace GameUILibrary.Models
             get { return m_ChatBoxText; }
             set
             {
-                m_ChatBoxText = value;
+                m_ChatBoxText = value ?? "";
                 RaisePropertyChanged();
             }
         }
@@ -35,7 +35,7 @@ namespace GameUILibrary.Models
             get { return m_ChatBoxInput; }
             set
             {
-                m_ChatBoxInput = ChatBoxInput;
+                m_ChatBoxInput = ChatBoxInput ?? "";
                 RaisePropertyChanged();
             }
         }

@@ -4,8 +4,11 @@
 
 #endregion Copyright
 
+using EmptyKeys.UserInterface.Generated;
+using GameUILibrary.Models;
 using Microsoft.Xna.Framework;
 using System;
+using Welt.Extensions;
 using Welt.Scenes;
 
 namespace Welt.Controllers
@@ -14,29 +17,39 @@ namespace Welt.Controllers
     {
         public static WeltGame Game = WeltGame.Instance;
 
-        public static GraphicsDeviceManager GraphicsManager;
-        private static Scene m_Current;
-
-        public SceneController(WeltGame game, GraphicsDeviceManager gdm)
+        static SceneController()
         {
-            Game = game;
-            GraphicsManager = gdm;
-            Scene.Controller = this;
             Game.Exiting += HandleExiting;
+            m_ErrorModel = new ErrorViewModel
+            {
+                ReturnAction = new Action(() =>
+                {
+                    m_IsErrorShown = false;
+                })
+            };
+        }
+
+        private static Scene m_Current;
+        private static bool m_IsErrorShown;
+        private static ErrorViewModel m_ErrorModel;
+        private static Error ErrorPage => new Error { DataContext = m_ErrorModel };
+        
+        public static void ShowError(string message)
+        {
+            m_IsErrorShown = true;
+            m_ErrorModel.Result = message;
         }
 
         public static void Draw(GameTime gameTime)
         {
-            GraphicsManager.GraphicsDevice.Clear(m_Current.BackColor);
+            //Game.GraphicsDevice.Clear(m_Current.BackColor);
             m_Current.I_Draw(gameTime);
             //if (m_Current.WillDrawUi) m_Ui.Draw(gameTime);
         }
 
-        public static void Initialize(GraphicsDeviceManager manager, Scene scene)
+        public static void Initialize(Scene scene)
         {
-            GraphicsManager = manager;
             Load(scene);
-            
         }
 
         public static void Load(Scene scene)
@@ -54,7 +67,8 @@ namespace Welt.Controllers
         public static void Update(GameTime gameTime)
         {
 
-            m_Current.I_Update(gameTime);
+            if (!m_IsErrorShown) m_Current.I_Update(gameTime);
+            else ErrorPage.Update(gameTime);
             //m_Ui.Update(gameTime);
             //_ui.Update(gameTime);
         }

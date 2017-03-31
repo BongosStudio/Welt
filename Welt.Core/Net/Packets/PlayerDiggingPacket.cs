@@ -25,8 +25,8 @@ namespace Welt.Core.Net.Packets
             Z = z;
             Face = face;
         }
-        
-        public byte Id { get { return 0x0E; } }
+
+        public byte Id => 0x0E;
 
         public Action PlayerAction;
         public int X;

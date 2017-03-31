@@ -15,12 +15,11 @@ namespace Welt.Cameras
     {
         protected Camera(Viewport viewport)
         {
-            this.Viewport = viewport;
+            Viewport = viewport;
         }
 
         public Matrix View { get; protected set; }
         public Matrix Projection { get; protected set; }
-        public Matrix ReflectionViewMatrix { get; protected set; }
 
         public Vector3 Position
         {
@@ -33,9 +32,9 @@ namespace Welt.Cameras
             }
         }
 
-        protected virtual void CalculateProjection()
+        protected virtual Matrix CalculateProjection()
         {
-            Projection = Matrix.CreatePerspectiveFieldOfView(_mViewAngle, Viewport.AspectRatio, _mNearPlane, _mFarPlane);
+            return Matrix.CreatePerspectiveFieldOfView(m_ViewAngle, Viewport.AspectRatio, m_NearPlane, m_FarPlane);
         }
 
         protected virtual void CalculateView()
@@ -45,7 +44,7 @@ namespace Welt.Cameras
         public virtual void Initialize()
         {
             CalculateView();
-            CalculateProjection();
+            Projection = CalculateProjection();
         }
 
         public virtual void Update(GameTime gameTime)
@@ -59,13 +58,29 @@ namespace Welt.Cameras
             View = Matrix.CreateLookAt(Position, target, Vector3.Up);
         }
 
+        public void LookAt(Matrix view)
+        {
+            View = view;
+        }
+
+        /// <summary>
+        /// Applies this camera to the specified effect.
+        /// </summary>
+        /// <param name="effect">The effect to apply this camera to.</param>
+        public void ApplyTo(IEffectMatrices effectMatrices)
+        {
+            Projection = CalculateProjection();
+            effectMatrices.View = View;
+            effectMatrices.Projection = Projection;
+        }
+
         #region Fields
 
         protected Vector3 _position = Vector3.Zero;
 
-        private readonly float _mViewAngle = MathHelper.PiOver4;
-        private readonly float _mNearPlane = 0.01f;
-        private readonly float _mFarPlane = 220*4;
+        protected readonly float m_ViewAngle = MathHelper.PiOver4;
+        protected readonly float m_NearPlane = 0.01f;
+        protected readonly float m_FarPlane = 220*4;
 
         public readonly Viewport Viewport;
 

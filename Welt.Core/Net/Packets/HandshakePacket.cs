@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct HandshakePacket : IPacket
     {
-        public byte Id { get { return 0x02; } }
+        public byte Id => 0x02;
 
         public HandshakePacket(string username)
         {

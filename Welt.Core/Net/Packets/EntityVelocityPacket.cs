@@ -9,7 +9,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct EntityVelocityPacket : IPacket
     {
-        public byte Id { get { return 0x1C; } }
+        public byte Id => 0x1C;
 
         public int EntityID;
         public short XVelocity;

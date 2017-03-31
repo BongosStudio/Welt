@@ -1,20 +1,17 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Welt.API;
+﻿using Welt.API;
 using Welt.API.Forge;
-using Welt.Blocks;
 using Welt.Core.Forge;
-using Welt.Processors;
 
 namespace Welt.Forge
 {
     public class ReadOnlyChunk
     {
         internal Chunk Chunk { get; set; }
+
+        public ReadOnlyChunk(Chunk chunk)
+        {
+            Chunk = chunk;
+        }
         
         public Block GetBlock(byte x, byte y, byte z)
         {

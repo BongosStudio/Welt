@@ -20,28 +20,32 @@ namespace Welt.Server
 
         public void Log(LogCategory category, string text, params object[] parameters)
         {
+            Console.CursorLeft = 0;
             switch (category)
             {
                 case LogCategory.Debug:
-                    Debug.WriteLine($"[DEBUG][{DateTime.UtcNow.ToShortTimeString()}]: {text}", parameters);
+#if DEBUG
+                    Console.WriteLine($"[DEBUG][{DateTime.Now.ToShortTimeString()}]: {text}", parameters);
+#endif
                     break;
                 case LogCategory.Notice:
-                    Console.WriteLine($"[INFO][{DateTime.UtcNow.ToShortTimeString()}]: {text}", parameters);
+                    Console.WriteLine($"[INFO][{DateTime.Now.ToShortTimeString()}]: {text}", parameters);
                     break;
                 case LogCategory.Packets:
-                    m_PacketFileLog.WriteLine($"{DateTime.UtcNow.ToLongTimeString()}: {text}", parameters);
+                    m_PacketFileLog.WriteLine($"{DateTime.Now.ToLongTimeString()}: {text}", parameters);
                     break;
                 case LogCategory.Warning:
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Debug.WriteLine($"[WARNING][{DateTime.UtcNow.ToShortTimeString()}]: {text}", parameters);
+                    Debug.WriteLine($"[WARNING][{DateTime.Now.ToShortTimeString()}]: {text}", parameters);
                     Console.ResetColor();
                     break;
                 case LogCategory.Error:
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Debug.WriteLine($"[ERROR][{DateTime.UtcNow.ToShortTimeString()}]: {text}", parameters);
+                    Debug.WriteLine($"[ERROR][{DateTime.Now.ToShortTimeString()}]: {text}", parameters);
                     Console.ResetColor();
                     break;
             }
+            Console.Write('>');
         }
     }
 }

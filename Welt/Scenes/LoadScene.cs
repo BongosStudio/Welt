@@ -12,6 +12,13 @@ using EmptyKeys.UserInterface.Mvvm;
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Generated;
 using Welt.Core.Forge;
+using Welt.Forge;
+using GameUILibrary.Models;
+using Welt.Core;
+using Welt.Core.Net.Packets;
+using Welt.Core.Net;
+using Welt.Components;
+using Microsoft.Xna.Framework.Content;
 
 namespace Welt.Scenes
 {
@@ -19,49 +26,73 @@ namespace Welt.Scenes
     {
         private static readonly string[] m_Texts =
         {
-            "Creating world...",
+            "Loading world...",
             "Building terrain...",
-            "Simulating world for a bit...",
-            "Preparing level..."
+            "Processing system...",
+            "Simulating world a bit...",
+            "Spawning in"
         };
-
-        private static int m_TextStep;
-        private readonly World m_World;
-        private WorldRenderer m_WorldRenderer;
-        private SkyRenderer m_SkyRenderer;
-        private PlayerRenderer m_PlayerRenderer;
-        private Player m_Player;
+        private LoadingViewModel m_ViewModel = new LoadingViewModel();
 
         internal override ViewModelBase DataContext { get; set; }
         internal override UIRoot UI { get; set; } = new Loading();
         internal override Color BackColor => new Color(0.15f, 0.15f, 0.15f);
 
-        public LoadScene(WeltGame game, World worldToLoad) : base(game)
+        public LoadScene(WeltGame game) : base(game)
         {
-            m_World = worldToLoad;
-            Player.CreatePlayer("test", "token");
-            Player.Current.AssignWorld(m_World);
-            m_Player = Player.Current;
-            m_PlayerRenderer = new PlayerRenderer(game.GraphicsDevice, m_Player);
-            m_PlayerRenderer = new PlayerRenderer(game.GraphicsDevice, m_Player);
-            m_WorldRenderer = new WorldRenderer(game.GraphicsDevice, m_PlayerRenderer.Camera, m_World);
-            m_SkyRenderer = new SkyRenderer(game.GraphicsDevice, m_PlayerRenderer.Camera, m_World);
-            
-            
+            // first, get world data from server
+            DataContext = m_ViewModel;
         }
 
         public override void Initialize()
         {
             new Thread(() =>
             {
+                var player = new PlayerRenderer(GraphicsDevice, Game.Client);
+                var chunks = new ChunkComponent(Game, GraphicsDevice, player, Game.Client.World);
+                var sky = new SkyComponent(Game, player);
+
+                Game.Client.QueuePacket(new LoginRequestPacket(PacketReader.Version, Game.Client.User.Username));
+                m_ViewModel.HintText = Constants.Tips[FastMath.NextRandom(Constants.Tips.Length)];
+                m_ViewModel.UsernameText = Game.Client.User.Username;
+
+                while (Game.Client.World.World == null) { }
+
+                //while (Game.Client.World.GetChunks().Length < 16)
+                //{
+                //    m_ViewModel.LoadingStatusText = "Loading world...";
+                //}
+
+
+                m_ViewModel.LoadingStatus++;
+                m_ViewModel.LoadingStatusText = "Processing system...";
+
+                player.LoadContent(Game.Content);
+                chunks.LoadContent(Game.Content);
+                sky.LoadContent(Game.Content);
+
+                m_ViewModel.LoadingStatus++;
+                m_ViewModel.LoadingStatusText = "Building terrain...";
+                chunks.LoadContent(Game.Content);
+                chunks.Initialize();
+                sky.Initialize();
+                player.Initialize();
+
+                m_ViewModel.LoadingStatus++;
+                m_ViewModel.LoadingStatusText = "Simulating world...";
                 
-                m_WorldRenderer.Initialize();
-                m_SkyRenderer.Initialize();
-                m_PlayerRenderer.Initialize();
-                
-                SceneController.Load(new PlayScene(Game, m_World, m_WorldRenderer, m_SkyRenderer, m_PlayerRenderer));
+
+                m_ViewModel.LoadingStatus++;
+                m_ViewModel.LoadingStatusText = "Spawning in.";
+
+                //for (double i = 1; i >= 0; i -= 0.01)
+                //{
+                //    m_ViewModel.Opacity = i;
+                //    Thread.Sleep(25);
+                //}
+                Next(new PlayScene(Game, chunks, sky, player));
             })
-            {IsBackground = true}.Start();
+            { IsBackground = true }.Start();
 
         }
 
@@ -73,23 +104,6 @@ namespace Welt.Scenes
         public override void Draw(GameTime gameTime)
         {
             
-        }
-
-        protected override void LoadContent()
-        {
-            m_WorldRenderer.LoadContent(WeltGame.Instance.Content);
-            m_SkyRenderer.LoadContent(WeltGame.Instance.Content);
-            m_PlayerRenderer.LoadContent(WeltGame.Instance.Content);
-        }
-
-        public void Handoff(out World world, out IRenderer renderer, out SkyRenderer sky,
-            out PlayerRenderer playerRenderer, out Player player)
-        {
-            world = m_World;
-            renderer = m_WorldRenderer;
-            sky = m_SkyRenderer;
-            playerRenderer = m_PlayerRenderer;
-            player = Player.Current;
         }
     }
 }

@@ -12,7 +12,7 @@ using Welt.Cameras;
 
 namespace Welt.Controllers
 {
-    public class FirstPersonCameraController : CameraController
+    public class FirstPersonCameraController : CameraController<FirstPersonCamera>
     {
         #region Fields
 
@@ -41,10 +41,8 @@ namespace Welt.Controllers
         
         #endregion
 
-        public FirstPersonCameraController(Camera camera) : base(camera)
+        public FirstPersonCameraController(FirstPersonCamera camera) : base(camera)
         {
-            if (!(camera is FirstPersonCamera))
-                throw new ArgumentException("Camera for FPSCameraController must be a FirstPersonCamera");
         }
 
         public override void Initialize()
@@ -81,8 +79,8 @@ namespace Welt.Controllers
 
             if (moveVector != Vector3.Zero)
             {
-                var rotationMatrix = Matrix.CreateRotationX(((FirstPersonCamera)Camera).UpDownRotation)*
-                                     Matrix.CreateRotationY(((FirstPersonCamera)Camera).LeftRightRotation);
+                var rotationMatrix = Matrix.CreateRotationX(Camera.UpDownRotation)*
+                                     Matrix.CreateRotationY(Camera.LeftRightRotation);
                 var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
                 Camera.Position += rotatedVector*MOVEMENTSPEED;
             }
@@ -103,19 +101,19 @@ namespace Welt.Controllers
 
                 if (mouseDx != 0)
                 {
-                    ((FirstPersonCamera)Camera).LeftRightRotation -= ROTATIONSPEED*(mouseDx/50)* ((FirstPersonCamera)Camera).HorizontalLookSensitivity;
+                    Camera.LeftRightRotation -= ROTATIONSPEED*(mouseDx/50)* Camera.HorizontalLookSensitivity;
                 }
                 if (mouseDy != 0)
                 {
-                    ((FirstPersonCamera)Camera).UpDownRotation -= ROTATIONSPEED*(mouseDy/50)* ((FirstPersonCamera)Camera).VerticalLookSensitivity;
+                    Camera.UpDownRotation -= ROTATIONSPEED*(mouseDy/50)* Camera.VerticalLookSensitivity;
 
                     // Locking camera rotation vertically between +/- 180 degrees
-                    var newPosition = ((FirstPersonCamera)Camera).UpDownRotation - ROTATIONSPEED * (mouseDy / 50);
+                    var newPosition = Camera.UpDownRotation - ROTATIONSPEED * (mouseDy / 50);
                     if (newPosition < -1.55f)
                         newPosition = -1.55f;
                     else if (newPosition > 1.55f)
                         newPosition = 1.55f;
-                    ((FirstPersonCamera)Camera).UpDownRotation = newPosition;
+                    Camera.UpDownRotation = newPosition;
                     // End of locking
                 }
                 //camera.LeftRightRotation -= GamePad.GetState(Game.ActivePlayerIndex).ThumbSticks.Right.X / 20;

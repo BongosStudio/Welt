@@ -16,6 +16,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Interactions.Core;
     using EmptyKeys.UserInterface.Interactivity;
     using EmptyKeys.UserInterface.Media;
+    using EmptyKeys.UserInterface.Media.Effects;
     using EmptyKeys.UserInterface.Media.Animation;
     using EmptyKeys.UserInterface.Media.Imaging;
     using EmptyKeys.UserInterface.Shapes;
@@ -23,7 +24,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Themes;
     
     
-    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.2.0.0")]
+    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.6.0.0")]
     public sealed class Dictionary : ResourceDictionary {
         
         private static Dictionary singleton = new Dictionary();
@@ -226,112 +227,135 @@ namespace EmptyKeys.UserInterface.Generated {
             Setter r_19_s_S_0 = new Setter(ComboBoxItem.TemplateProperty, r_19_s_S_0_ct);
             r_19_s.Setters.Add(r_19_s_S_0);
             this.Add(typeof(ComboBoxItem), r_19_s);
-            // Resource - [System.Windows.Controls.Slider] Style
-            Style r_20_s = new Style(typeof(Slider));
-            Setter r_20_s_S_0 = new Setter(Slider.SnapsToDevicePixelsProperty, true);
+            // Resource - [System.Windows.Controls.ListBoxItem] Style
+            Style r_20_s = new Style(typeof(ListBoxItem));
+            Setter r_20_s_S_0 = new Setter(ListBoxItem.BackgroundProperty, new ResourceReferenceExpression("BackgroundColor"));
             r_20_s.Setters.Add(r_20_s_S_0);
-            Setter r_20_s_S_1 = new Setter(Slider.TemplateProperty, new ResourceReferenceExpression("HorizontalSlider"));
+            Setter r_20_s_S_1 = new Setter(ListBoxItem.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
             r_20_s.Setters.Add(r_20_s_S_1);
-            this.Add(typeof(Slider), r_20_s);
-            // Resource - [System.Windows.Controls.TabItem] Style
-            Style r_21_s = new Style(typeof(TabItem));
-            Setter r_21_s_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("BackgroundColor"));
+            Func<UIElement, UIElement> r_20_s_S_2_ctFunc = r_20_s_S_2_ctMethod;
+            ControlTemplate r_20_s_S_2_ct = new ControlTemplate(typeof(ListBoxItem), r_20_s_S_2_ctFunc);
+            Trigger r_20_s_S_2_ct_T_0 = new Trigger();
+            r_20_s_S_2_ct_T_0.Property = ListBoxItem.IsFocusedProperty;
+            r_20_s_S_2_ct_T_0.Value = true;
+            Setter r_20_s_S_2_ct_T_0_S_0 = new Setter(ListBoxItem.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
+            r_20_s_S_2_ct_T_0.Setters.Add(r_20_s_S_2_ct_T_0_S_0);
+            r_20_s_S_2_ct.Triggers.Add(r_20_s_S_2_ct_T_0);
+            Trigger r_20_s_S_2_ct_T_1 = new Trigger();
+            r_20_s_S_2_ct_T_1.Property = ListBoxItem.IsMouseOverProperty;
+            r_20_s_S_2_ct_T_1.Value = true;
+            Setter r_20_s_S_2_ct_T_1_S_0 = new Setter(ListBoxItem.BackgroundProperty, new ResourceReferenceExpression("AccentColor"));
+            r_20_s_S_2_ct_T_1.Setters.Add(r_20_s_S_2_ct_T_1_S_0);
+            r_20_s_S_2_ct.Triggers.Add(r_20_s_S_2_ct_T_1);
+            Setter r_20_s_S_2 = new Setter(ListBoxItem.TemplateProperty, r_20_s_S_2_ct);
+            r_20_s.Setters.Add(r_20_s_S_2);
+            this.Add(typeof(ListBoxItem), r_20_s);
+            // Resource - [System.Windows.Controls.Slider] Style
+            Style r_21_s = new Style(typeof(Slider));
+            Setter r_21_s_S_0 = new Setter(Slider.SnapsToDevicePixelsProperty, true);
             r_21_s.Setters.Add(r_21_s_S_0);
-            Setter r_21_s_S_1 = new Setter(TabItem.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
+            Setter r_21_s_S_1 = new Setter(Slider.TemplateProperty, new ResourceReferenceExpression("HorizontalSlider"));
             r_21_s.Setters.Add(r_21_s_S_1);
-            Func<UIElement, UIElement> r_21_s_S_2_ctFunc = r_21_s_S_2_ctMethod;
-            ControlTemplate r_21_s_S_2_ct = new ControlTemplate(typeof(TabItem), r_21_s_S_2_ctFunc);
-            Trigger r_21_s_S_2_ct_T_0 = new Trigger();
-            r_21_s_S_2_ct_T_0.Property = TabItem.IsSelectedProperty;
-            r_21_s_S_2_ct_T_0.Value = true;
-            Setter r_21_s_S_2_ct_T_0_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
-            r_21_s_S_2_ct_T_0.Setters.Add(r_21_s_S_2_ct_T_0_S_0);
-            r_21_s_S_2_ct.Triggers.Add(r_21_s_S_2_ct_T_0);
-            Trigger r_21_s_S_2_ct_T_1 = new Trigger();
-            r_21_s_S_2_ct_T_1.Property = TabItem.IsFocusedProperty;
-            r_21_s_S_2_ct_T_1.Value = true;
-            Setter r_21_s_S_2_ct_T_1_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
-            r_21_s_S_2_ct_T_1.Setters.Add(r_21_s_S_2_ct_T_1_S_0);
-            r_21_s_S_2_ct.Triggers.Add(r_21_s_S_2_ct_T_1);
-            Trigger r_21_s_S_2_ct_T_2 = new Trigger();
-            r_21_s_S_2_ct_T_2.Property = TabItem.IsMouseOverProperty;
-            r_21_s_S_2_ct_T_2.Value = true;
-            Setter r_21_s_S_2_ct_T_2_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("AccentColor"));
-            r_21_s_S_2_ct_T_2.Setters.Add(r_21_s_S_2_ct_T_2_S_0);
-            r_21_s_S_2_ct.Triggers.Add(r_21_s_S_2_ct_T_2);
-            Setter r_21_s_S_2 = new Setter(TabItem.TemplateProperty, r_21_s_S_2_ct);
-            r_21_s.Setters.Add(r_21_s_S_2);
-            this.Add(typeof(TabItem), r_21_s);
-            // Resource - [System.Windows.Controls.TextBox] Style
-            var r_22_s_bo = this[typeof(TextBox)];
-            Style r_22_s = new Style(typeof(TextBox), r_22_s_bo as Style);
-            Setter r_22_s_S_0 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("BackgroundColor"));
+            this.Add(typeof(Slider), r_21_s);
+            // Resource - [System.Windows.Controls.TabItem] Style
+            Style r_22_s = new Style(typeof(TabItem));
+            Setter r_22_s_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("BackgroundColor"));
             r_22_s.Setters.Add(r_22_s_S_0);
-            Setter r_22_s_S_1 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
+            Setter r_22_s_S_1 = new Setter(TabItem.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
             r_22_s.Setters.Add(r_22_s_S_1);
-            Setter r_22_s_S_2 = new Setter(TextBox.SnapsToDevicePixelsProperty, true);
+            Func<UIElement, UIElement> r_22_s_S_2_ctFunc = r_22_s_S_2_ctMethod;
+            ControlTemplate r_22_s_S_2_ct = new ControlTemplate(typeof(TabItem), r_22_s_S_2_ctFunc);
+            Trigger r_22_s_S_2_ct_T_0 = new Trigger();
+            r_22_s_S_2_ct_T_0.Property = TabItem.IsSelectedProperty;
+            r_22_s_S_2_ct_T_0.Value = true;
+            Setter r_22_s_S_2_ct_T_0_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
+            r_22_s_S_2_ct_T_0.Setters.Add(r_22_s_S_2_ct_T_0_S_0);
+            r_22_s_S_2_ct.Triggers.Add(r_22_s_S_2_ct_T_0);
+            Trigger r_22_s_S_2_ct_T_1 = new Trigger();
+            r_22_s_S_2_ct_T_1.Property = TabItem.IsFocusedProperty;
+            r_22_s_S_2_ct_T_1.Value = true;
+            Setter r_22_s_S_2_ct_T_1_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
+            r_22_s_S_2_ct_T_1.Setters.Add(r_22_s_S_2_ct_T_1_S_0);
+            r_22_s_S_2_ct.Triggers.Add(r_22_s_S_2_ct_T_1);
+            Trigger r_22_s_S_2_ct_T_2 = new Trigger();
+            r_22_s_S_2_ct_T_2.Property = TabItem.IsMouseOverProperty;
+            r_22_s_S_2_ct_T_2.Value = true;
+            Setter r_22_s_S_2_ct_T_2_S_0 = new Setter(TabItem.BackgroundProperty, new ResourceReferenceExpression("AccentColor"));
+            r_22_s_S_2_ct_T_2.Setters.Add(r_22_s_S_2_ct_T_2_S_0);
+            r_22_s_S_2_ct.Triggers.Add(r_22_s_S_2_ct_T_2);
+            Setter r_22_s_S_2 = new Setter(TabItem.TemplateProperty, r_22_s_S_2_ct);
             r_22_s.Setters.Add(r_22_s_S_2);
-            Setter r_22_s_S_3 = new Setter(TextBox.BorderThicknessProperty, new Thickness(0F));
-            r_22_s.Setters.Add(r_22_s_S_3);
-            Setter r_22_s_S_4 = new Setter(TextBox.CaretBrushProperty, new SolidColorBrush(new ColorW(255, 255, 255, 255)));
-            r_22_s.Setters.Add(r_22_s_S_4);
-            Setter r_22_s_S_5 = new Setter(TextBox.SnapsToDevicePixelsProperty, true);
-            r_22_s.Setters.Add(r_22_s_S_5);
-            Func<UIElement, UIElement> r_22_s_S_6_ctFunc = r_22_s_S_6_ctMethod;
-            ControlTemplate r_22_s_S_6_ct = new ControlTemplate(typeof(TextBox), r_22_s_S_6_ctFunc);
-            Trigger r_22_s_S_6_ct_T_0 = new Trigger();
-            r_22_s_S_6_ct_T_0.Property = TextBox.IsFocusedProperty;
-            r_22_s_S_6_ct_T_0.Value = true;
-            Setter r_22_s_S_6_ct_T_0_S_0 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
-            r_22_s_S_6_ct_T_0.Setters.Add(r_22_s_S_6_ct_T_0_S_0);
-            Setter r_22_s_S_6_ct_T_0_S_1 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
-            r_22_s_S_6_ct_T_0.Setters.Add(r_22_s_S_6_ct_T_0_S_1);
-            r_22_s_S_6_ct.Triggers.Add(r_22_s_S_6_ct_T_0);
-            Trigger r_22_s_S_6_ct_T_1 = new Trigger();
-            r_22_s_S_6_ct_T_1.Property = TextBox.IsMouseOverProperty;
-            r_22_s_S_6_ct_T_1.Value = true;
-            Setter r_22_s_S_6_ct_T_1_S_0 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
-            r_22_s_S_6_ct_T_1.Setters.Add(r_22_s_S_6_ct_T_1_S_0);
-            Setter r_22_s_S_6_ct_T_1_S_1 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
-            r_22_s_S_6_ct_T_1.Setters.Add(r_22_s_S_6_ct_T_1_S_1);
-            r_22_s_S_6_ct.Triggers.Add(r_22_s_S_6_ct_T_1);
-            Trigger r_22_s_S_6_ct_T_2 = new Trigger();
-            r_22_s_S_6_ct_T_2.Property = TextBox.IsEnabledProperty;
-            r_22_s_S_6_ct_T_2.Value = false;
-            Setter r_22_s_S_6_ct_T_2_S_0 = new Setter(TextBox.IsHitTestVisibleProperty, false);
-            r_22_s_S_6_ct_T_2.Setters.Add(r_22_s_S_6_ct_T_2_S_0);
-            Setter r_22_s_S_6_ct_T_2_S_1 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("DisabledBackground"));
-            r_22_s_S_6_ct_T_2.Setters.Add(r_22_s_S_6_ct_T_2_S_1);
-            Setter r_22_s_S_6_ct_T_2_S_2 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("DisabledForeground"));
-            r_22_s_S_6_ct_T_2.Setters.Add(r_22_s_S_6_ct_T_2_S_2);
-            r_22_s_S_6_ct.Triggers.Add(r_22_s_S_6_ct_T_2);
-            Trigger r_22_s_S_6_ct_T_3 = new Trigger();
-            r_22_s_S_6_ct_T_3.Property = TextBox.IsEnabledProperty;
-            r_22_s_S_6_ct_T_3.Value = true;
-            Setter r_22_s_S_6_ct_T_3_S_0 = new Setter(TextBox.IsHitTestVisibleProperty, true);
-            r_22_s_S_6_ct_T_3.Setters.Add(r_22_s_S_6_ct_T_3_S_0);
-            r_22_s_S_6_ct.Triggers.Add(r_22_s_S_6_ct_T_3);
-            Setter r_22_s_S_6 = new Setter(TextBox.TemplateProperty, r_22_s_S_6_ct);
-            r_22_s.Setters.Add(r_22_s_S_6);
-            this.Add(typeof(TextBox), r_22_s);
-            // Resource - [TextBoxScrollViewer] Style
-            Style r_23_s = new Style(typeof(ScrollViewer));
-            Setter r_23_s_S_0 = new Setter(ScrollViewer.SnapsToDevicePixelsProperty, true);
+            this.Add(typeof(TabItem), r_22_s);
+            // Resource - [System.Windows.Controls.TextBox] Style
+            var r_23_s_bo = this[typeof(TextBox)];
+            Style r_23_s = new Style(typeof(TextBox), r_23_s_bo as Style);
+            Setter r_23_s_S_0 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("BackgroundColor"));
             r_23_s.Setters.Add(r_23_s_S_0);
-            Func<UIElement, UIElement> r_23_s_S_1_ctFunc = r_23_s_S_1_ctMethod;
-            ControlTemplate r_23_s_S_1_ct = new ControlTemplate(typeof(ScrollViewer), r_23_s_S_1_ctFunc);
-            Setter r_23_s_S_1 = new Setter(ScrollViewer.TemplateProperty, r_23_s_S_1_ct);
+            Setter r_23_s_S_1 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
             r_23_s.Setters.Add(r_23_s_S_1);
-            this.Add("TextBoxScrollViewer", r_23_s);
-            // Resource - [UiStyle] Style
-            Style r_24_s = new Style(typeof(UIRoot));
-            Setter r_24_s_S_0 = new Setter(UIRoot.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
+            Setter r_23_s_S_2 = new Setter(TextBox.SnapsToDevicePixelsProperty, true);
+            r_23_s.Setters.Add(r_23_s_S_2);
+            Setter r_23_s_S_3 = new Setter(TextBox.BorderThicknessProperty, new Thickness(0F));
+            r_23_s.Setters.Add(r_23_s_S_3);
+            Setter r_23_s_S_4 = new Setter(TextBox.CaretBrushProperty, new SolidColorBrush(new ColorW(255, 255, 255, 255)));
+            r_23_s.Setters.Add(r_23_s_S_4);
+            Setter r_23_s_S_5 = new Setter(TextBox.SnapsToDevicePixelsProperty, true);
+            r_23_s.Setters.Add(r_23_s_S_5);
+            Func<UIElement, UIElement> r_23_s_S_6_ctFunc = r_23_s_S_6_ctMethod;
+            ControlTemplate r_23_s_S_6_ct = new ControlTemplate(typeof(TextBox), r_23_s_S_6_ctFunc);
+            Trigger r_23_s_S_6_ct_T_0 = new Trigger();
+            r_23_s_S_6_ct_T_0.Property = TextBox.IsFocusedProperty;
+            r_23_s_S_6_ct_T_0.Value = true;
+            Setter r_23_s_S_6_ct_T_0_S_0 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
+            r_23_s_S_6_ct_T_0.Setters.Add(r_23_s_S_6_ct_T_0_S_0);
+            Setter r_23_s_S_6_ct_T_0_S_1 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
+            r_23_s_S_6_ct_T_0.Setters.Add(r_23_s_S_6_ct_T_0_S_1);
+            r_23_s_S_6_ct.Triggers.Add(r_23_s_S_6_ct_T_0);
+            Trigger r_23_s_S_6_ct_T_1 = new Trigger();
+            r_23_s_S_6_ct_T_1.Property = TextBox.IsMouseOverProperty;
+            r_23_s_S_6_ct_T_1.Value = true;
+            Setter r_23_s_S_6_ct_T_1_S_0 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("ActiveColor"));
+            r_23_s_S_6_ct_T_1.Setters.Add(r_23_s_S_6_ct_T_1_S_0);
+            Setter r_23_s_S_6_ct_T_1_S_1 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
+            r_23_s_S_6_ct_T_1.Setters.Add(r_23_s_S_6_ct_T_1_S_1);
+            r_23_s_S_6_ct.Triggers.Add(r_23_s_S_6_ct_T_1);
+            Trigger r_23_s_S_6_ct_T_2 = new Trigger();
+            r_23_s_S_6_ct_T_2.Property = TextBox.IsEnabledProperty;
+            r_23_s_S_6_ct_T_2.Value = false;
+            Setter r_23_s_S_6_ct_T_2_S_0 = new Setter(TextBox.IsHitTestVisibleProperty, false);
+            r_23_s_S_6_ct_T_2.Setters.Add(r_23_s_S_6_ct_T_2_S_0);
+            Setter r_23_s_S_6_ct_T_2_S_1 = new Setter(TextBox.BackgroundProperty, new ResourceReferenceExpression("DisabledBackground"));
+            r_23_s_S_6_ct_T_2.Setters.Add(r_23_s_S_6_ct_T_2_S_1);
+            Setter r_23_s_S_6_ct_T_2_S_2 = new Setter(TextBox.ForegroundProperty, new ResourceReferenceExpression("DisabledForeground"));
+            r_23_s_S_6_ct_T_2.Setters.Add(r_23_s_S_6_ct_T_2_S_2);
+            r_23_s_S_6_ct.Triggers.Add(r_23_s_S_6_ct_T_2);
+            Trigger r_23_s_S_6_ct_T_3 = new Trigger();
+            r_23_s_S_6_ct_T_3.Property = TextBox.IsEnabledProperty;
+            r_23_s_S_6_ct_T_3.Value = true;
+            Setter r_23_s_S_6_ct_T_3_S_0 = new Setter(TextBox.IsHitTestVisibleProperty, true);
+            r_23_s_S_6_ct_T_3.Setters.Add(r_23_s_S_6_ct_T_3_S_0);
+            r_23_s_S_6_ct.Triggers.Add(r_23_s_S_6_ct_T_3);
+            Setter r_23_s_S_6 = new Setter(TextBox.TemplateProperty, r_23_s_S_6_ct);
+            r_23_s.Setters.Add(r_23_s_S_6);
+            this.Add(typeof(TextBox), r_23_s);
+            // Resource - [TextBoxScrollViewer] Style
+            Style r_24_s = new Style(typeof(ScrollViewer));
+            Setter r_24_s_S_0 = new Setter(ScrollViewer.SnapsToDevicePixelsProperty, true);
             r_24_s.Setters.Add(r_24_s_S_0);
-            Setter r_24_s_S_1 = new Setter(UIRoot.FontFamilyProperty, new FontFamily("Code 7x5"));
+            Func<UIElement, UIElement> r_24_s_S_1_ctFunc = r_24_s_S_1_ctMethod;
+            ControlTemplate r_24_s_S_1_ct = new ControlTemplate(typeof(ScrollViewer), r_24_s_S_1_ctFunc);
+            Setter r_24_s_S_1 = new Setter(ScrollViewer.TemplateProperty, r_24_s_S_1_ct);
             r_24_s.Setters.Add(r_24_s_S_1);
-            Setter r_24_s_S_2 = new Setter(UIRoot.FontSizeProperty, 18F);
-            r_24_s.Setters.Add(r_24_s_S_2);
-            this.Add("UiStyle", r_24_s);
+            this.Add("TextBoxScrollViewer", r_24_s);
+            // Resource - [UiStyle] Style
+            Style r_25_s = new Style(typeof(UIRoot));
+            Setter r_25_s_S_0 = new Setter(UIRoot.ForegroundProperty, new ResourceReferenceExpression("ForegroundColor"));
+            r_25_s.Setters.Add(r_25_s_S_0);
+            Setter r_25_s_S_1 = new Setter(UIRoot.FontFamilyProperty, new FontFamily("Code 7x5"));
+            r_25_s.Setters.Add(r_25_s_S_1);
+            Setter r_25_s_S_2 = new Setter(UIRoot.FontSizeProperty, 18F);
+            r_25_s.Setters.Add(r_25_s_S_2);
+            this.Add("UiStyle", r_25_s);
         }
         
         private static UIElement r_3_s_S_2_ctMethod(UIElement parent) {
@@ -585,7 +609,7 @@ namespace EmptyKeys.UserInterface.Generated {
             return e_15;
         }
         
-        private static UIElement r_21_s_S_2_ctMethod(UIElement parent) {
+        private static UIElement r_20_s_S_2_ctMethod(UIElement parent) {
             // e_16 element
             Border e_16 = new Border();
             e_16.Parent = parent;
@@ -599,81 +623,102 @@ namespace EmptyKeys.UserInterface.Generated {
             ContentPresenter e_17 = new ContentPresenter();
             e_16.Child = e_17;
             e_17.Name = "e_17";
-            e_17.Margin = new Thickness(10F, 2F, 10F, 2F);
-            e_17.HorizontalAlignment = HorizontalAlignment.Center;
-            e_17.VerticalAlignment = VerticalAlignment.Center;
-            Binding binding_e_17_Content = new Binding("Header");
+            e_17.Margin = new Thickness(5F, 2F, 5F, 2F);
+            Binding binding_e_17_Content = new Binding("Content");
             binding_e_17_Content.Source = parent;
             e_17.SetBinding(ContentPresenter.ContentProperty, binding_e_17_Content);
             return e_16;
         }
         
-        private static UIElement r_22_s_S_6_ctMethod(UIElement parent) {
+        private static UIElement r_22_s_S_2_ctMethod(UIElement parent) {
             // e_18 element
-            Grid e_18 = new Grid();
+            Border e_18 = new Border();
             e_18.Parent = parent;
             e_18.Name = "e_18";
-            RowDefinition row_e_18_0 = new RowDefinition();
-            row_e_18_0.MinHeight = 36F;
-            e_18.RowDefinitions.Add(row_e_18_0);
-            ColumnDefinition col_e_18_0 = new ColumnDefinition();
-            col_e_18_0.Width = new GridLength(4F, GridUnitType.Pixel);
-            e_18.ColumnDefinitions.Add(col_e_18_0);
-            ColumnDefinition col_e_18_1 = new ColumnDefinition();
-            e_18.ColumnDefinitions.Add(col_e_18_1);
-            ColumnDefinition col_e_18_2 = new ColumnDefinition();
-            col_e_18_2.Width = new GridLength(4F, GridUnitType.Pixel);
-            e_18.ColumnDefinitions.Add(col_e_18_2);
+            e_18.SnapsToDevicePixels = true;
+            e_18.Padding = new Thickness(5F, 5F, 5F, 5F);
+            Binding binding_e_18_Background = new Binding("Background");
+            binding_e_18_Background.Source = parent;
+            e_18.SetBinding(Border.BackgroundProperty, binding_e_18_Background);
+            // e_19 element
+            ContentPresenter e_19 = new ContentPresenter();
+            e_18.Child = e_19;
+            e_19.Name = "e_19";
+            e_19.Margin = new Thickness(10F, 2F, 10F, 2F);
+            e_19.HorizontalAlignment = HorizontalAlignment.Center;
+            e_19.VerticalAlignment = VerticalAlignment.Center;
+            Binding binding_e_19_Content = new Binding("Header");
+            binding_e_19_Content.Source = parent;
+            e_19.SetBinding(ContentPresenter.ContentProperty, binding_e_19_Content);
+            return e_18;
+        }
+        
+        private static UIElement r_23_s_S_6_ctMethod(UIElement parent) {
+            // e_20 element
+            Grid e_20 = new Grid();
+            e_20.Parent = parent;
+            e_20.Name = "e_20";
+            RowDefinition row_e_20_0 = new RowDefinition();
+            row_e_20_0.MinHeight = 36F;
+            e_20.RowDefinitions.Add(row_e_20_0);
+            ColumnDefinition col_e_20_0 = new ColumnDefinition();
+            col_e_20_0.Width = new GridLength(4F, GridUnitType.Pixel);
+            e_20.ColumnDefinitions.Add(col_e_20_0);
+            ColumnDefinition col_e_20_1 = new ColumnDefinition();
+            e_20.ColumnDefinitions.Add(col_e_20_1);
+            ColumnDefinition col_e_20_2 = new ColumnDefinition();
+            col_e_20_2.Width = new GridLength(4F, GridUnitType.Pixel);
+            e_20.ColumnDefinitions.Add(col_e_20_2);
             // PART_TextBoxLeft element
             Border PART_TextBoxLeft = new Border();
-            e_18.Children.Add(PART_TextBoxLeft);
+            e_20.Children.Add(PART_TextBoxLeft);
             PART_TextBoxLeft.Name = "PART_TextBoxLeft";
             PART_TextBoxLeft.IsHitTestVisible = false;
             PART_TextBoxLeft.SetResourceReference(Border.BackgroundProperty, "BackgroundColor");
             // PART_TextBoxCenter element
             Border PART_TextBoxCenter = new Border();
-            e_18.Children.Add(PART_TextBoxCenter);
+            e_20.Children.Add(PART_TextBoxCenter);
             PART_TextBoxCenter.Name = "PART_TextBoxCenter";
             PART_TextBoxCenter.IsHitTestVisible = false;
             Grid.SetColumn(PART_TextBoxCenter, 1);
             PART_TextBoxCenter.SetResourceReference(Border.BackgroundProperty, "BackgroundColor");
             // PART_TextBoxRight element
             Border PART_TextBoxRight = new Border();
-            e_18.Children.Add(PART_TextBoxRight);
+            e_20.Children.Add(PART_TextBoxRight);
             PART_TextBoxRight.Name = "PART_TextBoxRight";
             PART_TextBoxRight.IsHitTestVisible = false;
             Grid.SetColumn(PART_TextBoxRight, 2);
             PART_TextBoxRight.SetResourceReference(Border.BackgroundProperty, "BackgroundColor");
             // PART_ScrollViewer element
             ScrollViewer PART_ScrollViewer = new ScrollViewer();
-            e_18.Children.Add(PART_ScrollViewer);
+            e_20.Children.Add(PART_ScrollViewer);
             PART_ScrollViewer.Name = "PART_ScrollViewer";
             PART_ScrollViewer.Margin = new Thickness(0F, 4F, 0F, 4F);
             PART_ScrollViewer.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             PART_ScrollViewer.VerticalContentAlignment = VerticalAlignment.Stretch;
             Grid.SetColumn(PART_ScrollViewer, 1);
             PART_ScrollViewer.SetResourceReference(ScrollViewer.StyleProperty, "TextBoxScrollViewer");
-            // e_19 element
-            TextBlock e_19 = new TextBlock();
-            PART_ScrollViewer.Content = e_19;
-            e_19.Name = "e_19";
-            e_19.VerticalAlignment = VerticalAlignment.Center;
-            Binding binding_e_19_HorizontalAlignment = new Binding("HorizontalContentAlignment");
-            binding_e_19_HorizontalAlignment.Source = parent;
-            e_19.SetBinding(TextBlock.HorizontalAlignmentProperty, binding_e_19_HorizontalAlignment);
-            Binding binding_e_19_Padding = new Binding("Padding");
-            binding_e_19_Padding.Source = parent;
-            e_19.SetBinding(TextBlock.PaddingProperty, binding_e_19_Padding);
-            Binding binding_e_19_TextAlignment = new Binding("TextAlignment");
-            binding_e_19_TextAlignment.Source = parent;
-            e_19.SetBinding(TextBlock.TextAlignmentProperty, binding_e_19_TextAlignment);
-            Binding binding_e_19_Text = new Binding("Text");
-            binding_e_19_Text.Source = parent;
-            e_19.SetBinding(TextBlock.TextProperty, binding_e_19_Text);
-            return e_18;
+            // e_21 element
+            TextBlock e_21 = new TextBlock();
+            PART_ScrollViewer.Content = e_21;
+            e_21.Name = "e_21";
+            e_21.VerticalAlignment = VerticalAlignment.Center;
+            Binding binding_e_21_HorizontalAlignment = new Binding("HorizontalContentAlignment");
+            binding_e_21_HorizontalAlignment.Source = parent;
+            e_21.SetBinding(TextBlock.HorizontalAlignmentProperty, binding_e_21_HorizontalAlignment);
+            Binding binding_e_21_Padding = new Binding("Padding");
+            binding_e_21_Padding.Source = parent;
+            e_21.SetBinding(TextBlock.PaddingProperty, binding_e_21_Padding);
+            Binding binding_e_21_TextAlignment = new Binding("TextAlignment");
+            binding_e_21_TextAlignment.Source = parent;
+            e_21.SetBinding(TextBlock.TextAlignmentProperty, binding_e_21_TextAlignment);
+            Binding binding_e_21_Text = new Binding("Text");
+            binding_e_21_Text.Source = parent;
+            e_21.SetBinding(TextBlock.TextProperty, binding_e_21_Text);
+            return e_20;
         }
         
-        private static UIElement r_23_s_S_1_ctMethod(UIElement parent) {
+        private static UIElement r_24_s_S_1_ctMethod(UIElement parent) {
             // PART_ScrollContentPresenter element
             ScrollContentPresenter PART_ScrollContentPresenter = new ScrollContentPresenter();
             PART_ScrollContentPresenter.Parent = parent;

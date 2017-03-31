@@ -5,11 +5,12 @@ namespace Welt.Core.Net.Packets
 {
     /// <summary>
     /// Sent periodically to confirm that the connection is still active. Send the same packet back
-    /// to confirm it. Connection is dropped if no keep alive is received within one minute.
+    /// to confirm it. Connection is dropped if no keep alive is received within 10 seconds.
     /// </summary>
     public struct KeepAlivePacket : IPacket
     {
-        public byte Id { get { return 0x00; } }
+        public byte Id => 0x00;
+        public long Data;
 
         public void ReadPacket(IWeltStream stream)
         {

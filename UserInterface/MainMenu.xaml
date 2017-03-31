@@ -27,7 +27,7 @@
         <Grid x:Name="MainButtons" Grid.RowSpan="2">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
                 <Button Content="Singleplayer" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SingleplayerButtonCommand}"/>
-                <Button Content="Multiplayer" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding MultiplayerButtonCommand}" IsEnabled="False"/>
+                <Button Content="Multiplayer" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding MultiplayerButtonCommand}"/>
                 <Button Content="Settings" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding SettingsButtonCommand}"/>
                 <Button Content="Exit" Style="{DynamicResource ButtonStyle}" HorizontalAlignment="Left" Height="50" Width="200" FontFamily="Code 7x5" FontSize="18" Command="{Binding ExitButtonCommand}"/>
             </StackPanel>

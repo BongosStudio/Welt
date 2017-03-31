@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct DisconnectPacket : IPacket
     {
-        public byte Id { get { return 0xFF; } }
+        public byte Id => 0xFF;
 
         public DisconnectPacket(string reason)
         {

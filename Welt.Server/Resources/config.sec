@@ -7,3 +7,4 @@ motd = Welcome to Welt!
 name = Welt's Dev Server
 query = true
 queryport = 224
+realtime = true

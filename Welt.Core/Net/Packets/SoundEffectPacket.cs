@@ -10,17 +10,10 @@ namespace Welt.Core.Net.Packets
     {
         public enum EffectType
         {
-            Click2 = 1000,
-            Click1 = 1001,
-            FireBow = 1002,
-            ToggleDoor = 1003,
-            Extinguish = 1004,
-            PlayRecord = 1005,
-            Smoke = 1006,
-            BreakBlock = 1007,
+            
         }
 
-        public byte Id { get { return 0x3D; } }
+        public byte Id => 0x3D;
 
         public EffectType Effect;
         public int X;

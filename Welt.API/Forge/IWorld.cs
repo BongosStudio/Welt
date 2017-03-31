@@ -9,7 +9,7 @@ namespace Welt.API.Forge
     public interface IWorld : IEnumerable<IChunk>
     {
         string Name { get; }
-        int Seed { get; }
+        long Seed { get; }
         int Size { get; }
         int TimeOfDay { get; set; }
         Vector3I SpawnPoint { get; set; }

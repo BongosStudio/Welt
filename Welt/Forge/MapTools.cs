@@ -4,7 +4,7 @@
 #region Using Statements
 
 using System.Collections.Generic;
-using Welt.Core.Forge.Generators;
+using Welt.Forge.Generators;
 
 #endregion
 
@@ -14,15 +14,15 @@ namespace Welt.Forge
     {
         #region ClearChunkBlocks
 
-        public static void ClearChunkBlocks(ReadOnlyChunk chunk)
+        public static void ClearChunkBlocks(Chunk chunk)
         {
-            for (byte x = 0; x < ReadOnlyChunk.Size.X; x++)
+            for (byte x = 0; x < Chunk.Size.X; x++)
             {
-                for (byte y = 0; y < ReadOnlyChunk.Size.Y; y++)
+                for (byte y = 0; y < Chunk.Size.Y; y++)
                 {
-                    for (byte z = 0; z < ReadOnlyChunk.Size.Z; z++)
+                    for (byte z = 0; z < Chunk.Size.Z; z++)
                     {
-                        chunk.SetBlock(x, y, z, new API.Forge.Block());
+                        chunk.SetBlock(x, y, z, new Block());
                     }
                 }
             }

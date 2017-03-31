@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -28,7 +29,7 @@ namespace Welt.Core.Server
             
             KnownEntities = new List<IEntity>();
             Disconnected = false;
-            EnableLogging = server.EnableClientLogging;
+            HasLogging = server.EnableClientLogging;
             NextWindowID = 1;
             Connection = connection;
             SocketPool = new SocketAsyncEventArgsPool(100, 200, 65536);
@@ -50,18 +51,18 @@ namespace Welt.Core.Server
         
         public IWeltStream GameStream { get; internal set; }
         public string Username { get; set; }
-        public bool LoggedIn { get; internal set; }
+        public bool IsLoggedIn { get; internal set; }
         public IMultiplayerServer Server { get; set; }
         public IWorld World { get; internal set; }
         public InventoryContainer Inventory { get; private set; }
         public short SelectedSlot { get; internal set; }
-        public bool EnableLogging { get; set; }
+        public bool HasLogging { get; set; }
         public IPacket LastSuccessfulPacket { get; set; }
         public DateTime ExpectedDigComplete { get; set; }
 
         public Socket Connection { get; private set; }
 
-        private SemaphoreSlim m_Sem = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim m_Sem = new SemaphoreSlim(1, 8);
 
         private SocketAsyncEventArgsPool SocketPool { get; set; }
 
@@ -95,7 +96,7 @@ namespace Welt.Core.Server
             }
             internal set
             {
-                
+                m_Entity = value;
             }
         }
 
@@ -114,7 +115,7 @@ namespace Welt.Core.Server
         public bool Load()
         {
             
-            return true;
+            return false;
         }
 
         public void Save()
@@ -131,18 +132,18 @@ namespace Welt.Core.Server
         {
             if (Disconnected || (Connection != null && !Connection.Connected))
                 return;
-
-            using (MemoryStream writeStream = new MemoryStream())
+            using (var writeStream = new MemoryStream())
             {
-                using (WeltStream ms = new WeltStream(writeStream))
+                using (var ms = new WeltStream(writeStream))
                 {
                     writeStream.WriteByte(packet.Id);
                     packet.WritePacket(ms);
+                    ms.BaseStream.Flush();
                 }
 
                 byte[] buffer = writeStream.ToArray();
 
-                SocketAsyncEventArgs args = new SocketAsyncEventArgs()
+                var args = new SocketAsyncEventArgs()
                 {
                     UserToken = packet
                 };
@@ -224,11 +225,16 @@ namespace Welt.Core.Server
                     Server.DisconnectClient(this);
                     return;
                 }
+                catch (ArgumentNullException)
+                {
+
+                }
 
                 var packets = PacketReader.ReadPackets(this, e.Buffer, e.Offset, e.BytesTransferred);
 
                 foreach (IPacket packet in packets)
                 {
+                    if (packet == null) break;
                     LastSuccessfulPacket = packet;
 
                     if (PacketHandlers[packet.Id] != null)
@@ -255,8 +261,7 @@ namespace Welt.Core.Server
                     }
                 }
 
-                if (m_Sem != null)
-                    m_Sem.Release();
+                m_Sem?.Release();
             }
             else
             {
@@ -310,15 +315,16 @@ namespace Welt.Core.Server
 
         internal void UpdateChunks()
         {
+            if (!IsLoggedIn) return;
             var newChunks = new List<Vector3I>();
+            var center = new Vector3((int)(Entity.Position.X / Chunk.Width), 0, (int)(Entity.Position.Z / Chunk.Depth));
             for (int x = -ChunkRadius; x < ChunkRadius; x++)
             {
                 for (int z = -ChunkRadius; z < ChunkRadius; z++)
                 {
-                    newChunks.Add(new Vector3I(
-                        ((int)Entity.Position.X >> 4) + x,
-                        0,
-                        ((int)Entity.Position.Z >> 4) + z));
+                    var adjustment = center + new Vector3(x, 0, z);
+                    Console.WriteLine($"{adjustment} - {center}");
+                    newChunks.Add(adjustment);
                 }
             }
             // Unload extraneous columns
@@ -351,19 +357,20 @@ namespace Welt.Core.Server
             }
         }
 
-        internal void LoadChunk(Vector3I position)
+        internal void LoadChunk(Vector3I index)
         {
-            var chunk = World.GetChunk(position);
+            var chunk = World.GetChunk(index);
+            
             QueuePacket(new ChunkPreamblePacket(chunk.Index.X, chunk.Index.Z));
             QueuePacket(CreatePacket(chunk));
-            LoadedChunks.Add(position);
+            LoadedChunks.Add(index);
             
         }
 
-        internal void UnloadChunk(Vector3I position)
+        internal void UnloadChunk(Vector3I index)
         {
-            QueuePacket(new ChunkPreamblePacket((uint)position.X, (uint)position.Y, false));
-            LoadedChunks.Remove(position);
+            QueuePacket(new ChunkPreamblePacket(index.X, index.Y, false));
+            LoadedChunks.Remove(index);
         }
 
         private static ChunkDataPacket CreatePacket(IChunk chunk)
@@ -371,12 +378,7 @@ namespace Welt.Core.Server
             var X = chunk.Index.X;
             var Z = chunk.Index.Z;
 
-            const int blocksPerChunk = Chunk.Width * Chunk.Height * Chunk.Depth;
-            const int bytesPerChunk = (int)(blocksPerChunk * 2.5);
-
-            byte[] data = new byte[bytesPerChunk];
-
-            return new ChunkDataPacket(X * Chunk.Width, 0, Z * Chunk.Depth, Chunk.Width, Chunk.Height, Chunk.Depth, null);
+            return new ChunkDataPacket(X, Z, chunk.GetData());
         }
 
         public void Dispose()

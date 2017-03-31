@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct EntityTeleportPacket : IPacket
     {
-        public byte Id { get { return 0x22; } }
+        public byte Id => 0x22;
 
         public int EntityID;
         public int X, Y, Z;

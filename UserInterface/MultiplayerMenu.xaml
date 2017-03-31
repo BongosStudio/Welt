@@ -1,0 +1,45 @@
+﻿<ek:UIRoot x:Class="UserInterface.MultiplayerMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:UserInterface"
+      xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
+      xmlns:c="clr-namespace:EmptyKeys.UserInterface.Designer.Charts;assembly=EmptyKeys.UserInterface.Designer"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="300">
+    <ek:UIRoot.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UserInterface;component/Dictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ek:UIRoot.Resources>
+    <Grid>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="8*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <ListBox Margin="0,90,0,100" ItemsSource="{Binding ServerList}" Grid.ColumnSpan="2" Grid.Column="1">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Height="75">
+                        <StackPanel HorizontalAlignment="Left">
+                            <TextBlock Text="{Binding ServerName}"/>
+                            <TextBlock Text="{Binding ServerMotd}"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding CurrentPlayerCount}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                        <Button Style="{DynamicResource ButtonStyle}" Content=">" HorizontalAlignment="Right" VerticalAlignment="Top" Command="{Binding JoinServerCommand}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Button Style="{DynamicResource ButtonStyle}" Content="x" HorizontalAlignment="Right" VerticalAlignment="Top" Width="28" Height="28" Command="{Binding ExitCommand}" Grid.Column="3"/>
+        <TextBox Margin="0,0,0,55" TextWrapping="Wrap" Text="{Binding NewIPAddressText}" VerticalAlignment="Bottom" Grid.Column="1" IsEnabled="{Binding IsCompletedAddition}"/>
+        <Button Content="Add" Style="{DynamicResource ButtonStyle}" Grid.Column="2" Margin="0,0,0,55" VerticalAlignment="Bottom" Command="{Binding AddNewIPCommand}" IsEnabled="{Binding IsCompletedAddition}"/>
+        <TextBlock Grid.Column="1" Margin="0,0,0,34" TextWrapping="Wrap" Text="{Binding StatusText}" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+    </Grid>
+</ek:UIRoot>

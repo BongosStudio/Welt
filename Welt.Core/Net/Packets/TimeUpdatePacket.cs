@@ -5,7 +5,7 @@ namespace Welt.Core.Net.Packets
 {
     public struct TimeUpdatePacket : IPacket
     {
-        public byte Id { get { return 0x04; } }
+        public byte Id => 0x04;
 
         public TimeUpdatePacket(int time)
         {

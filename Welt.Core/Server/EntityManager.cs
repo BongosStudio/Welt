@@ -224,6 +224,7 @@ namespace Welt.Core.Server
 
         public void DespawnEntity(IEntity entity)
         {
+            if (entity == null) return;
             entity.Despawned = true;
             PendingDespawns.Add(entity);
         }

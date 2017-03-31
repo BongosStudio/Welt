@@ -23,15 +23,9 @@ namespace Welt.Core.Forge
                 foreach (var type in assembly.GetTypes().Where(t =>
                     typeof(ICraftingRecipe).IsAssignableFrom(t) && !t.IsAbstract))
                 {
-                    recipeTypes.Add(type);
+                    RegisterRecipe((ICraftingRecipe)Activator.CreateInstance(type));
                 }
             }
-
-            recipeTypes.ForEach(t =>
-            {
-                var instance = (ICraftingRecipe)Activator.CreateInstance(t);
-                RegisterRecipe(instance);
-            });
         }
 
         public ICraftingRecipe GetRecipe(IWindowArea craftingArea)

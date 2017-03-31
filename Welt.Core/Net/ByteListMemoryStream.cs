@@ -50,7 +50,7 @@ namespace Welt.Core.Net
             if (buffer.Length < count)
                 throw new ArgumentOutOfRangeException("count");
 
-            byte[] buf = this.buffer.Skip((int)position).Take(count).ToArray();
+            byte[] buf = this.buffer.ToArray().Skip((int)position).Take(count).ToArray();
             
             Buffer.BlockCopy(buf, 0, buffer, offset, buf.Length);
 

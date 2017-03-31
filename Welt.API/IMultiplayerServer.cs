@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Welt.API.Net;
 using Welt.API.Forge;
 using Welt.API.Logging;
+using System.Runtime.CompilerServices;
 
 namespace Welt.API
 {
@@ -40,7 +41,7 @@ namespace Welt.API
         IEntityManager GetEntityManagerForWorld(IWorld world);
         void SendMessage(string message, params object[] parameters);
 
-        void DisconnectClient(IRemoteClient client);
+        void DisconnectClient(IRemoteClient client, [CallerMemberName] string caller = "");
 
         bool PlayerIsWhitelisted(string client);
         bool PlayerIsBlacklisted(string client);

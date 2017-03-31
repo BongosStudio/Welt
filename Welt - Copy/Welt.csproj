@@ -1,0 +1,371 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1A87ADF4-725C-4BC0-A437-4A5E234767B1}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Welt</RootNamespace>
+    <AssemblyName>Welt</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MonoGamePlatform>Windows</MonoGamePlatform>
+    <MonoGameContentBuilderExe>
+    </MonoGameContentBuilderExe>
+    <MonoGameInstallDirectory Condition=" '$(OS)' != 'Unix' ">$(MSBuildProgramFiles32)</MonoGameInstallDirectory>
+    <MonoGameInstallDirectory Condition=" '$(OS)' == 'Unix' ">$(MSBuildExtensionsPath)</MonoGameInstallDirectory>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Build\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Build\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Welt.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Build\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>..\Build\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Build\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>..\Build\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AudioFactory.cs" />
+    <Compile Include="Blocks\VertexPositionDualTexture.cs" />
+    <Compile Include="BMFont.cs" />
+    <Compile Include="Components\ChunkComponent.cs" />
+    <Compile Include="Components\IGameComponent.cs" />
+    <Compile Include="Components\IVisualComponent.cs" />
+    <Compile Include="Components\LightingComponent.cs" />
+    <Compile Include="Components\SkyComponent.cs" />
+    <Compile Include="Effects\AnimationBoard.cs" />
+    <Compile Include="Effects\IWeltAnimation.cs" />
+    <Compile Include="Events\ServerDiscoveredEventArgs.cs" />
+    <Compile Include="Forge\BlockBucket.cs" />
+    <Compile Include="Forge\Renderers\ChunkMesh.cs" />
+    <Compile Include="Graphics\ParticleVertex.cs" />
+    <Compile Include="Graphics\QuadRenderer.cs" />
+    <Compile Include="Graphics\VertexPositionNormalTextureEffect.cs" />
+    <Compile Include="Graphics\VertexPositionTextureLightEffect.cs" />
+    <Compile Include="Blocks\VertexPositionTextureShade.cs" />
+    <Compile Include="Cameras\Camera.cs" />
+    <Compile Include="Cameras\FirstPersonCamera.cs" />
+    <Compile Include="Cameras\HudRenderer.cs" />
+    <Compile Include="Cameras\PlayerRenderer.cs" />
+    <Compile Include="Cameras\VehicleCamera.cs" />
+    <Compile Include="Components\TaskManagerComponent.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Controllers\CameraController.cs" />
+    <Compile Include="Controllers\FirstPersonCameraController.cs" />
+    <Compile Include="Controllers\InputController.cs" />
+    <Compile Include="Controllers\SceneController.cs" />
+    <Compile Include="Controllers\VehicleCameraController.cs" />
+    <Compile Include="Events\ChatMessageEventArgs.cs" />
+    <Compile Include="Events\Forge\BlockChangedEventArgs.cs" />
+    <Compile Include="Events\Forge\ChunkEventArgs.cs" />
+    <Compile Include="Events\Forge\ForgeEventHandlers.cs" />
+    <Compile Include="Extensions\ForgeExtensions.cs" />
+    <Compile Include="Extensions\WeltExtensions.cs" />
+    <Compile Include="Forge\Block.cs" />
+    <Compile Include="Forge\ReadOnlyChunk.cs" />
+    <Compile Include="Forge\ReadOnlyWorld.cs" />
+    <Compile Include="Forge\Renderers\ChunkRenderer.cs" />
+    <Compile Include="Forge\Renderers\FogRenderer.cs" />
+    <Compile Include="Forge\Renderers\Mesh.cs" />
+    <Compile Include="Forge\Renderers\Renderer.cs" />
+    <Compile Include="Forge\Renderers\RendererEventArgs.cs" />
+    <Compile Include="Forge\WorldHelpers.cs" />
+    <Compile Include="GameSettings.cs" />
+    <Compile Include="Graphics\GraphicsManager.cs" />
+    <Compile Include="Handlers\ChunkHandlers.cs" />
+    <Compile Include="Handlers\InventoryHandlers.cs" />
+    <Compile Include="Handlers\PacketHandlers.cs" />
+    <Compile Include="IO\InputMap.cs" />
+    <Compile Include="IO\WireChunk.cs" />
+    <Compile Include="Lighting\Light.cs" />
+    <Compile Include="Lighting\LightEngine.cs" />
+    <Compile Include="Lighting\LightType.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Managers\AudioManager.cs" />
+    <Compile Include="Managers\TaskManager.cs" />
+    <Compile Include="Forge\ChunkState.cs" />
+    <Compile Include="MultiplayerClient.cs" />
+    <Compile Include="Particles\ParticleEmitter.cs" />
+    <Compile Include="Particles\ParticleSettings.cs" />
+    <Compile Include="Particles\ParticleSettings.Defaults.cs" />
+    <Compile Include="Particles\ParticleSystem.cs" />
+    <Compile Include="Particles\ParticleVertex.cs" />
+    <Compile Include="Processors\MeshBuilders\BlockMeshBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\GrassBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\LadderBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\PlantBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\SnowCapBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\TorchBuilder.cs" />
+    <Compile Include="Processors\MeshBuilders\UniformCubeBuilder.cs" />
+    <Compile Include="Profiling\FrameRateCounter.cs" />
+    <Compile Include="Profiling\Utility.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\LoadScene.cs" />
+    <Compile Include="Scenes\MainMenuScene.cs" />
+    <Compile Include="Scenes\PlayScene.cs" />
+    <Compile Include="Scenes\Scene.cs" />
+    <Compile Include="ThrowHelper.cs" />
+    <Compile Include="Extensions\UIExtensions.cs" />
+    <Compile Include="WeltGame.cs" />
+    <Compile Include="WindowDisplayMode.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="EmptyKeys.UserInterface, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI.2.6.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Common\AnyCPU\EmptyKeys.UserInterface.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.CocosSharp, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI.2.6.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\CocosSharp\AnyCPU\EmptyKeys.UserInterface.CocosSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.Core, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI.2.6.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Common\AnyCPU\EmptyKeys.UserInterface.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.Debug, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI.2.6.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Common\AnyCPU\EmptyKeys.UserInterface.Debug.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.Designer, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI_Generator.2.6.0\lib\net45\EmptyKeys.UserInterface.Designer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.FNA, Version=2.6.0.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>..\packages\EmptyKeysUI.2.6.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\FNA\x86\EmptyKeys.UserInterface.FNA.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EmptyKeys.UserInterface.MonoGame, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EmptyKeysUI.2.6.0\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\MonoGame\AnyCPU\EmptyKeys.UserInterface.MonoGame.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Lidgren.Network, Version=3.5.0.921, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Extended.0.5.149\lib\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.6.0.1516, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1516-develop\lib\net40\MonoGame.Framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="Sec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Sec.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.Direct2D1.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.Direct3D11.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D9, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.Direct3D9.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.DXGI.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.MediaFoundation, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.MediaFoundation.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.RawInput, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.RawInput.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.XAudio2, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.XAudio2.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="SharpDX.XInput, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\MonoGame\v3.0\Assemblies\Windows\SharpDX.XInput.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Effects\ClearGBuffer.fx" />
+    <Content Include="Content\Effects\CombineFinal.fx" />
+    <Content Include="Content\Effects\DirectionalLight.fx" />
+    <Content Include="Content\Effects\ParticleEffect.fx" />
+    <Content Include="Content\Effects\PerlinNoise.fx" />
+    <Content Include="Content\Effects\SkyDome.fx" />
+    <Content Include="Content\Effects\BlockEffect.fx" />
+    <Content Include="Content\Images\splashscreen.png" />
+    <Content Include="Content\Images\welt.png" />
+    <Content Include="Content\Music\Feather.wav" />
+    <Content Include="Content\Music\snowfall.mp3" />
+    <Content Include="Content\Sounds\fire.wav" />
+    <Content Include="Content\Sounds\menu-button.wma" />
+    <Content Include="Content\Sounds\rain-heavy.wav" />
+    <Content Include="Content\Sounds\rain.wav" />
+    <Content Include="Content\Sounds\splash.wav" />
+    <Content Include="Content\Sounds\step-ice.wav" />
+    <Content Include="Content\Sounds\waves.wav" />
+    <Content Include="Content\Sounds\wind-interior.wav" />
+    <Content Include="Content\Textures\blocks.png" />
+    <Content Include="Content\Textures\blocks_16.png" />
+    <Content Include="Content\Textures\blocks_64_2.png" />
+    <Content Include="Content\Textures\blocks_APR28_3.png" />
+    <Content Include="Content\Textures\cloudMap.jpg" />
+    <Content Include="Content\Textures\crosshair.png" />
+    <Content Include="Content\Textures\crosshair_moving.png" />
+    <Content Include="Content\Textures\newStars.png" />
+    <Content Include="Content\Textures\rain.PNG" />
+    <Content Include="Content\Textures\SelectionBlock.png" />
+    <Content Include="Content\Textures\snow.png" />
+    <Content Include="Content\Textures\terrain.png" />
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Content\Effects\PointLight.fx" />
+    <None Include="Content\Effects\ShadowMap.fx" />
+    <None Include="Content\Fonts\Arial_13.5_Regular.spritefont" />
+    <None Include="Content\Fonts\Code_7x5_13.5_Regular.spritefont" />
+    <None Include="Content\Fonts\console.spritefont" />
+    <None Include="Content\Fonts\OSDdisplay.spritefont" />
+    <None Include="Content\Models\dome.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Models\SelectionBlock.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Models\skydometex_0.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Content\Models\sphere.x" />
+    <None Include="Graphics\sample_data.gtd" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Console\" />
+    <Folder Include="Content\Particles\" />
+    <Folder Include="Forge\Renderers\ParticleSystems\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GameUILibrary\GameUILibrary.csproj">
+      <Project>{86c41467-c0a3-4079-a285-cf0ec80fef6f}</Project>
+      <Name>GameUILibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Welt.API\Welt.API.csproj">
+      <Project>{e26d7ec7-4be3-46c1-8185-608f2e649a2b}</Project>
+      <Name>Welt.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Welt.Core\Welt.Core.csproj">
+      <Project>{813df234-8ffd-4c3a-8231-d6296c221df1}</Project>
+      <Name>Welt.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

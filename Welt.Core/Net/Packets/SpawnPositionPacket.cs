@@ -9,7 +9,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct SpawnPositionPacket : IPacket
     {
-        public byte Id { get { return 0x06; } }
+        public byte Id => 0x06;
 
         public SpawnPositionPacket(int x, int y, int z)
         {

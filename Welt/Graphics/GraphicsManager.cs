@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
+using Welt.Core;
 
 namespace Welt.Graphics
 {
@@ -12,6 +14,8 @@ namespace Welt.Graphics
         public Texture2D MoonTexture;
         public Texture2D ParticleTexture;
 
+        public BitmapFont Font;
+
         private TextureMap m_TextureMap;
 
         public GraphicsManager(WeltGame game)
@@ -22,10 +26,12 @@ namespace Welt.Graphics
 
         public void Initialize()
         {
-            BlockTexture = m_TextureMap.LoadBlockTextures(Game.GraphicsDevice, "textures\\blocks");
-            CloudTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "textures\\environment\\clouds.png");
-            StarTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "textures\\environment\\stars.jpg");
-            SunTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "textures\\environment\\sun.png");
+            BlockTexture = m_TextureMap.LoadBlockTextures(Game.GraphicsDevice, "resources\\textures\\blocks");
+            CloudTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\clouds.png");
+            StarTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\stars.jpg");
+            //Font = Game.Content.Load<BitmapFont>("font");
+            SunTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\sun.png");
+            MoonTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\moon.png");
         }
     }
 }

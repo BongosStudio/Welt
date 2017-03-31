@@ -105,6 +105,11 @@ namespace Welt.API
             return new Color(v.X, v.Y, v.Z);
         }
 
+        public static explicit operator Vector3(Vector3B v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
+
         public static Vector3B Average(params Vector3B[] values)
         {
             var x = 0;

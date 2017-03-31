@@ -16,6 +16,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Interactions.Core;
     using EmptyKeys.UserInterface.Interactivity;
     using EmptyKeys.UserInterface.Media;
+    using EmptyKeys.UserInterface.Media.Effects;
     using EmptyKeys.UserInterface.Media.Animation;
     using EmptyKeys.UserInterface.Media.Imaging;
     using EmptyKeys.UserInterface.Shapes;
@@ -23,7 +24,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Themes;
     
     
-    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.2.0.0")]
+    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.6.0.0")]
     public partial class MainMenu : UIRoot {
         
         private Grid e_0;
@@ -100,7 +101,6 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_3.Name = "e_3";
             this.e_3.Height = 50F;
             this.e_3.Width = 200F;
-            this.e_3.IsEnabled = false;
             this.e_3.HorizontalAlignment = HorizontalAlignment.Left;
             this.e_3.FontFamily = new FontFamily("Code 7x5");
             this.e_3.FontSize = 18F;

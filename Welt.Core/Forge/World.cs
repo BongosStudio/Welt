@@ -39,7 +39,7 @@ namespace Welt.Core.Forge
             SpawnPoint = new Vector3I(FastMath.NextRandom(Size), 128, FastMath.NextRandom(Size));
         }
 
-        public World(string name, int seed) : this(name)
+        public World(string name, long seed) : this(name)
         {
             Seed = seed;
         }
@@ -71,7 +71,7 @@ namespace Welt.Core.Forge
         /// <summary>
         ///     The seed used for generation.
         /// </summary>
-        public int Seed { get; }
+        public long Seed { get; }
         /// <summary>
         ///     The size of the world in Chunks.
         /// </summary>
@@ -102,20 +102,6 @@ namespace Welt.Core.Forge
         /// </summary>
         public Vector3I SpawnPoint { get; set; }
 
-        public readonly RasterizerState WireframedRaster = new RasterizerState
-        {
-            CullMode = CullMode.None,
-            FillMode = FillMode.WireFrame
-        };
-
-        public readonly RasterizerState NormalRaster = new RasterizerState
-        {
-            CullMode = CullMode.CullCounterClockwiseFace,
-            FillMode = FillMode.Solid
-        };
-
-        public bool Wireframed;
-
         // Day/Night
         public int TimeOfDay { get; set; } = 1200;
         public Vector3 SunPos = new Vector3(0, 1000, 0); // Directly overhead
@@ -130,14 +116,14 @@ namespace Welt.Core.Forge
         public Vector4 SunColor = Color.White.ToVector4();
         public Vector4 HorizonColor = Color.White.ToVector4();
 
-        public Vector4 Eveningtint = Color.Red.ToVector4();
-        public Vector4 Morningtint = Color.Gold.ToVector4();
+        public Vector4 EveningTint = Color.Red.ToVector4();
+        public Vector4 MorningTint = Color.Gold.ToVector4();
 
         //private float _tod;
         //public bool dayMode = false;
         //public bool nightMode = false;
-        public float Fognear = 14 * 16; //(BUILD_RANGE - 1) * 16;
-        public float Fogfar = 16 * 16; //(BUILD_RANGE + 1) * 16;
+        public float FogNear = 14 * 16; //(BUILD_RANGE - 1) * 16;
+        public float FogFar = 16 * 16; //(BUILD_RANGE + 1) * 16;
 
         #endregion
 
@@ -166,14 +152,14 @@ namespace Welt.Core.Forge
 
         #endregion
 
-        public IChunk GetChunk(Vector3I position)
+        public IChunk GetChunk(Vector3I index)
         {
-            return ChunkManager.GetChunk(position);
+            return ChunkManager.GetChunk(index);
         }
 
-        public void SetChunk(Vector3I position, IChunk value)
+        public void SetChunk(Vector3I index, IChunk value)
         {
-            ChunkManager.SetChunk(position, value as Chunk);
+            ChunkManager.SetChunk(index, value as Chunk);
         }
 
         #region GetBlock

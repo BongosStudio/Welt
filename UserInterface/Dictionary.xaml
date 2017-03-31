@@ -16,6 +16,28 @@
     <SolidColorBrush x:Key="DisabledBackground" Color="#3d4046"/>
     <SolidColorBrush x:Key="DisabledForeground" Color="Gray"/>
 
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Background" Value="{DynamicResource BackgroundColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True" Padding="5">
+                        <ContentPresenter Content="{TemplateBinding Content}" Margin="5,2,5,2" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource ActiveColor}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style TargetType="TabItem">
         <Setter Property="Background" Value="{DynamicResource BackgroundColor}" />
         <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />

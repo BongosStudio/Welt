@@ -16,5 +16,6 @@ namespace Welt.API
         int MaxPlayers { get; }
         bool Query { get; }
         int QueryPort { get; }
+        bool IsRealtime { get; }
     }
 }

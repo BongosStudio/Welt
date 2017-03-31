@@ -9,6 +9,14 @@ namespace Welt.Core.Handlers
 {
     internal static class EntityHandlers
     {
+        public static void HandleSetPlayerPositionPacket(IPacket _packet, IRemoteClient _client, IMultiplayerServer server)
+        {
+            var packet = (SetPlayerPositionPacket)_packet;
+            _client.Entity.Position = new Vector3(packet.X, packet.Y, packet.Z);
+            _client.Entity.Pitch = packet.Pitch;
+            _client.Entity.Yaw = packet.Yaw;
+        }
+
         public static void HandlePlayerPositionPacket(IPacket _packet, IRemoteClient _client, IMultiplayerServer server)
         {
             var packet = (PlayerPositionPacket)_packet;
@@ -29,19 +37,19 @@ namespace Welt.Core.Handlers
 
         public static void HandlePlayerMovement(IRemoteClient client, Vector3 position, float yaw, float pitch)
         {
-            if (client.Entity.Position.DistanceTo(position) > 10)
-            {
-                client.QueuePacket(new DisconnectPacket("The server determined you moved faster than allowed."));
-                //client.Entity.Position = position;
-                //client.Entity.Yaw = yaw;
-                //client.Entity.Pitch = pitch;
-            }
-            else
-            {
-                client.Entity.Position = position;
-                client.Entity.Yaw = yaw;
-                client.Entity.Pitch = pitch;
-            }
+            //if (client.Entity.Position.DistanceTo(position) > 10)
+            //{
+            //    //client.QueuePacket(new DisconnectPacket("The server determined you moved faster than allowed."));
+            //    client.Entity.Position = position;
+            //    client.Entity.Yaw = yaw;
+            //    client.Entity.Pitch = pitch;
+            //}
+            //else
+            //{
+            //    client.Entity.Position = position;
+            //    client.Entity.Yaw = yaw;
+            //    client.Entity.Pitch = pitch;
+            //}
         }
     }
 }

@@ -16,6 +16,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Interactions.Core;
     using EmptyKeys.UserInterface.Interactivity;
     using EmptyKeys.UserInterface.Media;
+    using EmptyKeys.UserInterface.Media.Effects;
     using EmptyKeys.UserInterface.Media.Animation;
     using EmptyKeys.UserInterface.Media.Imaging;
     using EmptyKeys.UserInterface.Shapes;
@@ -23,7 +24,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Themes;
     
     
-    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.2.0.0")]
+    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.6.0.0")]
     public partial class PlayUI : UIRoot {
         
         private Grid e_0;
@@ -99,7 +100,6 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_3.SetBinding(TextBox.IsEnabledProperty, binding_e_3_IsEnabled);
             Binding binding_e_3_Text = new Binding("ChatBoxInput");
             this.e_3.SetBinding(TextBox.TextProperty, binding_e_3_Text);
-            FontManager.Instance.AddFont("Code 7x5", 18F, FontStyle.Regular, "Code_7x5_13.5_Regular");
         }
         
         private static void InitializeElementResources(UIElement elem) {

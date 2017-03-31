@@ -7,13 +7,22 @@
              xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
              xmlns:c="clr-namespace:EmptyKeys.UserInterface.Designer.Charts;assembly=EmptyKeys.UserInterface.Designer"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300" FontSize="18" FontFamily="Code 7x5">
-    <Grid>
+             d:DesignHeight="300" d:DesignWidth="300" FontSize="18">
+    <ek:UIRoot.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/UserInterface;component/Dictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ek:UIRoot.Resources>
+    <Grid Opacity="{Binding Opacity}">
         <TextBlock HorizontalAlignment="Right" Margin="0,0,10,10" TextAlignment="Right" Text="{Binding LoadingStatusText}" VerticalAlignment="Bottom" />
-        <StackPanel Height="130" VerticalAlignment="Bottom" Margin="0,0,159,0">
+        <StackPanel Height="130" VerticalAlignment="Bottom" Margin="10,0,159,0">
             <TextBlock Text="{Binding UsernameText}" />
             <TextBlock Text="{Binding WorldNameText}" />
             <TextBlock Text="{Binding WorldData}" />
         </StackPanel>
+        <ProgressBar HorizontalAlignment="Right" Height="10" Margin="0,0,10,40" VerticalAlignment="Bottom" Width="100" Value="{Binding LoadingStatus}" Maximum="4"/>
+        <TextBlock HorizontalAlignment="Left" Margin="20,20,0,0" TextWrapping="Wrap" Text="{Binding HintText}" VerticalAlignment="Top"/>
     </Grid>
 </ek:UIRoot>

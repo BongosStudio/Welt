@@ -16,6 +16,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Interactions.Core;
     using EmptyKeys.UserInterface.Interactivity;
     using EmptyKeys.UserInterface.Media;
+    using EmptyKeys.UserInterface.Media.Effects;
     using EmptyKeys.UserInterface.Media.Animation;
     using EmptyKeys.UserInterface.Media.Imaging;
     using EmptyKeys.UserInterface.Shapes;
@@ -23,7 +24,7 @@ namespace EmptyKeys.UserInterface.Generated {
     using EmptyKeys.UserInterface.Themes;
     
     
-    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.2.0.0")]
+    [GeneratedCodeAttribute("Empty Keys UI Generator", "2.6.0.0")]
     public partial class Loading : UIRoot {
         
         private Grid e_0;
@@ -37,6 +38,10 @@ namespace EmptyKeys.UserInterface.Generated {
         private TextBlock e_4;
         
         private TextBlock e_5;
+        
+        private ProgressBar e_6;
+        
+        private TextBlock e_7;
         
         public Loading() : 
                 base() {
@@ -56,12 +61,14 @@ namespace EmptyKeys.UserInterface.Generated {
         }
         
         private void InitializeComponent() {
-            this.FontFamily = new FontFamily("Code 7x5");
             this.FontSize = 18F;
+            InitializeElementResources(this);
             // e_0 element
             this.e_0 = new Grid();
             this.Content = this.e_0;
             this.e_0.Name = "e_0";
+            Binding binding_e_0_Opacity = new Binding("Opacity");
+            this.e_0.SetBinding(Grid.OpacityProperty, binding_e_0_Opacity);
             // e_1 element
             this.e_1 = new TextBlock();
             this.e_0.Children.Add(this.e_1);
@@ -77,7 +84,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_0.Children.Add(this.e_2);
             this.e_2.Name = "e_2";
             this.e_2.Height = 130F;
-            this.e_2.Margin = new Thickness(0F, 0F, 159F, 0F);
+            this.e_2.Margin = new Thickness(10F, 0F, 159F, 0F);
             this.e_2.VerticalAlignment = VerticalAlignment.Bottom;
             // e_3 element
             this.e_3 = new TextBlock();
@@ -97,7 +104,33 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_5.Name = "e_5";
             Binding binding_e_5_Text = new Binding("WorldData");
             this.e_5.SetBinding(TextBlock.TextProperty, binding_e_5_Text);
-            FontManager.Instance.AddFont("Code 7x5", 18F, FontStyle.Regular, "Code_7x5_13.5_Regular");
+            // e_6 element
+            this.e_6 = new ProgressBar();
+            this.e_0.Children.Add(this.e_6);
+            this.e_6.Name = "e_6";
+            this.e_6.Height = 10F;
+            this.e_6.Width = 100F;
+            this.e_6.Margin = new Thickness(0F, 0F, 10F, 40F);
+            this.e_6.HorizontalAlignment = HorizontalAlignment.Right;
+            this.e_6.VerticalAlignment = VerticalAlignment.Bottom;
+            this.e_6.Maximum = 4F;
+            Binding binding_e_6_Value = new Binding("LoadingStatus");
+            this.e_6.SetBinding(ProgressBar.ValueProperty, binding_e_6_Value);
+            // e_7 element
+            this.e_7 = new TextBlock();
+            this.e_0.Children.Add(this.e_7);
+            this.e_7.Name = "e_7";
+            this.e_7.Margin = new Thickness(20F, 20F, 0F, 0F);
+            this.e_7.HorizontalAlignment = HorizontalAlignment.Left;
+            this.e_7.VerticalAlignment = VerticalAlignment.Top;
+            this.e_7.TextWrapping = TextWrapping.Wrap;
+            Binding binding_e_7_Text = new Binding("HintText");
+            this.e_7.SetBinding(TextBlock.TextProperty, binding_e_7_Text);
+            FontManager.Instance.AddFont("Segoe UI", 18F, FontStyle.Regular, "Segoe_UI_13.5_Regular");
+        }
+        
+        private static void InitializeElementResources(UIElement elem) {
+            elem.Resources.MergedDictionaries.Add(Dictionary.Instance);
         }
     }
 }

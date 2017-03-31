@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -55,13 +56,13 @@ namespace Welt.Core.Net
                 CurrentPacket = createPacket();
             }
             
-            using (ByteListMemoryStream listStream = new ByteListMemoryStream(PacketBuffer, 1))
+            using (var listStream = new ByteListMemoryStream(PacketBuffer, 1))
             {
-                using (WeltStream ms = new WeltStream(listStream))
+                using (var ms = new WeltStream(listStream))
                 {
                     try
                     {
-                        CurrentPacket.ReadPacket(ms);
+                        CurrentPacket?.ReadPacket(ms);
                     }
                     catch (EndOfStreamException)
                     {

@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct ChunkPreamblePacket : IPacket
     {
-        public byte Id { get { return 0x32; } }
+        public byte Id => 0x32;
 
         public ChunkPreamblePacket(uint x, uint z, bool load = true)
         {

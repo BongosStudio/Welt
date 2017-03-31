@@ -13,6 +13,7 @@ using Welt.API.Logging;
 using Welt.Core.Net;
 using Welt.Core.Forge;
 using Welt.Core.Net.Packets;
+using System.Runtime.CompilerServices;
 
 namespace Welt.Core.Server
 {
@@ -120,7 +121,6 @@ namespace Welt.Core.Server
             Listener = new TcpListener(endPoint);
             Listener.Start();
             EndPoint = (IPEndPoint)Listener.LocalEndpoint;
-
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
             args.Completed += AcceptClient;
 
@@ -157,6 +157,14 @@ namespace Welt.Core.Server
                 HandleChunkLoaded(world, new ChunkLoadedEventArgs(chunk));
         }
 
+        public void QueuePacket(IPacket packet)
+        {
+            foreach (var client in Clients)
+            {
+                client.QueuePacket(packet);
+            }
+        }
+
         void HandleChunkLoaded(object sender, ChunkLoadedEventArgs e)
         {
             ChunksToSchedule.Add((sender as IWorld, e.Chunk));
@@ -172,7 +180,7 @@ namespace Welt.Core.Server
                 {
                     var client = (RemoteClient)Clients[i];
                     // TODO: Confirm that the client knows of this block
-                    if (client.LoggedIn && client.World == sender)
+                    if (client.IsLoggedIn && client.World == sender)
                     {
                         // send block change packet
                     }
@@ -291,7 +299,7 @@ namespace Welt.Core.Server
             PlayerQuit?.Invoke(this, e);
         }
 
-        public void DisconnectClient(IRemoteClient _client)
+        public void DisconnectClient(IRemoteClient _client, [CallerMemberName] string caller = "")
         {
             var client = (RemoteClient)_client;
 
@@ -305,9 +313,9 @@ namespace Welt.Core.Server
 
             client.Disconnected = true;
 
-            if (client.LoggedIn)
+            if (client.IsLoggedIn)
             {
-                SendMessage($"{client.Username} has left the server.");
+                SendMessage($"{client.Username} has left the server. {caller}");
                 GetEntityManagerForWorld(client.World).DespawnEntity(client.Entity);
                 GetEntityManagerForWorld(client.World).FlushDespawns();
             }
@@ -354,6 +362,11 @@ namespace Welt.Core.Server
             }
             foreach (var world in Worlds)
             {
+                if (ServerConfiguration.IsRealtime)
+                    world.TimeOfDay = (int)DateTime.Now.TimeOfDay.TotalSeconds;
+                else
+                    world.TimeOfDay += MillisecondsPerTick;
+
                 foreach (var chunk in world)
                 {
                     WorldLighter.ProcessChunk(chunk as Chunk);

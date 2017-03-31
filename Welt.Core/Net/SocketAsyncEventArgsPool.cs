@@ -9,17 +9,17 @@ namespace Welt.Core.Net
 {
     public class SocketAsyncEventArgsPool : IDisposable
     {
-        private readonly BlockingCollection<SocketAsyncEventArgs> argsPool;
+        private readonly BlockingCollection<SocketAsyncEventArgs> m_ArgsPool;
 
-        private readonly int maxPoolSize;
+        private readonly int m_MaxPoolSize;
 
-        private BufferManager bufferManager;
+        private BufferManager m_BufferManager;
 
         public SocketAsyncEventArgsPool(int poolSize, int maxSize, int bufferSize)
         {
-            maxPoolSize = maxSize;
-            argsPool = new BlockingCollection<SocketAsyncEventArgs>(new ConcurrentQueue<SocketAsyncEventArgs>());
-            bufferManager = new BufferManager(bufferSize);
+            m_MaxPoolSize = maxSize;
+            m_ArgsPool = new BlockingCollection<SocketAsyncEventArgs>(new ConcurrentQueue<SocketAsyncEventArgs>());
+            m_BufferManager = new BufferManager(bufferSize);
 
             Init(poolSize);
         }
@@ -28,20 +28,20 @@ namespace Welt.Core.Net
         {
             for (int i = 0; i < size; i++)
             {
-                argsPool.Add(CreateEventArgs());
+                m_ArgsPool.Add(CreateEventArgs());
             }
         }
 
         public SocketAsyncEventArgs Get()
         {
-            if (!argsPool.TryTake(out var args))
+            if (!m_ArgsPool.TryTake(out var args, 1000))
             {
                 args = CreateEventArgs();
             }
-
-            if (argsPool.Count > maxPoolSize)
+            
+            if (m_ArgsPool.Count > m_MaxPoolSize)
             {
-                Trim(argsPool.Count - maxPoolSize);
+                Trim(m_ArgsPool.Count - m_MaxPoolSize);
             }
 
             return args;
@@ -49,14 +49,14 @@ namespace Welt.Core.Net
 
         public void Add(SocketAsyncEventArgs args)
         {
-            if (!argsPool.IsAddingCompleted)
-                argsPool.Add(args);
+            if (!m_ArgsPool.IsAddingCompleted)
+                m_ArgsPool.Add(args);
         }
 
         protected SocketAsyncEventArgs CreateEventArgs()
         {
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            bufferManager.SetBuffer(args);
+            m_BufferManager.SetBuffer(args);
 
             return args;
         }
@@ -65,11 +65,9 @@ namespace Welt.Core.Net
         {
             for (int i = 0; i < count; i++)
             {
-                SocketAsyncEventArgs args;
-
-                if (argsPool.TryTake(out args))
+                if (m_ArgsPool.TryTake(out var args))
                 {
-                    bufferManager.ClearBuffer(args);
+                    m_BufferManager.ClearBuffer(args);
                     args.Dispose();
                 }
             }
@@ -86,18 +84,18 @@ namespace Welt.Core.Net
         {
             if (disposing)
             {
-                argsPool.CompleteAdding();
+                m_ArgsPool.CompleteAdding();
 
-                while (argsPool.Count > 0)
+                while (m_ArgsPool.Count > 0)
                 {
-                    SocketAsyncEventArgs arg = argsPool.Take();
+                    SocketAsyncEventArgs arg = m_ArgsPool.Take();
 
-                    bufferManager.ClearBuffer(arg);
+                    m_BufferManager.ClearBuffer(arg);
                     arg.Dispose();
                 }
             }
 
-            bufferManager = null;
+            m_BufferManager = null;
         }
 
         ~SocketAsyncEventArgsPool()

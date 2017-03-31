@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct LoginRequestPacket : IPacket
     {
-        public byte Id { get { return 0x01; } }
+        public byte Id => 0x01;
 
         public LoginRequestPacket(int protocolVersion, string username)
         {

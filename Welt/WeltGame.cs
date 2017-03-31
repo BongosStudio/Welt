@@ -9,11 +9,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Welt.Components;
 using Welt.Controllers;
 using Welt.Core.Forge;
+using Welt.Core.Net.Packets;
 using Welt.Graphics;
 using Welt.Scenes;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
@@ -31,15 +33,34 @@ namespace Welt
         public static bool ThrowExceptions = true;
         public static int Width;
         
+        /// <summary>
+        ///     Retrieves the game settings.
+        /// </summary>
         public GameSettings GameSettings { get; private set; }
+        /// <summary>
+        ///     The factory that processes audio updates.
+        /// </summary>
         public AudioFactory Audio { get; private set; }
+        /// <summary>
+        ///     Creates and executes tasks within the game.
+        /// </summary>
         public TaskManagerComponent TaskManager { get; private set; }
+        /// <summary>
+        ///     Manages and creates graphic resources within the game.
+        /// </summary>
         public GraphicsManager GraphicsManager { get; private set; }
+        /// <summary>
+        ///     The multiplayer client the game uses.
+        /// </summary>
+        public MultiplayerClient Client { get; private set; }
         public bool IsRunning { get; private set; }
-        
+        /// <summary>
+        ///     The render target for the game.
+        /// </summary>
+        public RenderTarget2D RenderTarget { get; internal set; }
+
         private readonly GraphicsDeviceManager m_Graphics;
         private MonoGameEngine m_UiEngine;
-        private RenderTarget2D m_RenderTarget;
         private SpriteBatch m_SpriteBatch;
 
         #endregion Fields
@@ -57,7 +78,9 @@ namespace Welt
             Exiting += (sender, args) =>
             {
                 IsRunning = false;
+                Client.Disconnect();
             };
+            Client = new MultiplayerClient(new Core.Server.User { Username = username, AuthToken = key });
         }
 
         public static void SetCursor(Cursor cursor)
@@ -67,12 +90,14 @@ namespace Welt
 
         protected override void LoadContent()
         {
+            // TODO: put these in a splash screen
+            GraphicsManager.Initialize();
             FontManager.Instance.LoadFonts(Content, "Fonts/");
             FontManager.DefaultFont =
                 Engine.Instance.Renderer.CreateFont(Content.Load<SpriteFont>("Fonts/Code_7x5_13.5_Regular"));
 
             ImageManager.Instance.LoadImages(Content, "Images/");
-            m_RenderTarget = new RenderTarget2D(
+            RenderTarget = new RenderTarget2D(
                 GraphicsDevice,
                 GraphicsDevice.PresentationParameters.BackBufferWidth,
                 GraphicsDevice.PresentationParameters.BackBufferHeight,
@@ -80,6 +105,7 @@ namespace Welt
                 GraphicsDevice.PresentationParameters.BackBufferFormat,
                 GraphicsDevice.PresentationParameters.DepthStencilFormat);
             m_SpriteBatch = new SpriteBatch(GraphicsDevice);
+            
             base.LoadContent();
         }
 
@@ -111,10 +137,12 @@ namespace Welt
                 IsFullScreen = fullscreen,
                 PreferredBackBufferWidth = width,
                 PreferredBackBufferHeight = height,
-                SynchronizeWithVerticalRetrace = true
+                SynchronizeWithVerticalRetrace = true,
+                GraphicsProfile = GraphicsProfile.HiDef,
             };
             graphics.DeviceCreated += Graphics_DeviceCreated;
             graphics.PreparingDeviceSettings += Graphics_PreparingDeviceSettings;
+
             return graphics;
         }
 
@@ -164,11 +192,9 @@ namespace Welt
             Height = Window.ClientBounds.Height;
             Width = Window.ClientBounds.Width;
             SetCursor(Cursors.Default);
-            SceneController.Initialize(m_Graphics, new MainMenuScene(this));
+            SceneController.Initialize(new MainMenuScene(this));
             // TODO: load audio 
             // TODO: move these to a splash screen
-            GraphicsManager.Initialize();
-            BlockProvider.CreateProviders();
         }
 
         #endregion Initialize
@@ -190,24 +216,40 @@ namespace Welt
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.SetRenderTarget(m_RenderTarget);
-            GraphicsDevice.Clear(Color.Black);
+            ResetRenderTarget();
             SceneController.Draw(gameTime);
             base.Draw(gameTime);
-            GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.Black);
+            ClearRenderTarget();
 
             m_SpriteBatch.Begin();
-            m_SpriteBatch.Draw(m_RenderTarget, Vector2.Zero, Color.White);
+            m_SpriteBatch.Draw(RenderTarget, Vector2.Zero, Color.White);
             m_SpriteBatch.End();
         }
 
         #endregion Draw
 
+        public void SetRenderTarget(RenderTarget2D target)
+        {
+            GraphicsDevice.SetRenderTarget(target);
+            //GraphicsDevice.Clear(Color.Black);
+        }
+
+        public void SetRenderTarget(RenderTarget2D target, Color backColor)
+        {
+            GraphicsDevice.SetRenderTarget(target);
+            //GraphicsDevice.Clear(backColor);
+        }
+
         public void ResetRenderTarget()
         {
-            GraphicsDevice.SetRenderTarget(m_RenderTarget);
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.SetRenderTarget(RenderTarget);
+            //GraphicsDevice.Clear(Color.Black);
+        }
+
+        public void ClearRenderTarget()
+        {
+            GraphicsDevice.SetRenderTarget(null);
+            //GraphicsDevice.Clear(Color.Black);
         }
 
         public void TakeScreenshot()
@@ -215,7 +257,17 @@ namespace Welt
             var title = $"screenshot-{DateTime.Now.Month}_{DateTime.Now.Day}_{DateTime.Now.Year}-{DateTime.Now.Hour}_{DateTime.Now.Minute}_{DateTime.Now.Second}";
             using (var stream = File.Create(title + ".png"))
             {
-                m_RenderTarget.SaveAsPng(stream, Width, Height);
+                RenderTarget.SaveAsPng(stream, Width, Height);
+            }
+            Process.Start(title + ".png");
+        }
+
+        public byte[] GetScreen()
+        {
+            using (var stream = new MemoryStream())
+            {
+                RenderTarget.SaveAsPng(stream, Width, Height);
+                return stream.GetBuffer();
             }
         }
     }

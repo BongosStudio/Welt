@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct PlayerLookPacket : IPacket
     {
-        public byte Id { get { return 0x0C; } }
+        public byte Id => 0x0C;
 
         public float Yaw, Pitch;
         public bool OnGround;

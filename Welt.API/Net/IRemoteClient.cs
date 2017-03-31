@@ -41,7 +41,7 @@ namespace Welt.API.Net
         /// <summary>
         /// If true, this client will be sent logging information as chat messages.
         /// </summary>
-        bool EnableLogging { get; set; }
+        bool HasLogging { get; set; }
         /// <summary>
         /// The time the user is expected to complete the active digging operation,
         /// depending on what kind of block they are mining and what tool they're using

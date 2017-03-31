@@ -21,5 +21,8 @@ namespace Welt.API.Forge
         byte GetHeight(byte x, byte z);
 
         void SetBlockId(byte x, byte y, byte z, ushort id);
+
+        byte[] GetData();
+        void Fill(byte[] data);
     }
 }

@@ -47,6 +47,17 @@ namespace Welt.Core.Forge
             BoundingBox = new BoundingBox(new Vector3(Position.X, Position.Y, Position.Z),
                 new Vector3(Position.X + Size.X, Position.Y + Size.Y, Position.Z + Size.Z));
         }
+
+        public byte[] GetData()
+        {
+            // for now, we'll return just the block palette? idk
+            return Blocks.ToByteArray();
+        }
+
+        public void Fill(byte[] data)
+        {
+            Blocks = BlockPalette.FromByteArray(data);
+        }
         
         public byte[] HeightMap { get; }
         public bool IsModified { get; set; }

@@ -3,7 +3,7 @@ using Welt.Cameras;
 
 namespace Welt.Controllers
 {
-    public class VehicleCameraController : CameraController
+    public class VehicleCameraController : CameraController<VehicleCamera>
     {
         public float Friction;
 

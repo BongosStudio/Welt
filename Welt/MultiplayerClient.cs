@@ -1,14 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Welt.API;
 using Welt.API.Forge;
 using Welt.API.Net;
@@ -19,6 +18,7 @@ using Welt.Core.Net;
 using Welt.Core.Net.Packets;
 using Welt.Core.Physics;
 using Welt.Core.Server;
+using Welt.Events;
 using Welt.Events.Forge;
 using Welt.Forge;
 
@@ -31,15 +31,17 @@ namespace Welt
     /// </summary>
     public class MultiplayerClient : IAABBEntity, INotifyPropertyChanged, IDisposable // TODO: Make IMultiplayerClient and so on
     {
-        public event EventHandler<ChatMessageEventArgs> ChatMessage;
+        public event EventHandler<Events.ChatMessageEventArgs> ChatMessage;
         public event EventHandler<ChunkEventArgs> ChunkModified;
         public event EventHandler<ChunkEventArgs> ChunkLoaded;
         public event EventHandler<ChunkEventArgs> ChunkUnloaded;
-        public event EventHandler<BlockChangeEventArgs> BlockChanged;
+        public event EventHandler<BlockChangedEventArgs> BlockChanged;
+        public event EventHandler<ServerDiscoveredEventArgs> ServerDiscovered;
         public event PropertyChangedEventHandler PropertyChanged;
 
         private long m_Connected;
-        private int hotbarSelection;
+        private int m_HotbarSelection;
+        private string m_LastErrorMessage;
 
         public User User { get; set; }
         public ReadOnlyWorld World { get; private set; }
@@ -50,21 +52,41 @@ namespace Welt
         public InventoryContainer Inventory { get; set; }
         public int Health { get; set; }
         public IWindow CurrentWindow { get; set; }
+        public IBlockRepository BlockRepository { get; set; }
+        public IItemRepository ItemRepository { get; set; }
         public ICraftingRepository CraftingRepository { get; set; }
         public Vector3I? LookingAt { get; set; }
         public BlockFaceDirection? LookingAtFace { get; set; }
+        public int LoadedChunks { get; private set; }
 
-        public bool Connected => Interlocked.Read(ref m_Connected) == 1;
+        public bool IsConnected => Interlocked.Read(ref m_Connected) == 1;
+        
+        public string LastErrorMessage
+        {
+            get
+            {
+                return m_LastErrorMessage;
+            }
+            set
+            {
+                if (m_LastErrorMessage == value) return;
+                m_LastErrorMessage = value;
+                OnPropertyChanged();
+                
+            }
+        }
 
         public int HotbarSelection
         {
-            get { return hotbarSelection; }
+            get { return m_HotbarSelection; }
             set
             {
-                hotbarSelection = value;
+                m_HotbarSelection = value;
                 // send update to server?
             }
         }
+
+        public ItemStack SelectedItem => Inventory[HotbarSelection];
 
         private TcpClient Client { get; set; }
         private IWeltStream Stream { get; set; }
@@ -72,7 +94,7 @@ namespace Welt
 
         private readonly PacketHandler[] m_PacketHandlers;
 
-        private SemaphoreSlim m_Sem = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim m_Sem = new SemaphoreSlim(1, 4);
 
         private readonly CancellationTokenSource m_Cancel;
 
@@ -91,13 +113,21 @@ namespace Welt
             var repo = new BlockRepository();
             repo.DiscoverBlockProviders();
             Physics = new PhysicsEngine(World.World, repo);
-            SocketPool = new SocketAsyncEventArgsPool(100, 200, 65536);
+            SocketPool = new SocketAsyncEventArgsPool(100, 200, ushort.MaxValue);
             m_Connected = 0;
             m_Cancel = new CancellationTokenSource();
             Health = 20;
-            var crafting = new CraftingRepository();
-            CraftingRepository = crafting;
-            crafting.DiscoverRecipes();
+            var blockRepository = new BlockRepository();
+            blockRepository.DiscoverBlockProviders();
+            BlockRepository = blockRepository;
+            var itemRepository = new ItemRepository();
+            itemRepository.DiscoverItemProviders();
+            ItemRepository = itemRepository;
+            BlockProvider.ItemRepository = ItemRepository;
+            BlockProvider.BlockRepository = BlockRepository;
+            var craftingRepository = new CraftingRepository();
+            craftingRepository.DiscoverRecipes();
+            CraftingRepository = craftingRepository;
         }
 
         public void RegisterPacketHandler(byte packetId, PacketHandler handler)
@@ -108,19 +138,18 @@ namespace Welt
         public void Connect(IPEndPoint endPoint)
         {
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.Completed += Connection_Completed;
+            args.Completed += HandleConnectionCompleted;
             args.RemoteEndPoint = endPoint;
 
             if (!Client.Client.ConnectAsync(args))
-                Connection_Completed(this, args);
+                HandleConnectionCompleted(this, args);
         }
 
-        private void Connection_Completed(object sender, SocketAsyncEventArgs e)
+        private void HandleConnectionCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success)
             {
                 Interlocked.CompareExchange(ref m_Connected, 1, 0);
-
                 Physics.AddEntity(this);
 
                 StartReceive();
@@ -128,13 +157,13 @@ namespace Welt
             }
             else
             {
-                throw new Exception("Could not connect to server!");
+                LastErrorMessage = e.SocketError.ToString();
             }
         }
 
         public void Disconnect()
         {
-            if (!Connected)
+            if (!IsConnected)
                 return;
 
             QueuePacket(new DisconnectPacket("Disconnecting"));
@@ -151,12 +180,11 @@ namespace Welt
 
         public void QueuePacket(IPacket packet)
         {
-            if (!Connected || (Client != null && !Client.Connected))
+            if (!IsConnected || (Client != null && Client.Client != null && !Client.Connected))
                 return;
-
-            using (MemoryStream writeStream = new MemoryStream())
+            using (var writeStream = new MemoryStream())
             {
-                using (WeltStream ms = new WeltStream(writeStream))
+                using (var ms = new WeltStream(writeStream))
                 {
                     ms.WriteUInt8(packet.Id);
                     packet.WritePacket(ms);
@@ -164,14 +192,21 @@ namespace Welt
 
                 byte[] buffer = writeStream.ToArray();
 
-                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-                args.UserToken = packet;
+                var args = new SocketAsyncEventArgs
+                {
+                    UserToken = packet
+                };
                 args.Completed += OperationCompleted;
-                args.SetBuffer(buffer, 0, buffer.Length);
+                args?.SetBuffer(buffer, 0, buffer.Length);
 
                 if (Client != null && !Client.Client.SendAsync(args))
                     OperationCompleted(this, args);
             }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string property = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
         private void StartReceive()
@@ -201,7 +236,6 @@ namespace Welt
                     {
                         Client.Client.Shutdown(SocketShutdown.Send);
                         Client.Close();
-
                         m_Cancel.Cancel();
                     }
 
@@ -226,12 +260,13 @@ namespace Welt
                 }
                 catch (OperationCanceledException)
                 {
+                    Debug.WriteLine("Operation cancelled");
                     return;
                 }
-
+                Debug.WriteLine(e.BytesTransferred);
+                // it gets stuck right here with reading incoming packets. Not quite sure why.
                 var packets = PacketReader.ReadPackets(this, e.Buffer, e.Offset, e.BytesTransferred, false);
-
-                foreach (IPacket packet in packets)
+                foreach (var packet in packets)
                 {
                     m_PacketHandlers[packet.Id]?.Invoke(packet, this);
                 }
@@ -245,18 +280,25 @@ namespace Welt
             }
         }
 
-        protected internal void OnChatMessage(ChatMessageEventArgs e)
+        protected internal void OnServerDiscovered(ServerDiscoveredEventArgs e)
+        {
+            ServerDiscovered?.Invoke(this, e);
+        }
+
+        protected internal void OnChatMessage(Events.ChatMessageEventArgs e)
         {
             ChatMessage?.Invoke(this, e);
         }
 
         protected internal void OnChunkLoaded(ChunkEventArgs e)
         {
+            LoadedChunks++;
             ChunkLoaded?.Invoke(this, e);
         }
 
         protected internal void OnChunkUnloaded(ChunkEventArgs e)
         {
+            LoadedChunks--;
             ChunkUnloaded?.Invoke(this, e);
         }
 
@@ -265,7 +307,7 @@ namespace Welt
             ChunkModified?.Invoke(this, e);
         }
 
-        protected internal void OnBlockChanged(BlockChangeEventArgs e)
+        protected internal void OnBlockChanged(BlockChangedEventArgs e)
         {
             BlockChanged?.Invoke(this, e);
         }

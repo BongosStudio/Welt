@@ -11,9 +11,18 @@ namespace Welt.Forge.Renderers
 {
     public class Mesh<TVertexType> : IDisposable where TVertexType : struct, IVertexType
     {
+        /// <summary>
+        ///     The total amount of vertices rendered for this type of mesh.
+        /// </summary>
         public static int VerticiesRendered { get; set; }
+        /// <summary>
+        ///     The total amount of indices rendered for this type of mesh.
+        /// </summary>
         public static int IndiciesRendered { get; set; }
 
+        /// <summary>
+        ///     Resets the rendered counts to 0.
+        /// </summary>
         public static void ResetStats()
         {
             VerticiesRendered = 0;
@@ -49,7 +58,7 @@ namespace Welt.Forge.Renderers
                     _vertices.Dispose();
 
                 _vertices = new VertexBuffer(m_GraphicsDevice, typeof(TVertexType),
-                        (value.Length + 1), BufferUsage.WriteOnly);
+                        value.Length, BufferUsage.WriteOnly);
                 _vertices.SetData(value);
                 m_IsReady = true;
 
@@ -58,26 +67,14 @@ namespace Welt.Forge.Renderers
             }
         }
 
-        public bool IsReady
-        {
-            get
-            {
-                return m_IsReady;
-            }
-        }
+        public bool IsReady => m_IsReady;
 
-        public int Submeshes
-        {
-            get
-            {
-                return m_Submeshes;
-            }
-        }
+        public int Submeshes => m_Submeshes;
 
         /// <summary>
         /// Gets the bounding box for this mesh.
         /// </summary>
-        public BoundingBox BoundingBox { get; private set; }
+        public BoundingBox BoundingBox { get; protected set; }
 
         /// <summary>
         /// Gets whether this mesh is disposed of.
@@ -111,7 +108,7 @@ namespace Welt.Forge.Renderers
         /// Creates a new mesh.
         /// </summary>
         public Mesh(WeltGame game, TVertexType[] vertices,
-                int[] indices, bool recalculateBounds = true) : this(game, 1, recalculateBounds)
+                short[] indices, bool recalculateBounds = true) : this(game, 1, recalculateBounds)
         {
             Vertices = vertices;
             SetSubmesh(0, indices);
@@ -120,7 +117,7 @@ namespace Welt.Forge.Renderers
         /// <summary>
         /// Sets a submesh in this mesh.
         /// </summary>
-        public void SetSubmesh(int index, int[] indices)
+        public void SetSubmesh(int index, short[] indices)
         {
             if ((index < 0) || (index > _indices.Length))
                 throw new ArgumentOutOfRangeException();
@@ -130,7 +127,7 @@ namespace Welt.Forge.Renderers
                 if (_indices[index] != null)
                     _indices[index].Dispose();
 
-                _indices[index] = new IndexBuffer(m_GraphicsDevice, typeof(int),
+                _indices[index] = new IndexBuffer(m_GraphicsDevice, IndexElementSize.SixteenBits,
                         (indices.Length + 1), BufferUsage.WriteOnly);
                 _indices[index].SetData(indices);
                 if (index + 1 > m_Submeshes)
@@ -163,8 +160,11 @@ namespace Welt.Forge.Renderers
 
             if ((index < 0) || (index > _indices.Length))
                 throw new ArgumentOutOfRangeException();
-
-            if (_vertices == null || _vertices.IsDisposed || _indices[index] == null || _indices[index].IsDisposed || _indices[index].IndexCount < 3)
+            if (_vertices == null)
+                throw new NullReferenceException("Vertices is null");
+            if (_indices[index] == null)
+                throw new NullReferenceException("Specified indices are null");
+            if (_vertices.IsDisposed || _indices[index].IsDisposed || _indices[index].IndexCount < 3)
                 return; // Invalid state for rendering, just return.
 
             effect.GraphicsDevice.SetVertexBuffer(_vertices);
@@ -209,12 +209,10 @@ namespace Welt.Forge.Renderers
         /// </summary>
         /// <param name="vertices">The vertices in this mesh.</param>
         /// <returns></returns>
-        //protected virtual BoundingBox RecalculateBounds(TVertexType[] vertices)
-        //{
-        //    return new BoundingBox(
-        //        vertices.Select(v => v.Position).OrderBy(v => v.Length()).First(),
-        //        vertices.Select(v => v.Position).OrderByDescending(v => v.Length()).First());
-        //}
+        protected virtual BoundingBox RecalculateBounds(TVertexType[] vertices)
+        {
+            return new BoundingBox();
+        }
 
         /// <summary>
         /// Disposes of this mesh.

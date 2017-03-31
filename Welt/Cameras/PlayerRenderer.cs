@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
+using System.Diagnostics;
 
 #endregion
 
@@ -20,6 +21,7 @@ namespace Welt.Cameras
 
     public class PlayerRenderer
     {
+
         public PlayerRenderer(GraphicsDevice graphicsDevice, MultiplayerClient player)
         {
             m_GraphicsDevice = graphicsDevice;
@@ -36,13 +38,7 @@ namespace Welt.Cameras
         public void Initialize()
         {
             m_CameraController.Initialize();
-            
-            Camera.Position = new Vector3(
-                Player.World.GetSpawnPoint().X, 
-                Player.World.GetSpawnPoint().Y, 
-                Player.World.GetSpawnPoint().Z);
-            // TODO: change the Y of the spawn position so we don't fall please?
-            Player.Position = Camera.Position;
+            Camera.Position = Player.Position;
             Camera.LookAt(Vector3.Forward);
             // TODO: load the previous data of position
 
@@ -63,14 +59,27 @@ namespace Welt.Cameras
         public void Update(GameTime gameTime)
         {
             var previousView = Camera.View;
-
-            if (Player.IsPaused) return; // this is here so we can still process the game while paused.
-            m_CameraController.ProcessInput(gameTime);
-            //Camera.Position = new Vector3(Camera.Position.X % Player.World.Size * Chunk.Size.X, Camera.Position.Y, Camera.Position.Z % Player.World.Size * Chunk.Size.Z);
-            Player.Position = Camera.Position;
-
+            //TODO: process input here.
+            var keyState = m_Input.GetKeyboardState();
+            var moveVector = new Vector3();
+            if (keyState.IsKeyDown(Keys.W))
+                moveVector += new Vector3(0, 0, 0.2f);
+            if (keyState.IsKeyDown(Keys.S))
+                moveVector += new Vector3(0, 0, -0.2f);
+            if (keyState.IsKeyDown(Keys.A))
+                moveVector += new Vector3(-0.2f, 0, 0);
+            if (keyState.IsKeyDown(Keys.D))
+                moveVector += new Vector3(0.2f, 0, 0);
+            if (keyState.IsKeyDown(Keys.Space))
+                moveVector += new Vector3(0, 0.2f, 0);
+            if (keyState.IsKeyDown(Keys.LeftShift))
+                moveVector += new Vector3(0, -0.2f, 0);
+            Player.Position += moveVector;
+            Camera.Position = Player.Position;
             m_CameraController.Update(gameTime);
             Camera.Update(gameTime);
+            if (Player.IsPaused) return; // this is here so we can still process the game while paused.
+
             
 
             var mouseState = m_Input.GetMouseState();
@@ -85,7 +94,7 @@ namespace Welt.Cameras
         public void Draw(GameTime gameTime)
         {
             // draw over selected block, current item in hand
-            m_Fog.Draw();
+            //m_Fog.Draw();
         }
 
         #endregion
@@ -93,11 +102,11 @@ namespace Welt.Cameras
         #region Fields
         
         public readonly MultiplayerClient Player;       
-        public readonly Camera Camera;
-        private readonly CameraController m_CameraController;
+        public readonly FirstPersonCamera Camera;
+        private readonly FirstPersonCameraController m_CameraController;
         private readonly FogRenderer m_Fog;
 
-        private Vector3 _mLookVector;
+        private Vector3 m_LookVector;
         private readonly InputController m_Input;
         private readonly GraphicsDevice m_GraphicsDevice;
         private readonly Viewport m_Viewport;

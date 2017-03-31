@@ -21,6 +21,7 @@ namespace Welt.Core.Handlers
             server.RegisterPacketHandler(new PlayerPositionPacket().Id, EntityHandlers.HandlePlayerPositionPacket);
             server.RegisterPacketHandler(new PlayerLookPacket().Id, EntityHandlers.HandlePlayerLookPacket);
             server.RegisterPacketHandler(new PlayerPositionAndLookPacket().Id, EntityHandlers.HandlePlayerPositionAndLookPacket);
+            server.RegisterPacketHandler(new SetPlayerPositionPacket().Id, EntityHandlers.HandleSetPlayerPositionPacket);
 
             server.RegisterPacketHandler(new PlayerDiggingPacket().Id, InteractionHandlers.HandlePlayerDiggingPacket);
             server.RegisterPacketHandler(new PlayerBlockPlacementPacket().Id, InteractionHandlers.HandlePlayerBlockPlacementPacket);
@@ -44,7 +45,8 @@ namespace Welt.Core.Handlers
 
         internal static void HandleDisconnect(IPacket _packet, IRemoteClient _client, IMultiplayerServer server)
         {
-            
+            var packet = (DisconnectPacket)_packet;
+            Console.WriteLine(packet.Reason);
         }
     }
 }

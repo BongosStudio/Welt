@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct EntityLookPacket : IPacket
     {
-        public byte Id { get { return 0x20; } }
+        public byte Id => 0x20;
 
         public int EntityID;
         public sbyte Yaw, Pitch;

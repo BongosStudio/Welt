@@ -5,7 +5,7 @@ namespace Welt.Core.Net.Packets
 {
     public struct SpawnPlayerPacket : IPacket
     {
-        public byte Id { get { return 0x14; } }
+        public byte Id => 0x14;
 
         public int EntityID;
         public string PlayerName;

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Welt.API;
+using Welt.API.Logging;
 using Welt.API.Net;
 using Welt.Core.Entities;
 using Welt.Core.Net.Packets;
@@ -16,7 +18,8 @@ namespace Welt.Core.Handlers
             var handshakePacket = (HandshakePacket) packet;
             var remoteClient = (RemoteClient)client;
             remoteClient.Username = handshakePacket.Username;
-            remoteClient.QueuePacket(new HandshakeResponsePacket("-")); // TODO: Implement some form of authentication
+            remoteClient.QueuePacket(new HandshakeResponsePacket("-", server.Clients.Count, server.ServerConfiguration)); 
+            // TODO: Implement some form of authentication
         }
 
         public static void HandleLoginRequestPacket(IPacket packet, IRemoteClient client, IMultiplayerServer server)
@@ -35,30 +38,29 @@ namespace Welt.Core.Handlers
                 remoteClient.QueuePacket(new DisconnectPacket("The player with this username is already logged in"));
             else
             {
-                remoteClient.LoggedIn = true;
+                remoteClient.IsLoggedIn = true;
                 remoteClient.Entity = new PlayerEntity(remoteClient.Username);
                 remoteClient.World = server.Worlds[0];
-                remoteClient.ChunkRadius = 2;
+                remoteClient.ChunkRadius = 5;
 
                 if (!remoteClient.Load())
                     remoteClient.Entity.Position = remoteClient.World.SpawnPoint;
                 // Make sure they don't spawn in the ground
-                var collision = new Func<bool>(() =>
-                {
-                    var feet = client.World.GetBlock(client.Entity.Position);
-                    var head = client.World.GetBlock(client.Entity.Position + Vector3.Up);
-                    var feetBox = server.BlockRepository.GetBlockProvider(feet.Id).GetBoundingBox(feet.Metadata);
-                    var headBox = server.BlockRepository.GetBlockProvider(head.Id).GetBoundingBox(head.Metadata);
-                    return feetBox != null || headBox != null;
-                });
-                while (collision())
-                    client.Entity.Position += Vector3.Up;
-
+                //var collision = new Func<bool>(() =>
+                //{
+                //    var feet = client.World.GetBlock(remoteClient.Entity.Position);
+                //    var head = client.World.GetBlock(remoteClient.Entity.Position + Vector3.Up);
+                //    var feetBox = server.BlockRepository.GetBlockProvider(feet.Id).GetBoundingBox(feet.Metadata);
+                //    var headBox = server.BlockRepository.GetBlockProvider(head.Id).GetBoundingBox(head.Metadata);
+                //    return feetBox != null || headBox != null;
+                //});
+                //while (collision())
+                //    remoteClient.Entity.Position += Vector3.Up;
                 var entityManager = server.GetEntityManagerForWorld(remoteClient.World);
                 entityManager.SpawnEntity(remoteClient.Entity);
 
                 // Send setup packets
-                remoteClient.QueuePacket(new LoginResponsePacket(client.Entity.EntityID, 0));
+                remoteClient.QueuePacket(new LoginResponsePacket(client.Entity.EntityID, 0, client.World.Name));
                 remoteClient.UpdateChunks();
                 remoteClient.QueuePacket(new SpawnPositionPacket((int)remoteClient.Entity.Position.X,
                         (int)remoteClient.Entity.Position.Y, (int)remoteClient.Entity.Position.Z));

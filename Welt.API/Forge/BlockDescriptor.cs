@@ -22,5 +22,18 @@ namespace Welt.API.Forge
                 SkyLight = block.Sun
             };
         }
+
+        public static BlockDescriptor FromBlock(Block block, IChunk chunk, Vector3I position)
+        {
+            return new BlockDescriptor
+            {
+                Id = block.Id,
+                Metadata = block.Metadata,
+                BlockLight = new Vector3B(block.R, block.G, block.B),
+                SkyLight = block.Sun,
+                Chunk = chunk,
+                Position = position
+            };
+        }
     }
 }

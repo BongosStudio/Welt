@@ -2,6 +2,8 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
+using System;
+using System.Collections.Generic;
 using Welt.API;
 using Welt.API.Forge;
 
@@ -49,6 +51,48 @@ namespace Welt.Core.Forge
             {
                 SetBlockData((int)index, value);
             }
+        }
+
+        public byte[] ToByteArray()
+        {
+            var data = new List<byte>();
+            var length = m_NextAvailableSlot;
+            data.Add(length); // 1 byte for wrapper count
+            for (var i = 0; i < length; i++)
+            {
+                var wrapper = m_BlockInstances[i];
+                data.AddRange(BitConverter.GetBytes(wrapper.Id)); // 2 bytes for the ID
+                data.Add(wrapper.Metadata); // 1 byte for the metadata
+            }
+            data.AddRange(BitConverter.GetBytes(m_Indices.Length)); // 4 bytes for the indices length
+            data.AddRange(m_Indices);
+            // don't worry about lighting. The lighting engine handles that.
+            return data.ToArray();
+        }
+
+        public static BlockPalette FromByteArray(byte[] data)
+        {
+            var stack = new Queue<byte>(data);
+            var length = stack.Dequeue();
+            var wrappers = new BlockDataWrapper[64];
+            for (var i = 0; i < length; i++)
+            {
+                var wrapper = new BlockDataWrapper(BitConverter.ToUInt16(new[] { stack.Dequeue(), stack.Dequeue() }, 0), stack.Dequeue());
+                wrappers[i] = wrapper;
+            }
+            var indicesCount = BitConverter.ToInt32(new[] { stack.Dequeue(), stack.Dequeue(), stack.Dequeue(), stack.Dequeue() }, 0);
+            var indices = new byte[indicesCount];
+            for (var i = 0; i < indicesCount; i++)
+            {
+                indices[i] = stack.Dequeue();
+            }
+            var palette = new BlockPalette(indicesCount)
+            {
+                m_NextAvailableSlot = length,
+                m_BlockInstances = wrappers,
+                m_Indices = indices
+            };
+            return palette;
         }
 
         public ushort GetId(int index)

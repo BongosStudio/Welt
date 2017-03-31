@@ -8,7 +8,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct SetPlayerPositionPacket : IPacket
     {
-        public byte Id { get { return 0x0D; } }
+        public byte Id => 0x0E;
 
         public SetPlayerPositionPacket(float x, float y, double stance, float z, float yaw, float pitch, bool onGround)
         {

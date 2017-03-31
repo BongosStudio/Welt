@@ -7,10 +7,12 @@
 using EmptyKeys.UserInterface.Controls;
 using EmptyKeys.UserInterface.Mvvm;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Welt.Components;
 using Welt.Controllers;
 using Welt.Extensions;
 
@@ -24,6 +26,7 @@ namespace Welt.Scenes
         ///     will be deleted when the next scene is initialized.
         /// </summary>
         private static readonly Dictionary<string, object> m_Cookies = new Dictionary<string, object>();
+        protected List<ILogicComponent> Components = new List<ILogicComponent>();
 
         protected Scene(WeltGame game)
         {
@@ -32,7 +35,6 @@ namespace Welt.Scenes
             IsEnabled = true;
             Opacity = 1;
             Input = InputController.CreateDefault();
-            
         }
 
         ~Scene()
@@ -73,15 +75,11 @@ namespace Welt.Scenes
 
         internal void I_Initialize()
         {
-            LoadContent();
+            LoadContent(Game.Content);
             WeltGame.SetCursor(Cursors.Arrow);
             if (UI != null)
                 UI.DataContext = DataContext;
             m_Cookies.Clear();
-            Game.Window.ClientSizeChanged += (sender, args) =>
-            {
-                UI.Resize(WeltGame.Width, WeltGame.Height);
-            };
             Initialize();
         }
 
@@ -114,17 +112,28 @@ namespace Welt.Scenes
             if (m_IsDisposed)
                 return;
             PreDispose?.Invoke(this, null);
+            foreach (var comp in Components)
+            {
+                comp.Dispose();
+            }
+            m_IsDisposed = true;
             PostDispose?.Invoke(this, null);
         }
 
-        protected virtual void LoadContent()
+        protected virtual void LoadContent(ContentManager content)
         {
-            
+            foreach (var comp in Components)
+            {
+                var c = comp as IVisualComponent;
+                if (c == null) continue;
+                c.LoadContent(content);
+            }
         }
 
         protected void Next(Scene scene)
         {
-            scene.OnExiting(this, null);
+            //scene.OnExiting(this, null);
+            //NextUpdate?.Invoke(this, null);
             SceneController.Load(scene);
         }
 
@@ -135,12 +144,24 @@ namespace Welt.Scenes
         internal void I_Update(GameTime time)
         {
             SceneUpdate?.Invoke(this, EventArgs.Empty);
+            //foreach (var c in Components)
+            //{
+            //    c.Update(time);
+            //}
             Update(time);
-            UI.Update(time);
+            if (Game.IsActive)
+                UI.Update(time);
         }
 
         internal void I_Draw(GameTime time)
         {
+            //foreach (var c in Components)
+            //{
+            //    var comp = c as IVisualComponent;
+            //    if (comp == null) continue;
+            //    comp.Draw(time);
+            //}
+            //GraphicsDevice.Clear(BackColor);
             Draw(time);
             UI.Draw(time);
         }

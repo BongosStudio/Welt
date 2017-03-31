@@ -10,7 +10,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct ChatMessagePacket : IPacket
     {
-        public byte Id { get { return 0x03; } }
+        public byte Id => 0x03;
 
         public ChatMessagePacket(string message)
         {

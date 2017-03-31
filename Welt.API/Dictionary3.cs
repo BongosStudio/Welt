@@ -19,24 +19,22 @@ namespace Welt.API
         {
             get
             {
-                var outVal = default(T);
-                TryGetValue((x + (y * SIZE) + (z * SIZE_SQUARED)), out outVal);
+                TryGetValue((x + (y * SIZE) + (z * SIZE_SQUARED)), out T outVal);
                 return outVal;
             }
             set
             {
                 var key = (x + (y * SIZE) + (z * SIZE_SQUARED));
 
-                //T outVal = default(T);
-                //if (TryGetValue(key, out outVal))
-                //{
-                    this[key] = value; 
-                //}
-                //else
-                //{
-                //    Add(key, value);
-                //}
-             }
+                if (TryGetValue(key, out T outVal))
+                {
+                    this[key] = value;
+                }
+                else
+                {
+                    Add(key, value);
+                }
+            }
         }
     }
 }

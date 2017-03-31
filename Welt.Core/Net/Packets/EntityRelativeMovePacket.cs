@@ -5,7 +5,7 @@ namespace Welt.Core.Net.Packets
 {
     public struct EntityRelativeMovePacket : IPacket
     {
-        public byte Id { get { return 0x1F; } }
+        public byte Id => 0x1F;
 
         public int EntityID;
         public sbyte DeltaX, DeltaY, DeltaZ;

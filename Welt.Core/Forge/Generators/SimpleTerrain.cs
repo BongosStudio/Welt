@@ -17,7 +17,7 @@ namespace Welt.Core.Forge.Generators
 
         public virtual void Generate(IWorld world, IChunk chunk)
         {
-            if (R == null) R = new Random(world.Seed);
+            if (R == null) R = new Random((int)(world.Seed/world.Size));
             for (byte x = 0; x < Chunk.Size.X; x++)
             {
                 var worldX = chunk.Position.X + x + (uint) world.Seed;

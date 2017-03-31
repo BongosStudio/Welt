@@ -3,11 +3,11 @@ using Welt.Cameras;
 
 namespace Welt.Controllers
 {
-    public abstract class CameraController
+    public abstract class CameraController<T> where T : Camera
     {
-        public Camera Camera;
+        public T Camera;
 
-        protected CameraController(Camera camera)
+        protected CameraController(T camera)
         {
             Camera = camera;
         }

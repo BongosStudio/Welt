@@ -31,5 +31,6 @@ namespace Welt.Core.Server
 
         public bool Query => m_File["server"].Get<SecBool>("query");
         public int QueryPort => m_File["server"].Get<SecInt>("queryport");
+        public bool IsRealtime => m_File["server"].Get<SecBool>("realtime");
     }
 }

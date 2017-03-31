@@ -7,7 +7,7 @@ using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
 {
-    public struct TakeScreenshotPacket : IPacket
+    public struct ScreenshotResultPacket : IPacket
     {
         public byte Id => 0xD0;
         public byte[] Data;

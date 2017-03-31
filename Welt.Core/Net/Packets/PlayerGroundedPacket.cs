@@ -9,7 +9,7 @@ namespace Welt.Core.Net.Packets
     /// </summary>
     public struct PlayerGroundedPacket : IPacket
     {
-        public byte Id { get { return 0x0A; }}
+        public byte Id => 0x0A;
 
         public bool OnGround;
 
