@@ -9,7 +9,7 @@ MonoGame update. (FIXED)
 LOGS:
 - March 6, 2017
 	- ChunkMesh bounding boxes do not update when being processed to draw, so they all have a min of 0 and a max of 0. 
-	We need to figure out what's going on with these. This MAY be the reason as to why chunks aren't being drawn.
+	We need to figure out what's going on with these. This MAY be the reason as to why chunks aren't being drawn. (FIXED)
 	- SkyComponent is acting like a bitch and not rendering correctly. Possibly think of a way to redo it or how to fix it.
 	- InputController doesn't work anymore for some reason. Lets think about moving it to a ILogicComponent and have it work
 	in the scene rather than the other components.
