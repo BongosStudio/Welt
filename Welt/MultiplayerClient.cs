@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Lidgren.Network;
+using Microsoft.Xna.Framework;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -59,7 +60,7 @@ namespace Welt
         public BlockFaceDirection? LookingAtFace { get; set; }
         public int LoadedChunks { get; private set; }
 
-        public bool IsConnected => Interlocked.Read(ref m_Connected) == 1;
+        public bool IsConnected => Client.ConnectionStatus == NetConnectionStatus.Connected;
         
         public string LastErrorMessage
         {
@@ -88,8 +89,7 @@ namespace Welt
 
         public ItemStack SelectedItem => Inventory[HotbarSelection];
 
-        private TcpClient Client { get; set; }
-        private IWeltStream Stream { get; set; }
+        private NetClient Client { get; set; }
         private PacketReader PacketReader { get; set; }
 
         private readonly PacketHandler[] m_PacketHandlers;
@@ -98,22 +98,26 @@ namespace Welt
 
         private readonly CancellationTokenSource m_Cancel;
 
-        private SocketAsyncEventArgsPool SocketPool { get; set; }
 
         public MultiplayerClient(User user)
         {
             User = user;
-            Client = new TcpClient();
+            Client = new NetClient(new NetPeerConfiguration("welt")
+            {
+                UseMessageRecycling = true,
+                AcceptIncomingConnections = false,
+                ReceiveBufferSize = ushort.MaxValue,
+                SendBufferSize = ushort.MaxValue
+            });
             PacketReader = new PacketReader();
             PacketReader.RegisterCorePackets();
+            var repo = new BlockRepository();
+            repo.DiscoverBlockProviders();
+            Physics = new PhysicsEngine(World.World, repo);
             m_PacketHandlers = new PacketHandler[0x100];
             Handlers.PacketHandlers.RegisterHandlers(this);
             World = new ReadOnlyWorld();
             Inventory = new InventoryContainer();
-            var repo = new BlockRepository();
-            repo.DiscoverBlockProviders();
-            Physics = new PhysicsEngine(World.World, repo);
-            SocketPool = new SocketAsyncEventArgsPool(100, 200, ushort.MaxValue);
             m_Connected = 0;
             m_Cancel = new CancellationTokenSource();
             Health = 20;
@@ -128,6 +132,7 @@ namespace Welt
             var craftingRepository = new CraftingRepository();
             craftingRepository.DiscoverRecipes();
             CraftingRepository = craftingRepository;
+            Client.Start();
         }
 
         public void RegisterPacketHandler(byte packetId, PacketHandler handler)
@@ -137,38 +142,53 @@ namespace Welt
 
         public void Connect(IPEndPoint endPoint)
         {
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.Completed += HandleConnectionCompleted;
-            args.RemoteEndPoint = endPoint;
-
-            if (!Client.Client.ConnectAsync(args))
-                HandleConnectionCompleted(this, args);
+            Client.DiscoverKnownPeer(endPoint);
         }
-
-        private void HandleConnectionCompleted(object sender, SocketAsyncEventArgs e)
-        {
-            if (e.SocketError == SocketError.Success)
-            {
-                Interlocked.CompareExchange(ref m_Connected, 1, 0);
-                Physics.AddEntity(this);
-
-                StartReceive();
-                QueuePacket(new HandshakePacket(User.Username));
-            }
-            else
-            {
-                LastErrorMessage = e.SocketError.ToString();
-            }
-        }
-
+        
         public void Disconnect()
         {
             if (!IsConnected)
                 return;
 
             QueuePacket(new DisconnectPacket("Disconnecting"));
+            Client.Disconnect("Client disconnecting");
 
             Interlocked.CompareExchange(ref m_Connected, 0, 1);
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            NetIncomingMessage message;
+            while ((message = Client.ReadMessage()) != null)
+            {
+                IPacket packet;
+                switch (message.MessageType)
+                {
+                    case NetIncomingMessageType.Data:
+                        packet = PacketReader.ReadPacket(message, false);
+                        m_PacketHandlers[packet.Id]?.Invoke(packet, this);
+                        break;
+                    case NetIncomingMessageType.DiscoveryResponse:
+                        Client.Connect(message.SenderEndPoint);
+                        break;
+                    case NetIncomingMessageType.StatusChanged:
+                        switch ((NetConnectionStatus)message.ReadByte())
+                        {
+                            case NetConnectionStatus.Connected:
+                                Debug.WriteLine("Connected");
+                                QueuePacket(new HandshakePacket(User.Username));
+                                break;
+                            case NetConnectionStatus.Disconnected:
+                                break;
+                        }
+                        break;
+                    default:
+                        Debug.WriteLine($"Could not read {message.MessageType}");
+                        break;
+                }
+                Client.Recycle(message);
+                Client.FlushSendQueue();
+            }
         }
 
         public void SendMessage(string message)
@@ -180,104 +200,16 @@ namespace Welt
 
         public void QueuePacket(IPacket packet)
         {
-            if (!IsConnected || (Client != null && Client.Client != null && !Client.Connected))
+            if (!IsConnected)
                 return;
-            using (var writeStream = new MemoryStream())
-            {
-                using (var ms = new WeltStream(writeStream))
-                {
-                    ms.WriteUInt8(packet.Id);
-                    packet.WritePacket(ms);
-                }
-
-                byte[] buffer = writeStream.ToArray();
-
-                var args = new SocketAsyncEventArgs
-                {
-                    UserToken = packet
-                };
-                args.Completed += OperationCompleted;
-                args?.SetBuffer(buffer, 0, buffer.Length);
-
-                if (Client != null && !Client.Client.SendAsync(args))
-                    OperationCompleted(this, args);
-            }
+            var message = Client.CreateMessage();
+            PacketReader.WritePacket(message, packet);
+            Client.SendMessage(message, NetDeliveryMethod.Unreliable);
         }
 
         public void OnPropertyChanged([CallerMemberName] string property = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
-
-        private void StartReceive()
-        {
-            SocketAsyncEventArgs args = SocketPool.Get();
-            args.Completed += OperationCompleted;
-
-            if (!Client.Client.ReceiveAsync(args))
-                OperationCompleted(this, args);
-        }
-
-        private void OperationCompleted(object sender, SocketAsyncEventArgs e)
-        {
-            e.Completed -= OperationCompleted;
-
-            switch (e.LastOperation)
-            {
-                case SocketAsyncOperation.Receive:
-                    ProcessNetwork(e);
-
-                    SocketPool.Add(e);
-                    break;
-                case SocketAsyncOperation.Send:
-                    IPacket packet = e.UserToken as IPacket;
-
-                    if (packet is DisconnectPacket)
-                    {
-                        Client.Client.Shutdown(SocketShutdown.Send);
-                        Client.Close();
-                        m_Cancel.Cancel();
-                    }
-
-                    e.SetBuffer(null, 0, 0);
-                    break;
-            }
-        }
-
-        private void ProcessNetwork(SocketAsyncEventArgs e)
-        {
-            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
-            {
-                SocketAsyncEventArgs newArgs = SocketPool.Get();
-                newArgs.Completed += OperationCompleted;
-
-                if (Client != null && !Client.Client.ReceiveAsync(newArgs))
-                    OperationCompleted(this, newArgs);
-
-                try
-                {
-                    m_Sem.Wait(m_Cancel.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    Debug.WriteLine("Operation cancelled");
-                    return;
-                }
-                Debug.WriteLine(e.BytesTransferred);
-                // it gets stuck right here with reading incoming packets. Not quite sure why.
-                var packets = PacketReader.ReadPackets(this, e.Buffer, e.Offset, e.BytesTransferred, false);
-                foreach (var packet in packets)
-                {
-                    m_PacketHandlers[packet.Id]?.Invoke(packet, this);
-                }
-
-                if (m_Sem != null)
-                    m_Sem.Release();
-            }
-            else
-            {
-                Disconnect();
-            }
         }
 
         protected internal void OnServerDiscovered(ServerDiscoveredEventArgs e)

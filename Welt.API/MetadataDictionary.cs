@@ -1,3 +1,4 @@
+using Lidgren.Network;
 using System;
 using System.Collections.Generic;
 using Welt.API.Net;
@@ -27,12 +28,12 @@ namespace Welt.API
             set { entries[index] = value; }
         }
 
-        public static MetadataDictionary FromStream(IWeltStream stream)
+        public static MetadataDictionary FromStream(NetIncomingMessage stream)
         {
             var value = new MetadataDictionary();
             while (true)
             {
-                byte key = stream.ReadUInt8();
+                byte key = stream.ReadByte();
                 if (key == 127) break;
 
                 byte type = (byte)((key & 0xE0) >> 5);
@@ -47,11 +48,11 @@ namespace Welt.API
             return value;
         }
 
-        public void WriteTo(IWeltStream stream)
+        public void WriteTo(NetOutgoingMessage stream)
         {
             foreach (var entry in entries)
                 entry.Value.WriteTo(stream, entry.Key);
-            stream.WriteUInt8(0x7F);
+            stream.Write(0x7F);
         }
 
         delegate MetadataEntry CreateEntryInstance();

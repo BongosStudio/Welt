@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -28,28 +29,28 @@ namespace Welt.Core.Net.Packets
             CurrentItem = currentItem;
         }
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             EntityID = stream.ReadInt32();
             PlayerName = stream.ReadString();
             X = stream.ReadInt32();
             Y = stream.ReadInt32();
             Z = stream.ReadInt32();
-            Yaw = stream.ReadInt8();
-            Pitch = stream.ReadInt8();
+            Yaw = stream.ReadSByte();
+            Pitch = stream.ReadSByte();
             CurrentItem = stream.ReadInt16();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(EntityID);
-            stream.WriteString(PlayerName);
-            stream.WriteInt32(X);
-            stream.WriteInt32(Y);
-            stream.WriteInt32(Z);
-            stream.WriteInt8(Yaw);
-            stream.WriteInt8(Pitch);
-            stream.WriteInt16(CurrentItem);
+            stream.Write(EntityID);
+            stream.Write(PlayerName);
+            stream.Write(X);
+            stream.Write(Y);
+            stream.Write(Z);
+            stream.Write(Yaw);
+            stream.Write(Pitch);
+            stream.Write(CurrentItem);
         }
     }
 }

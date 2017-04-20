@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -21,20 +22,20 @@ namespace Welt.Core.Net.Packets
         public uint Z;
         public byte[] CompressedData;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             X = stream.ReadUInt32();
             Z = stream.ReadUInt32();
             int len = stream.ReadInt32();
-            CompressedData = stream.ReadUInt8Array(len);
+            CompressedData = stream.ReadBytes(len);
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteUInt32(X);
-            stream.WriteUInt32(Z);
-            stream.WriteInt32(CompressedData.Length);
-            stream.WriteUInt8Array(CompressedData);
+            stream.Write(X);
+            stream.Write(Z);
+            stream.Write(CompressedData.Length);
+            stream.Write(CompressedData);
         }
     }
 }

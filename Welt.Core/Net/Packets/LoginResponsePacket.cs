@@ -1,6 +1,7 @@
 ﻿using System;
 using Welt.API.Net;
 using Welt.API;
+using Lidgren.Network;
 
 namespace Welt.Core.Net.Packets
 {
@@ -22,18 +23,18 @@ namespace Welt.Core.Net.Packets
         public long Seed;
         public string WorldName;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             EntityID = stream.ReadInt32();
             Seed = stream.ReadInt64();
             WorldName = stream.ReadString();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(EntityID);
-            stream.WriteInt64(Seed);
-            stream.WriteString(WorldName);
+            stream.Write(EntityID);
+            stream.Write(Seed);
+            stream.Write(WorldName);
         }
     }
 }

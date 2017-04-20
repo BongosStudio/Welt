@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -19,14 +20,14 @@ namespace Welt.Core.Net.Packets
 
         public string Message;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             Message = stream.ReadString();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteString(Message);
+            stream.Write(Message);
         }
     }
 }

@@ -1,3 +1,4 @@
+using Lidgren.Network;
 using System;
 using System.IO;
 using Welt.API.Net;
@@ -25,12 +26,12 @@ namespace Welt.API
             Value = value;
         }
 
-        public override void FromStream(IWeltStream stream)
+        public override void FromStream(NetIncomingMessage stream)
         {
             
         }
 
-        public override void WriteTo(IWeltStream stream, byte index)
+        public override void WriteTo(NetOutgoingMessage stream, byte index)
         {
             
         }

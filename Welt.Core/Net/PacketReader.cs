@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -62,38 +63,25 @@ namespace Welt.Core.Net
                 m_ServerboundPackets[packet.Id] = func;
         }
 
-        public IEnumerable<IPacket> ReadPackets(object key, byte[] buffer, int offset, int length, bool serverbound = true)
+        public IPacket ReadPacket(NetIncomingMessage message, bool serverbound = true)
         {
-            if (!Processors.ContainsKey(key))
-                Processors[key] = new PacketSegmentProcessor(this, serverbound);
+            var id = message.ReadByte();
 
-            IPacketSegmentProcessor processor = Processors[key];
-            processor.ProcessNextSegment(buffer, offset, length, out IPacket packet);
+            IPacket packet;
+            if (serverbound)
+                packet = m_ServerboundPackets[id]?.Invoke();
+            else
+                packet = m_ClientboundPackets[id]?.Invoke();
 
-            if (packet == null)
-                yield break;
-
-            while (true)
-            {
-                yield return packet;
-
-                if (!processor.ProcessNextSegment(m_EmptyBuffer, 0, 0, out packet))
-                {
-                    if (packet != null)
-                    {
-                        yield return packet;
-                    }
-
-                    yield break;
-                }
-            }
+            packet?.ReadPacket(message);
+            return packet;
         }
 
-        public void WritePacket(IWeltStream stream, IPacket packet)
+        public void WritePacket(NetOutgoingMessage message, IPacket packet)
         {
-            stream.WriteUInt8(packet.Id);
-            packet.WritePacket(stream);
-            stream.BaseStream.Flush();
+            message.Write(packet.Id);
+            packet.WritePacket(message);
+            
         }
     }
 }

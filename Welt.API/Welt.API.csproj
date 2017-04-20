@@ -30,8 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
+    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.7.0.213, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.0.213-develop\lib\net40\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Sec">
       <HintPath>..\lib\Sec.dll</HintPath>
@@ -100,7 +103,7 @@
     <Compile Include="MetadataShort.cs" />
     <Compile Include="MetadataSlot.cs" />
     <Compile Include="MetadataString.cs" />
-    <Compile Include="Net\IWeltStream.cs" />
+    <Compile Include="Net\INetworkWorker.cs" />
     <Compile Include="Net\IPacket.cs" />
     <Compile Include="Net\IPacketReader.cs" />
     <Compile Include="Net\IPacketSegmentProcessor.cs" />

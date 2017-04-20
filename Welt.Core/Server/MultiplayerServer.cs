@@ -14,6 +14,8 @@ using Welt.Core.Net;
 using Welt.Core.Forge;
 using Welt.Core.Net.Packets;
 using System.Runtime.CompilerServices;
+using Lidgren.Network;
+using System.Threading.Tasks;
 
 namespace Welt.Core.Server
 {
@@ -25,6 +27,7 @@ namespace Welt.Core.Server
 
         public IAccessConfiguration AccessConfiguration { get; internal set; }
         public IServerConfiguration ServerConfiguration { get; internal set; }
+        public NetPeerConfiguration NetworkConfiguration { get; internal set; }
 
         public IPacketReader PacketReader { get; private set; }
         public IList<IRemoteClient> Clients { get; private set; }
@@ -37,6 +40,8 @@ namespace Welt.Core.Server
         public WorldLighting WorldLighter { get; private set; }
         public bool EnableClientLogging { get; set; }
         public IPEndPoint EndPoint { get; private set; }
+
+        public NetServer Server { get; private set; }
 
         private static readonly int MillisecondsPerTick = 1000 / 20;
 
@@ -65,7 +70,7 @@ namespace Welt.Core.Server
         }
 
         private Timer EnvironmentWorker;
-        private TcpListener Listener;
+        private Thread NetworkingThread;
         private readonly PacketHandler[] PacketHandlers;
         private IList<ILogProvider> LogProviders;
         private ConcurrentBag<(IWorld World, IChunk Chunk)> ChunksToSchedule;
@@ -73,7 +78,7 @@ namespace Welt.Core.Server
         
         private QueryProtocol QueryProtocol;
 
-        internal bool ShuttingDown { get; private set; }
+        internal bool IsShuttingDown { get; private set; }
         
         public MultiplayerServer()
         {
@@ -105,7 +110,15 @@ namespace Welt.Core.Server
 
             AccessConfiguration = new AccessConfiguration();
             ServerConfiguration = new ServerConfiguration();
-
+            NetworkConfiguration = new NetPeerConfiguration("welt")
+            {
+                AcceptIncomingConnections = true,
+                UseMessageRecycling = true,
+                SendBufferSize = ushort.MaxValue,
+                ReceiveBufferSize = ushort.MaxValue
+            };
+            NetworkConfiguration.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            NetworkConfiguration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             reader.RegisterCorePackets();
             Handlers.PacketHandlers.RegisterHandlers(this);
         }
@@ -117,16 +130,62 @@ namespace Welt.Core.Server
 
         public void Start(IPEndPoint endPoint)
         {
-            ShuttingDown = false;
-            Listener = new TcpListener(endPoint);
-            Listener.Start();
-            EndPoint = (IPEndPoint)Listener.LocalEndpoint;
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.Completed += AcceptClient;
+            IsShuttingDown = false;
+            EndPoint = endPoint;
+            NetworkConfiguration.Port = endPoint.Port;
 
-            if (!Listener.Server.AcceptAsync(args))
-                AcceptClient(this, args);
-            
+            Server = new NetServer(NetworkConfiguration);
+            Server.Start();
+            NetworkingThread = new Thread(() =>
+            {
+                while (!IsShuttingDown)
+                {
+                    IPacket packet;
+                    IRemoteClient client;
+                    var message = Server.ReadMessage();
+                    if (message == null) continue;
+
+                    switch (message.MessageType)
+                    {
+                        case NetIncomingMessageType.ConnectionApproval:
+                            break;
+                        case NetIncomingMessageType.DiscoveryRequest:
+                            Server.SendDiscoveryResponse(null, message.SenderEndPoint);
+                            Clients.Add(new RemoteClient(this, PacketReader, PacketHandlers, message.SenderEndPoint));
+                            break;
+                        case NetIncomingMessageType.StatusChanged:
+                            switch ((NetConnectionStatus)message.ReadByte())
+                            {
+                                case NetConnectionStatus.Connected:
+                                    break;
+                                case NetConnectionStatus.Disconnected:
+                                    break;
+                                case NetConnectionStatus.RespondedAwaitingApproval:
+                                    message.SenderConnection.Approve();
+                                    break;
+                            }
+                            break;
+                        case NetIncomingMessageType.Data:
+                            client = GetClient(message.SenderEndPoint);
+                            packet = PacketReader.ReadPacket(message);
+                            if (packet != null)
+                                PacketHandlers[packet.Id]?.Invoke(packet, client, this);
+                            break;
+                        case NetIncomingMessageType.WarningMessage:
+                            var data = message.ReadString();
+                            Log(LogCategory.Warning, data);
+                            break;
+                        default:
+                            Log(LogCategory.Error, $"Could not process message of type {message.MessageType}");
+                            break;
+                    }
+                    Server.FlushSendQueue();
+                    Server.Recycle(message);
+                }
+            })
+            { IsBackground = true };
+            NetworkingThread.Start();
+
             Log(LogCategory.Notice, $"Server started on {EndPoint}.");
             EnvironmentWorker.Change(MillisecondsPerTick, 0);
             if(ServerConfiguration.Query)
@@ -135,8 +194,7 @@ namespace Welt.Core.Server
 
         public void Stop()
         {
-            ShuttingDown = true;
-            Listener.Stop();
+            IsShuttingDown = true;
             if(ServerConfiguration.Query)
                 QueryProtocol.Stop();
             //foreach (var w in Worlds)
@@ -176,10 +234,9 @@ namespace Welt.Core.Server
             // TODO: Propegate lighting changes to client (not possible with beta 1.7.3 protocol)
             if (e.NewBlock.Id != e.OldBlock.Id || e.NewBlock.Metadata != e.OldBlock.Metadata)
             {
-                for (int i = 0, ClientsCount = Clients.Count; i < ClientsCount; i++)
+                
+                foreach (var client in Clients.Cast<RemoteClient>())
                 {
-                    var client = (RemoteClient)Clients[i];
-                    // TODO: Confirm that the client knows of this block
                     if (client.IsLoggedIn && client.World == sender)
                     {
                         // send block change packet
@@ -247,6 +304,16 @@ namespace Welt.Core.Server
             }
         }
 
+        public NetConnection GetConnection(IPEndPoint endpoint)
+        {
+            return Server.GetConnection(endpoint);
+        }
+
+        public IRemoteClient GetClient(IPEndPoint endpoint)
+        {
+            return Clients.Single(c => ((RemoteClient)c).EndPoint == endpoint);
+        }
+
         public void AddLogProvider(ILogProvider provider)
         {
             LogProviders.Add(provider);
@@ -305,7 +372,7 @@ namespace Welt.Core.Server
 
             lock (ClientLock)
             {
-                Clients.Remove(client);
+                
             }
 
             if (client.Disconnected)
@@ -325,32 +392,10 @@ namespace Welt.Core.Server
 
             client.Dispose();
         }
-
-        private void AcceptClient(object sender, SocketAsyncEventArgs args)
-        {
-            try
-            {
-                var client = new RemoteClient(this, PacketReader, PacketHandlers, args.AcceptSocket);
-
-                lock (ClientLock)
-                    Clients.Add(client);
-            }
-            catch
-            {
-                // Who cares
-            }
-            finally
-            {
-                args.AcceptSocket = null;
-
-                if (!ShuttingDown && !Listener.Server.AcceptAsync(args))
-                    AcceptClient(this, args);
-            }
-        }
-
+        
         private void DoEnvironment(object discarded)
         {
-            if (ShuttingDown)
+            if (IsShuttingDown)
                 return;
             
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -16,7 +17,7 @@ namespace Welt.Core.Net.Packets
         public short YVelocity;
         public short ZVelocity;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             EntityID = stream.ReadInt32();
             XVelocity = stream.ReadInt16();
@@ -24,12 +25,12 @@ namespace Welt.Core.Net.Packets
             ZVelocity = stream.ReadInt16();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(EntityID);
-            stream.WriteInt16(XVelocity);
-            stream.WriteInt16(YVelocity);
-            stream.WriteInt16(ZVelocity);
+            stream.Write(EntityID);
+            stream.Write(XVelocity);
+            stream.Write(YVelocity);
+            stream.Write(ZVelocity);
         }
     }
 }

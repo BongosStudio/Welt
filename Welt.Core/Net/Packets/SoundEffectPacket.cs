@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -24,22 +25,22 @@ namespace Welt.Core.Net.Packets
         /// </summary>
         public int Data;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             Effect = (EffectType)stream.ReadInt32();
             X = stream.ReadInt32();
-            Y = stream.ReadInt8();
+            Y = stream.ReadSByte();
             Z = stream.ReadInt32();
             Data = stream.ReadInt32();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32((int)Effect);
-            stream.WriteInt32(X);
-            stream.WriteInt8(Y);
-            stream.WriteInt32(Z);
-            stream.WriteInt32(Data);
+            stream.Write((int)Effect);
+            stream.Write(X);
+            stream.Write(Y);
+            stream.Write(Z);
+            stream.Write(Data);
         }
     }
 }

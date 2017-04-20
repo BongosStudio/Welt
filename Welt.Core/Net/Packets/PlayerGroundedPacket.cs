@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -13,14 +14,14 @@ namespace Welt.Core.Net.Packets
 
         public bool OnGround;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             OnGround = stream.ReadBoolean();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteBoolean(OnGround);
+            stream.Write(OnGround);
         }
     }
 }

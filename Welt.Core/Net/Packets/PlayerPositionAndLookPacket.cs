@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -27,7 +28,7 @@ namespace Welt.Core.Net.Packets
         public float Yaw, Pitch;
         public bool OnGround;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             X = stream.ReadSingle();
             Y = stream.ReadSingle();
@@ -38,15 +39,15 @@ namespace Welt.Core.Net.Packets
             OnGround = stream.ReadBoolean();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteSingle(X);
-            stream.WriteSingle(Y);
-            stream.WriteDouble(Stance);
-            stream.WriteSingle(Z);
-            stream.WriteSingle(Yaw);
-            stream.WriteSingle(Pitch);
-            stream.WriteBoolean(OnGround);
+            stream.Write(X);
+            stream.Write(Y);
+            stream.Write(Stance);
+            stream.Write(Z);
+            stream.Write(Yaw);
+            stream.Write(Pitch);
+            stream.Write(OnGround);
         }
     }
 }

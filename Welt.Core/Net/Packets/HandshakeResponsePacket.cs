@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API;
 using Welt.API.Net;
 
@@ -23,7 +24,7 @@ namespace Welt.Core.Net.Packets
         public HandshakeResponsePacket(string connectionHash, int online, IServerConfiguration config) 
             : this(connectionHash, config.Name, config.MessageOfTheDay, online, config.MaxPlayers)
         {
-
+            
         }
 
         /// <summary>
@@ -35,7 +36,7 @@ namespace Welt.Core.Net.Packets
         public int OnlineUsers;
         public int MaxUsers;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             ConnectionHash = stream.ReadString();
             ServerName = stream.ReadString();
@@ -44,13 +45,13 @@ namespace Welt.Core.Net.Packets
             MaxUsers = stream.ReadInt32();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteString(ConnectionHash);
-            stream.WriteString(ServerName);
-            stream.WriteString(ServerMotd);
-            stream.WriteInt32(OnlineUsers);
-            stream.WriteInt32(MaxUsers);
+            stream.Write(ConnectionHash);
+            stream.Write(ServerName);
+            stream.Write(ServerMotd);
+            stream.Write(OnlineUsers);
+            stream.Write(MaxUsers);
         }
     }
 }

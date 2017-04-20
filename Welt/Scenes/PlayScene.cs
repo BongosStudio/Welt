@@ -160,6 +160,7 @@ namespace Welt.Scenes
 
         public override void Dispose()
         {
+            Game.Client.Disconnect();
             m_PlayerRenderer = null;
             GC.WaitForPendingFinalizers();
             GC.Collect();

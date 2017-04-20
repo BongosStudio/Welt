@@ -1,3 +1,4 @@
+using Lidgren.Network;
 using System;
 using System.Reflection;
 using Welt.API.Net;
@@ -9,8 +10,8 @@ namespace Welt.API
         public abstract byte Identifier { get; }
         public abstract string FriendlyName { get; }
 
-        public abstract void FromStream(IWeltStream stream);
-        public abstract void WriteTo(IWeltStream stream, byte index);
+        public abstract void FromStream(NetIncomingMessage stream);
+        public abstract void WriteTo(NetOutgoingMessage stream, byte index);
 
         internal byte Index { get; set; }
 

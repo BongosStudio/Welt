@@ -8,15 +8,15 @@ namespace Welt.API
 {
     public class ByteArraySegment : ICollection<byte>
     {
-        private readonly byte[] array;
-        private readonly int start;
-        private readonly int count;
+        private readonly byte[] m_Array;
+        private readonly int m_Start;
+        private readonly int m_Count;
 
         public ByteArraySegment(byte[] array, int start, int count)
         {
-            this.array = array;
-            this.start = start;
-            this.count = count;
+            this.m_Array = array;
+            this.m_Start = start;
+            this.m_Count = count;
         }
 
         public void Add(byte item)
@@ -31,12 +31,12 @@ namespace Welt.API
 
         public bool Contains(byte item)
         {
-            return array.Contains(item);
+            return m_Array.Contains(item);
         }
 
         public void CopyTo(byte[] target, int index)
         {
-            Buffer.BlockCopy(array, start, target, index, count);
+            Buffer.BlockCopy(m_Array, m_Start, target, index, m_Count);
         }
 
         public bool Remove(byte item)
@@ -48,7 +48,7 @@ namespace Welt.API
         {
             get
             {
-                return count;
+                return m_Count;
             }
         }
 
@@ -64,14 +64,14 @@ namespace Welt.API
         {
             get
             {
-                return array[index];
+                return m_Array[index];
             }
             set
             {
-                if (index > array.Length)
+                if (index > m_Array.Length)
                     throw new ArgumentOutOfRangeException("value");
 
-                array[index] = value;
+                m_Array[index] = value;
             }
         }
 
@@ -95,7 +95,7 @@ namespace Welt.API
             public ByteArraySegmentEnumerator(ByteArraySegment segment)
             {
                 _segment = segment;
-                pos = segment.start;
+                pos = segment.m_Start;
             }
 
             public bool MoveNext()
@@ -103,14 +103,14 @@ namespace Welt.API
                 if (pos >= _segment.Count)
                     return false;
 
-                current = _segment.array[++pos];
+                current = _segment.m_Array[++pos];
 
                 return true;
             }
 
             public void Reset()
             {
-                pos = _segment.start;
+                pos = _segment.m_Start;
             }
 
             public byte Current

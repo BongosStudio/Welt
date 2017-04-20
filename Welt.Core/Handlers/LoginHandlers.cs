@@ -18,7 +18,7 @@ namespace Welt.Core.Handlers
             var handshakePacket = (HandshakePacket) packet;
             var remoteClient = (RemoteClient)client;
             remoteClient.Username = handshakePacket.Username;
-            remoteClient.QueuePacket(new HandshakeResponsePacket("-", server.Clients.Count, server.ServerConfiguration)); 
+            remoteClient.QueuePacket(new HandshakeResponsePacket("-", server.Clients.Count(c => ((RemoteClient)c).IsLoggedIn), server.ServerConfiguration)); 
             // TODO: Implement some form of authentication
         }
 

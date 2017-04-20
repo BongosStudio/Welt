@@ -1,6 +1,7 @@
 ﻿using System;
 using Welt.API.Net;
 using Welt.API;
+using Lidgren.Network;
 
 namespace Welt.Core.Net.Packets
 {
@@ -41,31 +42,31 @@ namespace Welt.Core.Net.Packets
         /// </summary>
         public byte? Metadata;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             X = stream.ReadInt32();
-            Y = stream.ReadInt8();
+            Y = stream.ReadSByte();
             Z = stream.ReadInt32();
-            Face = (BlockFaceDirection)stream.ReadInt8();
+            Face = (BlockFaceDirection)stream.ReadSByte();
             ItemID = stream.ReadUInt16();
             if (ItemID != 0)
             {
-                Amount = stream.ReadInt8();
-                Metadata = stream.ReadUInt8();
+                Amount = stream.ReadSByte();
+                Metadata = stream.ReadByte();
             }
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(X);
-            stream.WriteInt8(Y);
-            stream.WriteInt32(Z);
-            stream.WriteInt8((sbyte)Face);
-            stream.WriteUInt16(ItemID);
+            stream.Write(X);
+            stream.Write(Y);
+            stream.Write(Z);
+            stream.Write((sbyte)Face);
+            stream.Write(ItemID);
             if (ItemID != 0)
             {
-                stream.WriteInt8(Amount.Value);
-                stream.WriteInt16(Metadata.Value);
+                stream.Write(Amount.Value);
+                stream.Write(Metadata.Value);
             }
         }
     }

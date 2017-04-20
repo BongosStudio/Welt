@@ -31,12 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lidgren.Network, Version=3.5.0.921, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Lidgren.Network.dll</HintPath>
+    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.7.0.213, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.0.213-develop\lib\net40\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Sec">
       <HintPath>..\lib\Sec.dll</HintPath>
@@ -108,15 +107,11 @@
     <Compile Include="Handlers\InteractionHandlers.cs" />
     <Compile Include="Handlers\LoginHandlers.cs" />
     <Compile Include="Handlers\PacketHandlers.cs" />
-    <Compile Include="Net\BufferedStream.cs" />
-    <Compile Include="Net\BufferManager.cs" />
-    <Compile Include="Net\ByteListMemoryStream.cs" />
     <Compile Include="Net\MalformedPacketException.cs" />
+    <Compile Include="Net\Packets\NetworkWorker.cs" />
     <Compile Include="Net\Packets\ScreenshotRequestPacket.cs" />
     <Compile Include="Net\Packets\TakeScreenshotPacket.cs" />
-    <Compile Include="Net\WeltStream.cs" />
     <Compile Include="Net\PacketReader.cs" />
-    <Compile Include="Net\PacketSegmentProcessor.cs" />
     <Compile Include="Net\Packets\ChatMessagePacket.cs" />
     <Compile Include="Net\Packets\ChunkDataPacket.cs" />
     <Compile Include="Net\Packets\ChunkPreamblePacket.cs" />
@@ -143,7 +138,6 @@
     <Compile Include="Net\Packets\SpawnPlayerPacket.cs" />
     <Compile Include="Net\Packets\SpawnPositionPacket.cs" />
     <Compile Include="Net\Packets\TimeUpdatePacket.cs" />
-    <Compile Include="Net\SocketAsyncEventArgsPool.cs" />
     <Compile Include="Persistence\ChunkPersistence.cs" />
     <Compile Include="Persistence\FakeChunkPersistence.cs" />
     <Compile Include="Physics\PhysicsEngine.cs" />

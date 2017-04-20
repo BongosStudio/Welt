@@ -1,3 +1,4 @@
+using Lidgren.Network;
 using System;
 using Welt.API.Net;
 
@@ -24,15 +25,15 @@ namespace Welt.API
             Value = value;
         }
 
-        public override void FromStream(IWeltStream stream)
+        public override void FromStream(NetIncomingMessage stream)
         {
             Value = stream.ReadInt16();
         }
 
-        public override void WriteTo(IWeltStream stream, byte index)
+        public override void WriteTo(NetOutgoingMessage stream, byte index)
         {
-            stream.WriteUInt8(GetKey(index));
-            stream.WriteInt16(Value);
+            stream.Write(GetKey(index));
+            stream.Write(Value);
         }
     }
 }

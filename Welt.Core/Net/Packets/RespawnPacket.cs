@@ -1,6 +1,7 @@
 ﻿using System;
 using Welt.API.Net;
 using Welt.API;
+using Lidgren.Network;
 
 namespace Welt.Core.Net.Packets
 {
@@ -12,12 +13,12 @@ namespace Welt.Core.Net.Packets
     {
         public byte Id => 0x09;
         
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
             
         }

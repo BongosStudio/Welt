@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -19,20 +20,16 @@ namespace Welt.Core.Net.Packets
         public int ProtocolVersion;
         public string Username;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             ProtocolVersion = stream.ReadInt32();
             Username = stream.ReadString();
-            stream.ReadInt64(); // Unused
-            stream.ReadInt8();  // Unused
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(ProtocolVersion);
-            stream.WriteString(Username);
-            stream.WriteInt64(0); // Unused
-            stream.WriteInt8(0);  // Unused
+            stream.Write(ProtocolVersion);
+            stream.Write(Username);
         }
     }
 }

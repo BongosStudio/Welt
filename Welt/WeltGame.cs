@@ -205,6 +205,7 @@ namespace Welt
         {
             var kstate = Keyboard.GetState();
             if (kstate.IsKeyDown(Keys.F6)) TakeScreenshot();
+            Client.Update(gameTime);
             SceneController.Update(gameTime);
             //m_UiRoot?.Update(gameTime);
             base.Update(gameTime);

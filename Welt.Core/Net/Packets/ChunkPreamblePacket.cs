@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -23,18 +24,18 @@ namespace Welt.Core.Net.Packets
         /// </summary>
         public bool Load;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             X = stream.ReadUInt32();
             Z = stream.ReadUInt32();
             Load = stream.ReadBoolean();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteUInt32(X);
-            stream.WriteUInt32(Z);
-            stream.WriteBoolean(Load);
+            stream.Write(X);
+            stream.Write(Z);
+            stream.Write(Load);
         }
     }
 }

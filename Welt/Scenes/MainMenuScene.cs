@@ -158,7 +158,6 @@ namespace Welt.Scenes
             Game.Client.Connect(new IPEndPoint(address, port));
             m_MultiplayerViewModel.IsCompletedAddition = true;
             m_MultiplayerViewModel.SetStatus("");
-            //Game.Client.Disconnect();
         }
     }
 }

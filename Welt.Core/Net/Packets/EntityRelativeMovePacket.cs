@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -10,20 +11,20 @@ namespace Welt.Core.Net.Packets
         public int EntityID;
         public sbyte DeltaX, DeltaY, DeltaZ;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             EntityID = stream.ReadInt32();
-            DeltaX = stream.ReadInt8();
-            DeltaY = stream.ReadInt8();
-            DeltaZ = stream.ReadInt8();
+            DeltaX = stream.ReadSByte();
+            DeltaY = stream.ReadSByte();
+            DeltaZ = stream.ReadSByte();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(EntityID);
-            stream.WriteInt8(DeltaX);
-            stream.WriteInt8(DeltaY);
-            stream.WriteInt8(DeltaZ);
+            stream.Write(EntityID);
+            stream.Write(DeltaX);
+            stream.Write(DeltaY);
+            stream.Write(DeltaZ);
         }
     }
 }

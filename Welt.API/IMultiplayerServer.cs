@@ -5,6 +5,7 @@ using Welt.API.Net;
 using Welt.API.Forge;
 using Welt.API.Logging;
 using System.Runtime.CompilerServices;
+using Lidgren.Network;
 
 namespace Welt.API
 {
@@ -22,11 +23,13 @@ namespace Welt.API
 
         IAccessConfiguration AccessConfiguration { get; }
         IServerConfiguration ServerConfiguration { get; }
+        NetPeerConfiguration NetworkConfiguration { get; }
         IPacketReader PacketReader { get; }
         IList<IRemoteClient> Clients { get; }
         IList<IWorld> Worlds { get; }
         IEventScheduler Scheduler { get; }
         IPEndPoint EndPoint { get; }
+        NetServer Server { get; }
         IBlockRepository BlockRepository { get; }
         IItemRepository ItemRepository { get; }
         bool BlockUpdatesEnabled { get; set; }
@@ -46,5 +49,8 @@ namespace Welt.API
         bool PlayerIsWhitelisted(string client);
         bool PlayerIsBlacklisted(string client);
         bool PlayerIsOp(string client);
+
+        IRemoteClient GetClient(IPEndPoint endpoint);
+        NetConnection GetConnection(IPEndPoint endpoint);
     }
 }

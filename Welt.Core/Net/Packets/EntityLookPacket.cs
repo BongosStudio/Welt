@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Net;
 
 namespace Welt.Core.Net.Packets
@@ -13,18 +14,18 @@ namespace Welt.Core.Net.Packets
         public int EntityID;
         public sbyte Yaw, Pitch;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
             EntityID = stream.ReadInt32();
-            Yaw = stream.ReadInt8();
-            Pitch = stream.ReadInt8();
+            Yaw = stream.ReadSByte();
+            Pitch = stream.ReadSByte();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt32(EntityID);
-            stream.WriteInt8(Yaw);
-            stream.WriteInt8(Pitch);
+            stream.Write(EntityID);
+            stream.Write(Yaw);
+            stream.Write(Pitch);
         }
     }
 }

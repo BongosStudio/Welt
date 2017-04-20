@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using Welt.API.Entities;
 using Welt.API.Forge;
 
@@ -6,10 +7,6 @@ namespace Welt.API.Net
 {
     public interface IRemoteClient
     {
-        /// <summary>
-        /// Minecraft stream used to communicate with this client.
-        /// </summary>
-        IWeltStream GameStream { get; }
         /// <summary>
         /// Returns true if this client has data pending in the network stream.
         /// </summary>
@@ -38,6 +35,10 @@ namespace Welt.API.Net
         /// The server this user is playing on.
         /// </summary>
         IMultiplayerServer Server { get; }
+        /// <summary>
+        /// The network identifier for this client.
+        /// </summary>
+        long Identifier { get; }
         /// <summary>
         /// If true, this client will be sent logging information as chat messages.
         /// </summary>

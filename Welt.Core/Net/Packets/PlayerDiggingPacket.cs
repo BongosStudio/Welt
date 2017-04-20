@@ -1,6 +1,7 @@
 ﻿using System;
 using Welt.API.Net;
 using Welt.API;
+using Lidgren.Network;
 
 namespace Welt.Core.Net.Packets
 {
@@ -34,22 +35,22 @@ namespace Welt.Core.Net.Packets
         public int Z;
         public BlockFaceDirection Face;
 
-        public void ReadPacket(IWeltStream stream)
+        public void ReadPacket(NetIncomingMessage stream)
         {
-            PlayerAction = (Action)stream.ReadInt8();
+            PlayerAction = (Action)stream.ReadSByte();
             X = stream.ReadInt32();
-            Y = stream.ReadInt8();
+            Y = stream.ReadSByte();
             Z = stream.ReadInt32();
-            Face = (BlockFaceDirection)stream.ReadUInt8();
+            Face = (BlockFaceDirection)stream.ReadByte();
         }
 
-        public void WritePacket(IWeltStream stream)
+        public void WritePacket(NetOutgoingMessage stream)
         {
-            stream.WriteInt8((sbyte)PlayerAction);
-            stream.WriteInt32(X);
-            stream.WriteInt8(Y);
-            stream.WriteInt32(Z);
-            stream.WriteUInt8((byte)Face);
+            stream.Write((sbyte)PlayerAction);
+            stream.Write(X);
+            stream.Write(Y);
+            stream.Write(Z);
+            stream.Write((byte)Face);
         }
     }
 }
