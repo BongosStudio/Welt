@@ -115,7 +115,8 @@ namespace Welt.Core.Server
                 AcceptIncomingConnections = true,
                 UseMessageRecycling = true,
                 SendBufferSize = ushort.MaxValue,
-                ReceiveBufferSize = ushort.MaxValue
+                ReceiveBufferSize = ushort.MaxValue,
+                AutoExpandMTU = true
             };
             NetworkConfiguration.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             NetworkConfiguration.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
@@ -138,49 +139,59 @@ namespace Welt.Core.Server
             Server.Start();
             NetworkingThread = new Thread(() =>
             {
+
+                var incomingMessages = new List<NetIncomingMessage>();
                 while (!IsShuttingDown)
                 {
                     IPacket packet;
                     IRemoteClient client;
-                    var message = Server.ReadMessage();
-                    if (message == null) continue;
-
-                    switch (message.MessageType)
+                    var inCount = Server.ReadMessages(incomingMessages);
+                    if (inCount < 1)
                     {
-                        case NetIncomingMessageType.ConnectionApproval:
-                            break;
-                        case NetIncomingMessageType.DiscoveryRequest:
-                            Server.SendDiscoveryResponse(null, message.SenderEndPoint);
-                            Clients.Add(new RemoteClient(this, PacketReader, PacketHandlers, message.SenderEndPoint));
-                            break;
-                        case NetIncomingMessageType.StatusChanged:
-                            switch ((NetConnectionStatus)message.ReadByte())
-                            {
-                                case NetConnectionStatus.Connected:
-                                    break;
-                                case NetConnectionStatus.Disconnected:
-                                    break;
-                                case NetConnectionStatus.RespondedAwaitingApproval:
-                                    message.SenderConnection.Approve();
-                                    break;
-                            }
-                            break;
-                        case NetIncomingMessageType.Data:
-                            client = GetClient(message.SenderEndPoint);
-                            packet = PacketReader.ReadPacket(message);
-                            if (packet != null)
-                                PacketHandlers[packet.Id]?.Invoke(packet, client, this);
-                            break;
-                        case NetIncomingMessageType.WarningMessage:
-                            var data = message.ReadString();
-                            Log(LogCategory.Warning, data);
-                            break;
-                        default:
-                            Log(LogCategory.Error, $"Could not process message of type {message.MessageType}");
-                            break;
+                        Thread.Sleep(20);
+                        continue;
                     }
+
+                    foreach(var message in incomingMessages)
+                    {
+                        switch (message.MessageType)
+                        {
+                            case NetIncomingMessageType.ConnectionApproval:
+                                break;
+                            case NetIncomingMessageType.DiscoveryRequest:
+                                Server.SendDiscoveryResponse(null, message.SenderEndPoint);
+                                Clients.Add(new RemoteClient(this, PacketReader, PacketHandlers, message.SenderEndPoint));
+                                break;
+                            case NetIncomingMessageType.StatusChanged:
+                                switch ((NetConnectionStatus)message.ReadByte())
+                                {
+                                    case NetConnectionStatus.Connected:
+                                        break;
+                                    case NetConnectionStatus.Disconnected:
+                                        break;
+                                    case NetConnectionStatus.RespondedAwaitingApproval:
+                                        message.SenderConnection.Approve();
+                                        break;
+                                }
+                                break;
+                            case NetIncomingMessageType.Data:
+                                client = GetClient(message.SenderEndPoint);
+                                packet = PacketReader.ReadPacket(message);
+                                if (packet != null)
+                                    PacketHandlers[packet.Id]?.Invoke(packet, client, this);
+                                break;
+                            case NetIncomingMessageType.WarningMessage:
+                                var data = message.ReadString();
+                                Log(LogCategory.Warning, data);
+                                break;
+                            default:
+                                Log(LogCategory.Error, $"Could not process message of type {message.MessageType}");
+                                break;
+                        }
+                        Server.Recycle(message);
+                    }
+                    incomingMessages.Clear();
                     Server.FlushSendQueue();
-                    Server.Recycle(message);
                 }
             })
             { IsBackground = true };

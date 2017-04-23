@@ -28,10 +28,10 @@ namespace Welt.Components
 
         public WeltGame Game { get; }
 
-        public PlayerRenderer PlayerRenderer;
-        public ChunkRenderer Renderer;
+        public PlayerRenderer PlayerRenderer { get; set; }
+        public ChunkRenderer Renderer { get; set; }
         public int ChunksRendered;
-        public ReadOnlyWorld World;
+        public ReadOnlyWorld World { get; set; }
         public LightEngine LightingEngine; // perhaps combine WorldLighting with LightEngine?
         public WorldLighting Lighting;
 
@@ -190,7 +190,6 @@ namespace Welt.Components
             Graphics.BlendState = BlendState.AlphaBlend;
             Graphics.DepthStencilState = DepthStencilState.Default;
             Graphics.RasterizerState = RasterizerState.CullClockwise;
-
             var rendered = 0;
             if (m_Meshes.Count == 0) return;
             for (var i = 0; i < m_Meshes.Count; i++)

@@ -58,11 +58,10 @@ namespace Welt.Scenes
 
                 while (Game.Client.World.World == null) { }
 
-                //while (Game.Client.World.GetChunks().Length < 16)
-                //{
-                //    m_ViewModel.LoadingStatusText = "Loading world...";
-                //}
-
+                while (Game.Client.World.GetChunks().Length < 5)
+                {
+                    m_ViewModel.LoadingStatusText = "Loading world...";
+                }
 
                 m_ViewModel.LoadingStatus++;
                 m_ViewModel.LoadingStatusText = "Processing system...";
@@ -81,7 +80,6 @@ namespace Welt.Scenes
                 m_ViewModel.LoadingStatus++;
                 m_ViewModel.LoadingStatusText = "Simulating world...";
                 
-
                 m_ViewModel.LoadingStatus++;
                 m_ViewModel.LoadingStatusText = "Spawning in.";
 

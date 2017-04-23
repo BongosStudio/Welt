@@ -46,3 +46,8 @@ LOGS:
 	with the SocketArgsPool a little, that doesn't effect it seeing as how the incorrect value would still be returned. 
 	I'm going to attempt some stress testing with no chunk data sent and see how well it handles that. That will be for 
 	tonight though.
+
+- April 22, 2017
+	- Replaced the net library. Everything sends fine now (for now, jesus fuck). One thing I did notice tho is that the 
+	ChunkComponent does not update the PlayerRenderer.Camera.Position properly. This is weird because the View angle is correct
+	so I need to figure out if it's becoming decoupled at one point.

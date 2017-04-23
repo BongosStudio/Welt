@@ -60,28 +60,12 @@ namespace Welt.Cameras
         {
             var previousView = Camera.View;
             //TODO: process input here.
-            var keyState = m_Input.GetKeyboardState();
-            var moveVector = new Vector3();
-            if (keyState.IsKeyDown(Keys.W))
-                moveVector += new Vector3(0, 0, 0.2f);
-            if (keyState.IsKeyDown(Keys.S))
-                moveVector += new Vector3(0, 0, -0.2f);
-            if (keyState.IsKeyDown(Keys.A))
-                moveVector += new Vector3(-0.2f, 0, 0);
-            if (keyState.IsKeyDown(Keys.D))
-                moveVector += new Vector3(0.2f, 0, 0);
-            if (keyState.IsKeyDown(Keys.Space))
-                moveVector += new Vector3(0, 0.2f, 0);
-            if (keyState.IsKeyDown(Keys.LeftShift))
-                moveVector += new Vector3(0, -0.2f, 0);
-            Player.Position += moveVector;
             Camera.Position = Player.Position;
+            m_CameraController.ProcessInput(gameTime);
+            Player._Position = Camera.Position;
             m_CameraController.Update(gameTime);
-            Camera.Update(gameTime);
             if (Player.IsPaused) return; // this is here so we can still process the game while paused.
-
             
-
             var mouseState = m_Input.GetMouseState();
             
             m_ForceUpdate = false;
@@ -101,8 +85,8 @@ namespace Welt.Cameras
 
         #region Fields
         
-        public readonly MultiplayerClient Player;       
-        public readonly FirstPersonCamera Camera;
+        public MultiplayerClient Player { get; set; }    
+        public FirstPersonCamera Camera { get; set; }
         private readonly FirstPersonCameraController m_CameraController;
         private readonly FogRenderer m_Fog;
 

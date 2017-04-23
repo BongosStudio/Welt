@@ -34,8 +34,9 @@
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.7.0.213, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.0.213-develop\lib\net40\MonoGame.Framework.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.7.0.242, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.0.242-develop\lib\net40\MonoGame.Framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Sec">
       <HintPath>..\lib\Sec.dll</HintPath>
@@ -108,7 +109,6 @@
     <Compile Include="Handlers\LoginHandlers.cs" />
     <Compile Include="Handlers\PacketHandlers.cs" />
     <Compile Include="Net\MalformedPacketException.cs" />
-    <Compile Include="Net\Packets\NetworkWorker.cs" />
     <Compile Include="Net\Packets\ScreenshotRequestPacket.cs" />
     <Compile Include="Net\Packets\TakeScreenshotPacket.cs" />
     <Compile Include="Net\PacketReader.cs" />

@@ -126,11 +126,11 @@ namespace Welt.Core.Server
 
         public void QueuePacket(IPacket packet)
         {
-            if (Disconnected)
+            if (Disconnected || Client.ConnectionsCount == 0)
                 return;
             var message = Client.CreateMessage();
             PacketReader.WritePacket(message, packet);
-            Client.SendMessage(message, Server.GetConnection(EndPoint), NetDeliveryMethod.Unreliable);
+            Client.SendMessage(message, Server.GetConnection(EndPoint), NetDeliveryMethod.ReliableOrdered, 0);
         }
         
         public void Disconnect()

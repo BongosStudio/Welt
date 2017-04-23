@@ -1,6 +1,7 @@
 ﻿using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -91,6 +92,7 @@ namespace Welt
 
         private NetClient Client { get; set; }
         private PacketReader PacketReader { get; set; }
+        private List<NetIncomingMessage> m_IncomingMessages;
 
         private readonly PacketHandler[] m_PacketHandlers;
 
@@ -107,19 +109,19 @@ namespace Welt
                 UseMessageRecycling = true,
                 AcceptIncomingConnections = false,
                 ReceiveBufferSize = ushort.MaxValue,
-                SendBufferSize = ushort.MaxValue
+                SendBufferSize = ushort.MaxValue,
+                AutoExpandMTU = true
             });
             PacketReader = new PacketReader();
             PacketReader.RegisterCorePackets();
-            var repo = new BlockRepository();
-            repo.DiscoverBlockProviders();
-            Physics = new PhysicsEngine(World.World, repo);
+            
             m_PacketHandlers = new PacketHandler[0x100];
             Handlers.PacketHandlers.RegisterHandlers(this);
             World = new ReadOnlyWorld();
             Inventory = new InventoryContainer();
             m_Connected = 0;
             m_Cancel = new CancellationTokenSource();
+            m_IncomingMessages = new List<NetIncomingMessage>();
             Health = 20;
             var blockRepository = new BlockRepository();
             blockRepository.DiscoverBlockProviders();
@@ -132,6 +134,7 @@ namespace Welt
             var craftingRepository = new CraftingRepository();
             craftingRepository.DiscoverRecipes();
             CraftingRepository = craftingRepository;
+            Physics = new PhysicsEngine(World.World, blockRepository);
             Client.Start();
         }
 
@@ -158,8 +161,9 @@ namespace Welt
 
         public void Update(GameTime gameTime)
         {
-            NetIncomingMessage message;
-            while ((message = Client.ReadMessage()) != null)
+            var inCount = Client.ReadMessages(m_IncomingMessages);
+            if (inCount < 1) return;
+            foreach (var message in m_IncomingMessages)
             {
                 IPacket packet;
                 switch (message.MessageType)
@@ -187,8 +191,9 @@ namespace Welt
                         break;
                 }
                 Client.Recycle(message);
-                Client.FlushSendQueue();
             }
+            m_IncomingMessages.Clear();
+            Client.FlushSendQueue();
         }
 
         public void SendMessage(string message)
@@ -204,7 +209,7 @@ namespace Welt
                 return;
             var message = Client.CreateMessage();
             PacketReader.WritePacket(message, packet);
-            Client.SendMessage(message, NetDeliveryMethod.Unreliable);
+            Client.SendMessage(message, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
         public void OnPropertyChanged([CallerMemberName] string property = "")
