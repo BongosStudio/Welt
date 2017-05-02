@@ -238,7 +238,7 @@ namespace Welt.Core.Server
                     ;
                 if (entity is IPhysicsEntity)
                     PhysicsEngine.RemoveEntity((IPhysicsEntity)entity);
-                lock ((Server as MultiplayerServer).ClientLock) // TODO: Thread safe way to iterate over client collection
+                lock ((Server as MultiplayerServer).m_ClientLock) // TODO: Thread safe way to iterate over client collection
                 {
                     for (int i = 0, ServerClientsCount = Server.Clients.Count; i < ServerClientsCount; i++)
                     {

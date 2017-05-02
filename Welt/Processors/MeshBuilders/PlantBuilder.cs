@@ -13,7 +13,7 @@ namespace Welt.Processors.MeshBuilders
         public const int VertexCount = 16;
 
         public static void BuildBlockVertexList(IBlockProvider provider, ReadOnlyChunk chunk,
-            Vector3I chunkRelativePosition, ChunkRenderer.VisibleFaces faces, int vertexCount,
+            Vector3I chunkRelativePosition, BlockFaceDirection face, int vertexCount,
             ref List<VertexPositionNormalTextureEffect> vertices, ref List<short> indices)
         {
 

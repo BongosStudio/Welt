@@ -301,7 +301,7 @@ namespace Welt
                 {
                     QueuePacket(new PlayerPositionAndLookPacket(value.X, value.Y, value.Y + Height,
                         value.Z, Yaw, Pitch, false));
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Position"));
+                    OnPropertyChanged();
                 }
                 _Position = value;
             }

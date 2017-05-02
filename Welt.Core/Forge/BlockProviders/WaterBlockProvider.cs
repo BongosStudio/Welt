@@ -14,6 +14,7 @@ namespace Welt.Core.Forge.BlockProviders
         public override BlockEffect DisplayEffect => BlockEffect.LightLiquidEffect;
         public override float Hardness { get; set; } = -1;
         public override bool IsOpaque => false;
+        public override bool RendersTransparentNeighbor => false;
         public override bool IsSolid => false;
     }
 }

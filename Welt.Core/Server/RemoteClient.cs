@@ -156,7 +156,7 @@ namespace Welt.Core.Server
                 return;
             Task.Factory.StartNew(() =>
             {
-                if (ChunkRadius < 8) // TODO: Allow customization of this number
+                if (ChunkRadius < 1) // TODO: Allow customization of this number
                 {
                     ChunkRadius++;
                     UpdateChunks();
@@ -181,7 +181,6 @@ namespace Welt.Core.Server
                 for (int z = -ChunkRadius; z < ChunkRadius; z++)
                 {
                     var adjustment = center + new Vector3(x, 0, z);
-                    Console.WriteLine($"{adjustment} - {center}");
                     newChunks.Add(adjustment);
                 }
             }

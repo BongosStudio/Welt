@@ -40,7 +40,6 @@ namespace Welt.Scenes
 
         public LoadScene(WeltGame game) : base(game)
         {
-            // first, get world data from server
             DataContext = m_ViewModel;
         }
 
@@ -48,7 +47,7 @@ namespace Welt.Scenes
         {
             new Thread(() =>
             {
-                var player = new PlayerRenderer(GraphicsDevice, Game.Client);
+                var player = new PlayerRenderer(GraphicsDevice);
                 var chunks = new ChunkComponent(Game, GraphicsDevice, player, Game.Client.World);
                 var sky = new SkyComponent(Game, player);
 
@@ -75,7 +74,6 @@ namespace Welt.Scenes
                 chunks.LoadContent(Game.Content);
                 chunks.Initialize();
                 sky.Initialize();
-                player.Initialize();
 
                 m_ViewModel.LoadingStatus++;
                 m_ViewModel.LoadingStatusText = "Simulating world...";
@@ -83,11 +81,11 @@ namespace Welt.Scenes
                 m_ViewModel.LoadingStatus++;
                 m_ViewModel.LoadingStatusText = "Spawning in.";
 
-                //for (double i = 1; i >= 0; i -= 0.01)
-                //{
-                //    m_ViewModel.Opacity = i;
-                //    Thread.Sleep(25);
-                //}
+                for (double i = 1; i >= 0; i -= 0.01)
+                {
+                    m_ViewModel.Opacity = i;
+                    Thread.Sleep(25);
+                }
                 Next(new PlayScene(Game, chunks, sky, player));
             })
             { IsBackground = true }.Start();

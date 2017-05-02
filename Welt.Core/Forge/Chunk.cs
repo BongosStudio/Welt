@@ -12,19 +12,6 @@ namespace Welt.Core.Forge
 {
     public class Chunk : IChunk
     {
-        /* 
-        For accessing array for x,z,y coordianate use the pattern: Blocks[x * Chunk.FlattenOffset + z * Chunk.SIZE.Y + y]
-        For allowing sequental access on blocks using iterations, the blocks are stored as [x,z,y]. So basically iterate x first, z then and y last.
-        Consider the following pattern;
-        for (int x = 0; x < Chunk.WidthInBlocks; x++)
-        {
-            for (int z = 0; z < Chunk.LenghtInBlocks; z++)
-            {
-                int offset = x * Chunk.FlattenOffset + z * Chunk.HeightInBlocks; // we don't want this x-z value to be calculated each in in y-loop!
-                for (int y = 0; y < Chunk.HeightInBlocks; y++)
-                {
-                    var block=Blocks[offset + y].Id 
-        */
 
         public const int Width = 16, Depth = 16, Height = 128;
         public static int FlattenOffset = Size.Z * Size.Y;

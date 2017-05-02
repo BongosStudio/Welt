@@ -28,8 +28,8 @@ namespace Welt.Components
 
         public WeltGame Game { get; }
 
-        public PlayerRenderer PlayerRenderer { get; set; }
-        public ChunkRenderer Renderer { get; set; }
+        public PlayerRenderer PlayerRenderer;
+        public ChunkRenderer Renderer;
         public int ChunksRendered;
         public ReadOnlyWorld World { get; set; }
         public LightEngine LightingEngine; // perhaps combine WorldLighting with LightEngine?
@@ -164,9 +164,9 @@ namespace Welt.Components
             var tod = World.World.TimeOfDay;
 
             BlockEffect.Parameters["World"].SetValue(Matrix.Identity);
-            BlockEffect.Parameters["View"].SetValue(PlayerRenderer.Camera.View);
-            BlockEffect.Parameters["Projection"].SetValue(PlayerRenderer.Camera.Projection);
-            BlockEffect.Parameters["CameraPosition"].SetValue(PlayerRenderer.Camera.Position);
+            BlockEffect.Parameters["View"].SetValue(PlayerRenderer.CameraController.Camera.View);
+            BlockEffect.Parameters["Projection"].SetValue(PlayerRenderer.CameraController.Camera.Projection);
+            BlockEffect.Parameters["CameraPosition"].SetValue(PlayerRenderer.CameraController.Camera.Position);
 
             BlockEffect.Parameters["FogNear"].SetValue(World.World.FogNear);
             BlockEffect.Parameters["FogFar"].SetValue(World.World.FogFar);
@@ -186,17 +186,17 @@ namespace Welt.Components
             BlockEffect.Parameters["Random"].SetValue((float)FastMath.NextRandomDouble());
             BlockEffect.Parameters["IsUnderWater"].SetValue(World.GetBlock(PlayerRenderer.Player.Position).Id == BlockType.WATER);
 
-            var viewFrustum = new BoundingFrustum(PlayerRenderer.Camera.View * PlayerRenderer.Camera.Projection);
+            var viewFrustum = new BoundingFrustum(PlayerRenderer.CameraController.Camera.View * PlayerRenderer.CameraController.Camera.Projection);
             Graphics.BlendState = BlendState.AlphaBlend;
             Graphics.DepthStencilState = DepthStencilState.Default;
-            Graphics.RasterizerState = RasterizerState.CullClockwise;
+            //Graphics.RasterizerState = RasterizerState.CullClockwise;
             var rendered = 0;
             if (m_Meshes.Count == 0) return;
             for (var i = 0; i < m_Meshes.Count; i++)
             {
                 var chunk = m_Meshes[i];
                 if (!viewFrustum.Intersects(chunk.BoundingBox)) continue;
-                
+                if (!chunk.IsReady) continue;
                 chunk.Draw(BlockEffect, 0);
                 rendered++;
             }
@@ -204,6 +204,7 @@ namespace Welt.Components
             {
                 var chunk = m_Meshes[i];
                 if (!viewFrustum.Intersects(chunk.BoundingBox)) continue;
+                if (!chunk.IsReady) continue;
                 chunk.Draw(BlockEffect, 1);
             }
             Graphics.RasterizerState = RasterizerState.CullCounterClockwise;
@@ -242,18 +243,18 @@ namespace Welt.Components
             PointLight.Parameters["Depthmap"].SetValue(m_DepthRt);
             var sphereWorldMatrix = Matrix.CreateScale(light.Intensity * 10) * Matrix.CreateTranslation(light.Position);
             PointLight.Parameters["World"].SetValue(sphereWorldMatrix);
-            PointLight.Parameters["View"].SetValue(PlayerRenderer.Camera.View);
-            PointLight.Parameters["Projection"].SetValue(PlayerRenderer.Camera.Projection);
+            PointLight.Parameters["View"].SetValue(PlayerRenderer.CameraController.Camera.View);
+            PointLight.Parameters["Projection"].SetValue(PlayerRenderer.CameraController.Camera.Projection);
             PointLight.Parameters["LightPosition"].SetValue(light.Position);
             PointLight.Parameters["LightColor"].SetValue(light.Color);
             PointLight.Parameters["LightRadius"].SetValue(light.Intensity * 10);
             PointLight.Parameters["LightIntensity"].SetValue(light.Intensity);
 
-            PointLight.Parameters["CameraPosition"].SetValue(PlayerRenderer.Camera.Position);
-            PointLight.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(PlayerRenderer.Camera.View * PlayerRenderer.Camera.Projection));
+            PointLight.Parameters["CameraPosition"].SetValue(PlayerRenderer.CameraController.Camera.Position);
+            PointLight.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(PlayerRenderer.CameraController.Camera.View * PlayerRenderer.CameraController.Camera.Projection));
             PointLight.Parameters["HalfPixel"].SetValue(m_HalfPixel);
 
-            var cameraToCenter = Vector3.Distance(PlayerRenderer.Camera.Position, light.Position);
+            var cameraToCenter = Vector3.Distance(PlayerRenderer.CameraController.Camera.Position, light.Position);
             if (cameraToCenter > light.Intensity * 10)
             {
                 Graphics.RasterizerState = RasterizerState.CullCounterClockwise;

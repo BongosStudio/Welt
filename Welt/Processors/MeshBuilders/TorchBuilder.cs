@@ -12,7 +12,7 @@ namespace Welt.Processors.MeshBuilders
     public class TorchBuilder : BlockMeshBuilder
     {
         public static void BuildBlockVertexList(IBlockProvider provider, ReadOnlyChunk chunk, Vector3I chunkRelativePosition,
-        ChunkRenderer.VisibleFaces faces, int vertexCount,
+        BlockFaceDirection face, int vertexCount,
         ref List<VertexPositionNormalTextureEffect> vertices, ref List<short> indices)
         {
 

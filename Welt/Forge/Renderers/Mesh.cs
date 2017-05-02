@@ -54,6 +54,7 @@ namespace Welt.Forge.Renderers
         {
             set
             {
+                if (value.Length == 0) return;
                 if (_vertices != null)
                     _vertices.Dispose();
 

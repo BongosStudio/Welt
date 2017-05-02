@@ -12,6 +12,7 @@ using Welt.Controllers;
 using Welt.Forge;
 using Welt.Forge.Renderers;
 using System.Diagnostics;
+using Welt.Core;
 
 #endregion
 
@@ -21,14 +22,11 @@ namespace Welt.Cameras
 
     public class PlayerRenderer
     {
-
-        public PlayerRenderer(GraphicsDevice graphicsDevice, MultiplayerClient player)
+        public PlayerRenderer(GraphicsDevice graphicsDevice)
         {
             m_GraphicsDevice = graphicsDevice;
-            Player = player;
             m_Viewport = graphicsDevice.Viewport;
-            Camera = new FirstPersonCamera(m_Viewport);
-            m_CameraController = new FirstPersonCameraController(Camera);
+            CameraController = new FirstPersonCameraController(new FirstPersonCamera(m_Viewport));
             m_Fog = new FogRenderer(graphicsDevice);
             m_Input = InputController.CreateDefault();
             m_LeftClickCooldown = TimeSpan.Zero;
@@ -37,9 +35,9 @@ namespace Welt.Cameras
 
         public void Initialize()
         {
-            m_CameraController.Initialize();
-            Camera.Position = Player.Position;
-            Camera.LookAt(Vector3.Forward);
+            CameraController.Initialize();
+            CameraController.Camera.Position = Player.Position;
+            CameraController.Camera.LookAt(Vector3.Forward);
             // TODO: load the previous data of position
 
             // SelectionBlock
@@ -58,12 +56,12 @@ namespace Welt.Cameras
 
         public void Update(GameTime gameTime)
         {
-            var previousView = Camera.View;
+            var previousView = CameraController.Camera.View;
             //TODO: process input here.
-            Camera.Position = Player.Position;
-            m_CameraController.ProcessInput(gameTime);
-            Player._Position = Camera.Position;
-            m_CameraController.Update(gameTime);
+            CameraController.Camera.Position = Player.Position;
+            CameraController.ProcessInput(gameTime);
+            Player.Position = CameraController.Camera.Position;
+            CameraController.Update(gameTime);
             if (Player.IsPaused) return; // this is here so we can still process the game while paused.
             
             var mouseState = m_Input.GetMouseState();
@@ -84,10 +82,10 @@ namespace Welt.Cameras
         #endregion
 
         #region Fields
-        
-        public MultiplayerClient Player { get; set; }    
-        public FirstPersonCamera Camera { get; set; }
-        private readonly FirstPersonCameraController m_CameraController;
+
+        public MultiplayerClient Player => WeltGame.Instance.Client;
+        public FirstPersonCamera Camera => CameraController.Camera;
+        public FirstPersonCameraController CameraController { get; }
         private readonly FogRenderer m_Fog;
 
         private Vector3 m_LookVector;

@@ -24,53 +24,15 @@ namespace Welt.Processors.MeshBuilders
         };
 
         public static void BuildBlockVertexList(IBlockProvider provider, ReadOnlyChunk chunk,
-            Vector3I chunkRelativePosition, ChunkRenderer.VisibleFaces faces, int vertexCount,
+            Vector3I chunkRelativePosition, BlockFaceDirection face, int vertexCount,
             ref List<VertexPositionNormalTextureEffect> vertices, ref List<short> indices)
         {
             if (provider.Id == 0) return;
             var blockPosition = chunk.GetPosition() + chunkRelativePosition;
 
-
-            // XDecreasing
-            if ((faces & ChunkRenderer.VisibleFaces.West) != 0)
-            {
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XDecreasing,
+            BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, face,
                     provider, vertexCount,
                     ref vertices, ref indices);
-            }
-            if ((faces & ChunkRenderer.VisibleFaces.East) != 0)
-            {
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.XIncreasing,
-                    provider, vertexCount,
-                    ref vertices, ref indices);
-            }
-            if ((faces & ChunkRenderer.VisibleFaces.Bottom) != 0)
-            {
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YDecreasing,
-                    provider, vertexCount,
-                    ref vertices, ref indices);
-            }
-            if ((faces & ChunkRenderer.VisibleFaces.Top) != 0)
-            {
-
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.YIncreasing,
-                    provider, vertexCount,
-                    ref vertices, ref indices);
-            }
-            if ((faces & ChunkRenderer.VisibleFaces.South) != 0)
-            {
-
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZDecreasing,
-                    provider, vertexCount,
-                    ref vertices, ref indices);
-            }
-            if ((faces & ChunkRenderer.VisibleFaces.North) != 0)
-            {
-
-                BuildFaceVertices(chunk, blockPosition, chunkRelativePosition, BlockFaceDirection.ZIncreasing,
-                    provider, vertexCount,
-                    ref vertices, ref indices);
-            }
         }
 
         protected static void BuildFaceVertices(ReadOnlyChunk chunk, Vector3I blockPosition, Vector3I chunkRelativePosition,

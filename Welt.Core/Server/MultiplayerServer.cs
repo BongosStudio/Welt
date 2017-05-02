@@ -69,14 +69,14 @@ namespace Welt.Core.Server
             }
         }
 
-        private Timer EnvironmentWorker;
-        private Thread NetworkingThread;
-        private readonly PacketHandler[] PacketHandlers;
-        private IList<ILogProvider> LogProviders;
-        private ConcurrentBag<(IWorld World, IChunk Chunk)> ChunksToSchedule;
-        internal object ClientLock = new object();
+        private Timer m_EnvironmentWorker;
+        private Thread m_NetworkingThread;
+        private readonly PacketHandler[] m_PacketHandlers;
+        private IList<ILogProvider> m_LogProviders;
+        private ConcurrentBag<(IWorld World, IChunk Chunk)> m_ChunksToSchedule;
+        internal object m_ClientLock = new object();
         
-        private QueryProtocol QueryProtocol;
+        private QueryProtocol m_QueryProtocol;
 
         internal bool IsShuttingDown { get; private set; }
         
@@ -85,11 +85,11 @@ namespace Welt.Core.Server
             var reader = new PacketReader();
             PacketReader = reader;
             Clients = new List<IRemoteClient>();
-            EnvironmentWorker = new Timer(DoEnvironment);
-            PacketHandlers = new PacketHandler[0x100];
+            m_EnvironmentWorker = new Timer(DoEnvironment);
+            m_PacketHandlers = new PacketHandler[0x100];
             Worlds = new List<IWorld>();
             EntityManagers = new List<IEntityManager>();
-            LogProviders = new List<ILogProvider>();
+            m_LogProviders = new List<ILogProvider>();
             Scheduler = new EventScheduler(this);
             var blockRepository = new BlockRepository();
             blockRepository.DiscoverBlockProviders();
@@ -104,9 +104,9 @@ namespace Welt.Core.Server
             CraftingRepository = craftingRepository;
             PendingBlockUpdates = new Queue<BlockUpdate>();
             EnableClientLogging = false;
-            QueryProtocol = new QueryProtocol(this);
+            m_QueryProtocol = new QueryProtocol(this);
             WorldLighter = new WorldLighting(blockRepository);
-            ChunksToSchedule = new ConcurrentBag<(IWorld, IChunk)>();
+            m_ChunksToSchedule = new ConcurrentBag<(IWorld, IChunk)>();
 
             AccessConfiguration = new AccessConfiguration();
             ServerConfiguration = new ServerConfiguration();
@@ -126,7 +126,7 @@ namespace Welt.Core.Server
 
         public void RegisterPacketHandler(byte packetId, PacketHandler handler)
         {
-            PacketHandlers[packetId] = handler;
+            m_PacketHandlers[packetId] = handler;
         }
 
         public void Start(IPEndPoint endPoint)
@@ -137,7 +137,7 @@ namespace Welt.Core.Server
 
             Server = new NetServer(NetworkConfiguration);
             Server.Start();
-            NetworkingThread = new Thread(() =>
+            m_NetworkingThread = new Thread(() =>
             {
 
                 var incomingMessages = new List<NetIncomingMessage>();
@@ -160,7 +160,7 @@ namespace Welt.Core.Server
                                 break;
                             case NetIncomingMessageType.DiscoveryRequest:
                                 Server.SendDiscoveryResponse(null, message.SenderEndPoint);
-                                Clients.Add(new RemoteClient(this, PacketReader, PacketHandlers, message.SenderEndPoint));
+                                Clients.Add(new RemoteClient(this, PacketReader, m_PacketHandlers, message.SenderEndPoint));
                                 break;
                             case NetIncomingMessageType.StatusChanged:
                                 switch ((NetConnectionStatus)message.ReadByte())
@@ -178,7 +178,7 @@ namespace Welt.Core.Server
                                 client = GetClient(message.SenderEndPoint);
                                 packet = PacketReader.ReadPacket(message);
                                 if (packet != null)
-                                    PacketHandlers[packet.Id]?.Invoke(packet, client, this);
+                                    m_PacketHandlers[packet.Id]?.Invoke(packet, client, this);
                                 break;
                             case NetIncomingMessageType.WarningMessage:
                                 var data = message.ReadString();
@@ -195,19 +195,19 @@ namespace Welt.Core.Server
                 }
             })
             { IsBackground = true };
-            NetworkingThread.Start();
+            m_NetworkingThread.Start();
 
             Log(LogCategory.Notice, $"Server started on {EndPoint}.");
-            EnvironmentWorker.Change(MillisecondsPerTick, 0);
+            m_EnvironmentWorker.Change(MillisecondsPerTick, 0);
             if(ServerConfiguration.Query)
-                QueryProtocol.Start();
+                m_QueryProtocol.Start();
         }
 
         public void Stop()
         {
             IsShuttingDown = true;
             if(ServerConfiguration.Query)
-                QueryProtocol.Stop();
+                m_QueryProtocol.Stop();
             //foreach (var w in Worlds)
             //    w.Save();
             foreach (var c in Clients)
@@ -236,7 +236,7 @@ namespace Welt.Core.Server
 
         void HandleChunkLoaded(object sender, ChunkLoadedEventArgs e)
         {
-            ChunksToSchedule.Add((sender as IWorld, e.Chunk));
+            m_ChunksToSchedule.Add((sender as IWorld, e.Chunk));
             WorldLighter.ProcessChunk(e.Chunk as Chunk);
         }
 
@@ -327,14 +327,14 @@ namespace Welt.Core.Server
 
         public void AddLogProvider(ILogProvider provider)
         {
-            LogProviders.Add(provider);
+            m_LogProviders.Add(provider);
         }
 
         public void Log(LogCategory category, string text, params object[] parameters)
         {
-            for (int i = 0, LogProvidersCount = LogProviders.Count; i < LogProvidersCount; i++)
+            for (int i = 0, LogProvidersCount = m_LogProviders.Count; i < LogProvidersCount; i++)
             {
-                var provider = LogProviders[i];
+                var provider = m_LogProviders[i];
                 provider.Log(category, text, parameters);
             }
         }
@@ -381,7 +381,7 @@ namespace Welt.Core.Server
         {
             var client = (RemoteClient)_client;
 
-            lock (ClientLock)
+            lock (m_ClientLock)
             {
                 
             }
@@ -428,10 +428,10 @@ namespace Welt.Core.Server
                     WorldLighter.ProcessChunk(chunk as Chunk);
                 }
             }
-            if (ChunksToSchedule.TryTake(out var t))
+            if (m_ChunksToSchedule.TryTake(out var t))
                 ScheduleUpdatesForChunk(t.World, t.Chunk);
 
-            EnvironmentWorker.Change(MillisecondsPerTick, 0);
+            m_EnvironmentWorker.Change(MillisecondsPerTick, 0);
         }
 
         public bool PlayerIsWhitelisted(string client)

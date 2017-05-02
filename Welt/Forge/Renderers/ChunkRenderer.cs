@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Welt.API;
 using Welt.API.Forge;
 using Welt.Core.Forge;
+using Welt.Core.Forge.BlockProviders;
 using Welt.Graphics;
 using Welt.Processors.MeshBuilders;
 
@@ -23,25 +25,6 @@ namespace Welt.Forge.Renderers
             All = North | South | East | West | Top | Bottom
         }
 
-        private static readonly Vector3I[] AdjacentCoordinates =
-        {
-            Vector3I.Up,
-            Vector3I.Down,
-            Vector3I.Forward,
-            Vector3I.Backward,
-            Vector3I.Right,
-            Vector3I.Left
-        };
-
-        private static readonly VisibleFaces[] AdjacentCoordFaces =
-        {
-            VisibleFaces.Bottom,
-            VisibleFaces.Top,
-            VisibleFaces.South,
-            VisibleFaces.North,
-            VisibleFaces.West,
-            VisibleFaces.East
-        };
         private ReadOnlyWorld World { get; set; }
         private WeltGame Game { get; set; }
         private IBlockRepository BlockRepository { get; set; }
@@ -56,14 +39,30 @@ namespace Welt.Forge.Renderers
 
         private class RenderState
         {
-            public readonly List<VertexPositionNormalTextureEffect> Vertices
-                = new List<VertexPositionNormalTextureEffect>();
-            public readonly List<short> OpaqueIndices
-                = new List<short>();
-            public readonly List<short> TransparentIndices
-                = new List<short>();
-            public Dictionary<Vector3I, VisibleFaces> DrawableCoordinates
-                = new Dictionary<Vector3I, VisibleFaces>();
+            public readonly List<VertexPositionNormalTextureEffect> Vertices = new List<VertexPositionNormalTextureEffect>();
+            public readonly List<short> OpaqueIndices = new List<short>();
+            public readonly List<short> TransparentIndices = new List<short>();
+            public Dictionary<Vector3I, VisibleFaces> DrawableCoordinates = new Dictionary<Vector3I, VisibleFaces>();
+
+            public VisibleFaces GetFacesFor(Vector3I position, bool createIfNone)
+            {
+                if (!DrawableCoordinates.TryGetValue(position, out var faces))
+                {
+                    if (createIfNone)
+                        DrawableCoordinates.Add(position, VisibleFaces.None);
+                    faces = VisibleFaces.None;
+                }
+                return faces;
+            }
+
+            public void AddFacesTo(Vector3I position, VisibleFaces faces)
+            {
+                if (Chunk.OutOfBounds((byte)position.X, (byte)position.Y, (byte)position.Z)) return;
+                if (!DrawableCoordinates.ContainsKey(position))
+                    DrawableCoordinates.Add(position, faces);
+                else
+                    DrawableCoordinates[position] |= faces;
+            }
 
             public void Clear()
             {
@@ -73,126 +72,10 @@ namespace Welt.Forge.Renderers
                 DrawableCoordinates.Clear();
             }
         }
-
-        private void AddBottomBlock(Vector3I coords, RenderState state, ReadOnlyChunk chunk)
-        {
-            var desiredFaces = VisibleFaces.None;
-            if (coords.X == 0)
-                desiredFaces |= VisibleFaces.West;
-            else if (coords.X == Chunk.Width - 1)
-                desiredFaces |= VisibleFaces.East;
-            if (coords.Z == 0)
-                desiredFaces |= VisibleFaces.North;
-            else if (coords.Z == Chunk.Depth - 1)
-                desiredFaces |= VisibleFaces.South;
-            if (coords.Y == 0)
-                desiredFaces |= VisibleFaces.Bottom;
-            else if (coords.Y == Chunk.Height - 1)
-                desiredFaces |= VisibleFaces.Top;
-            state.DrawableCoordinates.TryGetValue(coords, out var faces);
-            faces |= desiredFaces;
-            state.DrawableCoordinates[coords] = desiredFaces;
-        }
-
-        private void AddAdjacentBlocks(Vector3I coords, RenderState state, ReadOnlyChunk chunk)
-        {
-            // Add adjacent blocks
-            for (int i = 0; i < AdjacentCoordinates.Length; i++)
-            {
-                var next = coords + AdjacentCoordinates[i];
-                if (next.X < 0 || next.X >= Chunk.Width
-                    || next.Y < 0 || next.Y >= Chunk.Height
-                    || next.Z < 0 || next.Z >= Chunk.Depth)
-                {
-                    continue;
-                }
-                var provider = BlockRepository.GetBlockProvider(chunk.GetBlock((byte)next.X, (byte)next.Y, (byte)next.Z).Id);
-                if (provider.IsOpaque)
-                {
-                    if (!state.DrawableCoordinates.TryGetValue(next, out VisibleFaces faces))
-                        faces = VisibleFaces.None;
-                    faces |= AdjacentCoordFaces[i];
-                    state.DrawableCoordinates[next] = faces;
-                }
-            }
-        }
-
-        private void AddTransparentBlock(Vector3I coords, RenderState state, ReadOnlyChunk chunk)
-        {
-            // Add adjacent blocks
-            VisibleFaces faces = VisibleFaces.None;
-            for (int i = 0; i < AdjacentCoordinates.Length; i++)
-            {
-                var next = coords + AdjacentCoordinates[i];
-                if (next.X < 0 || next.X >= Chunk.Width
-                    || next.Y < 0 || next.Y >= Chunk.Height
-                    || next.Z < 0 || next.Z >= Chunk.Depth)
-                {
-                    faces |= AdjacentCoordFaces[i];
-                    continue;
-                }
-                if (chunk.GetBlock((byte)next.X, (byte)next.Y, (byte)next.Z).Id == 0)
-                    faces |= AdjacentCoordFaces[i];
-            }
-            if (faces != VisibleFaces.None)
-                state.DrawableCoordinates[coords] = faces;
-        }
-
-        private void UpdateFacesFromAdjacent(Vector3I adjacent, ReadOnlyChunk chunk,
-            VisibleFaces mod, ref VisibleFaces faces)
-        {
-            if (chunk == null)
-                return;
-            var provider = BlockRepository.GetBlockProvider(chunk.GetBlock((byte)adjacent.X, (byte)adjacent.Y, (byte)adjacent.Z).Id);
-            if (!provider.IsOpaque)
-                faces |= mod;
-        }
-
-        private void AddChunkBoundaryBlocks(Vector3I coords, RenderState state, ReadOnlyChunk chunk)
-        {
-            VisibleFaces faces;
-            if (!state.DrawableCoordinates.TryGetValue(coords, out faces))
-                faces = VisibleFaces.None;
-            VisibleFaces oldFaces = faces;
-
-            if (coords.X == 0)
-            {
-                var adjacent = coords;
-                adjacent.X = Chunk.Width - 1;
-                var nextChunk = World.GetChunk(chunk.Chunk.Index + Vector3I.Left);
-                UpdateFacesFromAdjacent(adjacent, nextChunk, VisibleFaces.West, ref faces);
-            }
-            else if (coords.X == Chunk.Width - 1)
-            {
-                var adjacent = coords;
-                adjacent.X = 0;
-                var nextChunk = World.GetChunk(chunk.Chunk.Index + Vector3I.Right);
-                UpdateFacesFromAdjacent(adjacent, nextChunk, VisibleFaces.East, ref faces);
-            }
-
-            if (coords.Z == 0)
-            {
-                var adjacent = coords;
-                adjacent.Z = Chunk.Depth - 1;
-                var nextChunk = World.GetChunk(chunk.Chunk.Index + Vector3I.Forward);
-                UpdateFacesFromAdjacent(adjacent, nextChunk, VisibleFaces.North, ref faces);
-            }
-            else if (coords.Z == Chunk.Depth - 1)
-            {
-                var adjacent = coords;
-                adjacent.Z = 0;
-                var nextChunk = World.GetChunk(chunk.Chunk.Index + Vector3I.Backward);
-                UpdateFacesFromAdjacent(adjacent, nextChunk, VisibleFaces.South, ref faces);
-            }
-
-            if (oldFaces != faces)
-                state.DrawableCoordinates[coords] = faces;
-        }
-
+        
         private void ProcessChunk(ReadOnlyWorld world, ReadOnlyChunk chunk, RenderState state)
         {
             state.Clear();
-
             for (byte x = 0; x < Chunk.Width; x++)
             {
                 for (byte z = 0; z < Chunk.Depth; z++)
@@ -201,42 +84,94 @@ namespace Welt.Forge.Renderers
                     {
                         var coords = new Vector3I(x, y, z);
                         var id = chunk.GetBlock(x, y, z).Id;
-                        var provider = BlockRepository.GetBlockProvider(id);
-                        if (id != 0 && coords.Y == 0)
-                            AddBottomBlock(coords, state, chunk);
-                        if (!provider.IsOpaque)
-                        {
-                            AddAdjacentBlocks(coords, state, chunk);
-                            if (id != 0)
-                                AddTransparentBlock(coords, state, chunk);
-                        }
-                        else
-                        {
-                            if (coords.X == 0 || coords.X == Chunk.Width - 1 ||
-                                coords.Z == 0 || coords.Z == Chunk.Depth - 1)
-                            {
-                                AddChunkBoundaryBlocks(coords, state, chunk);
-                            }
-                        }
+                        var provider = BlockRepository.GetBlockProvider(id) ?? new DefaultBlockProvider();
+                        if (x == 15 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x + 1, y, z).Id)))
+                            state.AddFacesTo(coords, VisibleFaces.East);
+                        if (x == 0 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x - 1, y, z).Id)))
+                            state.AddFacesTo(coords, VisibleFaces.West);
+                        if (z == 15 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z + 1).Id)))
+                            state.AddFacesTo(coords, VisibleFaces.North);
+                        if (z == 0 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z - 1).Id)))
+                            state.AddFacesTo(coords, VisibleFaces.South);
+                        if (y == Chunk.Height || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y + 1, z).Id)))
+                            state.AddFacesTo(coords, VisibleFaces.Top);
+                        if (y == 0 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y - 1, z).Id)))
+                            state.AddFacesTo(coords, VisibleFaces.Bottom);
                     }
                 }
             }
-            var enumerator = state.DrawableCoordinates.GetEnumerator();
-            for (int j = 0; j <= state.DrawableCoordinates.Count; j++)
+
+            var drawable = state.DrawableCoordinates.ToArray();
+            VertexPositionNormalTextureEffect[] vertices;
+            short[] indices;
+            for (var i = 0; i < drawable.Length; i++)
             {
-                var coords = enumerator.Current;
-                enumerator.MoveNext();
-                var c = coords.Key;
-                var descriptor = BlockDescriptor.FromBlock(chunk.GetBlock((byte)coords.Key.X, (byte)coords.Key.Y, (byte)coords.Key.Z), chunk.Chunk, coords.Key);
-                
-                var provider = BlockRepository.GetBlockProvider(descriptor.Id);
-                BlockMeshBuilder.Render(provider, chunk, coords.Key, coords.Value, state.Vertices.Count, out var vertices, out var indices);
-                state.Vertices.AddRange(vertices);
-                if (provider.WillRenderOpaque)
-                    state.OpaqueIndices.AddRange(indices);
-                else
-                    state.TransparentIndices.AddRange(indices);
+                var c = drawable[i];
+                var pos = c.Key;
+                var faces = c.Value;
+                var id = chunk.GetBlock((byte)pos.X, (byte)pos.Y, (byte)pos.Z).Id;
+                var provider = BlockRepository.GetBlockProvider(id);
+                if ((faces & VisibleFaces.Top) != 0)
+                {
+                    BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.YIncreasing, state.Vertices.Count, out vertices, out indices);
+                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                }
+                if ((faces & VisibleFaces.Bottom) != 0)
+                {
+                    BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.YDecreasing, state.Vertices.Count, out vertices, out indices);
+                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                }
+                if ((faces & VisibleFaces.East) != 0)
+                {
+                    BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.XIncreasing, state.Vertices.Count, out vertices, out indices);
+                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                }
+                if ((faces & VisibleFaces.West) != 0)
+                {
+                    BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.XDecreasing, state.Vertices.Count, out vertices, out indices);
+                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                }
+                if ((faces & VisibleFaces.North) != 0)
+                {
+                    BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.ZIncreasing, state.Vertices.Count, out vertices, out indices);
+                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                }
+                if ((faces & VisibleFaces.South) != 0)
+                {
+                    BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.ZDecreasing, state.Vertices.Count, out vertices, out indices);
+                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                }
             }
+        }
+
+        private bool WillRenderFace(IBlockProvider source, IBlockProvider neighbor)
+        {
+            if (source.IsOpaque)
+            {
+                if (!neighbor.IsOpaque) return true;
+            }
+            else
+            {
+                if (source.Id != neighbor.Id) return true;
+                if (neighbor.RendersTransparentNeighbor) return true;
+            }
+            return false;
+        }
+        
+        private static void AddDataToState(RenderState state, VertexPositionNormalTextureEffect[] vertices, short[] indices, bool isOpaque)
+        {
+            state.Vertices.AddRange(vertices);
+            if (isOpaque)
+                state.OpaqueIndices.AddRange(indices);
+            else
+                state.OpaqueIndices.AddRange(indices);
+        }
+        
+        private bool IsOpaque(ReadOnlyChunk chunk, Vector3I position)
+        {
+            if (Chunk.OutOfBounds((byte)position.X, (byte)position.Y, (byte)position.Z)) return false;
+            var provider = BlockRepository.GetBlockProvider(chunk.GetBlock((byte)position.X, (byte)position.Y, (byte)position.Z).Id);
+            return provider.IsOpaque;
         }
 
         protected override bool TryRender(ReadOnlyChunk item, out Mesh<VertexPositionNormalTextureEffect> result)

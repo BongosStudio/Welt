@@ -12,6 +12,7 @@ namespace Welt.Core.Forge.BlockProviders
 
         public override string DisplayName => "Leaves";
         public override bool IsOpaque => false;
+        public override bool RendersTransparentNeighbor => true;
         public override BlockEffect DisplayEffect => BlockEffect.VegetationWindEffect;
 
         public override Vector4 GetOverlay(BlockFaceDirection face, ushort blockAbove = 0)

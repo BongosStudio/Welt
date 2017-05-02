@@ -81,6 +81,7 @@ namespace Welt.Scenes
         public override void Initialize()
         {
             // all world/sky renderers will be initialized before this in the loading scene
+            m_PlayerRenderer.Initialize();
             m_Hud.Initialize();
             m_PlayerRenderer.Player._Position = Game.Client.World.GetSpawnPoint();
             //Input.Assign(() => m_PlayerRenderer.Player.IsPaused = !m_PlayerRenderer.Player.IsPaused, Keys.Escape);

@@ -13,7 +13,7 @@ namespace Welt.Processors.MeshBuilders
 {
     public delegate void BlockVertexBuilder(
         IBlockProvider provider, ReadOnlyChunk chunk, Vector3I chunkRelativePosition, 
-        ChunkRenderer.VisibleFaces faces, int vertexCount, 
+        BlockFaceDirection face, int vertexCount, 
         ref List<VertexPositionNormalTextureEffect> vertices, ref List<short> indices);
     public class BlockMeshBuilder
     {
@@ -49,11 +49,11 @@ namespace Welt.Processors.MeshBuilders
             }
         }
 
-        public static void Render(IBlockProvider provider, ReadOnlyChunk chunk, Vector3I position, ChunkRenderer.VisibleFaces faces, int vertexCount, out VertexPositionNormalTextureEffect[] vertices, out short[] indices)
+        public static void Render(IBlockProvider provider, ReadOnlyChunk chunk, Vector3I position, BlockFaceDirection face, int vertexCount, out VertexPositionNormalTextureEffect[] vertices, out short[] indices)
         {
             var v = new List<VertexPositionNormalTextureEffect>();
             var i = new List<short>();
-            GetVertexBuilder(provider.Id)(provider, chunk, position, faces, vertexCount, ref v, ref i);
+            GetVertexBuilder(provider.Id)(provider, chunk, position, face, vertexCount, ref v, ref i);
             vertices = v.ToArray();
             indices = i.ToArray();
         }
@@ -69,6 +69,7 @@ namespace Welt.Processors.MeshBuilders
                     uvs[i], (uint)provider.DisplayEffect));
             }
             indices.AddRange(ins.Select(i => (short)(i + currentVertexCount)));
+            
         }
     }
 }

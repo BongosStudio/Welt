@@ -15,6 +15,7 @@ namespace Welt.Core.Handlers
             _client.Entity.Position = new Vector3(packet.X, packet.Y, packet.Z);
             _client.Entity.Pitch = packet.Pitch;
             _client.Entity.Yaw = packet.Yaw;
+            Console.WriteLine(_client.Entity.Position);
         }
 
         public static void HandlePlayerPositionPacket(IPacket _packet, IRemoteClient _client, IMultiplayerServer server)

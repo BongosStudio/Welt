@@ -121,8 +121,6 @@ float noise3f(float3 p)
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 {
-	input.Position.w = 1.0f;
-
 	VertexShaderOutput output;
 
 	float4 worldPosition = mul(input.Position, World);
@@ -167,7 +165,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	// gives a rounded shape to the landscape, making it seem like an actual planet.
 	// this value needs to be dependant on world size so smaller planets have a larger bend.
-	output.Position.y -= output.Distance * output.Distance *0.001f;
+	//output.Position.y -= output.Distance * output.Distance *0.001f;
 	output.Effect = input.Effect;
 	return output;
 }

@@ -44,9 +44,9 @@ namespace Welt.Components
                 new VertexPositionColor(new Vector3(64, 0, -64), Color.White),
                 new VertexPositionColor(new Vector3(-64, 0, 64), Color.Gray),
 
-                new VertexPositionColor(new Vector3(64, 0, -64), Color.White),
+                new VertexPositionColor(new Vector3(64, 0, -64), Color.Black),
                 new VertexPositionColor(new Vector3(64, 0, 64), Color.Gray),
-                new VertexPositionColor(new Vector3(-64, 0, 64), Color.White)
+                new VertexPositionColor(new Vector3(-64, 0, 64), Color.Black)
             };
             SkyPlane = new VertexBuffer(Game.GraphicsDevice, VertexPositionColor.VertexDeclaration,
                 plane.Length, BufferUsage.WriteOnly);
@@ -180,7 +180,7 @@ namespace Welt.Components
             Player.Camera.ApplyTo(SkyPlaneEffect);
             Player.Player.Yaw = yaw;
             Player.Camera.ApplyTo(CelestialPlaneEffect);
-            Player.Player.Position = position;
+            Player.Camera.Position = position;
             // Sky
             SkyPlaneEffect.FogColor = AtmosphereColor.ToVector3();
             SkyPlaneEffect.World = Matrix.CreateRotationX(MathHelper.Pi)
@@ -220,16 +220,16 @@ namespace Welt.Components
             Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             // Void
-            Game.GraphicsDevice.SetVertexBuffer(SkyPlane);
-            SkyPlaneEffect.World = Matrix.CreateTranslation(0, -16, 0);
-            SkyPlaneEffect.AmbientLightColor = WorldSkyColor.ToVector3()
-                * new Vector3(0.2f, 0.2f, 0.6f)
-                + new Vector3(0.04f, 0.04f, 0.1f);
-            foreach (var pass in SkyPlaneEffect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                SkyPlaneEffect.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
-            }
+            //Game.GraphicsDevice.SetVertexBuffer(SkyPlane);
+            //SkyPlaneEffect.World = Matrix.CreateTranslation(0, -16, 0);
+            //SkyPlaneEffect.AmbientLightColor = WorldSkyColor.ToVector3()
+            //    * new Vector3(0.2f, 0.2f, 0.6f)
+            //    + new Vector3(0.04f, 0.04f, 0.1f);
+            //foreach (var pass in SkyPlaneEffect.CurrentTechnique.Passes)
+            //{
+            //    pass.Apply();
+            //    SkyPlaneEffect.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
+            //}
         }
 
         public void Update(GameTime gameTime)

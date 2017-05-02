@@ -59,7 +59,7 @@ namespace Welt.Controllers
 
             var moveVector = new Vector3(0, 0, 0);
             var keyState = Keyboard.GetState();
-
+            if (keyState.GetPressedKeys().Length == 0) return;
             if (keyState.IsKeyDown(Keys.W))
             {
                 moveVector += Vector3.Forward;
@@ -76,10 +76,18 @@ namespace Welt.Controllers
             {
                 moveVector += Vector3.Right;
             }
+            if (keyState.IsKeyDown(Keys.LeftShift) && Camera.Position.Y > -20 && Camera.Position.Y < 240)
+            {
+                moveVector += Vector3.Down;
+            }
+            if (keyState.IsKeyDown(Keys.Space))
+            {
+                moveVector += Vector3.Up;
+            }
 
             if (moveVector != Vector3.Zero)
             {
-                var rotationMatrix = Matrix.CreateRotationX(Camera.UpDownRotation)*
+                var rotationMatrix = //Matrix.CreateRotationX(Camera.UpDownRotation)*
                                      Matrix.CreateRotationY(Camera.LeftRightRotation);
                 var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
                 Camera.Position += rotatedVector*MOVEMENTSPEED;
