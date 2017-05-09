@@ -99,6 +99,7 @@
     <Compile Include="AudioFactory.cs" />
     <Compile Include="BMFont.cs" />
     <Compile Include="Components\ChunkComponent.cs" />
+    <Compile Include="Components\FpsComponent.cs" />
     <Compile Include="Components\IGameComponent.cs" />
     <Compile Include="Components\IVisualComponent.cs" />
     <Compile Include="Components\LightingComponent.cs" />

@@ -10,7 +10,7 @@ namespace Welt.Core.Forge.Generators
     /// </summary>
     public class PerlinNoise2D
     {
-        private readonly double[,] _mNoiseValues;
+        private readonly double[,] m_NoiseValues;
 
         /// <summary>
         /// Constructor
@@ -18,7 +18,7 @@ namespace Welt.Core.Forge.Generators
         public PerlinNoise2D(int freq, float amp)
         {
             var rand = new Random(Environment.TickCount);
-            _mNoiseValues = new double[freq, freq];
+            m_NoiseValues = new double[freq, freq];
             Amplitude = amp;
             Frequency = freq;
 
@@ -27,7 +27,7 @@ namespace Welt.Core.Forge.Generators
             {
                 for (var k = 0; k < freq; k++)
                 {
-                    _mNoiseValues[i, k] = rand.NextDouble();
+                    m_NoiseValues[i, k] = rand.NextDouble();
                 }
             }
         }
@@ -39,13 +39,13 @@ namespace Welt.Core.Forge.Generators
         public double GetInterpolatedPoint(int xa, int xb, int ya, int yb, double x, double y)
         {
             var i1 = Interpolate(
-                _mNoiseValues[xa%Frequency, ya%Frequency],
-                _mNoiseValues[xb%Frequency, ya%Frequency]
+                m_NoiseValues[xa%Frequency, ya%Frequency],
+                m_NoiseValues[xb%Frequency, ya%Frequency]
                 , x);
 
             var i2 = Interpolate(
-                _mNoiseValues[xa%Frequency, yb%Frequency],
-                _mNoiseValues[xb%Frequency, yb%Frequency]
+                m_NoiseValues[xa%Frequency, yb%Frequency],
+                m_NoiseValues[xb%Frequency, yb%Frequency]
                 , x);
 
             return Interpolate(i1, i2, y);

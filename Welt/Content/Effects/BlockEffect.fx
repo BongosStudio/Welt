@@ -1,3 +1,10 @@
+//custom structs
+
+struct Light
+{
+
+};
+
 float4x4 World;
 float4x4 View;
 float4x4 Projection;
@@ -16,6 +23,7 @@ float4 HorizonColor;
 float4 SunColor;
 float4 NightColor;
 float4 DeepWaterColor;
+float4 SunPosition;
 
 float4 MorningTint;
 float4 EveningTint;
@@ -73,10 +81,10 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
 	float4 Position : POSITION0;
-	float3 Normal : NORMAL0;
 	float2 TexCoords1 : TEXCOORD0;
-	float Distance : TEXCOORD1;
-	float2 Depth : TEXCOORD2;
+	float3 CameraView : TEXCOORD1;
+	float Distance : TEXCOORD2;
+	float4 Color : COLOR0;
 	float Effect : BLENDWEIGHT1;
 };
 
@@ -126,11 +134,12 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	float4 worldPosition = mul(input.Position, World);
 	float4 viewPosition = mul(worldPosition, View);
 	output.Position = mul(viewPosition, Projection);
-	output.Normal = mul(input.Normal, World);
-	output.Depth.x = output.Position.z;
-	output.Depth.y = output.Position.w;
+
+	output.CameraView = normalize(CameraPosition - worldPosition);
 	output.Distance = length(CameraPosition - worldPosition);
+
 	output.TexCoords1 = input.TexCoords1;
+
 
 	float4 sColor = SunColor;
 
@@ -147,16 +156,42 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 	{
 	case 1: // LightLiquidEffect
 		output.Position.y += (0.1f * sin(RippleTime + input.Position.x + (input.Position.z * 2))) - 0.2f;
+		output.Color.rgb = (sColor * 15);
+		output.Color.a = 1;
+
+		output.Color.a = 1;
 		// TODO: display reflection
 		break;
 	case 3: // grass wave effect
 		float n = noise3f(input.Position.xyz);
 		output.Position.x += (0.05f * sin((RippleTime/2)*n*2 + input.Position.x + (input.Position.z * 2)));
+		/*if (HasFlicker)
+		{
+			output.Color.rgb = (sColor * (15 * saturate(length(SunPosition - input.Position)))) + (((HeldItemLight * 0.75 * (1 + sin(RippleTime)*(Random*0.1))) / output.Distance) * 0.25);
+		}
+		else
+		{
+			output.Color.rgb = (sColor * (15 * saturate(length(SunPosition - input.Position))));
+		}*/
+		output.Color.rgb = sColor * 15;
+		output.Color.a = 0.3;
 		break;
 	default:
+		/*if (HasFlicker)
+		{
+			output.Color.rgb = (sColor * (15 * saturate(length(SunPosition - input.Position)))) + (((HeldItemLight * 0.75 * (1 + sin(RippleTime)*(Random*0.1))) / output.Distance) * 0.25);
+		}
+		else
+		{
+			output.Color.rgb = (sColor * (15 * saturate(length(SunPosition - input.Position))));
+		}*/
+		output.Color.rgb = sColor * 15;
+		output.Color.a = 1;
 		break;
 	}
 	//output.Color.xyz += (input.Overlay.rgb * input.Overlay.a) * input.SunLight;
+
+	output.Color.xyz = float3(1, 1, 1);
 
 	if (IsUnderWater)
 	{
@@ -165,15 +200,13 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 
 	// gives a rounded shape to the landscape, making it seem like an actual planet.
 	// this value needs to be dependant on world size so smaller planets have a larger bend.
-	//output.Position.y -= output.Distance * output.Distance *0.001f;
+	output.Position.y -= output.Distance * output.Distance *0.001f;
 	output.Effect = input.Effect;
 	return output;
 }
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-	PixelShaderOutput output;
-
 	float4 texColor1 = tex2D(BlockTextureSampler, input.TexCoords1);
 	float fog = saturate((input.Distance - FogNear) / (FogNear - FogFar));
 	float4 topColor = SunColor;
@@ -181,17 +214,31 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 nColor = NightColor;
 	float4 color;
 	float4 outputFogColor;
-	color.rgb = texColor1.rgb;
+
+	color.rgb = texColor1.rgb * input.Color.rgb;
 	if (IsUnderWater)
 	{
 		float vis = saturate((input.Distance - 50) / -25);
 		color = lerp(DeepWaterColor, color, vis);
 		color.r /= 2;
 		color.g /= 1.5;
-		
+
 	}
 	color.a = texColor1.a;
-	
+	switch (input.Effect)
+	{
+	case 1:
+		//color.a = 0.3;
+
+		break;
+	default:
+		if (color.a == 0)
+		{
+			clip(-1);
+		}
+		break;
+	}
+
 	nColor *= (4 - input.TexCoords1.y) * .125f;
 
 	if (TimeOfDay <= 12)
@@ -214,13 +261,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 	outputFogColor = lerp(FogColor, topColor, saturate((input.TexCoords1.y) / 0.9f));
 
-	output.Color = lerp(FogColor, color, fog);
-	output.Color.a = SpecularIntensity;
-	output.Normal.rgb = 0.5f * (normalize(input.Normal) + 1.0f);
-	output.Normal.a = SpecularPower;
-	output.Depth = input.Depth.x / input.Depth.y;
-	return color;
-	//return output.Color;
+	return lerp(FogColor, color, fog);
+
 }
 
 technique BlockTechnique

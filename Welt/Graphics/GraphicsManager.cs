@@ -14,7 +14,7 @@ namespace Welt.Graphics
         public Texture2D MoonTexture;
         public Texture2D ParticleTexture;
 
-        public BitmapFont Font;
+        public SpriteFont Font;
 
         private TextureMap m_TextureMap;
 
@@ -29,7 +29,7 @@ namespace Welt.Graphics
             BlockTexture = m_TextureMap.LoadBlockTextures(Game.GraphicsDevice, "resources\\textures\\blocks");
             CloudTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\clouds.png");
             StarTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\stars.jpg");
-            //Font = Game.Content.Load<BitmapFont>("font");
+            Font = Game.Content.Load<SpriteFont>("Fonts\\console");
             SunTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\sun.png");
             MoonTexture = m_TextureMap.LoadTexture(Game.GraphicsDevice, "resources\\textures\\environment\\moon.png");
         }

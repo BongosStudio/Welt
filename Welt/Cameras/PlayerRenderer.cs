@@ -56,13 +56,11 @@ namespace Welt.Cameras
 
         public void Update(GameTime gameTime)
         {
-            var previousView = CameraController.Camera.View;
-            //TODO: process input here.
-            CameraController.Camera.Position = Player.Position;
-            CameraController.ProcessInput(gameTime);
-            Player.Position = CameraController.Camera.Position;
             CameraController.Update(gameTime);
             if (Player.IsPaused) return; // this is here so we can still process the game while paused.
+            //TODO: process input here.
+            ProcessInput(gameTime);
+            CameraController.Camera.Position = Player.Position;
             
             var mouseState = m_Input.GetMouseState();
             
@@ -86,12 +84,15 @@ namespace Welt.Cameras
         public MultiplayerClient Player => WeltGame.Instance.Client;
         public FirstPersonCamera Camera => CameraController.Camera;
         public FirstPersonCameraController CameraController { get; }
+
         private readonly FogRenderer m_Fog;
 
         private Vector3 m_LookVector;
         private readonly InputController m_Input;
         private readonly GraphicsDevice m_GraphicsDevice;
         private readonly Viewport m_Viewport;
+
+        private const float MOVEMENTSPEED = 0.25f;
 
         // SelectionBlock
         public Model SelectionBlock;
@@ -131,5 +132,47 @@ namespace Welt.Cameras
         }
 
         #endregion
+
+        private void ProcessInput(GameTime gameTime)
+        {
+            var moveVector = new Vector3(0, 0, 0);
+            var keyState = Keyboard.GetState();
+            if (keyState.GetPressedKeys().Length == 0) return;
+
+            if (keyState.IsKeyDown(Keys.W))
+            {
+                moveVector += Vector3.Forward;
+            }
+            if (keyState.IsKeyDown(Keys.S))
+            {
+                moveVector += Vector3.Backward;
+            }
+            if (keyState.IsKeyDown(Keys.A))
+            {
+                moveVector += Vector3.Left;
+            }
+            if (keyState.IsKeyDown(Keys.D))
+            {
+                moveVector += Vector3.Right;
+            }
+            if (keyState.IsKeyDown(Keys.LeftShift) && Camera.Position.Y > -20 && Camera.Position.Y < 240)
+            {
+                moveVector += Vector3.Down;
+            }
+            if (keyState.IsKeyDown(Keys.Space))
+            {
+                moveVector += Vector3.Up;
+            }
+
+            if (moveVector != Vector3.Zero)
+            {
+                var rotationMatrix = //Matrix.CreateRotationX(Camera.UpDownRotation)*
+                                     Matrix.CreateRotationY(Camera.LeftRightRotation);
+                var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
+                
+                Player.Position += rotatedVector * MOVEMENTSPEED;
+            }
+            Player.Physics.Update(gameTime.ElapsedGameTime);
+        }
     }
 }

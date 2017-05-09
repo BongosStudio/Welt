@@ -297,13 +297,14 @@ namespace Welt
             }
             set
             {
-                if (_Position != value)
-                {
+                if (_Position == value) return;
+                // Only do substantial changes in distance because we don't want to flood the system
+                if (Vector3.Distance(_Position, value) > 0.2)
                     QueuePacket(new PlayerPositionAndLookPacket(value.X, value.Y, value.Y + Height,
-                        value.Z, Yaw, Pitch, false));
-                    OnPropertyChanged();
-                }
+                    value.Z, Yaw, Pitch, false));
                 _Position = value;
+
+                OnPropertyChanged();
             }
         }
 

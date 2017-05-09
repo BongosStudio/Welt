@@ -35,8 +35,8 @@ namespace Welt.Core.Forge
             if (m_LoadedChunks.ContainsKey(index)) return m_LoadedChunks[index];
             if (TryLoad(index, out var chunk)) return chunk;
             if (!generate) return null;
-            chunk = new Chunk(World, index);
-            World.Generator.Generate(World, chunk);
+            chunk = (Chunk)World.Generator.GenerateChunk(index);
+            SetChunk(index, chunk);
             return chunk;
         }
 

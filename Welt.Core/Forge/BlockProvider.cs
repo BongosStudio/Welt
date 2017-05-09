@@ -23,10 +23,10 @@ namespace Welt.Core.Forge
         public virtual float Hardness { get; set; } = 1f;
 
         public virtual bool IsOpaque => true;
-        public virtual bool RendersTransparentNeighbor => !IsOpaque;
+        public virtual bool WillRenderSameNeighbor => !IsOpaque;
         public virtual bool IsSolid => true;
 
-        public virtual bool WillRenderOpaque => true;
+        public virtual bool WillRenderOpaque => IsOpaque;
 
         public virtual byte LightOpacity => 0;
 

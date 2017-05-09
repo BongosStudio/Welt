@@ -59,12 +59,12 @@ namespace Welt.Core.Physics
                             entity.Velocity = Vector3.Zero;
                         Vector3.Clamp(entity.Velocity, Vector3.Zero, new Vector3(entity.TerminalVelocity));
 
-                        Vector3 collision, before = entity.Velocity;
+                        Vector3 before = entity.Velocity;
 
                         var aabbEntity = entity as IAABBEntity;
                         if (aabbEntity != null)
                         {
-                            if (TestTerrainCollisionY(aabbEntity, out collision))
+                            if (TestTerrainCollisionY(aabbEntity, out var collision))
                                 aabbEntity.TerrainCollision(collision, before.Y < 0 ? Vector3.Down : Vector3.Up);
                             if (TestTerrainCollisionX(aabbEntity, out collision))
                                 aabbEntity.TerrainCollision(collision, before.X < 0 ? Vector3.Left : Vector3.Right);

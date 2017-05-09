@@ -137,9 +137,7 @@ namespace Welt.Particles
             // particle system. By cloning the effect, we prevent one particle system
             // from stomping over the parameter settings of another.
 
-            //particleEffect = effect.Clone ();
-            // No cloning for now so we will just create a new effect for now
-            m_ParticleEffect = effect;
+            m_ParticleEffect = effect.Clone();
 
             EffectParameterCollection parameters = m_ParticleEffect.Parameters;
 

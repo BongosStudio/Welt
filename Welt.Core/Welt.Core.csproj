@@ -69,10 +69,8 @@
     <Compile Include="Entities\PlayerEntity.cs" />
     <Compile Include="Extensions\MonoGameExtensions.cs" />
     <Compile Include="FastMath.cs" />
-    <Compile Include="Forge\Biome\Biome.cs" />
-    <Compile Include="Forge\Biome\Desert_Subtropical.cs" />
-    <Compile Include="Forge\Biome\Grassland_Temperate.cs" />
-    <Compile Include="Forge\Biome\Tundra_Alpine.cs" />
+    <Compile Include="Forge\Biomes\BiomeSystem.cs" />
+    <Compile Include="Forge\Biomes\MountainBiome.cs" />
     <Compile Include="Forge\BlockPalette.cs" />
     <Compile Include="Forge\BlockProvider.cs" />
     <Compile Include="Forge\BlockProviders\DefaultBlockProvider.cs" />
@@ -93,14 +91,20 @@
     <Compile Include="Forge\Chunk.cs" />
     <Compile Include="Forge\ChunkManager.cs" />
     <Compile Include="Forge\CraftingRepository.cs" />
-    <Compile Include="Forge\Generators\DualLayerTerrainWithMediumValleysForRivers.cs" />
-    <Compile Include="Forge\Generators\FlatReferenceTerrain.cs" />
+    <Compile Include="Forge\Generation\HillGenerator.cs" />
     <Compile Include="Forge\Generators\PerlinNoise2D.cs" />
     <Compile Include="Forge\Generators\PerlinSimplexNoise.cs" />
-    <Compile Include="Forge\Generators\SimpleTerrain.cs" />
-    <Compile Include="Forge\Generators\TerrainWithCaves.cs" />
+    <Compile Include="Forge\Generators\WorldGenerator.cs" />
     <Compile Include="Forge\ItemProvider.cs" />
     <Compile Include="Forge\ItemRepository.cs" />
+    <Compile Include="Forge\Noise\CellNoise.cs" />
+    <Compile Include="Forge\Noise\ClampNoise.cs" />
+    <Compile Include="Forge\Noise\INoise.cs" />
+    <Compile Include="Forge\Noise\ModifyNoise.cs" />
+    <Compile Include="Forge\Noise\NoiseGen.cs" />
+    <Compile Include="Forge\Noise\PerlinNoise.cs" />
+    <Compile Include="Forge\Noise\ScaledNoise.cs" />
+    <Compile Include="Forge\Noise\SimplexNoise.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\World.cs" />
     <Compile Include="Forge\WorldLighting.cs" />
@@ -170,7 +174,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Casl\" />
-    <Folder Include="Forge\Biomes\" />
     <Folder Include="Forge\Designers\" />
     <Folder Include="Forge\Generators\Caves\" />
   </ItemGroup>

@@ -19,6 +19,7 @@ using Welt.Lighting;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
+using Welt.Particles;
 
 namespace Welt.Components
 {
@@ -34,6 +35,7 @@ namespace Welt.Components
         public ReadOnlyWorld World { get; set; }
         public LightEngine LightingEngine; // perhaps combine WorldLighting with LightEngine?
         public WorldLighting Lighting;
+        public ParticleSystem Particles;
 
         protected Effect BlockEffect;
         protected Effect PointLight;
@@ -76,6 +78,23 @@ namespace Welt.Components
             m_IncomingChunks = new ConcurrentBag<Mesh<VertexPositionNormalTextureEffect>>();
             m_Meshes = new List<ChunkMesh>();
             LightingEngine = new LightEngine(game, player.Player, world);
+            Particles = new ParticleSystem(game, game.Content, player.Camera, new ParticleSettings
+            {
+                TextureName = "Textures/rain",
+                MaxParticles = 100,
+                Duration = TimeSpan.FromSeconds(10),
+                MinHorizontalVelocity = 0,
+                MaxHorizontalVelocity = 10,
+                MinEndSize = 10,
+                MaxEndSize = 15,
+                MinVerticalVelocity = 50,
+                MaxVerticalVelocity = 50,
+                MinStartSize = 10,
+                MinColor = Color.LightBlue,
+                MaxColor = Color.DarkBlue,
+                EmitterVelocitySensitivity = 1,
+                BlendState = BlendState.AlphaBlend
+            });
 
             PlayerRenderer.Player.BlockChanged += HandleBlockChanged;
             PlayerRenderer.Player.ChunkModified += HandleChunkModified;
@@ -103,6 +122,7 @@ namespace Welt.Components
         {
             //SetGBuffer();
             //ClearGBuffer();
+            Particles.Draw(gameTime);
             DrawChunks();
             //ResolveGBuffer();
             //DrawLights(gameTime);
@@ -135,11 +155,13 @@ namespace Welt.Components
             m_CombineFinalEffect = content.Load<Effect>("Effects\\CombineFinal");
             m_LightSphereModel = content.Load<Model>("Models\\sphere");
             TextureAtlas = Game.GraphicsManager.BlockTexture;
+            Particles.LoadContent();
         }
 
         public void Update(GameTime gameTime)
         {
-            while (m_IncomingChunks.TryTake(out var result))
+            var processed = 0;
+            while (m_IncomingChunks.TryTake(out var result) && processed < 4)
             {
                 var mesh = result as ChunkMesh;
                 if (m_ActiveMeshes.Contains(mesh.Chunk.GetIndex()))
@@ -152,9 +174,16 @@ namespace Welt.Components
                     m_ActiveMeshes.Add(mesh.Chunk.GetIndex());
                     m_Meshes.Add(mesh);
                 }
+                processed++;
             }
             m_RippleTime += 0.1f;
             if (m_RippleTime == 1.0f) m_RippleTime = 0;
+            Particles.SetCamera(PlayerRenderer.Camera.View, PlayerRenderer.Camera.Projection);
+            for (var i = 0; i < 100; i++)
+            {
+                Particles.AddParticle(PlayerRenderer.Camera.Position + new Vector3(0, 20, 0), new Vector3(0, -15, 0));
+            }
+            Particles.Update(gameTime);
         }
 
         #region Private methods
@@ -189,7 +218,6 @@ namespace Welt.Components
             var viewFrustum = new BoundingFrustum(PlayerRenderer.CameraController.Camera.View * PlayerRenderer.CameraController.Camera.Projection);
             Graphics.BlendState = BlendState.AlphaBlend;
             Graphics.DepthStencilState = DepthStencilState.Default;
-            //Graphics.RasterizerState = RasterizerState.CullClockwise;
             var rendered = 0;
             if (m_Meshes.Count == 0) return;
             for (var i = 0; i < m_Meshes.Count; i++)
@@ -200,6 +228,7 @@ namespace Welt.Components
                 chunk.Draw(BlockEffect, 0);
                 rendered++;
             }
+            Graphics.BlendState = BlendState.NonPremultiplied;
             for (var i = 0; i < m_Meshes.Count; i++)
             {
                 var chunk = m_Meshes[i];

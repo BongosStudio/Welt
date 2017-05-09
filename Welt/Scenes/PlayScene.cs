@@ -56,6 +56,7 @@ namespace Welt.Scenes
         private PlayerRenderer m_PlayerRenderer;
         private ChunkComponent m_ChunkComp;
         private SkyComponent m_SkyComp;
+        private FpsComponent m_Fps;
 
         internal override Color BackColor => Color.Blue;
         internal override UIRoot UI { get; set; }
@@ -67,7 +68,7 @@ namespace Welt.Scenes
             m_SkyComp = sky;
             m_PlayerRenderer = player;
             m_Hud = new HudRenderer(GraphicsDevice, game.Client.World, m_PlayerRenderer);
-
+            m_Fps = new FpsComponent(game);
         }
 
         #region Initialize
@@ -84,6 +85,7 @@ namespace Welt.Scenes
             m_PlayerRenderer.Initialize();
             m_Hud.Initialize();
             m_PlayerRenderer.Player._Position = Game.Client.World.GetSpawnPoint();
+            m_Fps.Initialize();
             //Input.Assign(() => m_PlayerRenderer.Player.IsPaused = !m_PlayerRenderer.Player.IsPaused, Keys.Escape);
         }
 
@@ -103,7 +105,8 @@ namespace Welt.Scenes
         /// </summary>
         protected override void LoadContent(ContentManager content)
         {
-            m_Hud.LoadContent(content);   
+            m_Hud.LoadContent(content);
+            m_Fps.LoadContent(content);
         }
 
         #endregion
@@ -136,6 +139,7 @@ namespace Welt.Scenes
                 m_SkyComp.Update(gameTime);
                 m_ChunkComp.Update(gameTime);
                 m_PlayerRenderer.Update(gameTime);
+                m_Fps.Update(gameTime);
             }
             WeltGame.Instance.IsMouseVisible = Game.Client.IsPaused;
         }
@@ -154,6 +158,7 @@ namespace Welt.Scenes
             m_ChunkComp.Draw(gameTime);
             m_PlayerRenderer.Draw(gameTime);
             m_Hud.Draw(gameTime);
+            m_Fps.Draw(gameTime);
         }
 
         #endregion

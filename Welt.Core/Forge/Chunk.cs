@@ -13,15 +13,15 @@ namespace Welt.Core.Forge
     public class Chunk : IChunk
     {
 
-        public const int Width = 16, Depth = 16, Height = 128;
+        public const int Width = 16, Depth = 16, Height = 250;
         public static int FlattenOffset = Size.Z * Size.Y;
-        public static Vector3B Size = new Vector3B(16, 128, 16);
-        public static Vector3B Max = new Vector3B(15, 127, 15);
+        public static Vector3B Size = new Vector3B(16, 250, 16);
+        public static Vector3B Max = new Vector3B(15, 249, 15);
 
         public Chunk(World world, Vector3I index)
         {
             World = world;
-            Blocks = new BlockPalette(Width * Depth * Size.Y);
+            Blocks = new BlockPalette(Width * Depth * Height);
             HeightMap = new byte[Width * Depth];
 
             index %= World.Size;
@@ -43,7 +43,7 @@ namespace Welt.Core.Forge
 
         public void Fill(byte[] data)
         {
-            Blocks = BlockPalette.FromByteArray(data);
+            Blocks = BlockPalette.FromByteArray(Width * Depth * Height, data);
         }
         
         public byte[] HeightMap { get; }
@@ -104,7 +104,7 @@ namespace Welt.Core.Forge
 
             if (HeightMap[x * Size.X + z] < y)
                 HeightMap[x * Size.X + z] = y;
-
+            
             Blocks[x * FlattenOffset + z * Size.Y + y] = b;
         }
 
@@ -217,10 +217,10 @@ namespace Welt.Core.Forge
 
             //TODO chunk relative GetBlock could even handle more tha just -1 but -2 -3 ... -15 
 
-            if (relx < 0) x = Max.X;
-            if (relz < 0) z = Max.Z;
-            if (relx > 15) x = 0;
-            if (relz > 15) z = 0;
+            if (relx < 0) x = Max.X - relx;
+            if (relz < 0) z = Max.Z - relz;
+            if (relx > 15) x = relx - Max.X;
+            if (relz > 15) z = relz - Max.Z;
 
 
             if (x != relx && x == 0)

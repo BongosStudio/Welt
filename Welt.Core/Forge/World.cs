@@ -11,6 +11,8 @@ using Welt.Core.Forge.Generators;
 using Welt.Core.Persistence;
 using System.Collections;
 using System.Collections.Generic;
+using Welt.Core.Forge.Biomes;
+using Welt.Core.Forge.Generation;
 
 namespace Welt.Core.Forge
 {
@@ -18,10 +20,7 @@ namespace Welt.Core.Forge
     {
         #region choose terrain generation
 
-        //public IChunkGenerator Generator = new SimpleTerrain();
-        //public IChunkGenerator Generator = new FlatReferenceTerrain();
-        //public IChunkGenerator Generator = new TerrainWithCaves();
-        public IChunkGenerator Generator = new DualLayerTerrainWithMediumValleysForRivers();
+        public IWorldGenerator Generator { get; set; }
 
         // Biomes
         //public IChunkGenerator Generator = new Tundra_Alpine();
@@ -36,7 +35,12 @@ namespace Welt.Core.Forge
             ChunkManager = new ChunkManager(new ChunkPersistence(), this);
             Name = name;
             Seed = 54321;
-            SpawnPoint = new Vector3I(FastMath.NextRandom(Size), 128, FastMath.NextRandom(Size));
+            WaterLevel = 128;
+            SpawnPoint = new Vector3I(FastMath.NextRandom(Size)*Chunk.Width, 128, FastMath.NextRandom(Size)*Chunk.Depth);
+            Generator = new WorldGenerator(this);
+            var bSys = new BiomeSystem(this);
+            bSys.RegisterBiome<MountainBiome>(new HillGenerator(), null);
+            Generator.RegisterBiomeSystem(bSys);
         }
 
         public World(string name, long seed) : this(name)
@@ -90,6 +94,10 @@ namespace Welt.Core.Forge
         ///     the world is a moon or spacestation.
         /// </summary>
         public World ParentWorld { get; set; }
+        /// <summary>
+        ///     The water level for the world.
+        /// </summary>
+        public int WaterLevel { get; set; }
 
         public Action<object, ChunkLoadedEventArgs> ChunkGenerated { get; set; }
 

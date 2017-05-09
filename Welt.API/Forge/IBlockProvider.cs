@@ -10,7 +10,7 @@ namespace Welt.API.Forge
         float BlastResistance { get; }
         float Hardness { get; }
         bool IsOpaque { get; }
-        bool RendersTransparentNeighbor { get; }
+        bool WillRenderSameNeighbor { get; }
         bool IsSolid { get; }
         bool WillRenderOpaque { get; }
         byte LightOpacity { get; }

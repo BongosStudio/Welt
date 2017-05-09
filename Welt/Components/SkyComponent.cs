@@ -20,6 +20,16 @@ namespace Welt.Components
         private VertexBuffer SkyPlane { get; set; }
         private VertexBuffer CelestialPlane { get; set; }
         private PlayerRenderer Player { get; set; }
+        private Texture2D CloudMap { get; set; }
+        // GPU generated clouds
+
+        public float CloudOvercast = 1f;
+
+        protected Model SkyDome;
+        protected Texture2D CloudStaticMap;
+        protected RenderTarget2D CloudsRenderTarget;
+        protected Effect PerlinNoise;
+        protected VertexPositionTexture[] FullScreenVertices;
 
         public SkyComponent(WeltGame game, PlayerRenderer player)
         {
@@ -40,12 +50,12 @@ namespace Welt.Components
             };
             var plane = new[]
             {
-                new VertexPositionColor(new Vector3(-64, 0, -64), Color.Gray),
-                new VertexPositionColor(new Vector3(64, 0, -64), Color.White),
-                new VertexPositionColor(new Vector3(-64, 0, 64), Color.Gray),
+                new VertexPositionColor(new Vector3(-64, 0, -64), Color.Black),
+                new VertexPositionColor(new Vector3(64, 0, -64), Color.Black),
+                new VertexPositionColor(new Vector3(-64, 0, 64), Color.Black),
 
                 new VertexPositionColor(new Vector3(64, 0, -64), Color.Black),
-                new VertexPositionColor(new Vector3(64, 0, 64), Color.Gray),
+                new VertexPositionColor(new Vector3(64, 0, 64), Color.Black),
                 new VertexPositionColor(new Vector3(-64, 0, 64), Color.Black)
             };
             SkyPlane = new VertexBuffer(Game.GraphicsDevice, VertexPositionColor.VertexDeclaration,
@@ -216,8 +226,13 @@ namespace Welt.Components
                 pass.Apply();
                 CelestialPlaneEffect.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
             }
-            Game.GraphicsDevice.BlendState = backup;
-            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            var currentViewMatrix = Player.Camera.View;
+
+            var tod = Player.Player.World.World.TimeOfDay;
+
+            var modelTransforms = new Matrix[SkyDome.Bones.Count];
+            SkyDome.CopyAbsoluteBoneTransformsTo(modelTransforms);
 
             // Void
             //Game.GraphicsDevice.SetVertexBuffer(SkyPlane);
@@ -230,15 +245,65 @@ namespace Welt.Components
             //    pass.Apply();
             //    SkyPlaneEffect.GraphicsDevice.DrawPrimitives(PrimitiveType.TriangleList, 0, 2);
             //}
+
+            //var wMatrix = Matrix.CreateTranslation(0, -0.1f, 0) *
+            //              Matrix.CreateScale(100) * Matrix.CreateTranslation(Player.Camera.Position);
+            //foreach (var mesh in SkyDome.Meshes)
+            //{
+            //    foreach (var currentEffect in mesh.Effects)
+            //    {
+            //        var worldMatrix = modelTransforms[mesh.ParentBone.Index] * wMatrix;
+
+            //        currentEffect.CurrentTechnique = currentEffect.Techniques["SkyDome"];
+
+            //        currentEffect.Parameters["xWorld"].SetValue(worldMatrix);
+            //        currentEffect.Parameters["xView"].SetValue(currentViewMatrix);
+            //        currentEffect.Parameters["xProjection"].SetValue(Player.Camera.Projection);
+            //        currentEffect.Parameters["xTexture"].SetValue(CloudMap);
+            //        currentEffect.Parameters["NightColor"].SetValue(Color.Black.ToVector3());
+            //        currentEffect.Parameters["SunColor"].SetValue(Color.Yellow.ToVector3());
+            //        currentEffect.Parameters["HorizonColor"].SetValue(WorldSkyColor.ToVector3());
+
+            //        currentEffect.Parameters["MorningTint"].SetValue(Color.White.ToVector3());
+            //        currentEffect.Parameters["EveningTint"].SetValue(Color.Red.ToVector3());
+            //        currentEffect.Parameters["TimeOfDay"].SetValue(tod);
+            //    }
+            //    mesh.Draw();
+            //}
+
+            Game.GraphicsDevice.BlendState = backup;
+            Game.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            
         }
 
         public void Update(GameTime gameTime)
         {
+            // Generate the clouds
+            var time = (float)gameTime.TotalGameTime.TotalMilliseconds / 100.0f;
+            //CloudOvercast += 0.001f;
+            GeneratePerlinNoise(time);
         }
 
         public void LoadContent(ContentManager content)
         {
+            SkyDome = content.Load<Model>("Models\\dome");
+            SkyDome.Meshes[0].MeshParts[0].Effect = content.Load<Effect>("Effects\\SkyDome");
 
+            CloudMap = Game.GraphicsManager.CloudTexture;
+            PerlinNoise = content.Load<Effect>("Effects\\PerlinNoise");
+
+            var pp = Graphics.PresentationParameters;
+
+            //the mipmap does not work on some pc ( i5 laptops at least), with mipmap false it s fine 
+
+            CloudsRenderTarget = new RenderTarget2D(Graphics, pp.BackBufferWidth, pp.BackBufferHeight, false,
+
+                SurfaceFormat.Color, DepthFormat.None);
+
+            CloudStaticMap = CreateStaticMap(32);
+
+            FullScreenVertices = SetUpFullscreenVertices();
         }
 
         public void Initialize()
@@ -250,5 +315,52 @@ namespace Welt.Components
         {
 
         }
+
+        public virtual Texture2D CreateStaticMap(int resolution)
+        {
+            var rand = new Random();
+            var noisyColors = new Color[resolution * resolution];
+            for (var x = 0; x < resolution; x++)
+                for (var y = 0; y < resolution; y++)
+                    noisyColors[x + y * resolution] = new Color(new Vector3(rand.Next(1000) / 1000.0f, 0, 0));
+
+            var noiseImage = new Texture2D(Graphics, resolution, resolution, true, SurfaceFormat.Color);
+            noiseImage.SetData(noisyColors);
+            return noiseImage;
+        }
+
+        public virtual VertexPositionTexture[] SetUpFullscreenVertices()
+        {
+            return new[]
+            {
+
+                new VertexPositionTexture(new Vector3(-1, 1, 0f), new Vector2(0, 1)),
+                new VertexPositionTexture(new Vector3(1, 1, 0f), new Vector2(1, 1)),
+                new VertexPositionTexture(new Vector3(-1, -1, 0f), new Vector2(0, 0)),
+                new VertexPositionTexture(new Vector3(1, -1, 0f), new Vector2(1, 0))
+            };
+        }
+
+        public virtual void GeneratePerlinNoise(float time)
+        {
+            Graphics.SetRenderTarget(CloudsRenderTarget);
+            //_graphicsDevice.Clear(Color.White);
+
+            PerlinNoise.CurrentTechnique = PerlinNoise.Techniques["PerlinNoise"];
+            PerlinNoise.Parameters["xTexture"].SetValue(CloudStaticMap);
+            PerlinNoise.Parameters["xOvercast"].SetValue(CloudOvercast);
+            PerlinNoise.Parameters["xTime"].SetValue(time / 1000.0f);
+
+            foreach (var pass in PerlinNoise.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                Graphics.DrawUserPrimitives(PrimitiveType.TriangleStrip, FullScreenVertices, 0, 2);
+            }
+
+            Graphics.SetRenderTarget(null);
+            CloudMap = CloudsRenderTarget;
+
+        }
+
     }
 }

@@ -139,7 +139,6 @@ namespace Welt.Core.Server
             Server.Start();
             m_NetworkingThread = new Thread(() =>
             {
-
                 var incomingMessages = new List<NetIncomingMessage>();
                 while (!IsShuttingDown)
                 {

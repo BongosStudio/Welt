@@ -26,15 +26,13 @@ namespace Welt.Core.Forge
             }
         }
 
-        private byte m_NextAvailableSlot = 1;
-        private BlockDataWrapper[] m_BlockInstances = new BlockDataWrapper[64];
-        private byte[] m_Indices;
+        private BlockDataWrapper[] m_Blocks;
+        
         private byte[] m_R, m_G, m_B, m_S;
 
         public BlockPalette(int size)
         {
-            m_Indices = new byte[size];
-            m_BlockInstances[0] = new BlockDataWrapper(0, 0);
+            m_Blocks = new BlockDataWrapper[size];
             m_R = new byte[size];
             m_G = new byte[size];
             m_B = new byte[size];
@@ -55,54 +53,44 @@ namespace Welt.Core.Forge
 
         public byte[] ToByteArray()
         {
-            var data = new List<byte>();
-            var length = m_NextAvailableSlot;
-            data.Add(length); // 1 byte for wrapper count
+            var data = new List<byte>(m_Blocks.Length*3);
+            var length = m_Blocks.Length;
+            data.AddRange(BitConverter.GetBytes(length)); // 4 bytes
+
             for (var i = 0; i < length; i++)
             {
-                var wrapper = m_BlockInstances[i];
-                data.AddRange(BitConverter.GetBytes(wrapper.Id)); // 2 bytes for the ID
-                data.Add(wrapper.Metadata); // 1 byte for the metadata
+                var block = m_Blocks[i];
+                data.AddRange(BitConverter.GetBytes(block.Id));
+                data.Add(block.Metadata);
             }
-            data.AddRange(BitConverter.GetBytes(m_Indices.Length)); // 4 bytes for the indices length
-            data.AddRange(m_Indices);
-            // don't worry about lighting. The lighting engine handles that.
+
             return data.ToArray();
         }
 
-        public static BlockPalette FromByteArray(byte[] data)
+        public static BlockPalette FromByteArray(int size, byte[] data)
         {
-            var stack = new Queue<byte>(data);
-            var length = stack.Dequeue();
-            var wrappers = new BlockDataWrapper[64];
-            for (var i = 0; i < length; i++)
+            var queue = new Queue<byte>(data);
+            var length = new[] { queue.Dequeue(), queue.Dequeue(), queue.Dequeue(), queue.Dequeue() };
+            var blocks = new BlockDataWrapper[BitConverter.ToInt32(length, 0)];
+            var i = 0;
+            while (queue.Count > 0)
             {
-                var wrapper = new BlockDataWrapper(BitConverter.ToUInt16(new[] { stack.Dequeue(), stack.Dequeue() }, 0), stack.Dequeue());
-                wrappers[i] = wrapper;
+                var id = BitConverter.ToUInt16(new[] { queue.Dequeue(), queue.Dequeue() }, 0);
+                var meta = queue.Dequeue();
+                blocks[i] = new BlockDataWrapper(id, meta);
+                i++;
             }
-            var indicesCount = BitConverter.ToInt32(new[] { stack.Dequeue(), stack.Dequeue(), stack.Dequeue(), stack.Dequeue() }, 0);
-            var indices = new byte[indicesCount];
-            for (var i = 0; i < indicesCount; i++)
-            {
-                indices[i] = stack.Dequeue();
-            }
-            var palette = new BlockPalette(indicesCount)
-            {
-                m_NextAvailableSlot = length,
-                m_BlockInstances = wrappers,
-                m_Indices = indices
-            };
-            return palette;
+            return new BlockPalette(size) { m_Blocks = blocks };
         }
 
         public ushort GetId(int index)
         {
-            return m_BlockInstances[m_Indices[index]].Id;
+            return m_Blocks[index].Id;
         }
 
         public byte GetBlockMetadata(int index)
         {
-            return m_BlockInstances[m_Indices[index]].Metadata;
+            return m_Blocks[index].Metadata;
         }
 
         public Vector3B GetBlockLight(int index)
@@ -132,12 +120,17 @@ namespace Welt.Core.Forge
 
         public void SetId(int index, ushort value)
         {
-
+            var block = GetBlockData(index);
+            block.Id = value;
+            block.Metadata = 0;
+            SetBlockData(index, block);
         }
 
         public void SetBlockMeta(int index, byte value)
         {
-
+            var block = GetBlockData(index);
+            block.Metadata = value;
+            SetBlockData(index, block);
         }
 
         public void SetBlockSun(int index, byte value)
@@ -166,65 +159,20 @@ namespace Welt.Core.Forge
         {
             m_B[index] = value;
         }
-
-        private bool TryGetIndex(BlockDataWrapper block, out byte index)
-        {
-            for (byte i = 0; i < m_NextAvailableSlot; ++i)
-            {
-                var c = m_BlockInstances[i];
-                //Debug.WriteLine($"Comparing {block.Id};{block.Meta} to {c.Id};{c.Metadata}");
-                if (m_BlockInstances[i].Id == block.Id && m_BlockInstances[i].Metadata == block.Metadata)
-                {
-                    //Debug.WriteLine($"Match found at {i}");
-                    index = i;
-                    return true;
-                }
-                //Thread.Sleep(250);
-            }
-            // no blocks were found. Create new one.
-            //Debug.WriteLine($"No match found. Checking for space. Available index is {m_NextAvailableSlot}");
-            index = m_NextAvailableSlot;
-            if (index >= 64)
-            {
-                // no space. Abort.
-                //Debug.WriteLine($"Index unacceptable: {index}");
-                index = 0;
-                return false;
-            }
-            m_BlockInstances[index] = block;
-            m_NextAvailableSlot++;
-            //Debug.WriteLine($"Index is acceptable.");
-            return true;
-        }
-
-        private int GetIndex(int index)
-        {
-            return m_Indices[index];
-        }
-
+        
         private Block GetBlockData(int index)
         {
-            var data = m_BlockInstances[GetIndex(index)];
-            var result = new Block(data.Id, data.Metadata, m_R[index], m_G[index], m_B[index], m_S[index]);
-            return result;
+            var block = m_Blocks[index];
+            return new Block(block.Id, block.Metadata);
         }
 
         private void SetBlockData(int index, Block value)
         {
-            if (TryGetIndex(new BlockDataWrapper(value.Id, value.Metadata), out var i))
-            {
-                // i is the index within the indices where we have our USHORT/BYTE instance.
-                // first we set the index data
-                m_Indices[index] = i;
-                m_R[index] = value.R;
-                m_G[index] = value.G;
-                m_B[index] = value.B;
-                m_S[index] = value.Sun;
-            }
-            else
-            {
-                //Debug.WriteLine("Could not set block data");
-            }
+            m_Blocks[index] = new BlockDataWrapper(value.Id, value.Metadata);
+            m_R[index] = value.R;
+            m_G[index] = value.G;
+            m_B[index] = value.B;
+            m_S[index] = value.Sun;
         }
     }
 }

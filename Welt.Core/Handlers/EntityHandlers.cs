@@ -15,13 +15,13 @@ namespace Welt.Core.Handlers
             _client.Entity.Position = new Vector3(packet.X, packet.Y, packet.Z);
             _client.Entity.Pitch = packet.Pitch;
             _client.Entity.Yaw = packet.Yaw;
-            Console.WriteLine(_client.Entity.Position);
         }
 
         public static void HandlePlayerPositionPacket(IPacket _packet, IRemoteClient _client, IMultiplayerServer server)
         {
             var packet = (PlayerPositionPacket)_packet;
             HandlePlayerMovement(_client, new Vector3(packet.X, packet.Y, packet.Z), _client.Entity.Yaw, _client.Entity.Pitch);
+
         }
 
         public static void HandlePlayerLookPacket(IPacket _packet, IRemoteClient _client, IMultiplayerServer server)
@@ -46,11 +46,11 @@ namespace Welt.Core.Handlers
             //    client.Entity.Pitch = pitch;
             //}
             //else
-            //{
-            //    client.Entity.Position = position;
-            //    client.Entity.Yaw = yaw;
-            //    client.Entity.Pitch = pitch;
-            //}
+            {
+                client.Entity.Position = position;
+                client.Entity.Yaw = yaw;
+                client.Entity.Pitch = pitch;
+            }
         }
     }
 }

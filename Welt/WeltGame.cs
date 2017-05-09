@@ -81,6 +81,7 @@ namespace Welt
                 Client.Disconnect();
             };
             Client = new MultiplayerClient(new Core.Server.User { Username = username, AuthToken = key });
+            IsFixedTimeStep = false;
         }
 
         public static void SetCursor(Cursor cursor)
@@ -203,6 +204,7 @@ namespace Welt
 
         protected override void Update(GameTime gameTime)
         {
+            Draw(gameTime);
             var kstate = Keyboard.GetState();
             if (kstate.IsKeyDown(Keys.F6)) TakeScreenshot();
             Client.Update(gameTime);

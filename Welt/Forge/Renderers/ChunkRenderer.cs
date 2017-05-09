@@ -76,26 +76,26 @@ namespace Welt.Forge.Renderers
         private void ProcessChunk(ReadOnlyWorld world, ReadOnlyChunk chunk, RenderState state)
         {
             state.Clear();
-            for (byte x = 0; x < Chunk.Width; x++)
+            for (var x = 0; x < Chunk.Width; x++)
             {
-                for (byte z = 0; z < Chunk.Depth; z++)
+                for (var z = 0; z < Chunk.Depth; z++)
                 {
-                    for (byte y = 0; y < Chunk.Height; y++)
+                    for (var y = 0; y < Chunk.Height; y++)
                     {
                         var coords = new Vector3I(x, y, z);
                         var id = chunk.GetBlock(x, y, z).Id;
                         var provider = BlockRepository.GetBlockProvider(id) ?? new DefaultBlockProvider();
-                        if (x == 15 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x + 1, y, z).Id)))
+                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x + 1, y, z).Id)))
                             state.AddFacesTo(coords, VisibleFaces.East);
-                        if (x == 0 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x - 1, y, z).Id)))
+                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x - 1, y, z).Id)))
                             state.AddFacesTo(coords, VisibleFaces.West);
-                        if (z == 15 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z + 1).Id)))
+                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z + 1).Id)))
                             state.AddFacesTo(coords, VisibleFaces.North);
-                        if (z == 0 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z - 1).Id)))
+                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z - 1).Id)))
                             state.AddFacesTo(coords, VisibleFaces.South);
-                        if (y == Chunk.Height || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y + 1, z).Id)))
+                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y + 1, z).Id)))
                             state.AddFacesTo(coords, VisibleFaces.Top);
-                        if (y == 0 || WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y - 1, z).Id)))
+                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y - 1, z).Id)))
                             state.AddFacesTo(coords, VisibleFaces.Bottom);
                     }
                 }
@@ -114,46 +114,46 @@ namespace Welt.Forge.Renderers
                 if ((faces & VisibleFaces.Top) != 0)
                 {
                     BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.YIncreasing, state.Vertices.Count, out vertices, out indices);
-                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                    AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
                 if ((faces & VisibleFaces.Bottom) != 0)
                 {
                     BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.YDecreasing, state.Vertices.Count, out vertices, out indices);
-                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                    AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
                 if ((faces & VisibleFaces.East) != 0)
                 {
                     BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.XIncreasing, state.Vertices.Count, out vertices, out indices);
-                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                    AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
                 if ((faces & VisibleFaces.West) != 0)
                 {
                     BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.XDecreasing, state.Vertices.Count, out vertices, out indices);
-                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                    AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
                 if ((faces & VisibleFaces.North) != 0)
                 {
                     BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.ZIncreasing, state.Vertices.Count, out vertices, out indices);
-                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                    AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
                 if ((faces & VisibleFaces.South) != 0)
                 {
                     BlockMeshBuilder.Render(provider, chunk, pos, BlockFaceDirection.ZDecreasing, state.Vertices.Count, out vertices, out indices);
-                    AddDataToState(state, vertices, indices, provider.IsOpaque);
+                    AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
             }
         }
 
         private bool WillRenderFace(IBlockProvider source, IBlockProvider neighbor)
         {
-            if (source.IsOpaque)
+            if (source.IsOpaque != neighbor.IsOpaque)
             {
-                if (!neighbor.IsOpaque) return true;
+                return true;
             }
             else
             {
                 if (source.Id != neighbor.Id) return true;
-                if (neighbor.RendersTransparentNeighbor) return true;
+                if (neighbor.WillRenderSameNeighbor) return true;
             }
             return false;
         }
@@ -164,7 +164,7 @@ namespace Welt.Forge.Renderers
             if (isOpaque)
                 state.OpaqueIndices.AddRange(indices);
             else
-                state.OpaqueIndices.AddRange(indices);
+                state.TransparentIndices.AddRange(indices);
         }
         
         private bool IsOpaque(ReadOnlyChunk chunk, Vector3I position)
