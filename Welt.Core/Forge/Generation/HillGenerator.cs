@@ -17,11 +17,11 @@ namespace Welt.Core.Forge.Generation
 
         public int SurfaceDepthMin => 3;
 
-        public int SurfaceMax => 200;
+        public int SurfaceMax => Chunk.Height - 10;
 
         public int SurfaceMaxPeakCount => 2;
 
-        public int SurfaceMin => 120;
+        public int SurfaceMin => Chunk.Height - 80;
 
         public int SurfaceMinPeakCount => 0;
 

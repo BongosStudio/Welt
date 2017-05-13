@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Welt.Core</RootNamespace>
     <AssemblyName>Welt.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,9 +35,8 @@
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lidgren.Network.1.0.2\lib\net451\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.7.0.242, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.0.242-develop\lib\net40\MonoGame.Framework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MonoGame.Framework, Version=3.7.0.347, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.7.0.347-develop\lib\net40\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Sec">
       <HintPath>..\lib\Sec.dll</HintPath>
@@ -68,6 +68,7 @@
     <Compile Include="Entities\ObjectEntity.cs" />
     <Compile Include="Entities\PlayerEntity.cs" />
     <Compile Include="Extensions\MonoGameExtensions.cs" />
+    <Compile Include="Extensions\WorldExtensions.cs" />
     <Compile Include="FastMath.cs" />
     <Compile Include="Forge\Biomes\BiomeSystem.cs" />
     <Compile Include="Forge\Biomes\MountainBiome.cs" />
@@ -91,9 +92,10 @@
     <Compile Include="Forge\Chunk.cs" />
     <Compile Include="Forge\ChunkManager.cs" />
     <Compile Include="Forge\CraftingRepository.cs" />
+    <Compile Include="Forge\Galaxy.cs" />
     <Compile Include="Forge\Generation\HillGenerator.cs" />
-    <Compile Include="Forge\Generators\PerlinNoise2D.cs" />
-    <Compile Include="Forge\Generators\PerlinSimplexNoise.cs" />
+    <Compile Include="Forge\Generators\StarGenerator.cs" />
+    <Compile Include="Forge\Generators\SystemGenerator.cs" />
     <Compile Include="Forge\Generators\WorldGenerator.cs" />
     <Compile Include="Forge\ItemProvider.cs" />
     <Compile Include="Forge\ItemRepository.cs" />
@@ -105,6 +107,8 @@
     <Compile Include="Forge\Noise\PerlinNoise.cs" />
     <Compile Include="Forge\Noise\ScaledNoise.cs" />
     <Compile Include="Forge\Noise\SimplexNoise.cs" />
+    <Compile Include="Forge\SolarSystem.cs" />
+    <Compile Include="Forge\Star.cs" />
     <Compile Include="Forge\Weather\WeatherType.cs" />
     <Compile Include="Forge\World.cs" />
     <Compile Include="Forge\WorldLighting.cs" />

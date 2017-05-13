@@ -146,7 +146,8 @@ namespace Welt.Forge.Renderers
         {
             if (m_IsDisposed)
                 throw new ObjectDisposedException(GetType().Name);
-
+            if (item == null)
+                return false;
             if (m_Pending.Contains(item))
                 return false;
             m_Pending.Add(item);

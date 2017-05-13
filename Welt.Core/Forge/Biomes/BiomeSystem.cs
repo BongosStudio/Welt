@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Welt.API;
 using Welt.API.Forge;
+using Welt.Core.Forge.BlockProviders;
 using Welt.Core.Forge.Noise;
 
 namespace Welt.Core.Forge.Biomes
@@ -18,14 +19,20 @@ namespace Welt.Core.Forge.Biomes
         {
             World = world;
             HighNoise.Persistance = 1;
-            HighNoise.Frequency = 0.013;
-            HighNoise.Amplitude = 10;
-            HighNoise.Octaves = 2;
+            HighNoise.Frequency = 0.034;
+            HighNoise.Amplitude = 35;
+            HighNoise.Octaves = 3;
             HighNoise.Lacunarity = 2;
+
+            MidNoise.Persistance = 0.3;
+            MidNoise.Frequency = 0.045;
+            MidNoise.Amplitude = 15;
+            MidNoise.Octaves = 1;
+            MidNoise.Lacunarity = 5;
 
             LowNoise.Persistance = 1;
             LowNoise.Frequency = 0.004;
-            LowNoise.Amplitude = 35;
+            LowNoise.Amplitude = 15;
             LowNoise.Octaves = 2;
             LowNoise.Lacunarity = 2.5;
 
@@ -38,12 +45,12 @@ namespace Welt.Core.Forge.Biomes
             HighClamp = new ClampNoise(HighNoise)
             {
                 MinValue = -30,
-                MaxValue = 50
+                MaxValue = 80
             };
             LowClamp = new ClampNoise(LowNoise)
             {
                 MinValue = -30,
-                MaxValue = 30
+                MaxValue = 45
             };
             BottomClamp = new ClampNoise(BottomNoise)
             {
@@ -79,40 +86,67 @@ namespace Welt.Core.Forge.Biomes
             LowNoise.Seed = seed;
             CaveNoise.Seed = seed;
 
-            var testImage = new Bitmap(16, 16);
             for (byte x = 0; x < Chunk.Width; x++)
             {
                 for (byte z = 0; z < Chunk.Depth; z++)
                 {
-                    var worldX = (int)(index.X * Chunk.Width + x);
-                    var worldZ = (int)(index.Z * Chunk.Depth + z);
+                    var worldX = (int)(chunk.Position.X + x);
+                    var worldZ = (int)(chunk.Position.Z + z);
                     var biome = GetBiome(worldX, worldZ);
                     var height = GetHeight(worldX, worldZ);
-                    chunk.HeightMap[x * Chunk.Width + z] = (byte)height;
+#if DEBUG
+
+                    //height = FastMath.NextRandom(60, 80);
+#endif
+                    chunk.HeightMap[x * Chunk.Width + z] = height;
                     // get the depth of that layer
                     var surfaceDepth = height - FastMath.NextRandom(biome.Terrain.SurfaceDepthMin, biome.Terrain.SurfaceDepthMax);
-                    testImage.SetPixel(x, z, Color.FromArgb(height, height, height));
                     var topBlock = new Block(biome.Biome.TopBlockId, biome.Biome.TopBlockMetadata);
                     var surfaceBlock = new Block(biome.Biome.SurfaceBlockId, biome.Biome.SurfaceBlockMetadata);
                     var subBlock = new Block(biome.Biome.SublayerBlockId, biome.Biome.SublayerBlockMetadata);
-                    for (byte y = 0; y < height; y++)
+                    var comp = height < World.WaterLevel ? World.WaterLevel : height;
+                    
+
+                    for (byte y = 0; y < comp; y++)
                     {
-                        if (y == height - 1)
+                        
+                        if (y > height && y <= World.WaterLevel)
                         {
-                            chunk.SetBlock(x, y, z, topBlock);
+                            chunk.SetBlock(x, y, z, new Block(BlockType.WATER));
+                            continue;
                         }
-                        else if (y >= surfaceDepth)
+                        if (y <= World.WaterLevel)
                         {
-                            chunk.SetBlock(x, y, z, surfaceBlock);
+                            if (y >= surfaceDepth)
+                            {
+                                chunk.SetBlock(x, y, z, new Block(BlockType.SAND));
+                            }
+                            else
+                            {
+                                chunk.SetBlock(x, y, z, subBlock);
+                            }
                         }
                         else
                         {
-                            chunk.SetBlock(x, y, z, subBlock);
+                            var interpol = MidNoise.Interpolated3D(worldX, y, worldZ);
+                            if (interpol > .25 && interpol < .3)
+                                continue;
+                            if (y == height - 1)
+                            {
+                                chunk.SetBlock(x, y, z, topBlock);
+                            }
+                            else if (y >= surfaceDepth)
+                            {
+                                chunk.SetBlock(x, y, z, surfaceBlock);
+                            }
+                            else
+                            {
+                                chunk.SetBlock(x, y, z, subBlock);
+                            }
                         }
                     }
                 }
             }
-            testImage.Save($"{index.X}-{index.Z}_chunk.bmp");
             return chunk;
         }
 
@@ -127,6 +161,8 @@ namespace Welt.Core.Forge.Biomes
         #region Generation
 
         PerlinNoise HighNoise = new PerlinNoise();
+
+        PerlinNoise MidNoise = new PerlinNoise();
 
         PerlinNoise LowNoise = new PerlinNoise();
 
@@ -144,14 +180,14 @@ namespace Welt.Core.Forge.Biomes
 
         bool EnableCaves;
 
-        int GetHeight(int x, int z)
+        byte GetHeight(int x, int z)
         {
-            var NoiseValue = FinalNoise.Value2D(x, z) + World.WaterLevel;
-            if (NoiseValue < 0)
-                NoiseValue = World.WaterLevel;
-            if (NoiseValue > Chunk.Height)
-                NoiseValue = Chunk.Height - 1;
-            return (int)NoiseValue;
+            var noise = (FinalNoise.Value2D(x, z) + World.WaterLevel) * .75;
+            if (noise < 0)
+                noise = World.WaterLevel;
+            if (noise > Chunk.Height)
+                noise = Chunk.Height - 1;
+            return (byte)noise;
         }
 
         BiomeGenerator GetBiome(int x, int z)

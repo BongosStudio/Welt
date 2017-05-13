@@ -178,6 +178,13 @@ namespace Welt.Core
         {
             lock (m_Rlock)
             {
+                if (min > max)
+                {
+                    var copyMin = min;
+                    var copyMax = max;
+                    min = copyMax;
+                    max = copyMin;
+                }
                 return m_Random.Next(min, max);
             }
         }
@@ -186,6 +193,13 @@ namespace Welt.Core
         {
             lock (m_Rlock)
             {
+                if (min > max)
+                {
+                    var copyMin = min;
+                    var copyMax = max;
+                    min = copyMax;
+                    max = copyMin;
+                }
                 return (uint)m_Random.Next((int) min, (int)max);
             }
         }
@@ -213,6 +227,11 @@ namespace Welt.Core
             if (rand + randD > upper) return rand - randD;
             if (rand - randD < lower) return rand + randD;
             return NextRandomBoolean() ? rand + randD : rand - randD;
+        }
+
+        public static Color NextRandom(Color min, Color max)
+        {
+            return new Color(NextRandomBetween(min.R, max.R), NextRandomBetween(min.G, max.G), NextRandomBetween(min.B, max.B));
         }
 
         public static float FRand()

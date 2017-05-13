@@ -22,6 +22,8 @@ namespace Welt.Core.Forge
 
         public virtual float Hardness { get; set; } = 1f;
 
+        public virtual float Density => 1; // 0 = free movement, 1 = no movement, 
+
         public virtual bool IsOpaque => true;
         public virtual bool WillRenderSameNeighbor => !IsOpaque;
         public virtual bool IsSolid => true;

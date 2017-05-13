@@ -9,6 +9,7 @@ namespace Welt.API.Forge
         ushort Id { get; }
         float BlastResistance { get; }
         float Hardness { get; }
+        float Density { get; }
         bool IsOpaque { get; }
         bool WillRenderSameNeighbor { get; }
         bool IsSolid { get; }

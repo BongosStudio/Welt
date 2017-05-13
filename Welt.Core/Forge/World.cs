@@ -35,7 +35,7 @@ namespace Welt.Core.Forge
             ChunkManager = new ChunkManager(new ChunkPersistence(), this);
             Name = name;
             Seed = 54321;
-            WaterLevel = 128;
+            WaterLevel = 60;
             SpawnPoint = new Vector3I(FastMath.NextRandom(Size)*Chunk.Width, 128, FastMath.NextRandom(Size)*Chunk.Depth);
             Generator = new WorldGenerator(this);
             var bSys = new BiomeSystem(this);
@@ -81,7 +81,7 @@ namespace Welt.Core.Forge
         /// </summary>
         /// <remarks>
         ///     The size is a single uint value which represents both width and depth. This
-        ///     means that a world may only be said amount of chunks wide and deep.
+        ///     means that a world may only be said amount of chunks wide and deep. Max is 2056.
         /// </remarks>
         public int Size { get; set; } = 256;
         /// <summary>
@@ -98,6 +98,7 @@ namespace Welt.Core.Forge
         ///     The water level for the world.
         /// </summary>
         public int WaterLevel { get; set; }
+        public Vector3B Position { get; }
 
         public Action<object, ChunkLoadedEventArgs> ChunkGenerated { get; set; }
 
@@ -160,9 +161,9 @@ namespace Welt.Core.Forge
 
         #endregion
 
-        public IChunk GetChunk(Vector3I index)
+        public IChunk GetChunk(Vector3I index, bool generate)
         {
-            return ChunkManager.GetChunk(index);
+            return ChunkManager.GetChunk(index, generate);
         }
 
         public void SetChunk(Vector3I index, IChunk value)
@@ -190,8 +191,8 @@ namespace Welt.Core.Forge
             var x = position.X;
             var z = position.Z;
 
-            var cx = x / Chunk.Size.X;
-            var cz = z / Chunk.Size.Z;
+            var cx = x / Chunk.Width;
+            var cz = z / Chunk.Depth;
 
             var at = ChunkManager.GetChunk(cx, 0, cz, generate);
 
@@ -204,8 +205,7 @@ namespace Welt.Core.Forge
                 return new Block(BlockType.NONE);
             //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
             var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
-            return chunk.Blocks[x % Chunk.Size.X * Chunk.FlattenOffset + z % Chunk.Size.Z * Chunk.Size.Y + y % Chunk.Size.Y];
-            //Debug.WriteLine("no block at  ({0},{1},{2}) ", x, y, z);
+            return chunk.Blocks[x % Chunk.Width, y, x % Chunk.Depth];
         }
 
         #endregion
@@ -222,7 +222,7 @@ namespace Welt.Core.Forge
             var localX = (byte)(x % Chunk.Size.X);
             var localY = (byte)(y % Chunk.Size.Y);
             var localZ = (byte)(z % Chunk.Size.Z);
-            var old = chunk.Blocks[localX * Chunk.FlattenOffset + localZ * Chunk.Size.Y + localY];
+            var old = chunk.Blocks[localX, localY, localZ];
             var oldD = GetBlockData(pos);
             //chunk.SetBlock is also called by terrain generators for Y loops min max optimisation
             chunk.SetBlock(localX, localY, localZ, newType);

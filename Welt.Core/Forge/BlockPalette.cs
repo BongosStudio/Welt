@@ -9,6 +9,7 @@ using Welt.API.Forge;
 
 namespace Welt.Core.Forge
 {
+    // TODO: CHANGE TO USE SINGLE DIMENSION ARRAY. Gettin tired of this shit. Idk what even happened.
     /// <summary>
     ///     Contains all block information within the assigned chunk.
     /// </summary>
@@ -26,28 +27,40 @@ namespace Welt.Core.Forge
             }
         }
 
-        private BlockDataWrapper[] m_Blocks;
-        
-        private byte[] m_R, m_G, m_B, m_S;
+        private BlockDataWrapper[,,] m_Blocks;
+        private int m_X;
+        private int m_Y;
+        private int m_Z;
 
-        public BlockPalette(int size)
+        public BlockPalette(int width, int height, int depth)
         {
-            m_Blocks = new BlockDataWrapper[size];
-            m_R = new byte[size];
-            m_G = new byte[size];
-            m_B = new byte[size];
-            m_S = new byte[size];
+            m_Blocks = new BlockDataWrapper[width, height, depth];
+            m_X = width;
+            m_Y = height;
+            m_Z = depth;
         }
 
-        public Block this[long index]
+        public Block this[int x, int y, int z]
         {
             get
             {
-                return GetBlockData((int)index);
+                return GetBlockData(x, y, z);
             }
             set
             {
-                SetBlockData((int)index, value);
+                SetBlockData(x, y, z, value);
+            }
+        }
+
+        public Block this[uint x, uint y, uint z]
+        {
+            get
+            {
+                return GetBlockData(x, y, z);
+            }
+            set
+            {
+                SetBlockData(x, y, z, value);
             }
         }
 
@@ -57,122 +70,121 @@ namespace Welt.Core.Forge
             var length = m_Blocks.Length;
             data.AddRange(BitConverter.GetBytes(length)); // 4 bytes
 
-            for (var i = 0; i < length; i++)
+            for (var x = 0; x < m_X; x++)
             {
-                var block = m_Blocks[i];
-                data.AddRange(BitConverter.GetBytes(block.Id));
-                data.Add(block.Metadata);
+                for (var z = 0; z < m_Z; z++)
+                {
+                    for (var y = 0; y < m_Y; y++)
+                    {
+                        var block = m_Blocks[x, y, z];
+                        data.AddRange(BitConverter.GetBytes(block.Id));
+                        data.Add(block.Metadata);
+                    }
+                }
             }
-
+            
             return data.ToArray();
         }
 
-        public static BlockPalette FromByteArray(int size, byte[] data)
+        public static BlockPalette FromByteArray(int width, int height, int depth, byte[] data)
         {
             var queue = new Queue<byte>(data);
             var length = new[] { queue.Dequeue(), queue.Dequeue(), queue.Dequeue(), queue.Dequeue() };
-            var blocks = new BlockDataWrapper[BitConverter.ToInt32(length, 0)];
+            var palette = new BlockPalette(width, height, depth);
             var i = 0;
-            while (queue.Count > 0)
+            for (var x = 0; x < palette.m_X; x++)
             {
-                var id = BitConverter.ToUInt16(new[] { queue.Dequeue(), queue.Dequeue() }, 0);
-                var meta = queue.Dequeue();
-                blocks[i] = new BlockDataWrapper(id, meta);
-                i++;
+                for (var z = 0; z < palette.m_Z; z++)
+                {
+                    for (var y = 0; y < palette.m_Y; y++)
+                    {
+                        var id = BitConverter.ToUInt16(new[] { queue.Dequeue(), queue.Dequeue() }, 0);
+                        var meta = queue.Dequeue();
+                        palette[x, y, z] = new Block(id, meta);
+                    }
+                }
             }
-            return new BlockPalette(size) { m_Blocks = blocks };
+            
+            return palette;
         }
 
-        public ushort GetId(int index)
+        public ushort GetId(int x, int y, int z)
         {
-            return m_Blocks[index].Id;
+            return m_Blocks[x, y, z].Id;
         }
 
-        public byte GetBlockMetadata(int index)
+        public byte GetBlockMetadata(int x, int y, int z)
         {
-            return m_Blocks[index].Metadata;
+            return m_Blocks[x, y, z].Metadata;
         }
 
-        public Vector3B GetBlockLight(int index)
+        public Vector3B GetBlockLight(int x, int y, int z)
         {
-            return new Vector3B(m_R[index], m_G[index], m_B[index]);
+            return new Vector3B();
         }
 
-        public byte GetBlockLightR(int index)
+        public byte GetBlockLightR(int x, int y, int z)
         {
-            return m_R[index];
+            return 0;
         }
 
-        public byte GetBlockLightG(int index)
+        public byte GetBlockLightG(int x, int y, int zex)
         {
-            return m_G[index];
+            return 0;
         }
 
-        public byte GetBlockLightB(int index)
+        public byte GetBlockLightB(int x, int y, int z)
         {
-            return m_B[index];
+            return 0;
         }
 
-        public byte GetSunLight(int index)
+        public byte GetSunLight(int x, int y, int z)
         {
-            return m_S[index];
+            return 0;
         }
 
-        public void SetId(int index, ushort value)
+        public void SetId(int x, int y, int z, ushort value)
         {
-            var block = GetBlockData(index);
+            var block = GetBlockData(x, y, z);
             block.Id = value;
             block.Metadata = 0;
-            SetBlockData(index, block);
+            SetBlockData(x, y, z, block);
         }
 
-        public void SetBlockMeta(int index, byte value)
+        public void SetBlockMeta(int x, int y, int z, byte value)
         {
-            var block = GetBlockData(index);
+            var block = GetBlockData(x, y, z);
             block.Metadata = value;
-            SetBlockData(index, block);
-        }
-
-        public void SetBlockSun(int index, byte value)
-        {
-            m_S[index] = value;
-        }
-
-        public void SetBlockLight(int index, Vector3B value)
-        {
-            m_R[index] = value.X;
-            m_G[index] = value.Y;
-            m_B[index] = value.Z;
-        }
-
-        public void SetRLight(int index, byte value)
-        {
-            m_R[index] = value;
-        }
-
-        public void SetGLight(int index, byte value)
-        {
-            m_G[index] = value;
-        }
-
-        public void SetBLight(int index, byte value)
-        {
-            m_B[index] = value;
+            SetBlockData(x, y, z, block);
         }
         
-        private Block GetBlockData(int index)
+        private Block GetBlockData(int x, int y, int z)
         {
-            var block = m_Blocks[index];
+            var block = m_Blocks[x, y % m_Y, z];
             return new Block(block.Id, block.Metadata);
         }
 
-        private void SetBlockData(int index, Block value)
+        private Block GetBlockData(uint x, uint y, uint z)
         {
-            m_Blocks[index] = new BlockDataWrapper(value.Id, value.Metadata);
-            m_R[index] = value.R;
-            m_G[index] = value.G;
-            m_B[index] = value.B;
-            m_S[index] = value.Sun;
+            var block = m_Blocks[x, y % m_Y, z];
+            return new Block(block.Id, block.Metadata);
+        }
+        
+        private void SetBlockData(int x, int y, int z, Block value)
+        {
+            m_Blocks[x, y % m_Y, z] = new BlockDataWrapper(value.Id, value.Metadata);
+            
+        }
+
+        private void SetBlockData(uint x, uint y, uint z, Block value)
+        {
+            m_Blocks[x, y % m_Y, z] = new BlockDataWrapper(value.Id, value.Metadata);
+
+        }
+
+        private int GetIndex(int x, int y, int z)
+        {
+            return x + m_X * (y + m_Z * z);
         }
     }
 }

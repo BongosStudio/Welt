@@ -7,21 +7,22 @@ using Microsoft.Xna.Framework;
 using Welt.API;
 using Welt.API.Forge;
 using System.Linq;
+using System.Drawing;
 
 namespace Welt.Core.Forge
 {
     public class Chunk : IChunk
     {
 
-        public const int Width = 16, Depth = 16, Height = 250;
+        public const int Width = 16, Depth = 16, Height = 128;
         public static int FlattenOffset = Size.Z * Size.Y;
-        public static Vector3B Size = new Vector3B(16, 250, 16);
-        public static Vector3B Max = new Vector3B(15, 249, 15);
+        public static Vector3B Size = new Vector3B(16, 128, 16);
+        public static Vector3B Max = new Vector3B(15, 127, 15);
 
         public Chunk(World world, Vector3I index)
         {
             World = world;
-            Blocks = new BlockPalette(Width * Depth * Height);
+            Blocks = new BlockPalette(Width, Height, Depth);
             HeightMap = new byte[Width * Depth];
 
             index %= World.Size;
@@ -38,12 +39,19 @@ namespace Welt.Core.Forge
         public byte[] GetData()
         {
             // for now, we'll return just the block palette? idk
-            return Blocks.ToByteArray();
+            var data = Blocks.ToByteArray();
+
+#if DEBUG
+            
+
+#endif
+
+            return data;
         }
 
         public void Fill(byte[] data)
         {
-            Blocks = BlockPalette.FromByteArray(Width * Depth * Height, data);
+            Blocks = BlockPalette.FromByteArray(Width, Height, Depth, data);
         }
         
         public byte[] HeightMap { get; }
@@ -105,7 +113,7 @@ namespace Welt.Core.Forge
             if (HeightMap[x * Size.X + z] < y)
                 HeightMap[x * Size.X + z] = y;
             
-            Blocks[x * FlattenOffset + z * Size.Y + y] = b;
+            Blocks[x, y, z] = b;
         }
 
         #endregion
@@ -121,63 +129,6 @@ namespace Welt.Core.Forge
         {
             return HeightMap[x * Size.X + z];
         }
-
-        public Vector3B GetBlockLight(int relx, int rely, int relz)
-        {
-            if (rely < 0 || rely > Max.Y)
-            {
-                //infinite Y : y bounds currently set as rock for never rendering those y bounds
-                return new Vector3B();
-            }
-
-            //handle the normal simple case
-            if (relx >= 0 && relz >= 0 && relx < Size.X && relz < Size.Z)
-            {
-                var b = Blocks.GetBlockLight(relx * FlattenOffset + relz * Size.Y + rely);
-                return b;
-            }
-
-            //handle all special cases
-
-            int x = relx, z = relz;
-            Chunk nChunk = null;
-
-            //TODO chunk relative GetBlock could even handle more tha just -1 but -2 -3 ... -15 
-
-            if (relx < 0) x = Max.X;
-            if (relz < 0) z = Max.Z;
-            if (relx > 15) x = 0;
-            if (relz > 15) z = 0;
-
-
-            if (x != relx && x == 0)
-                if (z != relz && z == 0)
-                    nChunk = Nw;
-                else if (z != relz && z == 15)
-                    nChunk = Sw;
-                else
-                    nChunk = W;
-            else if (x != relx && x == 15)
-                if (z != relz && z == 0)
-                    nChunk = Ne;
-                else if (z != relz && z == 15)
-                    nChunk = Se;
-                else
-                    nChunk = E;
-            else if (z != relz && z == 0)
-                nChunk = N;
-            else if (z != relz && z == 15)
-                nChunk = S;
-
-            if (nChunk == null)
-            {
-                //happens at current world bounds
-                return new Vector3B();
-            }
-            var light = nChunk.Blocks.GetBlockLight(x * FlattenOffset + z * Size.Y + rely);
-            return light;
-        }
-
 
         public void SetId(byte x, byte y, byte z, ushort id)
         {
@@ -206,7 +157,7 @@ namespace Welt.Core.Forge
             //handle the normal simple case
             if (relx >= 0 && relz >= 0 && relx < Size.X && relz < Size.Z)
             {
-                var b = Blocks[relx * FlattenOffset + relz * Size.Y + rely];
+                var b = Blocks[relx, rely, relz];
                 return b;
             }
 
@@ -247,7 +198,7 @@ namespace Welt.Core.Forge
                 //happens at current world bounds
                 return new Block(BlockType.NONE);
             }
-            var block = nChunk.Blocks[x * FlattenOffset + z * Size.Y + rely];
+            var block = nChunk.Blocks[x, rely, z];
             return block;
         }
 

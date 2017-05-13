@@ -324,8 +324,7 @@ namespace Welt.Components
             foreach (var adj in m_AdjacentCoords)
             {
                 var chunk = World.GetChunk(adj + args.Chunk.GetIndex());
-                if (chunk == null) continue;
-                Renderer.Enqueue(chunk);
+                Renderer.Enqueue(chunk, true);
             }
         }
 
@@ -343,6 +342,7 @@ namespace Welt.Components
         private void HandleMeshCompleted(object sender, RendererEventArgs<ReadOnlyChunk, VertexPositionNormalTextureEffect> args)
         {
             m_IncomingChunks.Add(args.Result);
+            
         }
 
         private static Vector3I[] m_AdjacentCoords =

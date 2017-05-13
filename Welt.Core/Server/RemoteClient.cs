@@ -216,7 +216,7 @@ namespace Welt.Core.Server
 
         internal void LoadChunk(Vector3I index)
         {
-            var chunk = World.GetChunk(index);
+            var chunk = World.GetChunk(index, true);
             
             QueuePacket(new ChunkPreamblePacket(chunk.Index.X, chunk.Index.Z));
             QueuePacket(CreatePacket(chunk));

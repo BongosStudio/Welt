@@ -17,6 +17,7 @@ namespace Welt.Core.Forge.BlockProviders
         public override bool WillRenderOpaque => IsOpaque;
         public override bool WillRenderSameNeighbor => true;
         public override float Hardness { get; set; } = 0;
+        public override float Density => 0;
 
         public override void BlockPlaced(BlockDescriptor descriptor, BlockFaceDirection face, IWorld world, IRemoteClient user)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Welt.API;
@@ -84,6 +85,7 @@ namespace Welt.Forge.Renderers
                     {
                         var coords = new Vector3I(x, y, z);
                         var id = chunk.GetBlock(x, y, z).Id;
+                        var worldCoords = new Vector3(chunk.GetPosition().X + x, y, chunk.GetPosition().Z + z);
                         var provider = BlockRepository.GetBlockProvider(id) ?? new DefaultBlockProvider();
                         if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x + 1, y, z).Id)))
                             state.AddFacesTo(coords, VisibleFaces.East);
@@ -101,12 +103,13 @@ namespace Welt.Forge.Renderers
                 }
             }
 
-            var drawable = state.DrawableCoordinates.ToArray();
+            var enumerator = state.DrawableCoordinates.GetEnumerator();
+
             VertexPositionNormalTextureEffect[] vertices;
             short[] indices;
-            for (var i = 0; i < drawable.Length; i++)
+            do
             {
-                var c = drawable[i];
+                var c = enumerator.Current;
                 var pos = c.Key;
                 var faces = c.Value;
                 var id = chunk.GetBlock((byte)pos.X, (byte)pos.Y, (byte)pos.Z).Id;
@@ -142,18 +145,20 @@ namespace Welt.Forge.Renderers
                     AddDataToState(state, vertices, indices, provider.WillRenderOpaque);
                 }
             }
+            while (enumerator.MoveNext());
         }
 
         private bool WillRenderFace(IBlockProvider source, IBlockProvider neighbor)
         {
+            if (source.Id == 0 && neighbor.Id != 0) return true;
+            if (source.Id != 0 && neighbor.Id == 0) return true;
             if (source.IsOpaque != neighbor.IsOpaque)
             {
                 return true;
             }
             else
             {
-                if (source.Id != neighbor.Id) return true;
-                if (neighbor.WillRenderSameNeighbor) return true;
+                if (neighbor.WillRenderSameNeighbor && (source.Id == neighbor.Id)) return true;
             }
             return false;
         }
@@ -181,7 +186,7 @@ namespace Welt.Forge.Renderers
 
             result = new ChunkMesh(item, Game, state.Vertices.ToArray(),
                 state.OpaqueIndices.ToArray(), state.TransparentIndices.ToArray());
-
+            state.Clear();
             return (result != null);
         }
     }

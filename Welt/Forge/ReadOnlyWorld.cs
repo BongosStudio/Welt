@@ -23,7 +23,14 @@ namespace Welt.Forge
             World.SetBlock(position, block);
         }
 
-        public ReadOnlyChunk GetChunk(Vector3I index) => new ReadOnlyChunk(World.GetChunk(index) as Chunk);
+        public ReadOnlyChunk GetChunk(Vector3I index)
+        {
+            if (World.GetChunk(index, false) == null)
+            {
+                World.SetChunk(index, new Chunk(World, index));
+            }
+            return new ReadOnlyChunk(World.GetChunk(index, false) as Chunk);
+        }
         public ReadOnlyChunk[] GetChunks() => World.ChunkManager.Chunks.Select(c => new ReadOnlyChunk(c)).ToArray();
         public void SetChunk(Vector3I index, ReadOnlyChunk chunk)
         {

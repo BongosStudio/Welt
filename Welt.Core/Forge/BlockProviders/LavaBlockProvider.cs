@@ -9,5 +9,7 @@ namespace Welt.Core.Forge.BlockProviders
         public override string Name => "lava_still";
 
         public override string DisplayName => "Lava";
+
+        public override float Density => 0.7f;
     }
 }

@@ -13,6 +13,7 @@ using Welt.Forge;
 using Welt.Forge.Renderers;
 using System.Diagnostics;
 using Welt.Core;
+using Welt.API;
 
 #endregion
 
@@ -93,6 +94,7 @@ namespace Welt.Cameras
         private readonly Viewport m_Viewport;
 
         private const float MOVEMENTSPEED = 0.25f;
+        private const float JUMPSPEED = 6f;
 
         // SelectionBlock
         public Model SelectionBlock;
@@ -170,9 +172,12 @@ namespace Welt.Cameras
                                      Matrix.CreateRotationY(Camera.LeftRightRotation);
                 var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
                 
+                
                 Player.Position += rotatedVector * MOVEMENTSPEED;
+                
             }
             Player.Physics.Update(gameTime.ElapsedGameTime);
         }
+        
     }
 }

@@ -77,7 +77,7 @@
       <Name>Welt.API</Name>
     </ProjectReference>
     <ProjectReference Include="..\Welt.Core\Welt.Core.csproj">
-      <Project>{813DF234-8FFD-4C3A-8231-D6296C221DF1}</Project>
+      <Project>{813df234-8ffd-4c3a-8231-d6296c221df1}</Project>
       <Name>Welt.Core</Name>
     </ProjectReference>
   </ItemGroup>

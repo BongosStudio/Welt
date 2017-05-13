@@ -27,7 +27,7 @@ namespace Welt.Handlers
         public static void HandleChunkData(IPacket _packet, MultiplayerClient client)
         {
             var packet = (ChunkDataPacket)_packet;
-            client.World.World.GetChunk(new Vector3I(packet.X, 0, packet.Z)).Fill(packet.CompressedData);
+            client.World.World.GetChunk(new Vector3I(packet.X, 0, packet.Z), false).Fill(packet.CompressedData);
             
             client.OnChunkLoaded(new ChunkEventArgs(client.World.GetChunk(new Vector3I(packet.X, 0, packet.Z))));
         }
