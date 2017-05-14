@@ -26,6 +26,7 @@ $('.main').onepage_scroll({
     setTimeout(function() {
       $('section.active').toggleClass('inview', true);
     }, 250);
+
     var color = $('body').css('background-color');
     switch(index) {
       case 0:

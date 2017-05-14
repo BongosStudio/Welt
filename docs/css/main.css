@@ -220,7 +220,8 @@ section.inview .content {
 /* media styles  */
 
 @media (max-width: 640px) {
-  .left, .right {
+
+  .left, .right, .center {
     margin-top: 0;
   }
 
@@ -232,5 +233,11 @@ section.inview .content {
 
   section .content {
     opacity: 1;
+    margin-bottom: 35px;
+  }
+
+  .footer {
+    height: 25px;
+    padding-top: 10px;
   }
 }
