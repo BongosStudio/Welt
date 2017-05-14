@@ -18,7 +18,7 @@ $('.main').onepage_scroll({
   animationTime: 500,
   pagination: true,
   updateURL: false,
-  //responsiveFallback: 640,
+  responsiveFallback: 640,
   beforeMove: function(index) {
 
   },
