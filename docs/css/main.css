@@ -144,10 +144,16 @@ a:hover {
 
 .left .content {
   max-width: 60%;
+  border: none;
+  border-left: rgba(255,255,255, 0.5) solid 2px;
+  margin-left: 25px;
 }
 
 .right .content {
   max-width: 60%;
+  border: none;
+  border-right: rgba(255,255,255,0.5) solid 2px;
+  margin-right: 25px;
 }
 
 .center h1, .center h2, .center h3,
@@ -186,12 +192,6 @@ a:hover {
   margin-right: 50px;
 }
 
-.right .content {
-  border: none;
-  border-right: rgba(255,255,255,0.5) solid 2px;
-  margin-right: 25px;
-}
-
 code {
   background-color: rgba(100, 100, 100, 0.5);
 }
@@ -219,7 +219,7 @@ section.inview .content {
 
 /* media styles  */
 
-@media (max-width: 320px) {
+@media (max-width: 640px) {
   .left, .right {
     margin-top: 0;
   }
@@ -227,5 +227,6 @@ section.inview .content {
   .left .content, .right .content {
     height: 40%;
     overflow-y: scroll;
+    max-width: 100%;
   }
 }
