@@ -216,3 +216,16 @@ section.inview .content {
   text-align: center;
   padding-top: 30px;
 }
+
+/* media styles  */
+
+@media (max-width: 320px) {
+  .left, .right {
+    margin-top: 0;
+  }
+
+  .left .content, .right .content {
+    height: 40%;
+    overflow-y: scroll;
+  }
+}
