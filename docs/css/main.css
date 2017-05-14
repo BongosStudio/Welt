@@ -229,4 +229,8 @@ section.inview .content {
     overflow-y: scroll;
     max-width: 100%;
   }
+
+  section .content {
+    opacity: 1;
+  }
 }
