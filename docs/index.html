@@ -1,54 +1,142 @@
 <!DOCTYPE html>
+<html>
 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, width=device-width, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <title>Welt</title>
-    <link href="css/style.css" rel="stylesheet" type="text/css" media="screen"/>
-    <script src="javascripts/index.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
-    
+    <link rel="stylesheet" href="css/ops.css" type="text/css" />
+    <link rel="stylesheet" href="css/main.css" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/ops-min.js"></script>
 </head>
-<body>
-    <div id="player" style="position: fixed; z-index: -99; width: 105%; height: 107%; margin-left: -30px; pointer-events: none;">
-    </div>
-    
-<p>
-</p>
-    <h1 id="welcome-header">Hello Universe</h1>
-    <div style="text-align:center;">
-      <a id="discord-button" href="https://discord.gg/DhJu8pR">Register for Alpha on Discord&trade;</a>
-    </div>
-    
-    <footer>
-        <a href="https://github.com/BongosStudio/welt">Check out the GitHub!</a>
-        |
-        <a href="https://tree.taiga.io/project/conji-welt/">Check out the progress!</a>
-        |
-        <a href="https://www.youtube.com/watch?v=yrgaD9I_CtI">Background video</a>
-    </footer>
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        var player;
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                videoId: 'yrgaD9I_CtI',
-                playerVars: {
-                    autohide: true,
-                    autoplay: true,
-                    showinfo: false,
-                },
-                
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
 
-        function onPlayerReady(event) {
-            player.mute();
-        }
+<body>
+    <script type="text/x-template" id="modal-template">
+        <transition name="modal">
+            <div class="modal-mask">
+                <div class="modal-wrapper">
+                    <div class="modal-container">
+
+                        <div class="modal-header">
+                            <slot name="header">
+                                default header
+                            </slot>
+                        </div>
+
+                        <div class="modal-body">
+                            <slot name="body">
+                                default body
+                            </slot>
+                        </div>
+
+                        <div class="modal-footer">
+                            <slot name="footer">
+                                default footer
+                                <button class="modal-default-button" @click="$emit('close')">
+                                    OK
+                                </button>
+                            </slot>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
     </script>
+    <div class="main">
+      <section>
+        <div id="app">
+            <modal v-if="showModal" @close="showModal = false">
+                <h2 slot="header">Join the Discord&trade; server!</h2>
+                <div slot="body">
+                  <p>
+                    You can either copy the link into Discord&trade; or click the
+                    <a href="https://discord.gg/DhJu8pR">
+                      following link
+                    </a>.
+                  </p>
+                  <p>
+                    Once you're in the server, you'll need to go to the
+                    registration channel and type <code>/register</code> to begin
+                    the process.
+                  </p>
+                </div>
+                <div slot="footer">
+                  <button class="modal-default-button" @click="showModal = false">
+                    got it!
+                  </button>
+                </div>
+            </modal>
+            <div class="center">
+                <h1 class="center">hello universe</h1>
+                <button @click="showModal = true"><h4>register for alpha testing</h4></button>
+            </div>
+
+        </div>
+      </section>
+      <section>
+        <div class="left">
+          <h1>what is welt?</h1>
+          <div class="content">
+            <p>
+              In a universe where anything is possible, it's your job to explore farther than the reaches
+              of what you ever thought was possible.
+            </p>
+             <p>
+               From the beginning you'll be surrounded with any
+              resource needed for you to move up in the tiers of science or alchemy. But remember,
+              once you make your choice, you can never go back.
+             </p>
+             <p>
+               From exploring the local system to
+              discovering what lies beyond your galaxy, you'll find systems flourishing with life, both
+              friendly and hostile. Whether you befriend or betray the civilizations you encounter, your
+              choices will determine the fate of reality itself.
+             </p>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="right">
+          <h1>what does it require?</h1>
+          <div class="content">
+            <p>Just your soul.</p>
+            <p>
+              Just kidding. At the current build, it currently runs just fine with older hardware. Optimizations
+              are a big priority with me while making this so if you find something that could be improved, feel
+              free to contact me.
+            </p>
+            <p>
+              Currently, it only runs on Windows running .NET 4.6+ and DirectX 11&trade;. The launcher does not
+              install either so it's recommended that you install both before playing.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="left">
+          <h1>can i help?</h1>
+          <div class="content">
+            <p>
+              Absolutely. If you want to get into contact with me to assist with development or testing, you
+              can contact me through the Discord. I'm always open for conversations.
+            </p>
+            <p>
+              If you want to follow development or check out the source code, you can look at the GitHub. All
+              important updates are pushed to the Discord&trade; server but you can always get more in-depth
+              information there.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="footer">
+      <a href="https://github.com/BongosStudio/welt">Check out the GitHub!</a>
+    </div>
 </body>
+<script src="https://unpkg.com/vue"></script>
+<script src="js/app.js"></script>
+<!-- Latest compiled and minified JavaScript -->
 </html>

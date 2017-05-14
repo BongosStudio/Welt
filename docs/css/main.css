@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css?family=Muli|Nunito');
+html {
+}
+
+body {
+  background-color: rgb(35, 0, 50);
+  color: rgba(250, 250, 250, .7);
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  font-family: 'Muli', sans-serif !important;
+}
+
+body.loaded {
+  transition: opacity ease 1s;
+  opacity: 1;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Nunito', sans-serif !important;
+}
+
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, .5);
+  display: table;
+  transition: opacity .3s ease;
+}
+
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.modal-container {
+  width: 300px;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: rgb(50, 0, 65);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  transition: all .3s ease;
+}
+
+.modal-header h1, .modal-header h2, .modal-header h3 {
+  margin-top: 0;
+  color: rgb(150, 150, 245);
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+.modal-footer {
+  padding-bottom: 40px;
+}
+
+.modal-default-button {
+  float: right;
+}
+
+
+/*
+ * The following styles are auto-applied to elements with
+ * transition="modal" when their visibility is toggled
+ * by Vue.js.
+ *
+ * You can easily play with the modal transition by editing
+ * these styles.
+ */
+
+.modal-enter {
+  opacity: 0;
+}
+
+.modal-leave-active {
+  opacity: 0;
+}
+
+.modal-enter .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+
+button, .btn {
+  background-color: transparent;
+  color: rgba(250, 250, 250, .7);
+  border-color: rgba(150, 150, 245, 0.3);
+  transition: background-color ease 20ms, transform ease 200ms;
+  border-width: 2px;
+  border-radius: 150px;
+  border-style: solid;
+  padding: 5px 15px;
+  margin: 10px 15px;
+  min-width: 75px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button:hover, .btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+  transition: background-color ease 180ms, transform ease 200ms;
+}
+
+a {
+  color: rgba(150, 150, 245, 0.7);
+  text-decoration: none;
+}
+
+a:hover {
+  color: rgba(100, 100, 175, 1);
+}
+
+.center {
+  vertical-align: middle;
+  text-align: center;
+  width: 100%;
+  margin-top: 20%;
+}
+
+.left {
+  float: left;
+  left: 50px;
+  width: 100%;
+  margin-top: 15%;
+}
+
+.right {
+  float: right;
+  right: 50px;
+  width: 100%;
+  margin-top: 15%;
+}
+
+.left .content {
+  max-width: 60%;
+}
+
+.right .content {
+  max-width: 60%;
+}
+
+.center h1, .center h2, .center h3,
+.left h1, .left h2, .left h3,
+.right h1, .right h2, .right h3 {
+  cursor: default;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                supported by Chrome and Opera */
+}
+
+
+.left * {
+  float: left;
+}
+
+.left h1, .left h2, .left h3 {
+  margin-left: 50px;
+}
+
+.left .content {
+  border: none;
+  border-left: rgba(255,255,255, 0.5) solid 2px;
+  margin-left: 25px;
+}
+
+.right * {
+  float: right;
+}
+
+.right h1, .right h2, .right h3 {
+  margin-right: 50px;
+}
+
+.right .content {
+  border: none;
+  border-right: rgba(255,255,255,0.5) solid 2px;
+  margin-right: 25px;
+}
+
+code {
+  background-color: rgba(100, 100, 100, 0.5);
+}
+
+section .content {
+  opacity: 0;
+  padding: 0 50px;
+}
+
+section.inview .content {
+  opacity: 1;
+  transition: opacity ease 1s;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  height: 50px;
+  max-height: 50px;
+  width: 100%;
+  background-color: rgba(20,0,35,0.5);
+  text-align: center;
+  padding-top: 30px;
+}
