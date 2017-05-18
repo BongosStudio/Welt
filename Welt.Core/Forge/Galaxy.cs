@@ -14,24 +14,28 @@ namespace Welt.Core.Forge
 
         public Vector3B Position { get; }
 
+        private OccupiedSpacialMap<ISolarSystem> m_Map;
+
         public Galaxy(IUniverse universe, Vector3B position)
         {
-
+            Position = position;
+            m_Map = new OccupiedSpacialMap<ISolarSystem>(256);
         }
 
-        public Galaxy(IUniverse universe, string name, Vector3B position)
+        public Galaxy(IUniverse universe, string name, Vector3B position) : this(universe, position)
         {
+            Name = name;
 
         }
 
         public ISolarSystem GetSystem(Vector3B system)
         {
-            throw new NotImplementedException();
+            return m_Map.GetObject(system.X, system.Z, out var x, out var y);
         }
 
         public bool SetSystem(Vector3B position, ISolarSystem value)
         {
-            throw new NotImplementedException();
+            return m_Map.TrySetPosition(position.X, position.Z, value, 4);
         }
     }
 }

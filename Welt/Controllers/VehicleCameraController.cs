@@ -10,10 +10,5 @@ namespace Welt.Controllers
         public VehicleCameraController(VehicleCamera camera) : base(camera)
         {
         }
-
-        public override void ProcessInput(GameTime gameTime)
-        {
-            
-        }
     }
 }

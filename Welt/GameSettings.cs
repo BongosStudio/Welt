@@ -45,5 +45,7 @@ namespace Welt
 #endif
         public int RenderDistance { get; set; } = 14;
         public int CacheDistance { get; set; } = 16;
+
+        public bool ShowTooltips { get; set; } = true;
     }
 }

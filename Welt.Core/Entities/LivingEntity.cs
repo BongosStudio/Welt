@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Welt.API;
 
 namespace Welt.Core.Entities
 {
@@ -19,7 +20,7 @@ namespace Welt.Core.Entities
             set
             {
                 _Air = value;
-                OnPropertyChanged("Air");
+                OnPropertyChanged();
             }
         }
 
@@ -30,7 +31,7 @@ namespace Welt.Core.Entities
             set
             {
                 _Health = value;
-                OnPropertyChanged("Health");
+                OnPropertyChanged();
             }
         }
 
@@ -41,7 +42,18 @@ namespace Welt.Core.Entities
             set
             {
                 _HeadYaw = value;
-                OnPropertyChanged("HeadYaw");
+                OnPropertyChanged();
+            }
+        }
+
+        protected bool _IsFlying;
+        public bool IsFlying
+        {
+            get { return _IsFlying; }
+            set
+            {
+                _IsFlying = value;
+                OnPropertyChanged();
             }
         }
 
@@ -54,5 +66,6 @@ namespace Welt.Core.Entities
         }
 
         public abstract short MaxHealth { get; }
+        public abstract AppendageReport[] AppendageReports { get; }
     }
 }

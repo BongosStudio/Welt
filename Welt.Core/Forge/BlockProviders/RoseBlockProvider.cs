@@ -15,6 +15,7 @@ namespace Welt.Core.Forge.BlockProviders
         public override bool IsOpaque => false;
         public override bool WillRenderOpaque => false;
         public override bool WillRenderSameNeighbor => true;
+        public override float Density => 0.1f;
         public override BlockEffect DisplayEffect => BlockEffect.VegetationWindEffect;
 
         public override BoundingBox? GetBoundingBox(byte metadata)

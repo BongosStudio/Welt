@@ -14,7 +14,9 @@ namespace Welt.Core.Forge.BlockProviders
         public override string DisplayName => "Ladder";
 
         public override bool IsOpaque => false;
-        
+
+        public override float Density => 0;
+
         public override BoundingBox? GetBoundingBox(byte metadata)
         {
             // lol this fukd

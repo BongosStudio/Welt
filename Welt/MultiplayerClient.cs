@@ -15,6 +15,7 @@ using Welt.API.Forge;
 using Welt.API.Net;
 using Welt.API.Physics;
 using Welt.API.Windows;
+using Welt.Core.Entities;
 using Welt.Core.Forge;
 using Welt.Core.Net;
 using Welt.Core.Net.Packets;
@@ -48,11 +49,13 @@ namespace Welt
         public User User { get; set; }
         public ReadOnlyWorld World { get; private set; }
         public PhysicsEngine Physics { get; set; }
+        public PlayerEntity Entity { get; set; }
         public bool IsLoggedIn { get; internal set; }
         public bool IsPaused { get; internal set; }
-        public int EntityID { get; internal set; }
+        public int EntityId { get; internal set; }
+        public double HeadBob { get; set; }
         public InventoryContainer Inventory { get; set; }
-        public int Health { get; set; }
+        
         public IWindow CurrentWindow { get; set; }
         public IBlockRepository BlockRepository { get; set; }
         public IItemRepository ItemRepository { get; set; }
@@ -112,9 +115,16 @@ namespace Welt
                 SendBufferSize = ushort.MaxValue,
                 AutoExpandMTU = true
             });
+            Entity = new PlayerEntity(User.Username);
             PacketReader = new PacketReader();
             PacketReader.RegisterCorePackets();
-            
+
+#if DEBUG
+
+            IsFlying = true;
+
+#endif
+
             m_PacketHandlers = new PacketHandler[0x100];
             Handlers.PacketHandlers.RegisterHandlers(this);
             World = new ReadOnlyWorld();
@@ -269,7 +279,7 @@ namespace Welt
             }
         }
 
-        public Size Size => new Size(Width, Height, Depth);
+        public Size Size => Entity.Size;
 
         #endregion
 
@@ -285,8 +295,37 @@ namespace Welt
             Position = newPosition;
         }
 
-        public float Yaw { get; set; }
-        public float Pitch { get; set; }
+        public short Health
+        {
+            get { return Entity.Health; }
+            set { Entity.Health = value; }
+        }
+        public bool IsFlying
+        {
+            get { return Entity.IsFlying; }
+            set { Entity.IsFlying = value; }
+        }
+        public bool IsCrouching
+        {
+            get { return Entity.IsCrouching; }
+            set { Entity.IsCrouching = value; }
+        }
+
+        public float Yaw
+        {
+            get { return Entity.Yaw; }
+            set { Entity.Yaw = value; }
+        }
+        public float Pitch
+        {
+            get { return Entity.Pitch; }
+            set { Entity.Pitch = value; }
+        }
+        public float HeadYaw
+        {
+            get { return Entity.HeadYaw; }
+            set { Entity.HeadYaw = value; }
+        }
 
         internal Vector3 _Position;
         public Vector3 Position
@@ -303,12 +342,16 @@ namespace Welt
                     QueuePacket(new PlayerPositionAndLookPacket(value.X, value.Y, value.Y + Height,
                     value.Z, Yaw, Pitch, false));
                 _Position = value;
-
+                Entity.Position = value;
                 OnPropertyChanged();
             }
         }
 
-        public Vector3 Velocity { get; set; }
+        public Vector3 Velocity
+        {
+            get { return Entity.Velocity; }
+            set { Entity.Velocity = value; }
+        }
 
         public float AccelerationDueToGravity => 1.6f;
 

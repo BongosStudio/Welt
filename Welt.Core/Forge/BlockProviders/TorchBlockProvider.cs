@@ -21,6 +21,7 @@ namespace Welt.Core.Forge.BlockProviders
         public override string DisplayName => "Torch";
         public override bool IsOpaque => false;
         public override bool IsSolid => false;
+        public override float Density => 0;
 
         public override Vector3B GetLightLevel(byte metadata)
         {

@@ -8,6 +8,7 @@ using Welt.Extensions;
 using Welt.API;
 using Welt.API.Forge;
 using Welt.Core;
+using Welt.Core.Forge;
 
 namespace Welt
 {
@@ -101,29 +102,7 @@ namespace Welt
 
         private void Update()
         {
-            //var player = Player.Current;
-            //if (player == null) return;
-
-            //if (player.World.IsBlockAround(BlockType.WATER, player.Position, 10, 10, 10, out var position))
-            //{
-            //    var vol = 1f - Vector3.Distance(player.Position, position) / 10;
-            //    FastMath.Adjust(0, 1, ref vol);
-            //    WaterWaves.Volume = vol;
-            //    if (WaterWaves.State == SoundState.Playing) return;
-            //    WaterWaves.IsLooped = true;
-            //    WaterWaves.Play();
-            //}
-            //else
-            //{
-            //    try
-            //    {
-            //        WaterWaves.Stop();
-            //    }
-            //    catch (Exception)
-            //    {
-
-            //    }
-            //}
+            
         }
     }
 }

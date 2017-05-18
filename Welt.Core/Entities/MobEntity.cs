@@ -52,29 +52,11 @@ namespace Welt.Core.Entities
             Position = newPosition;
         }
 
-        public float AccelerationDueToGravity
-        {
-            get
-            {
-                return 1.6f;
-            }
-        }
+        public float AccelerationDueToGravity => 1.6f;
 
-        public float Drag
-        {
-            get
-            {
-                return 0.40f;
-            }
-        }
+        public float Drag => .4f;
 
-        public float TerminalVelocity
-        {
-            get
-            {
-                return 78.4f;
-            }
-        }
+        public float TerminalVelocity => 78.4f;
 
         public PathResult CurrentPath { get; set; }
 

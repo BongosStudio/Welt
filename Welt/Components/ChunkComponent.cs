@@ -41,6 +41,7 @@ namespace Welt.Components
         protected Effect PointLight;
         protected Effect DirectionalLight;
         protected Texture2D TextureAtlas;
+        protected RenderTarget2D ReflectionTarget;
         private HashSet<Vector3I> m_ActiveMeshes;
         private List<ChunkMesh> m_Meshes;
         private ConcurrentBag<Mesh<VertexPositionNormalTextureEffect>> m_IncomingChunks;
@@ -181,7 +182,7 @@ namespace Welt.Components
             Particles.SetCamera(PlayerRenderer.Camera.View, PlayerRenderer.Camera.Projection);
             for (var i = 0; i < 100; i++)
             {
-                Particles.AddParticle(PlayerRenderer.Camera.Position + new Vector3(0, 20, 0), new Vector3(0, -15, 0));
+                Particles.AddParticle(PlayerRenderer.Player.Position + new Vector3(0, 20, 0), new Vector3(0, -15, 0));
             }
             Particles.Update(gameTime);
         }

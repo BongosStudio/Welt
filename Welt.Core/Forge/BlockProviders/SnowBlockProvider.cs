@@ -12,6 +12,7 @@ namespace Welt.Core.Forge.BlockProviders
 
         public override string DisplayName => "Snow";
         public override bool IsSolid => false;
+        public override float Density => 0.2f;
 
         public override BoundingBox? GetBoundingBox(byte metadata)
         {

@@ -35,7 +35,7 @@ namespace Welt.Core.Forge
             ChunkManager = new ChunkManager(new ChunkPersistence(), this);
             Name = name;
             Seed = 54321;
-            WaterLevel = 60;
+            WaterLevel = 50;
             SpawnPoint = new Vector3I(FastMath.NextRandom(Size)*Chunk.Width, 128, FastMath.NextRandom(Size)*Chunk.Depth);
             Generator = new WorldGenerator(this);
             var bSys = new BiomeSystem(this);
@@ -188,13 +188,7 @@ namespace Welt.Core.Forge
 
         public IChunk ChunkAt(Vector3I position, bool generate = false)
         {
-            var x = position.X;
-            var z = position.Z;
-
-            var cx = x / Chunk.Width;
-            var cz = z / Chunk.Depth;
-
-            var at = ChunkManager.GetChunk(cx, 0, cz, generate);
+            var at = ChunkManager.GetChunk(position.X / Chunk.Width, 0, position.Z / Chunk.Depth, generate);
 
             return at;
         }
@@ -205,7 +199,7 @@ namespace Welt.Core.Forge
                 return new Block(BlockType.NONE);
             //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
             var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
-            return chunk.Blocks[x % Chunk.Width, y, x % Chunk.Depth];
+            return chunk.GetBlock(x % Chunk.Width, y, z % Chunk.Depth);
         }
 
         #endregion

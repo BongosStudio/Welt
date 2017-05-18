@@ -60,10 +60,12 @@
     <Compile Include="BlockEffect.cs" />
     <Compile Include="BlockFaceDirection.cs" />
     <Compile Include="BlockStack.cs" />
+    <Compile Include="AppendageStatus.cs" />
     <Compile Include="BoundingCylinder.cs" />
     <Compile Include="ByteArraySegment.cs" />
     <Compile Include="Cardinal.cs" />
     <Compile Include="ChatMessageEventArgs.cs" />
+    <Compile Include="Appendage.cs" />
     <Compile Include="Dictionary2.cs" />
     <Compile Include="Dictionary3.cs" />
     <Compile Include="Entities\IBlockPhysicsProvider.cs" />
@@ -95,6 +97,7 @@
     <Compile Include="Forge\IWorld.cs" />
     <Compile Include="Forge\IWorldDecorationGenerator.cs" />
     <Compile Include="Forge\IWorldGenerator.cs" />
+    <Compile Include="Forge\PlayerCollidedEventArgs.cs" />
     <Compile Include="Forge\WorldType.cs" />
     <Compile Include="IAccessConfiguration.cs" />
     <Compile Include="IEntityManager.cs" />

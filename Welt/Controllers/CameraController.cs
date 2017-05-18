@@ -12,8 +12,6 @@ namespace Welt.Controllers
             Camera = camera;
         }
 
-        public abstract void ProcessInput(GameTime gameTime);
-
         public virtual void Initialize()
         {
             Camera.Initialize();

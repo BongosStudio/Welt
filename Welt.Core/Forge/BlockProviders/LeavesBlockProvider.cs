@@ -12,6 +12,7 @@ namespace Welt.Core.Forge.BlockProviders
 
         public override string DisplayName => "Leaves";
         public override bool IsOpaque => false;
+        public override float Density => 0.3f;
         public override bool WillRenderOpaque => true;
         public override bool WillRenderSameNeighbor => true;
         public override BlockEffect DisplayEffect => BlockEffect.VegetationWindEffect;

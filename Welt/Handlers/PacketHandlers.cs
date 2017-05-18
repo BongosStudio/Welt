@@ -66,7 +66,7 @@ namespace Welt.Handlers
         public static void HandleLoginResponse(IPacket _packet, MultiplayerClient client)
         {
             var packet = (LoginResponsePacket)_packet;
-            client.EntityID = packet.EntityID;
+            client.EntityId = packet.EntityID;
             client.QueuePacket(new PlayerGroundedPacket());
             client.World.World = new World(packet.WorldName, packet.Seed);
         }

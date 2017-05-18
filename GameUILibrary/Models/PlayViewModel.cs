@@ -51,6 +51,20 @@ namespace GameUILibrary.Models
             }
         }
 
+        private string m_TooltipText = "";
+        public string TooltipText
+        {
+            get { return m_TooltipText; }
+            set { SetProperty(ref m_TooltipText, value ?? ""); }
+        }
+
+        private double m_TooltipOpacity = 0;
+        public double TooltipOpacity
+        {
+            get { return m_TooltipOpacity; }
+            set { SetProperty(ref m_TooltipOpacity, value); }
+        }
+
         public void AddMessage(string message)
         {
             ChatBoxText += Environment.NewLine + message;

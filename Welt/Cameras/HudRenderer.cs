@@ -64,7 +64,7 @@ namespace Welt.Cameras
             m_SpriteBatch.Draw(m_CrosshairTexture,
                 new Vector2(
                     m_GraphicsDevice.Viewport.Width/2 - m_CrosshairTexture.Width/2,
-                    m_GraphicsDevice.Viewport.Height/2 - m_CrosshairTexture.Height/2), Color.White);
+                    m_GraphicsDevice.Viewport.Height/2 - m_CrosshairTexture.Height/2), Color.Black);
             m_SpriteBatch.End();
 
             #region minimap

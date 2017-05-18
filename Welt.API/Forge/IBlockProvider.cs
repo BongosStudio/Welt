@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using Welt.API.Net;
+using Welt.API.Physics;
 
 namespace Welt.API.Forge
 {
@@ -32,5 +33,8 @@ namespace Welt.API.Forge
         void BlockMined(BlockDescriptor descriptor, BlockFaceDirection face, IWorld world, IRemoteClient user);
         void BlockUpdate(BlockDescriptor descriptor, BlockDescriptor source, IMultiplayerServer server, IWorld world);
         void BlockLoadedFromChunk(Vector3I coords, IMultiplayerServer server, IWorld world);
+
+        event EventHandler<PlayerCollidedEventArgs> PlayerCollide;
+        void OnPlayerCollide(IAABBEntity entity, Vector3I collisionPoint);
     }
 }

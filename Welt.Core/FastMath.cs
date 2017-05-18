@@ -158,6 +158,74 @@ namespace Welt.Core
             return values.Sum()/values.Length;
         }
 
+        public static int Min(params int[] values)
+        {
+            return values.Min();
+        }
+
+        public static long Min(params long[] values)
+        {
+            return values.Min();
+        }
+
+        public static float Min(params float[] values)
+        {
+            return values.Min();
+        }
+
+        public static double Min(params double[] values)
+        {
+            return values.Min();
+        }
+
+        public static int Max(params int[] values)
+        {
+            return values.Max();
+        }
+
+        public static long Max(params long[] values)
+        {
+            return values.Max();
+        }
+
+        public static float Max(params float[] values)
+        {
+            return values.Max();
+        }
+
+        public static double Max(params double[] values)
+        {
+            return values.Max();
+        }
+
+        public static int Centerize(int targetValue, int currentValue, int step)
+        {
+            if (Math.Abs(targetValue - currentValue) <= step) return targetValue;
+            if (currentValue > targetValue) return currentValue - step;
+            else return targetValue - step;
+        }
+
+        public static long Centerize(long targetValue, long currentValue, long step)
+        {
+            if (Math.Abs(targetValue - currentValue) <= step) return targetValue;
+            if (currentValue > targetValue) return currentValue - step;
+            else return targetValue - step;
+        }
+
+        public static float Centerize(float targetValue, float currentValue, float step)
+        {
+            if (Math.Abs(targetValue - currentValue) <= step) return targetValue;
+            if (currentValue > targetValue) return currentValue - step;
+            else return targetValue - step;
+        }
+
+        public static double Centerize(double targetValue, double currentValue, double step)
+        {
+            if (Math.Abs(targetValue - currentValue) <= step) return targetValue;
+            if (currentValue > targetValue) return currentValue - step;
+            else return targetValue - step;
+        }
+
         public static int NextRandom(int max)
         {
             lock (m_Rlock)

@@ -51,50 +51,6 @@ namespace Welt.Controllers
             ProcessesInput = true;
         }
 
-        #region ProcessInput
-        public override void ProcessInput(GameTime gameTime)
-        {
-            //PlayerIndex activeIndex;
-            if (!ProcessesInput) return;
-
-            var moveVector = new Vector3(0, 0, 0);
-            var keyState = Keyboard.GetState();
-            if (keyState.GetPressedKeys().Length == 0) return;
-            if (keyState.IsKeyDown(Keys.W))
-            {
-                moveVector += Vector3.Forward;
-            }
-            if (keyState.IsKeyDown(Keys.S))
-            {
-                moveVector += Vector3.Backward;
-            }
-            if (keyState.IsKeyDown(Keys.A))
-            {
-                moveVector += Vector3.Left;
-            }
-            if (keyState.IsKeyDown(Keys.D))
-            {
-                moveVector += Vector3.Right;
-            }
-            if (keyState.IsKeyDown(Keys.LeftShift) && Camera.Position.Y > -20 && Camera.Position.Y < 240)
-            {
-                moveVector += Vector3.Down;
-            }
-            if (keyState.IsKeyDown(Keys.Space))
-            {
-                moveVector += Vector3.Up;
-            }
-
-            if (moveVector != Vector3.Zero)
-            {
-                var rotationMatrix = //Matrix.CreateRotationX(Camera.UpDownRotation)*
-                                     Matrix.CreateRotationY(Camera.LeftRightRotation);
-                var rotatedVector = Vector3.Transform(moveVector, rotationMatrix);
-                Camera.Position += rotatedVector*MOVEMENTSPEED;
-            }
-        }
-        #endregion
-
         #region Update
 
         public override void Update(GameTime gameTime)

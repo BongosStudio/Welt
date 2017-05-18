@@ -231,6 +231,11 @@ namespace Welt
 
         #endregion Draw
 
+        public void ShowTooltip(string tooltip)
+        {
+            PlayScene.Instance.ShowTooltip(tooltip);
+        }
+
         public void SetRenderTarget(RenderTarget2D target)
         {
             GraphicsDevice.SetRenderTarget(target);

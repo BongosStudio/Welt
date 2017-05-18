@@ -115,7 +115,6 @@ namespace Welt.Core.Server
                 AcceptIncomingConnections = true,
                 UseMessageRecycling = true,
                 SendBufferSize = ushort.MaxValue,
-                ReceiveBufferSize = ushort.MaxValue,
                 AutoExpandMTU = true
             };
             NetworkConfiguration.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -190,7 +189,6 @@ namespace Welt.Core.Server
                         Server.Recycle(message);
                     }
                     incomingMessages.Clear();
-                    Server.FlushSendQueue();
                 }
             })
             { IsBackground = true };

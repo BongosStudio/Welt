@@ -53,14 +53,13 @@ namespace Welt.API
 
         public static implicit operator Vector3I(Vector3 value)
         {
-            return new Vector3I((uint)value.X, (uint)value.Y, (uint)value.Z);
+            return new Vector3I((uint)Math.Floor(value.X), (uint)Math.Floor(value.Y), (uint)Math.Floor(value.Z));
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is Vector3I)
+            if (obj is Vector3I other)
             {
-                var other = (Vector3I)obj;
                 return X == other.X && Y == other.Y && Z == other.Z;
             }
             return base.Equals(obj);

@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using Welt.API.Entities;
+using Welt.API.Forge;
+using Welt.Core.Extensions;
 using Welt.Core.Forge;
 using Welt.Forge;
 
@@ -93,6 +96,27 @@ namespace Welt.Extensions
                 }
             }
             return blocks.ToArray();
+        }
+
+        public static bool IsEntityInWater(this IEntity entity)
+        {
+            return entity.World.GetBlock(entity.Position).Id == BlockType.WATER;
+        }
+
+        public static bool IsPlayerInWater(this MultiplayerClient player)
+        {
+            return player.World.GetBlock(player.Position).Id == BlockType.WATER ||
+                player.World.GetBlock(player.Position + Vector3.UnitY).Id == BlockType.WATER;
+        }
+
+        public static float GetGravity(this ReadOnlyWorld world)
+        {
+            return world.World.GetGravity();
+        }
+
+        public static IBlockProvider GetBlockProvider(this ReadOnlyWorld world, Vector3 position)
+        {
+            return BlockProvider.BlockRepository.GetBlockProvider(world.GetBlock(position).Id);
         }
     }
 }

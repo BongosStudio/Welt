@@ -14,6 +14,15 @@ namespace Welt.Core.Entities
         public PlayerEntity(string username) : base()
         {
             Username = username;
+            AppendageReports = new[]
+            {
+                new AppendageReport(Appendage.Head),
+                new AppendageReport(Appendage.LeftArm),
+                new AppendageReport(Appendage.RightArm),
+                new AppendageReport(Appendage.LeftLeg),
+                new AppendageReport(Appendage.RightLeg),
+                new AppendageReport(Appendage.Torso)
+            };
         }
 
         public const float Width = 0.6f;
@@ -29,7 +38,7 @@ namespace Welt.Core.Entities
                     FastMath.CreateAbsoluteInt(Position.Y),
                     FastMath.CreateAbsoluteInt(Position.Z),
                     FastMath.CreateRotationByte(Yaw),
-                    FastMath.CreateRotationByte(Pitch), 0 /* Note: current item is set through other means */);
+                    FastMath.CreateRotationByte(Pitch), 0);
             }
         }
 
@@ -92,6 +101,8 @@ namespace Welt.Core.Entities
                 OnPropertyChanged();
             }
         }
+
+        public override AppendageReport[] AppendageReports { get; }
 
         public event EventHandler<EntityEventArgs> PickUpItem;
         public void OnPickUpItem(ItemEntity item)

@@ -37,6 +37,10 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private TextBox e_3;
         
+        private Border e_4;
+        
+        private TextBlock e_5;
+        
         public PlayUI() : 
                 base() {
             this.Initialize();
@@ -100,6 +104,27 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_3.SetBinding(TextBox.IsEnabledProperty, binding_e_3_IsEnabled);
             Binding binding_e_3_Text = new Binding("ChatBoxInput");
             this.e_3.SetBinding(TextBox.TextProperty, binding_e_3_Text);
+            // e_4 element
+            this.e_4 = new Border();
+            this.e_0.Children.Add(this.e_4);
+            this.e_4.Name = "e_4";
+            this.e_4.Margin = new Thickness(0F, 21F, 26F, 0F);
+            this.e_4.HorizontalAlignment = HorizontalAlignment.Right;
+            this.e_4.VerticalAlignment = VerticalAlignment.Top;
+            this.e_4.BorderBrush = new SolidColorBrush(new ColorW(54, 85, 143, 255));
+            this.e_4.BorderThickness = new Thickness(4F, 0F, 0F, 0F);
+            Binding binding_e_4_Opacity = new Binding("TooltipOpacity");
+            this.e_4.SetBinding(Border.OpacityProperty, binding_e_4_Opacity);
+            // e_5 element
+            this.e_5 = new TextBlock();
+            this.e_4.Child = this.e_5;
+            this.e_5.Name = "e_5";
+            this.e_5.Background = new SolidColorBrush(new ColorW(0, 0, 0, 178));
+            this.e_5.Foreground = new SolidColorBrush(new ColorW(255, 255, 255, 255));
+            this.e_5.Padding = new Thickness(20F, 10F, 20F, 10F);
+            this.e_5.TextWrapping = TextWrapping.Wrap;
+            Binding binding_e_5_Text = new Binding("TooltipText");
+            this.e_5.SetBinding(TextBlock.TextProperty, binding_e_5_Text);
         }
         
         private static void InitializeElementResources(UIElement elem) {

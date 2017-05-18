@@ -8,6 +8,7 @@ using Welt.API.Forge;
 using ApiBlock = Welt.API.Forge.Block;
 using Welt.API.Entities;
 using Welt.API.Net;
+using Welt.API.Physics;
 
 namespace Welt.Core.Forge
 {
@@ -43,6 +44,13 @@ namespace Welt.Core.Forge
         ushort IItemProvider.Id => Id;
 
         public byte MaximumStack => 64;
+
+        public event EventHandler<PlayerCollidedEventArgs> PlayerCollide;
+
+        public virtual void OnPlayerCollide(IAABBEntity entity, Vector3I collisionPoint)
+        {
+            PlayerCollide?.Invoke(entity, new PlayerCollidedEventArgs(entity, collisionPoint));
+        }
 
         public virtual BoundingBox? GetBoundingBox(byte metadata)
         {

@@ -131,6 +131,7 @@ namespace Welt.Core.Server
             var message = Client.CreateMessage();
             PacketReader.WritePacket(message, packet);
             Client.SendMessage(message, Server.GetConnection(EndPoint), NetDeliveryMethod.ReliableOrdered, 0);
+            Client.FlushSendQueue();
         }
         
         public void Disconnect()

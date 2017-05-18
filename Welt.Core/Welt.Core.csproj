@@ -59,6 +59,7 @@
     <Compile Include="AI\AStarPathFinder.cs" />
     <Compile Include="AI\PriorityQueue.cs" />
     <Compile Include="AI\WanderState.cs" />
+    <Compile Include="Entities\AppendageReport.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\EntityEventArgs.cs" />
     <Compile Include="Entities\EntityFlags.cs" />

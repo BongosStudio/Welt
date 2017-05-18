@@ -1,10 +1,3 @@
-//custom structs
-
-struct Light
-{
-
-};
-
 float4x4 World;
 float4x4 View;
 float4x4 Projection;
@@ -158,9 +151,6 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 		output.Position.y += (0.1f * sin(RippleTime + input.Position.x + (input.Position.z * 2))) - 0.2f;
 		output.Color.rgb = (sColor * 15);
 		output.Color.a = 1;
-
-		output.Color.a = 1;
-		// TODO: display reflection
 		break;
 	case 3: // grass wave effect
 		float n = noise3f(input.Position.xyz);
@@ -227,16 +217,16 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	color.a = texColor1.a;
 	switch (input.Effect)
 	{
-	case 1:
-		//color.a = 0.3;
-
-		break;
-	default:
-		if (color.a == 0)
-		{
-			clip(-1);
-		}
-		break;
+		case 1:
+            //float4 reflColor = tex2D(ReflectionTextureSampler, input.Position.xz);
+            //color.rgb *= reflColor;
+			break;
+		default:
+			if (color.a == 0)
+			{
+				clip(-1);
+			}
+			break;
 	}
 
 	nColor *= (4 - input.TexCoords1.y) * .125f;

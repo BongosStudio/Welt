@@ -6,6 +6,7 @@ using Welt.API;
 using Welt.API.Forge;
 using Welt.Core.Forge;
 using Welt.Core.Forge.BlockProviders;
+using Welt.Extensions;
 using Welt.Graphics;
 using Welt.Processors.MeshBuilders;
 
@@ -87,17 +88,17 @@ namespace Welt.Forge.Renderers
                         var id = chunk.GetBlock(x, y, z).Id;
                         var worldCoords = new Vector3(chunk.GetPosition().X + x, y, chunk.GetPosition().Z + z);
                         var provider = BlockRepository.GetBlockProvider(id) ?? new DefaultBlockProvider();
-                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x + 1, y, z).Id)))
+                        if (WillRenderFace(provider, world.GetBlockProvider(worldCoords + Vector3.UnitX)))
                             state.AddFacesTo(coords, VisibleFaces.East);
-                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x - 1, y, z).Id)))
+                        if (WillRenderFace(provider, world.GetBlockProvider(worldCoords - Vector3.UnitX)))
                             state.AddFacesTo(coords, VisibleFaces.West);
-                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z + 1).Id)))
+                        if (WillRenderFace(provider, world.GetBlockProvider(worldCoords + Vector3.UnitZ)))
                             state.AddFacesTo(coords, VisibleFaces.North);
-                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y, z - 1).Id)))
+                        if (WillRenderFace(provider, world.GetBlockProvider(worldCoords - Vector3.UnitZ)))
                             state.AddFacesTo(coords, VisibleFaces.South);
-                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y + 1, z).Id)))
+                        if (WillRenderFace(provider, world.GetBlockProvider(worldCoords + Vector3.UnitY)))
                             state.AddFacesTo(coords, VisibleFaces.Top);
-                        if (WillRenderFace(provider, BlockRepository.GetBlockProvider(chunk.GetBlock(x, y - 1, z).Id)))
+                        if (WillRenderFace(provider, world.GetBlockProvider(worldCoords - Vector3.UnitY)))
                             state.AddFacesTo(coords, VisibleFaces.Bottom);
                     }
                 }
