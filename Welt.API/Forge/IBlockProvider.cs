@@ -14,6 +14,7 @@ namespace Welt.API.Forge
         bool IsOpaque { get; }
         bool WillRenderSameNeighbor { get; }
         bool IsSolid { get; }
+        bool IsSelectable { get; }
         bool WillRenderOpaque { get; }
         byte LightOpacity { get; }
         bool WillDiffuseSkyLight { get; }

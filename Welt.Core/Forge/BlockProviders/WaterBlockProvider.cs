@@ -15,6 +15,7 @@ namespace Welt.Core.Forge.BlockProviders
         public override float Hardness { get; set; } = -1;
         public override float Density => 0.3f;
         public override bool IsOpaque => false;
+        public override bool IsSelectable => false;
         public override bool WillRenderSameNeighbor => false;
         public override bool IsSolid => false;
     }

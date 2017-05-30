@@ -65,6 +65,13 @@ namespace GameUILibrary.Models
             set { SetProperty(ref m_TooltipOpacity, value); }
         }
 
+        private string m_LookingAt = "";
+        public string LookingAt
+        {
+            get { return m_LookingAt; }
+            set { SetProperty(ref m_LookingAt, value ?? ""); }
+        }
+
         public void AddMessage(string message)
         {
             ChatBoxText += Environment.NewLine + message;

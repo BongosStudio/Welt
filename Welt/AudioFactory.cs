@@ -93,7 +93,7 @@ namespace Welt
             switch (block)
             {
                 case BlockType.WATER:
-                    Splash.Play();
+                    //Splash.Play();
                     break;
                 default:
                     break;

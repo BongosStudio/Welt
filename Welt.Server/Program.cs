@@ -46,7 +46,7 @@ namespace Welt.Server
                 {
                     for (var z = -8; z < 8; z++)
                     {
-                        world.GetChunk(new Vector3I((uint)(x + world.SpawnPoint.X), 0, (uint)(z + world.SpawnPoint.Z)), true);
+                        world.GetChunk(new Vector3I((uint)(x + world.SpawnPoint.X), 0, (uint)(z + world.SpawnPoint.Y)), true);
                     }
                 }
                 server.AddLogProvider(new DefaultLogProvider());

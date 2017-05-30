@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,13 @@ namespace Welt.Core.Extensions
         public static string GenerateRandomSystemName(this IGalaxy galaxy)
         {
             return $"{galaxy.Name[0]}{char.ConvertFromUtf32(FastMath.NextRandom(char.MaxValue))}{FastMath.NextRandom(10, 99)}";
+        }
+
+        public static Vector3 GetSpawnPosition(this IWorld world)
+        {
+            var spawnChunk = new Vector3(world.SpawnPoint.X / 16, 0, world.SpawnPoint.Y / 16);
+            var height = world.GetChunk(spawnChunk, true).GetHeight((byte)(spawnChunk.X % Chunk.Width), (byte)(spawnChunk.Z % Chunk.Depth));
+            return new Vector3(world.SpawnPoint.X, height + 1, world.SpawnPoint.Y);
         }
     }
 }

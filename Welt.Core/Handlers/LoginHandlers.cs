@@ -6,6 +6,8 @@ using Welt.API;
 using Welt.API.Logging;
 using Welt.API.Net;
 using Welt.Core.Entities;
+using Welt.Core.Extensions;
+using Welt.Core.Forge;
 using Welt.Core.Net.Packets;
 using Welt.Core.Server;
 
@@ -44,7 +46,9 @@ namespace Welt.Core.Handlers
                 remoteClient.ChunkRadius = 5;
 
                 if (!remoteClient.Load())
-                    remoteClient.Entity.Position = remoteClient.World.SpawnPoint;
+                {
+                    remoteClient.Entity.Position = remoteClient.World.GetSpawnPosition();
+                }
                 // Make sure they don't spawn in the ground
                 //var collision = new Func<bool>(() =>
                 //{
@@ -63,7 +67,7 @@ namespace Welt.Core.Handlers
                 remoteClient.QueuePacket(new LoginResponsePacket(client.Entity.EntityID, 0, client.World.Name));
                 remoteClient.UpdateChunks();
                 remoteClient.QueuePacket(new SpawnPositionPacket((int)remoteClient.Entity.Position.X,
-                        (int)remoteClient.Entity.Position.Y, (int)remoteClient.Entity.Position.Z));
+                        (int)remoteClient.Entity.Position.Z));
                 remoteClient.QueuePacket(new SetPlayerPositionPacket(remoteClient.Entity.Position.X,
                         remoteClient.Entity.Position.Y + 1,
                         remoteClient.Entity.Position.Y + remoteClient.Entity.Size.Height + 1,

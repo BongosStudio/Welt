@@ -18,11 +18,11 @@ namespace Welt.Core.Forge.Biomes
         public BiomeSystem(World world)
         {
             World = world;
-            HighNoise.Persistance = 1;
-            HighNoise.Frequency = 0.034;
-            HighNoise.Amplitude = 35;
-            HighNoise.Octaves = 3;
-            HighNoise.Lacunarity = 2;
+            LowNoise.Persistance = 1;
+            LowNoise.Frequency = 0.034;
+            LowNoise.Amplitude = 35;
+            LowNoise.Octaves = 3;
+            LowNoise.Lacunarity = 2;
 
             MidNoise.Persistance = 0.3;
             MidNoise.Frequency = 0.045;
@@ -30,11 +30,11 @@ namespace Welt.Core.Forge.Biomes
             MidNoise.Octaves = 1;
             MidNoise.Lacunarity = 5;
 
-            LowNoise.Persistance = 1;
-            LowNoise.Frequency = 0.004;
-            LowNoise.Amplitude = 15;
-            LowNoise.Octaves = 2;
-            LowNoise.Lacunarity = 2.5;
+            HighNoise.Persistance = 1;
+            HighNoise.Frequency = 0.034;
+            HighNoise.Amplitude = 15;
+            HighNoise.Octaves = 2;
+            HighNoise.Lacunarity = 4;
 
             BottomNoise.Persistance = 0.5;
             BottomNoise.Frequency = 0.013;
@@ -182,7 +182,7 @@ namespace Welt.Core.Forge.Biomes
 
         byte GetHeight(int x, int z)
         {
-            var noise = (FinalNoise.Value2D(x, z) + World.WaterLevel) * .75;
+            var noise = (FinalNoise.Value2D(x, z) + World.WaterLevel);
             if (noise < 0)
                 noise = World.WaterLevel;
             if (noise > Chunk.Height)

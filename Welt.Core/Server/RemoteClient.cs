@@ -177,6 +177,7 @@ namespace Welt.Core.Server
             if (!IsLoggedIn) return;
             var newChunks = new List<Vector3I>();
             var center = new Vector3((int)(Entity.Position.X / Chunk.Width), 0, (int)(Entity.Position.Z / Chunk.Depth));
+   
             for (int x = -ChunkRadius; x < ChunkRadius; x++)
             {
                 for (int z = -ChunkRadius; z < ChunkRadius; z++)

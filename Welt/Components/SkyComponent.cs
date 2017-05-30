@@ -24,11 +24,7 @@ namespace Welt.Components
         // GPU generated clouds
 
         public float CloudOvercast = 1f;
-
-        protected Model SkyDome;
-        protected Texture2D CloudStaticMap;
-        protected RenderTarget2D CloudsRenderTarget;
-        protected Effect PerlinNoise;
+        
         protected VertexPositionTexture[] FullScreenVertices;
 
         public SkyComponent(WeltGame game, PlayerRenderer player)
@@ -187,9 +183,9 @@ namespace Welt.Components
             Player.Camera.Position = Vector3.Zero;
             Player.Player.Yaw = 0;
             Player.Camera.Update(gameTime);
-            Player.Camera.ApplyTo(SkyPlaneEffect);
+            Player.Camera.ApplyTo((IEffectMatrices)SkyPlaneEffect);
             Player.Player.Yaw = yaw;
-            Player.Camera.ApplyTo(CelestialPlaneEffect);
+            Player.Camera.ApplyTo((IEffectMatrices)CelestialPlaneEffect);
             Player.Camera.Position = position;
             // Sky
             SkyPlaneEffect.FogColor = AtmosphereColor.ToVector3();
@@ -230,9 +226,7 @@ namespace Welt.Components
             var currentViewMatrix = Player.Camera.View;
 
             var tod = Player.Player.World.World.TimeOfDay;
-
-            var modelTransforms = new Matrix[SkyDome.Bones.Count];
-            SkyDome.CopyAbsoluteBoneTransformsTo(modelTransforms);
+            
 
             // Void
             //Game.GraphicsDevice.SetVertexBuffer(SkyPlane);
@@ -282,27 +276,15 @@ namespace Welt.Components
             // Generate the clouds
             var time = (float)gameTime.TotalGameTime.TotalMilliseconds / 100.0f;
             //CloudOvercast += 0.001f;
-            GeneratePerlinNoise(time);
         }
 
         public void LoadContent(ContentManager content)
         {
-            SkyDome = content.Load<Model>("Models\\dome");
-            SkyDome.Meshes[0].MeshParts[0].Effect = content.Load<Effect>("Effects\\SkyDome");
-
-            CloudMap = Game.GraphicsManager.CloudTexture;
-            PerlinNoise = content.Load<Effect>("Effects\\PerlinNoise");
-
             var pp = Graphics.PresentationParameters;
 
             //the mipmap does not work on some pc ( i5 laptops at least), with mipmap false it s fine 
 
-            CloudsRenderTarget = new RenderTarget2D(Graphics, pp.BackBufferWidth, pp.BackBufferHeight, false,
-
-                SurfaceFormat.Color, DepthFormat.None);
-
-            CloudStaticMap = CreateStaticMap(32);
-
+            
             FullScreenVertices = SetUpFullscreenVertices();
         }
 
@@ -340,27 +322,5 @@ namespace Welt.Components
                 new VertexPositionTexture(new Vector3(1, -1, 0f), new Vector2(1, 0))
             };
         }
-
-        public virtual void GeneratePerlinNoise(float time)
-        {
-            Graphics.SetRenderTarget(CloudsRenderTarget);
-            //_graphicsDevice.Clear(Color.White);
-
-            PerlinNoise.CurrentTechnique = PerlinNoise.Techniques["PerlinNoise"];
-            PerlinNoise.Parameters["xTexture"].SetValue(CloudStaticMap);
-            PerlinNoise.Parameters["xOvercast"].SetValue(CloudOvercast);
-            PerlinNoise.Parameters["xTime"].SetValue(time / 1000.0f);
-
-            foreach (var pass in PerlinNoise.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                Graphics.DrawUserPrimitives(PrimitiveType.TriangleStrip, FullScreenVertices, 0, 2);
-            }
-
-            Graphics.SetRenderTarget(null);
-            CloudMap = CloudsRenderTarget;
-
-        }
-
     }
 }

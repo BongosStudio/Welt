@@ -102,12 +102,10 @@
     <Compile Include="Components\FpsComponent.cs" />
     <Compile Include="Components\IGameComponent.cs" />
     <Compile Include="Components\IVisualComponent.cs" />
-    <Compile Include="Components\LightingComponent.cs" />
     <Compile Include="Components\SkyComponent.cs" />
     <Compile Include="Effects\AnimationBoard.cs" />
     <Compile Include="Effects\IWeltAnimation.cs" />
     <Compile Include="Events\ServerDiscoveredEventArgs.cs" />
-    <Compile Include="Forge\BlockBucket.cs" />
     <Compile Include="Forge\Renderers\ChunkMesh.cs" />
     <Compile Include="Graphics\ParticleVertex.cs" />
     <Compile Include="Graphics\QuadRenderer.cs" />
@@ -147,13 +145,9 @@
     <Compile Include="Handlers\PacketHandlers.cs" />
     <Compile Include="IO\InputMap.cs" />
     <Compile Include="IO\WireChunk.cs" />
-    <Compile Include="Lighting\Light.cs" />
-    <Compile Include="Lighting\LightEngine.cs" />
-    <Compile Include="Lighting\LightType.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Managers\AudioManager.cs" />
     <Compile Include="Managers\TaskManager.cs" />
-    <Compile Include="Forge\ChunkState.cs" />
     <Compile Include="MultiplayerClient.cs" />
     <Compile Include="Particles\ParticleEmitter.cs" />
     <Compile Include="Particles\ParticleSettings.cs" />
@@ -267,12 +261,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Effects\ClearGBuffer.fx" />
-    <Content Include="Content\Effects\CombineFinal.fx" />
-    <Content Include="Content\Effects\DirectionalLight.fx" />
+    <Content Include="Content\Effects\Combine.fx" />
+    <Content Include="Content\Effects\DepthNormal.fx" />
+    <Content Include="Content\Effects\LightMap.fx" />
     <Content Include="Content\Effects\ParticleEffect.fx" />
     <Content Include="Content\Effects\PerlinNoise.fx" />
-    <Content Include="Content\Effects\SkyDome.fx" />
     <Content Include="Content\Effects\BlockEffect.fx" />
     <Content Include="Content\Images\splashscreen.png" />
     <Content Include="Content\Images\welt.png" />
@@ -305,8 +298,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Content\Effects\PointLight.fx" />
-    <None Include="Content\Effects\ShadowMap.fx" />
     <None Include="Content\Fonts\Arial_13.5_Regular.spritefont" />
     <None Include="Content\Fonts\Code_7x5_13.5_Regular.spritefont" />
     <None Include="Content\Fonts\console.spritefont" />

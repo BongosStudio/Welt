@@ -41,11 +41,6 @@ namespace Welt.Core.Forge
             // for now, we'll return just the block palette? idk
             var data = Blocks.ToByteArray();
 
-#if DEBUG
-            
-
-#endif
-
             return data;
         }
 

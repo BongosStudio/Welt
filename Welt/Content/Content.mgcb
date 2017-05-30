@@ -26,12 +26,6 @@
 /processorParam:DebugMode=Auto
 /build:Effects/PerlinNoise.fx
 
-#begin Effects/SkyDome.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/SkyDome.fx
-
 #begin Textures/crosshair.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -152,12 +146,6 @@
 /processorParam:DebugMode=Auto
 /build:Effects/ParticleEffect.fx
 
-#begin Effects/ShadowMap.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/ShadowMap.fx
-
 #begin Fonts/Arial_13.5_Regular.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -205,34 +193,28 @@
 /processorParam:TextureFormat=Compressed
 /build:Models/sphere.x
 
-#begin Effects/ClearGBuffer.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/ClearGBuffer.fx
-
-#begin Effects/CombineFinal.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/CombineFinal.fx
-
-#begin Effects/DirectionalLight.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/DirectionalLight.fx
-
-#begin Effects/PointLight.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Effects/PointLight.fx
-
 #begin Fonts/Code_7x5_13.5_Regular.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Code_7x5_13.5_Regular.spritefont
+
+#begin Effects/Combine.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/Combine.fx
+
+#begin Effects/DepthNormal.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/DepthNormal.fx
+
+#begin Effects/LightMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Effects/LightMap.fx
 

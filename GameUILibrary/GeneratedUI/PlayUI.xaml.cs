@@ -41,6 +41,8 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private TextBlock e_5;
         
+        private TextBlock e_6;
+        
         public PlayUI() : 
                 base() {
             this.Initialize();
@@ -108,7 +110,7 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_4 = new Border();
             this.e_0.Children.Add(this.e_4);
             this.e_4.Name = "e_4";
-            this.e_4.Margin = new Thickness(0F, 21F, 26F, 0F);
+            this.e_4.Margin = new Thickness(20F, 20F, 20F, 0F);
             this.e_4.HorizontalAlignment = HorizontalAlignment.Right;
             this.e_4.VerticalAlignment = VerticalAlignment.Top;
             this.e_4.BorderBrush = new SolidColorBrush(new ColorW(54, 85, 143, 255));
@@ -125,6 +127,16 @@ namespace EmptyKeys.UserInterface.Generated {
             this.e_5.TextWrapping = TextWrapping.Wrap;
             Binding binding_e_5_Text = new Binding("TooltipText");
             this.e_5.SetBinding(TextBlock.TextProperty, binding_e_5_Text);
+            // e_6 element
+            this.e_6 = new TextBlock();
+            this.e_0.Children.Add(this.e_6);
+            this.e_6.Name = "e_6";
+            this.e_6.Margin = new Thickness(10F, 57F, 0F, 0F);
+            this.e_6.HorizontalAlignment = HorizontalAlignment.Left;
+            this.e_6.VerticalAlignment = VerticalAlignment.Top;
+            this.e_6.TextWrapping = TextWrapping.Wrap;
+            Binding binding_e_6_Text = new Binding("LookingAt");
+            this.e_6.SetBinding(TextBlock.TextProperty, binding_e_6_Text);
         }
         
         private static void InitializeElementResources(UIElement elem) {

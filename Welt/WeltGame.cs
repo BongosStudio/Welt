@@ -175,10 +175,16 @@ namespace Welt
 
         protected override void Initialize()
         {
-            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            //AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            //{
+            //    ThrowHelper.Throw<Exception>(args.ExceptionObject,
+            //        args.IsTerminating ? ThrowType.Severe : ThrowType.Error);
+            //};
+            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
             {
-                ThrowHelper.Throw<Exception>(args.ExceptionObject,
-                    args.IsTerminating ? ThrowType.Severe : ThrowType.Error);
+                Logger.WriteLine(args.Exception.ToString());
+                //Exit();
+                
             };
             IsMouseVisible = true;
             Window.ClientSizeChanged += (sender, args) =>
@@ -204,7 +210,6 @@ namespace Welt
 
         protected override void Update(GameTime gameTime)
         {
-            Draw(gameTime);
             var kstate = Keyboard.GetState();
             if (kstate.IsKeyDown(Keys.F6)) TakeScreenshot();
             Client.Update(gameTime);

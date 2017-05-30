@@ -8,10 +8,10 @@ namespace Welt.API
 {
     public struct ItemStack
     {
-        public BlockDescriptor Block;
+        public Block Block;
         public byte Count;
         
-        public ItemStack(BlockDescriptor block, byte count = 1)
+        public ItemStack(Block block, byte count = 1)
         {
             Block = block;
             Count = count;
@@ -31,6 +31,21 @@ namespace Welt.API
             }
             stack.Count += Count;
             return true;
+        }
+
+        public void IncreaseCount(byte by)
+        {
+            Count += by;
+        }
+
+        public void DecreaseCount(byte by)
+        {
+            Count -= by;
+        }
+
+        public void SetCount(byte amount)
+        {
+            Count = amount;
         }
     }
 }

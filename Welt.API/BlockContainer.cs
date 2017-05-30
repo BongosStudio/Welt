@@ -3,18 +3,23 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Welt.API
 {
-    public abstract class BlockContainer
+    public abstract class BlockContainer : IList<ItemStack>
     {
-        private readonly ItemStack[] m_Collection;
+        private readonly List<ItemStack> m_Collection;
+
+        public int Count => m_Collection.Count;
+
+        public bool IsReadOnly => false;
 
         protected BlockContainer(byte slotCount)
         {
-            m_Collection = new ItemStack[slotCount];
+            m_Collection = new List<ItemStack>(slotCount);
         }
 
         public ItemStack this[int index]
@@ -29,7 +34,7 @@ namespace Welt.API
 
         public virtual bool CanMoveTo(ItemStack stack, byte index)
         {
-            return index < m_Collection.Length && m_Collection[index].TryMerge(ref stack);
+            return index < m_Collection.Count && m_Collection[index].TryMerge(ref stack);
         }
 
         public virtual bool TryMerge(ref ItemStack stack)
@@ -66,6 +71,51 @@ namespace Welt.API
                     break;
             }
             return null;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return m_Collection.GetEnumerator();
+        }
+
+        public int IndexOf(ItemStack item)
+        {
+            return m_Collection.IndexOf(item);
+        }
+
+        public void Insert(int index, ItemStack item)
+        {
+            m_Collection.Insert(index, item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            m_Collection.RemoveAt(index);
+        }
+
+        public void Add(ItemStack item)
+        {
+            m_Collection.Add(item);
+        }
+
+        public void Clear()
+        {
+            m_Collection.Clear();
+        }
+
+        public bool Contains(ItemStack item)
+        {
+            return m_Collection.Contains(item);
+        }
+
+        public void CopyTo(ItemStack[] array, int arrayIndex)
+        {
+            m_Collection.CopyTo(array, arrayIndex);
+        }
+
+        public bool Remove(ItemStack item)
+        {
+            return m_Collection.Remove(item);
         }
 
         public event EventHandler CollectionChanged;

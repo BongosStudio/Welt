@@ -3,6 +3,8 @@
 #endregion
 
 
+using System.Diagnostics;
+
 namespace Welt
 {
     internal static class Program
@@ -18,6 +20,11 @@ namespace Welt
             {
                 game.Run();
             }
+            Logger.Close();
+
+#if DEBUG 
+            Process.Start("log.txt");
+#endif
         }
     }
 }

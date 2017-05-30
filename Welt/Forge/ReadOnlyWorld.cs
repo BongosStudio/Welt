@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Welt.Forge
     {
         internal World World { get; set; }
 
-        public Vector3I GetSpawnPoint() => World.SpawnPoint;
+        public Vector2 GetSpawnPoint() => World.SpawnPoint;
 
         public Block GetBlock(Vector3I position) => World.GetBlock(position);
         public Block GetBlock(uint x, uint y, uint z) => World.GetBlock(x, y, z);

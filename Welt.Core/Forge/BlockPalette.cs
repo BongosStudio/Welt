@@ -27,14 +27,16 @@ namespace Welt.Core.Forge
             }
         }
 
-        private BlockDataWrapper[,,] m_Blocks;
+        private ushort[,,] m_BlockIds;
+        private byte[,,] m_Metadatas;
         private int m_X;
         private int m_Y;
         private int m_Z;
 
         public BlockPalette(int width, int height, int depth)
         {
-            m_Blocks = new BlockDataWrapper[width, height, depth];
+            m_BlockIds = new ushort[width, height, depth];
+            m_Metadatas = new byte[width, height, depth];
             m_X = width;
             m_Y = height;
             m_Z = depth;
@@ -66,8 +68,8 @@ namespace Welt.Core.Forge
 
         public byte[] ToByteArray()
         {
-            var data = new List<byte>(m_Blocks.Length*3);
-            var length = m_Blocks.Length;
+            var data = new List<byte>(m_BlockIds.Length*3);
+            var length = m_BlockIds.Length;
             data.AddRange(BitConverter.GetBytes(length)); // 4 bytes
 
             for (var x = 0; x < m_X; x++)
@@ -76,9 +78,8 @@ namespace Welt.Core.Forge
                 {
                     for (var y = 0; y < m_Y; y++)
                     {
-                        var block = m_Blocks[x, y, z];
-                        data.AddRange(BitConverter.GetBytes(block.Id));
-                        data.Add(block.Metadata);
+                        data.AddRange(BitConverter.GetBytes(m_BlockIds[x, y, z]));
+                        data.Add(m_Metadatas[x, y, z]);
                     }
                 }
             }
@@ -110,12 +111,12 @@ namespace Welt.Core.Forge
 
         public ushort GetId(int x, int y, int z)
         {
-            return m_Blocks[x, y, z].Id;
+            return m_BlockIds[x, y, z];
         }
 
         public byte GetBlockMetadata(int x, int y, int z)
         {
-            return m_Blocks[x, y, z].Metadata;
+            return m_Metadatas[x, y, z];
         }
 
         public Vector3B GetBlockLight(int x, int y, int z)
@@ -160,26 +161,25 @@ namespace Welt.Core.Forge
         
         private Block GetBlockData(int x, int y, int z)
         {
-            var block = m_Blocks[x, y % m_Y, z];
-            return new Block(block.Id, block.Metadata);
+            return new Block(m_BlockIds[x, y % m_Y, z], m_Metadatas[x, y % m_Y, z]);
         }
 
         private Block GetBlockData(uint x, uint y, uint z)
         {
-            var block = m_Blocks[x, y % m_Y, z];
-            return new Block(block.Id, block.Metadata);
+            return new Block(m_BlockIds[x, y % m_Y, z], m_Metadatas[x, y % m_Y, z]);
         }
         
         private void SetBlockData(int x, int y, int z, Block value)
         {
-            m_Blocks[x, y % m_Y, z] = new BlockDataWrapper(value.Id, value.Metadata);
+            m_BlockIds[x, y % m_Y, z] = value.Id;
+            m_Metadatas[x, y % m_Y, z] = value.Metadata;
             
         }
 
         private void SetBlockData(uint x, uint y, uint z, Block value)
         {
-            m_Blocks[x, y % m_Y, z] = new BlockDataWrapper(value.Id, value.Metadata);
-
+            m_BlockIds[x, y % m_Y, z] = value.Id;
+            m_Metadatas[x, y % m_Y, z] = value.Metadata;
         }
 
         private int GetIndex(int x, int y, int z)

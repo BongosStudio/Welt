@@ -28,6 +28,7 @@ namespace Welt.Core.Forge
         public virtual bool IsOpaque => true;
         public virtual bool WillRenderSameNeighbor => !IsOpaque;
         public virtual bool IsSolid => true;
+        public virtual bool IsSelectable => true;
 
         public virtual bool WillRenderOpaque => IsOpaque;
 

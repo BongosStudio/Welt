@@ -78,10 +78,11 @@ namespace Welt.Forge.Renderers
         private void ProcessChunk(ReadOnlyWorld world, ReadOnlyChunk chunk, RenderState state)
         {
             state.Clear();
-            for (var x = 0; x < Chunk.Width; x++)
+            for (var x = Chunk.Width; x >= 0; x--)
             {
-                for (var z = 0; z < Chunk.Depth; z++)
+                for (var z = Chunk.Depth; z >= 0; z--)
                 {
+                    //var maxy = chunk.Chunk.GetHeight(
                     for (var y = 0; y < Chunk.Height; y++)
                     {
                         var coords = new Vector3I(x, y, z);

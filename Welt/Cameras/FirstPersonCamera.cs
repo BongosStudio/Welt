@@ -44,6 +44,8 @@ namespace Welt.Cameras
             }
         }
 
+        public Matrix RotationMatrix => m_RotationMatrix;
+
         public Vector3 LookVector { get; private set; }
         public float VerticalLookSensitivity { get; set; } = 0.8f;
         public float HorizontalLookSensitivity { get; set; } = 0.8f;
@@ -64,12 +66,12 @@ namespace Welt.Cameras
 
         protected override void CalculateView()
         {
-            var rotationMatrix = Matrix.CreateRotationX(m_UpDownRotation)*Matrix.CreateRotationY(m_LeftRightRotation);
-            LookVector = Vector3.Transform(Vector3.Forward, rotationMatrix);
+            m_RotationMatrix = Matrix.CreateRotationX(m_UpDownRotation)*Matrix.CreateRotationY(m_LeftRightRotation);
+            LookVector = Vector3.Transform(Vector3.Forward, m_RotationMatrix);
 
             Target = Position + LookVector;
 
-            var cameraRotatedUpVector = Vector3.Transform(Vector3.Up, rotationMatrix);
+            var cameraRotatedUpVector = Vector3.Transform(Vector3.Up, m_RotationMatrix);
             View = Matrix.CreateLookAt(Position, Target, cameraRotatedUpVector);
             
             base.CalculateView();
@@ -132,6 +134,7 @@ namespace Welt.Cameras
         private const float ROTATION_SPEED = 0.05f;
         private float m_LeftRightRotation;
         private float m_UpDownRotation;
+        private Matrix m_RotationMatrix;
 
         #endregion
     }

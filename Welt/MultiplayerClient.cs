@@ -222,6 +222,18 @@ namespace Welt
             Client.SendMessage(message, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
+        public void PlaceCurrentBlock(Vector3I position)
+        {
+            World.SetBlock(position, SelectedItem.Block);
+            OnChunkModified(new ChunkEventArgs(World.GetChunk(position % 16)));
+        }
+
+        public void BreakBlock(Vector3I position)
+        {
+            World.SetBlock(position, new Block());
+            OnChunkModified(new ChunkEventArgs(World.GetChunk(position % 16)));
+        }
+
         public void OnPropertyChanged([CallerMemberName] string property = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));

@@ -13,6 +13,7 @@ namespace Welt.Core.Forge.BlockProviders
 
         public override string DisplayName => "Air";
         public override bool IsSolid => false;
+        public override bool IsSelectable => false;
         public override bool IsOpaque => false;
         public override bool WillRenderOpaque => IsOpaque;
         public override bool WillRenderSameNeighbor => true;

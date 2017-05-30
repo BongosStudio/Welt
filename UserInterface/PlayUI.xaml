@@ -23,8 +23,9 @@
         <TextBlock Margin="0,0,150,87" TextWrapping="Wrap" Text="{Binding ChatBoxText}" VerticalAlignment="Bottom" Height="66"/>
         <TextBox Height="37" Margin="0,0,150,50" TextWrapping="Wrap" Text="{Binding ChatBoxInput}" VerticalAlignment="Bottom" IsEnabled="{Binding IsChatBoxSelected}" Visibility="Collapsed"/>
 
-        <Border BorderBrush="#FF36558F" BorderThickness="4,0,0,0" HorizontalAlignment="Right" Margin="0,21,26,0" VerticalAlignment="Top" Opacity="{Binding TooltipOpacity}">
+        <Border BorderBrush="#FF36558F"  BorderThickness="4,0,0,0" HorizontalAlignment="Right" Margin="20,20,20,0" VerticalAlignment="Top" Opacity="{Binding TooltipOpacity}">
             <TextBlock  Padding="20,10,20,10" TextWrapping="Wrap" Background="#B2000000" Foreground="White" Text="{Binding TooltipText}"/>
         </Border>
+        <TextBlock HorizontalAlignment="Left" Margin="10,57,0,0" TextWrapping="Wrap" Text="{Binding LookingAt}" VerticalAlignment="Top"/>
     </Grid>
 </ek:UIRoot>

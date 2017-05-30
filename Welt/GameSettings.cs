@@ -17,8 +17,6 @@ namespace Welt
         public Keys JumpKey { get; set; } = Keys.Space;
         public Keys CrouchKey { get; set; } = Keys.LeftControl;
         public Keys SprintKey { get; set; } = Keys.LeftShift;
-        public Keys LeanLeftKey { get; set; } = Keys.Q;
-        public Keys LeanRightKey { get; set; } = Keys.E;
         public Keys Hotbar0 { get; set; } = Keys.D1;
         public Keys Hotbar1 { get; set; } = Keys.D2;
         public Keys Hotbar2 { get; set; } = Keys.D3;
@@ -29,7 +27,9 @@ namespace Welt
         public Keys Hotbar7 { get; set; } = Keys.D8;
         public Keys Hotbar8 { get; set; } = Keys.D9;
         public Keys Hotbar9 { get; set; } = Keys.D0;
-        public Keys InteractKey { get; set; } = Keys.F;
+        public Keys FlightKey { get; set; } = Keys.F;
+        public Keys InventoryKey { get; set; } = Keys.R;
+        public Keys InteractKey { get; set; } = Keys.E;
 
         /* Mouse */
         public bool IsMouseRightHanded { get; set; } = true;

@@ -14,7 +14,7 @@ namespace Welt.API.Forge
         int Size { get; }
         Vector3B Position { get; }
         int TimeOfDay { get; set; }
-        Vector3I SpawnPoint { get; set; }
+        Vector2 SpawnPoint { get; set; }
         WorldType WorldType { get; }
         Action<object, ChunkLoadedEventArgs> ChunkGenerated { get; set; }
         Action<object, ChunkLoadedEventArgs> ChunkLoaded { get; set; }

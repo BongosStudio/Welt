@@ -24,6 +24,9 @@ using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Welt.Core.Extensions;
+using Welt.API.Forge;
+using Welt.Core;
 
 namespace Welt.Scenes
 {
@@ -31,32 +34,22 @@ namespace Welt.Scenes
     {
         public static PlayScene Instance;
 
-        private PlayUI m_PlayUi => new PlayUI
+        private PlayUI PlayUI => new PlayUI
         {
             DataContext = m_PlayViewModel
         };
-        private Pause m_PauseUi => new Pause
+        private Pause PauseUI => new Pause
         {
-            DataContext = new PauseViewModel
-            {
-                ResumeButtonCommand = 
-                new Action(SwitchToPlayUi).CreateButtonCommand(),
-                OptionsButtonCommand = 
-                new Action(SwitchToSettingsUi).CreateButtonCommand(),
-                QuitButtonCommand = 
-                new Action(() => Next(new MainMenuScene(Game))).CreateButtonCommand()
-            }
+            DataContext = m_PauseViewModel
         };
-        private SettingsMenu m_SettingsUi => new SettingsMenu
+        private SettingsMenu SettingsUI => new SettingsMenu
         {
-            DataContext = new SettingsModel
-            {
-                ExitCommand =
-                new Action(SwitchToPauseUi).CreateButtonCommand()
-            }
+            DataContext = m_SettingsViewModel
         };
 
         private PlayViewModel m_PlayViewModel = new PlayViewModel();
+        private PauseViewModel m_PauseViewModel = new PauseViewModel();
+        private SettingsModel m_SettingsViewModel = new SettingsModel();
         
         private HudRenderer m_Hud;
         private PlayerRenderer m_PlayerRenderer;
@@ -72,7 +65,7 @@ namespace Welt.Scenes
 
         public PlayScene(WeltGame game, ChunkComponent chunks, SkyComponent sky, PlayerRenderer player) : base(game)
         {   
-            UI = m_PlayUi;
+            UI = PlayUI;
             m_ChunkComp = chunks;
             m_SkyComp = sky;
             m_PlayerRenderer = player;
@@ -111,25 +104,6 @@ namespace Welt.Scenes
         {
             if (tooltip == null) return;
             m_TooltipQueue.Enqueue(tooltip);
-            //m_TooltipQueue.Enqueue(tooltip);
-            //new Thread(() =>
-            //{
-            //    m_PlayViewModel.TooltipOpacity = 0;
-            //    m_PlayViewModel.TooltipText = m_TooltipQueue.Dequeue();
-            //    while(m_PlayViewModel.TooltipOpacity < 1)
-            //    {
-            //        m_PlayViewModel.TooltipOpacity += 0.05;
-            //        Thread.Sleep(20);
-            //    }
-
-            //    Thread.Sleep(3000);
-            //    while(m_PlayViewModel.TooltipOpacity > 0)
-            //    {
-            //        m_PlayViewModel.TooltipOpacity -= 0.05;
-            //        Thread.Sleep(100);
-            //    }
-            //})
-            //{ IsBackground = true }.Start();
         }
 
         #region Initialize
@@ -142,17 +116,109 @@ namespace Welt.Scenes
         /// </summary>
         public override void Initialize()
         {
+            RegisterViewModels();
             // all world/sky renderers will be initialized before this in the loading scene
             m_PlayerRenderer.Initialize();
             m_Hud.Initialize();
-            m_PlayerRenderer.Player._Position = Game.Client.World.GetSpawnPoint();
+            //m_PlayerRenderer.Player._Position = m_PlayerRenderer.Player.World.World.GetSpawnPosition();
             m_Fps.Initialize();
-            Input.Assign(() => m_PlayerRenderer.Player.IsFlying = !m_PlayerRenderer.Player.IsFlying, Keys.F);
-            //Input.Assign(() => m_PlayerRenderer.Player.IsPaused = !m_PlayerRenderer.Player.IsPaused, Keys.Escape);
+            SwitchToPlayUi();
+
+            m_PlayerRenderer.Player.Inventory = new InventoryContainer
+            {
+                new ItemStack(new Block(BlockType.DIRT)),
+                new ItemStack(new Block(BlockType.STONE))
+            };
+
+            Input.RegisterHandler(ToggleFlight, InputController.InputAction.Flight);
+            Input.RegisterHandler(TogglePause, InputController.InputAction.Escape);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 0); }, InputController.InputAction.Hotbar0);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 1); }, InputController.InputAction.Hotbar1);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 2); }, InputController.InputAction.Hotbar2);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 3); }, InputController.InputAction.Hotbar3);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 4); }, InputController.InputAction.Hotbar4);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 5); }, InputController.InputAction.Hotbar5);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 6); }, InputController.InputAction.Hotbar6);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 7); }, InputController.InputAction.Hotbar7);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 8); }, InputController.InputAction.Hotbar8);
+            Input.RegisterHandler((client) => { return ToggleSelection(client, 9); }, InputController.InputAction.Hotbar9);
+            Input.RegisterHandler(HitAction, InputController.InputAction.Hit);
+            Input.RegisterHandler(PlaceAction, InputController.InputAction.Place);
+
             Game.ShowTooltip("Welcome to Welt!");
             Game.ShowTooltip("To move around, you can use the standard WSAD controls.");
-            Game.ShowTooltip("To leave flight-mode, press F.");
-            Game.ShowTooltip("To run, press Left Shift. To jump, press Spacebar. In flight-mode, these are your ascend and decend controls.");
+            Game.ShowTooltip($"To leave flight-mode, press {Input.GetKeyFor(InputController.InputAction.Flight)}.");
+            Game.ShowTooltip($"To run, press {Input.GetKeyFor(InputController.InputAction.Sprint)}. " +
+                $"To jump, press {Input.GetKeyFor(InputController.InputAction.Jump)}. " +
+                $"In flight-mode, these are your ascend and decend controls.");
+        }
+
+        #endregion
+
+        private void UpdateViewModels()
+        {
+            m_PlayViewModel.LookingAt = $"{m_PlayerRenderer.Player.BlockRepository.GetBlockProvider(m_PlayerRenderer.LookingAt.Id).Name}";
+            m_PlayViewModel.SelectedItemName = m_PlayerRenderer.Player.BlockRepository.GetBlockProvider(m_PlayerRenderer.Player.SelectedItem.Block.Id).Name;
+            
+            // TODO: copy settings over to viewmodel
+        }
+
+        private void RegisterViewModels()
+        {
+            m_PlayViewModel = new PlayViewModel
+            {
+                   
+            };
+            m_PauseViewModel = new PauseViewModel
+            {
+                ResumeButtonCommand =
+                new Action(SwitchToPlayUi).CreateButtonCommand(),
+                OptionsButtonCommand =
+                new Action(SwitchToSettingsUi).CreateButtonCommand(),
+                QuitButtonCommand =
+                new Action(() => Next(new MainMenuScene(Game))).CreateButtonCommand()
+            };
+            m_SettingsViewModel = new SettingsModel
+            {
+                ExitCommand =
+                new Action(SwitchToPauseUi).CreateButtonCommand()
+            };
+        }
+
+        #region Input Handlers
+
+        private static bool ToggleFlight(MultiplayerClient client)
+        {
+            //TODO: check permission
+            client.IsFlying = !client.IsFlying;
+            return true;
+        }
+
+        private bool TogglePause(MultiplayerClient client)
+        {
+            client.IsPaused = !client.IsPaused;
+            if (client.IsPaused) SwitchToPauseUi();
+            else SwitchToPlayUi();
+            return true;
+        }
+
+        private static bool ToggleSelection(MultiplayerClient client, int index)
+        {
+            FastMath.Adjust(0, client.Inventory.Count - 1, ref index);
+            client.HotbarSelection = index;
+            return true;
+        }
+
+        private bool HitAction(MultiplayerClient client)
+        {
+            client.BreakBlock(m_PlayerRenderer.LookingAtPosition);
+            return true;
+        }
+
+        private bool PlaceAction(MultiplayerClient client)
+        {
+            client.PlaceCurrentBlock(m_PlayerRenderer.LookingAtNeighbor);
+            return true;
         }
 
         #endregion
@@ -199,8 +265,8 @@ namespace Welt.Scenes
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         public override void Update(GameTime gameTime)
         {
-
             WeltGame.Instance.IsMouseVisible = Game.Client.IsPaused;
+            UpdateViewModels();
             if (Game.IsActive)
             {
                 Input.Update(gameTime);
@@ -208,7 +274,6 @@ namespace Welt.Scenes
                 m_ChunkComp.Update(gameTime);
                 m_PlayerRenderer.Update(gameTime);
                 m_Fps.Update(gameTime);
-                // this needs to go last
                 ShowNextTooltip();
             }
         }
@@ -245,18 +310,18 @@ namespace Welt.Scenes
        
         private void SwitchToPlayUi()
         {
-            UI = m_PlayUi;
+            UI = PlayUI;
             Game.Client.IsPaused = false;
         }
 
         private void SwitchToPauseUi()
         {
-            UI = m_PauseUi;
+            UI = PauseUI;
         }
 
         private void SwitchToSettingsUi()
         {
-            UI = m_SettingsUi;
+            UI = SettingsUI;
         }
 
         #endregion

@@ -33,9 +33,9 @@ namespace Welt.Cameras
             m_Viewport = graphicsDevice.Viewport;
             CameraController = new FirstPersonCameraController(new FirstPersonCamera(m_Viewport));
             m_Fog = new FogRenderer(graphicsDevice);
-            m_Input = InputController.CreateDefault();
             m_LeftClickCooldown = TimeSpan.Zero;
             m_RightClickCooldown = TimeSpan.Zero;
+            m_Input = InputController.Instance;
         }
 
         public void Initialize()
@@ -63,12 +63,11 @@ namespace Welt.Cameras
         {
             CameraController.Update(gameTime);
             UpdatePosition(gameTime);
+            CalculateLookAt();
             var hb = GetPlayerHeadBob();
             var headbobOffset = (float)(Math.Sin(Player.HeadBob) * hb.Size + 0.15f) * hb.Speed;
-            CameraController.Camera.Position = Player.Position + new Vector3(0, headbobOffset, 0);
-            var mouseState = m_Input.GetMouseState();
-            
-            m_ForceUpdate = false;
+            if (Player.IsPlayerInWater() || Player.IsFlying) headbobOffset = 0;
+            CameraController.Camera.Position = Player.Position + new Vector3(0, headbobOffset + 0.7f, 0);
         }
 
         #endregion
@@ -90,14 +89,10 @@ namespace Welt.Cameras
         public FirstPersonCameraController CameraController { get; }
 
         private readonly FogRenderer m_Fog;
-
-        private Vector3 m_LookVector;
+        
         private readonly InputController m_Input;
         private readonly GraphicsDevice m_GraphicsDevice;
         private readonly Viewport m_Viewport;
-
-        private const float MOVEMENTSPEED = 0.25f;
-        private const float JUMPSPEED = 6f;
 
         // SelectionBlock
         public Model SelectionBlock;
@@ -105,7 +100,9 @@ namespace Welt.Cameras
         private Texture2D m_SelectionBlockTexture;
         private TimeSpan m_LeftClickCooldown;
         private TimeSpan m_RightClickCooldown;
-        private bool m_ForceUpdate;
+        public Vector3I LookingAtPosition;
+        public Vector3I LookingAtNeighbor;
+        public Block LookingAt { get; private set; }
         public bool FreeCam;
 
         #endregion
@@ -120,18 +117,41 @@ namespace Welt.Cameras
             
         }
 
+        private void CalculateLookAt()
+        {
+            var lookVector = Camera.LookVector;
+            for (var i = 0.5f; i < 8; i += 0.1f)
+            {
+                var check = Camera.Position + (Camera.RotationMatrix.Forward * i);
+                var block = Player.World.GetBlock(check);
+                var provider = Player.BlockRepository.GetBlockProvider(block.Id);
+                if (!provider.IsSelectable) continue;
+                if (!provider.GetBoundingBox(block.Metadata).HasValue) continue;
+                var b = provider.GetBoundingBox(block.Metadata).Value.OffsetBy(check.Floor());
+                if (b.Contains(check) != ContainmentType.Contains) continue;
+                CalculateLookAtFace(i);
+                LookingAtPosition = check;
+                LookingAt = block;
+                return;
+            }
+            LookingAt = new Block();
+        }
+
+        private void CalculateLookAtFace(float x)
+        {
+            for (var i = x; i > 0.7f; i -= 0.1f)
+            {
+                var check = Camera.Position + (Camera.RotationMatrix.Forward * i);
+                var block = Player.World.GetBlock(check);
+                var provider = Player.BlockRepository.GetBlockProvider(block.Id);
+                if (provider.IsSelectable) continue;
+                LookingAtNeighbor = check;
+                return;
+            }
+            LookingAtNeighbor = Vector3.Zero;
+        }
+
         private void DrawSelectionBlockMesh(GraphicsDevice graphicsdevice, ModelMesh mesh, Effect effect)
-        {
-            
-        }
-
-        private float SetPlayerSelectedBlock(bool waterSelectable)
-        {
-            
-            return 0;
-        }
-
-        private void SetPlayerAdjacentSelectedBlock(float xStart)
         {
             
         }
@@ -143,6 +163,7 @@ namespace Welt.Cameras
             if (Player.Entity.IsCrouching) return (0.01f, 0.5f);
             if (Player.Entity.IsSprinting) return (0.1f, 1);
             if (Player.IsPlayerInWater()) return (0, 0);
+            if (Player.IsFlying) return (0, 0);
             return (0.05f, 0.75f);
 
         }
@@ -176,7 +197,10 @@ namespace Welt.Cameras
                 FastMath.Adjust(-20, 20, ref newVelocityZ);
                 Player.Velocity = new Vector3(newVelocityX, newVelocityY, newVelocityZ);
             }
-
+            else
+            {
+                Player.Velocity = Vector3.Zero;
+            }
             
             var moveVector = new Vector3(0, 0, 0);
             if (!Player.IsPaused)
@@ -184,23 +208,23 @@ namespace Welt.Cameras
                 var keyState = Keyboard.GetState();
                 if (keyState.GetPressedKeys().Length == 0) return;
 
-                if (keyState.IsKeyDown(Keys.W))
+                if (m_Input.IsInputPressed(InputController.InputAction.MoveForward))
                 {
                     moveVector += Vector3.Forward;
                 }
-                if (keyState.IsKeyDown(Keys.S))
+                if (m_Input.IsInputPressed(InputController.InputAction.MoveBackward))
                 {
                     moveVector += Vector3.Backward;
                 }
-                if (keyState.IsKeyDown(Keys.A))
+                if (m_Input.IsInputPressed(InputController.InputAction.StrafeLeft))
                 {
                     moveVector += Vector3.Left;
                 }
-                if (keyState.IsKeyDown(Keys.D))
+                if (m_Input.IsInputPressed(InputController.InputAction.StrafeRight))
                 {
                     moveVector += Vector3.Right;
                 }
-                if (keyState.IsKeyDown(Keys.LeftShift))
+                if (m_Input.IsInputPressed(InputController.InputAction.Sprint))
                 {
                     if (Player.IsFlying)
                     {
@@ -211,7 +235,7 @@ namespace Welt.Cameras
                         Player.Entity.IsSprinting = true;
                     }
                 }
-                if (keyState.IsKeyDown(Keys.Space))
+                if (m_Input.IsInputPressed(InputController.InputAction.Jump))
                 {
                     if (Player.IsFlying || Player.IsPlayerInWater())
                     {
@@ -263,8 +287,8 @@ namespace Welt.Cameras
 
             // Apply this test vector.
             var movePosition = Player.Position + testVector;
-            var midBodyPoint = movePosition;
-            var lowerBodyPoint = movePosition + new Vector3(0, -0.4f, 0);
+            var midBodyPoint = movePosition + new Vector3(0, 0.5f, 0);
+            var lowerBodyPoint = movePosition - new Vector3(0, 0.5f, 0);
 
             var lowerBlock = Player.BlockRepository.GetBlockProvider(Player.World.GetBlock(lowerBodyPoint).Id);
             var midBlock = Player.BlockRepository.GetBlockProvider(Player.World.GetBlock(midBodyPoint).Id);
@@ -277,6 +301,12 @@ namespace Welt.Cameras
                 {
                     Player.HeadBob += 0.2;
                 }
+                return true;
+            }
+            else if (lowerBlock.Density >= 1 && midBlock.Density < 1)
+            {
+                Player.Velocity += new Vector3(0, 0.3f, 0);
+                Player.Position += new Vector3(0, 1.05f, 0);
                 return true;
             }
             return false;

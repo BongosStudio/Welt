@@ -6,76 +6,162 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Linq;
 
 namespace Welt.Controllers
 {
+    public delegate bool InputHandler(MultiplayerClient client);
+
     public class InputController
     {
-        private static readonly Dictionary<Keys, Action> m_Action = new Dictionary<Keys, Action>();
+        public static InputController Instance { get; private set; }
+        // keyboard
+        private Dictionary<InputAction, InputHandler> m_Handlers = new Dictionary<InputAction, InputHandler>();
+        private Dictionary<InputAction, bool> m_Status = new Dictionary<InputAction, bool>();
+        private Keys[] m_MappedKeys = new Keys[byte.MaxValue];
+        private KeyboardState m_Ks;
+        // mouse
+        private MouseState m_Ms;
+        private bool m_IsMouseRighthanded;
+        private TimeSpan m_LeftMouseReset = TimeSpan.Zero;
+        private TimeSpan m_RightMouseReset = TimeSpan.Zero;
+        private InputHandler m_LeftMouseHandler;
+        private InputHandler m_RightMouseHandler;
 
-        private double m_KeyCooldown;
-        private Keys m_LastKey;
-        private KeyboardState m_Keyboard;
-        private MouseState m_Mouse;
+        public WeltGame Game { get; }
 
         #region .ctor
 
-        public static InputController CreateDefault()
+        public InputController(WeltGame game)
         {
-            // TODO: apply action event mapping
-            m_Action.Clear();
-            return new InputController();
+            Game = game;
+            m_MappedKeys[(int)InputAction.Sprint] = game.GameSettings.SprintKey;
+            m_MappedKeys[(int)InputAction.MoveForward] = game.GameSettings.MoveForwardKey;
+            m_MappedKeys[(int)InputAction.MoveBackward] = game.GameSettings.MoveBackwardKey;
+            m_MappedKeys[(int)InputAction.StrafeLeft] = game.GameSettings.StrafeLeftKey;
+            m_MappedKeys[(int)InputAction.StrafeRight] = game.GameSettings.StrafeRightKey;
+            m_MappedKeys[(int)InputAction.Jump] = game.GameSettings.JumpKey;
+            m_MappedKeys[(int)InputAction.Crouch] = game.GameSettings.CrouchKey;
+            m_MappedKeys[(int)InputAction.OpenInventory] = game.GameSettings.InventoryKey;
+            m_MappedKeys[(int)InputAction.Interact] = game.GameSettings.InteractKey;
+            m_MappedKeys[(int)InputAction.Flight] = game.GameSettings.FlightKey;
+            m_MappedKeys[(int)InputAction.Hotbar0] = game.GameSettings.Hotbar0;
+            m_MappedKeys[(int)InputAction.Hotbar1] = game.GameSettings.Hotbar1;
+            m_MappedKeys[(int)InputAction.Hotbar2] = game.GameSettings.Hotbar2;
+            m_MappedKeys[(int)InputAction.Hotbar3] = game.GameSettings.Hotbar3;
+            m_MappedKeys[(int)InputAction.Hotbar4] = game.GameSettings.Hotbar4;
+            m_MappedKeys[(int)InputAction.Hotbar5] = game.GameSettings.Hotbar5;
+            m_MappedKeys[(int)InputAction.Hotbar6] = game.GameSettings.Hotbar6;
+            m_MappedKeys[(int)InputAction.Hotbar7] = game.GameSettings.Hotbar7;
+            m_MappedKeys[(int)InputAction.Hotbar8] = game.GameSettings.Hotbar8;
+            m_MappedKeys[(int)InputAction.Hotbar9] = game.GameSettings.Hotbar9;
+
+            m_IsMouseRighthanded = game.GameSettings.IsMouseRightHanded;
+
+            Instance = this;
+            m_Ks = Keyboard.GetState();
         }
 
-        #endregion
-
-        public MouseState GetMouseState()
+        public void Update(GameTime gameTime)
         {
-            m_Mouse = Mouse.GetState();
-            return m_Mouse;
-        }
-
-        public KeyboardState GetKeyboardState()
-        {
-            m_Keyboard = Keyboard.GetState();
-            return m_Keyboard;
-        }
-
-        public void Update(GameTime time)
-        {
-            GetKeyboardState();
-            m_KeyCooldown -= time.ElapsedGameTime.TotalMilliseconds;
-            foreach (var key in m_Keyboard.GetPressedKeys())
+            m_Ks = Keyboard.GetState();
+            if (m_Ks.GetPressedKeys().Length > 0)
             {
-                if (m_Action.TryGetValue(key, out var action))
+                foreach (var handler in m_Handlers)
                 {
-                    if (key != m_LastKey)
+                    if (IsInputPressed(handler.Key))
                     {
-                        m_KeyCooldown = 0;
+                        if (!m_Status[handler.Key])
+                        {
+                            handler.Value?.Invoke(Game.Client);
+                            m_Status[handler.Key] = true;
+                        }
+
                     }
-                    
-                    if (m_KeyCooldown <= 0)
-                        action.Invoke();
-                    m_KeyCooldown = 250; // we'll make it 250ms
-                    m_LastKey = key;
+                    else
+                    {
+                        m_Status[handler.Key] = false;
+                    }
                 }
+
+            }
+
+            m_Ms = Mouse.GetState();
+            if (m_LeftMouseReset > TimeSpan.Zero) m_LeftMouseReset -= gameTime.ElapsedGameTime;
+            if (m_RightMouseReset > TimeSpan.Zero) m_RightMouseReset -= gameTime.ElapsedGameTime;
+            if (m_Ms.LeftButton == ButtonState.Pressed)
+            {
+                if (m_LeftMouseReset <= TimeSpan.Zero)
+                {
+                    m_LeftMouseReset = TimeSpan.FromMilliseconds(500);
+                    m_LeftMouseHandler?.Invoke(Game.Client);
+                }
+            }
+            else
+            {
+                m_LeftMouseReset = TimeSpan.Zero;
+            }
+            if (m_Ms.RightButton == ButtonState.Pressed)
+            {
+                if (m_RightMouseReset <= TimeSpan.Zero)
+                {
+                    m_RightMouseReset = TimeSpan.FromMilliseconds(500);
+                    m_RightMouseHandler?.Invoke(Game.Client);
+                }
+            }
+            else
+            {
+                m_RightMouseReset = TimeSpan.Zero;
             }
         }
 
-        public void Assign(Action action, Keys keys)
+        public void RegisterHandler(InputHandler handler, InputAction action)
         {
-            m_Action.Add(keys, action);
+            switch (action)
+            {
+                case InputAction.Hit:
+                    if (m_IsMouseRighthanded)
+                        m_LeftMouseHandler = handler;
+                    else
+                        m_RightMouseHandler = handler;
+                    break;
+                case InputAction.Place:
+                    if (m_IsMouseRighthanded)
+                        m_RightMouseHandler = handler;
+                    else
+                        m_LeftMouseHandler = handler;
+                    break;
+                default:
+                    if (!m_Handlers.ContainsKey(action))
+                        m_Handlers.Add(action, handler);
+                    else
+                        m_Handlers[action] += handler;
+                    if (!m_Status.ContainsKey(action))
+                        m_Status.Add(action, false);
+                    break;
+            }
         }
 
-        public void Clear()
+        public void UnregisterHandler(InputHandler handler, InputAction action)
         {
-            m_Action.Clear();
+            if (m_Handlers.ContainsKey(action))
+                m_Handlers[action] -= handler;
         }
 
+        public Keys GetKeyFor(InputAction action)
+        {
+            return m_MappedKeys[(int)action];
+        }
+
+        public bool IsInputPressed(InputAction action)
+        {
+            return m_Ks.IsKeyDown(m_MappedKeys[(int)action]);
+        }
+        
+        #endregion
+        
         public enum InputAction
         {
-            Break,
-            Use,
             Sprint,
             MoveForward,
             MoveBackward,
@@ -84,8 +170,12 @@ namespace Welt.Controllers
             Jump,
             Crouch,
             OpenInventory,
+            Interact,
             Escape,
-
+            Flight,
+            Hotbar0, Hotbar1, Hotbar2, Hotbar3, Hotbar4, Hotbar5, Hotbar6, Hotbar7, Hotbar8, Hotbar9,
+            Hit,
+            Place
         }
     }
 }

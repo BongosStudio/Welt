@@ -74,6 +74,13 @@ namespace Welt.Cameras
             effectMatrices.Projection = Projection;
         }
 
+        public void ApplyTo(Effect effect)
+        {
+            Projection = CalculateProjection();
+            effect.Parameters["View"].SetValue(View);
+            effect.Parameters["Projection"].SetValue(Projection);
+        }
+
         #region Fields
 
         protected Vector3 _position = Vector3.Zero;

@@ -74,13 +74,14 @@ namespace Welt.Handlers
         public static void HandleSpawnPosition(IPacket _packet, MultiplayerClient client)
         {
             var packet = (SpawnPositionPacket)_packet;
-            client.World.World.SpawnPoint = new Vector3I(packet.X, packet.Y, packet.Z);
+            client.World.World.SpawnPoint = new Vector2(packet.X, packet.Z);
         }
 
         public static void HandleSetPlayerPosition(IPacket _packet, MultiplayerClient client)
         {
             var packet = (SetPlayerPositionPacket)_packet;
             client._Position = new Vector3(packet.X, packet.Y, packet.Z);
+            Console.WriteLine($"Set player position to {client._Position}");
             //client.QueuePacket(packet);
             client.IsLoggedIn = true;
             // TODO: Pitch and yaw

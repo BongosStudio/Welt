@@ -26,7 +26,13 @@ namespace Welt.Scenes
         ///     will be deleted when the next scene is initialized.
         /// </summary>
         private static readonly Dictionary<string, object> m_Cookies = new Dictionary<string, object>();
+        protected static InputController Input { get; set; }
         protected List<ILogicComponent> Components = new List<ILogicComponent>();
+
+        static Scene()
+        {
+            Input = new InputController(WeltGame.Instance);
+        }
 
         protected Scene(WeltGame game)
         {
@@ -34,7 +40,6 @@ namespace Welt.Scenes
             GraphicsDevice = game.GraphicsDevice;
             IsEnabled = true;
             Opacity = 1;
-            Input = InputController.CreateDefault();
         }
 
         ~Scene()
@@ -60,7 +65,6 @@ namespace Welt.Scenes
         internal abstract UIRoot UI { get; set; }
         internal virtual Color BackColor { get; } = Color.CornflowerBlue;
 
-        protected InputController Input { get; set; }
 
         private bool m_IsDisposed;
 
@@ -149,6 +153,7 @@ namespace Welt.Scenes
             //    c.Update(time);
             //}
             Update(time);
+            Input.Update(time);
             if (Game.IsActive)
                 UI.Update(time);
         }

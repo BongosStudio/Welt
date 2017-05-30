@@ -57,6 +57,17 @@ sampler BlockTextureSampler = sampler_state
 	AddressV = WRAP;
 };
 
+texture ReflectionTexture;
+sampler ReflectionTextureSampler = sampler_state
+{
+    texture = <ReflectionTexture>;
+    magfilter = POINT;
+    minfilter = POINT;
+    mipfilter = POINT;
+    AddressU = WRAP;
+    AddressV = WRAP;
+};
+
 texture ColorTexture;
 sampler ColorMap = sampler_state
 {
@@ -79,13 +90,6 @@ struct VertexShaderOutput
 	float Distance : TEXCOORD2;
 	float4 Color : COLOR0;
 	float Effect : BLENDWEIGHT1;
-};
-
-struct PixelShaderOutput
-{
-	half4 Color : COLOR0;
-	half4 Normal : COLOR1;
-	half4 Depth : COLOR2;
 };
 
 int LFSR_Rand_Gen(int n)
@@ -206,6 +210,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 outputFogColor;
 
 	color.rgb = texColor1.rgb * input.Color.rgb;
+    //color.r /= saturate((input.Distance - 50) / -25);
+    //color.b /= saturate((input.Distance - 50) / 25);
 	if (IsUnderWater)
 	{
 		float vis = saturate((input.Distance - 50) / -25);
@@ -218,7 +224,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	switch (input.Effect)
 	{
 		case 1:
-            //float4 reflColor = tex2D(ReflectionTextureSampler, input.Position.xz);
+            float4 reflColor = tex2D(ReflectionTextureSampler, input.Position.xz);
             //color.rgb *= reflColor;
 			break;
 		default:
@@ -251,7 +257,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 
 	outputFogColor = lerp(FogColor, topColor, saturate((input.TexCoords1.y) / 0.9f));
 
-	return lerp(FogColor, color, fog);
+	return lerp(outputFogColor, color, fog);
 
 }
 

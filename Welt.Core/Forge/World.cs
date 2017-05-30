@@ -36,7 +36,7 @@ namespace Welt.Core.Forge
             Name = name;
             Seed = 54321;
             WaterLevel = 50;
-            SpawnPoint = new Vector3I(FastMath.NextRandom(Size)*Chunk.Width, 128, FastMath.NextRandom(Size)*Chunk.Depth);
+            SpawnPoint = new Vector2(FastMath.NextRandom(Size)*Chunk.Width, FastMath.NextRandom(Size)*Chunk.Depth);
             Generator = new WorldGenerator(this);
             var bSys = new BiomeSystem(this);
             bSys.RegisterBiome<MountainBiome>(new HillGenerator(), null);
@@ -52,8 +52,8 @@ namespace Welt.Core.Forge
 
         public bool InView(uint x, uint y, uint z)
         {
-            if (ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z, false) == null)
-                return false;
+            //if (ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z, false) == null)
+            //    return false;
 
             var lx = x % Chunk.Size.X;
             var ly = y % Chunk.Size.Y;
@@ -109,7 +109,7 @@ namespace Welt.Core.Forge
         /// <summary>
         ///     The spawn chunk of the world. 
         /// </summary>
-        public Vector3I SpawnPoint { get; set; }
+        public Vector2 SpawnPoint { get; set; }
 
         // Day/Night
         public int TimeOfDay { get; set; } = 1200;
@@ -199,6 +199,7 @@ namespace Welt.Core.Forge
                 return new Block(BlockType.NONE);
             //TODO blocktype.unknown ( with matrix films green symbols texture ? ) 
             var chunk = ChunkManager.GetChunk(x / Chunk.Size.X, 0, z / Chunk.Size.Z);
+            if (chunk == null) return new Block();
             return chunk.GetBlock(x % Chunk.Width, y, z % Chunk.Depth);
         }
 

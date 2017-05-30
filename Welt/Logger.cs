@@ -2,24 +2,30 @@
 // COPYRIGHT 2016 JUSTIN COX (CONJI)
 #endregion
 
+using System.IO;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Welt
 {
     public static class Logger
     {
-        private static readonly Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
-            ProtocolType.Udp);
+        private static FileStream m_Stream;
 
-        private static string _toSend;
         public static void Create()
         {
-            // TODO: because I can't think of how to do this shit
+            m_Stream = File.OpenWrite("log.txt");
         }
 
         public static void WriteLine(string input)
         {
-            _toSend = input;
+            var buffer = Encoding.UTF8.GetBytes(input + "\r\n");
+            m_Stream.Write(buffer, 0, buffer.Length);
+        }
+
+        public static void Close()
+        {
+            m_Stream.Dispose();
         }
     }
 }

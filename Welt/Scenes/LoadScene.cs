@@ -57,7 +57,7 @@ namespace Welt.Scenes
 
                 while (Game.Client.World.World == null) { }
 
-                while (Game.Client.World.GetChunks().Length < 5)
+                while (Game.Client.World.GetChunks().Length < Game.GameSettings.RenderDistance)
                 {
                     m_ViewModel.LoadingStatusText = "Loading world...";
                 }
@@ -74,6 +74,13 @@ namespace Welt.Scenes
                 chunks.LoadContent(Game.Content);
                 chunks.Initialize();
                 sky.Initialize();
+
+                while(chunks.Renderer.Rendered < Game.GameSettings.RenderDistance*2)
+                {
+
+                }
+
+                chunks.FlushIncoming();
 
                 m_ViewModel.LoadingStatus++;
                 m_ViewModel.LoadingStatusText = "Simulating world...";
